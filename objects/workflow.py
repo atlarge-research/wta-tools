@@ -26,6 +26,7 @@ class Workflow(object):
         self.domain = workflow_domain  # The domain the workflow belongs to, e.g. industrial, scientific, etc.
         self.application_name = workflow_application_name  # The name of the application, e.g. Montage, SIPHT
         self.application_field = workflow_appliation_field  # The field of the application, e.g. bioinformatics, astronomy
+        # TODO or resource_amount_assgined ?
         self.total_resources = sum(t.resource_amount_requested for t in tasks)  # Total number of resources
         self.total_memory_usage = sum(max(t.memory_requested, 0.0) for t in
                                       tasks)  # Total amount of memory allocated/consumed by all tasks in this workflow

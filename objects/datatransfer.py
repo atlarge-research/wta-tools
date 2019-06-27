@@ -1,5 +1,6 @@
 import json
 import os
+from collections import OrderedDict
 
 import numpy as np
 
@@ -38,6 +39,24 @@ class Datatransfer(object):
             "events": self.events,
             "version": self._version,
         }
+
+    @staticmethod
+    def get_parquet_meta_dict():
+        type_info = {
+            "id": np.int64,
+            "type": np.str,
+            "ts_submit": np.int64,
+            "transfertime": np.int64,
+            "source": np.int64,
+            "destination": np.int64,
+            "size": np.int64,
+            "size_unit": np.str,
+            "events": np.str,
+        }
+
+        ordered_dict = OrderedDict(sorted(type_info.items(), key=lambda t: t[0]))
+
+        return ordered_dict
 
     def get_parquet_dict(self):
         return {

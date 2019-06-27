@@ -49,7 +49,7 @@ class Workload(object):
 
         # Network consumption statistics
         network_usage_list = pd.Series(
-            [task.network_io_time for wf in workflows for task in wf.tasks if task.network_usage != -1])
+            [task.network_io_time for wf in workflows for task in wf.tasks if task.network_io_time != -1])
         self.min_network_io_time = float(network_usage_list.min()) if not network_usage_list.empty else -1
         self.max_network_io_time = float(network_usage_list.max()) if not network_usage_list.empty else -1
         self.std_network_io_time = float(network_usage_list.std()) if not network_usage_list.empty else -1
@@ -63,7 +63,7 @@ class Workload(object):
 
         # Disk space consumption statistics
         disk_space_usage_list = pd.Series(
-            [task.disk_space_usage for wf in workflows for task in wf.tasks if task.disk_space_usage != -1])
+            [task.disk_space_requested for wf in workflows for task in wf.tasks if task.disk_space_requested != -1])
         self.min_disk_space_usage = float(disk_space_usage_list.min()) if not disk_space_usage_list.empty else -1
         self.max_disk_space_usage = float(disk_space_usage_list.max()) if not disk_space_usage_list.empty else -1
         self.std_disk_space_usage = float(disk_space_usage_list.std()) if not disk_space_usage_list.empty else -1
