@@ -45,14 +45,22 @@ def task_info_from_line(line, workflow_start, workflow_index):
     workflow_id = mmh3.hash64("workflow:{}".format(workflow_index))[0]
     task_id = mmh3.hash64("workflow:{}_task:{}".format(workflow_index, int(cols[0])))[0]
 
-    submit_time = abs(workflow_start - float(cols[1])) * 1000
+    task_submit_time = int(cols[1])
     wait_time = float(cols[2])
+
+    # Weird bug in the trace, sometimes the task submit time is -1, but then the
+    # wait time is the unix timestamp...
+    if task_submit_time == -1 and wait_time > 1000000000000:
+        task_submit_time = wait_time
+        wait_time = -1
+
+    submit_time = workflow_start - task_submit_time
 
     if not submit_time:
         return None, None
 
     site_id = mmh3.hash64("site:{}".format(str(cols[16]).strip()))[0]
-    run_time = float(cols[3]) * 1000
+    run_time = int(cols[3])
     n_procs = int(cols[4])
     req_n_procs = int(n_procs)
     used_memory = float(cols[6])
@@ -106,6 +114,7 @@ def parse_askalon_file(askalon_file):
     os.makedirs(TARGET_DIR, exist_ok=True)
 
     workflow_index = 0
+    invalid_workflow_count = 0
     workflow_start = None
     invalid_workflow = False
 
@@ -114,9 +123,10 @@ def parse_askalon_file(askalon_file):
     final_workflow_list = []
 
     tasks = []
+    task_by_id = dict()
     task_state_list = []
     with open(askalon_file, 'r') as asklon_trace:
-        for line in asklon_trace:
+        for line in asklon_trace.readlines():
             if line.startswith('#'):
                 if not line.startswith('# Started:'):
                     continue
@@ -139,7 +149,16 @@ def parse_askalon_file(askalon_file):
 
                 # Create a workflow based on observed tasks before starting a new.
                 if tasks:
+                    # Since we cannot trust the logs (our validator proved this)
+                    # We will have to add both the children and parents manually to be safe.
+                    for t in tasks:
+                        for child_id in t.children:
+                            task_by_id[child_id].parents.add(t.id)
+                        for parent_id in t.parents:
+                            task_by_id[parent_id].children.add(t.id)
+
                     workflow = get_workflow_from_tasks(tasks, workflow_start, askalon_file, workflow_index)
+
                     final_workflow_list.append(workflow)
 
                     final_task_list.extend(tasks)
@@ -155,23 +174,44 @@ def parse_askalon_file(askalon_file):
                 invalid_workflow = False  # new workflow begins, reset flag
             else:
                 if invalid_workflow:  # skip reading tasks, advance to the next workflow
-                    print("Found invalid workflow, skipping")
+                    # print("Found invalid workflow, skipping")
+                    invalid_workflow_count += 1
                     continue
 
                 task, task_state = task_info_from_line(line, workflow_start, workflow_index)
 
                 if task:
+                    if task.runtime < 0:
+                        invalid_workflow = True
+                        invalid_workflow_count += 1
+                        tasks = []
+                        task_state_list = []
+                        continue
+
                     tasks.append(task)
+                    task_by_id[task.id] = task
                     task_state_list.append(task_state)
                 else:
                     invalid_workflow = True
+                    invalid_workflow_count += 1
                     tasks = []
                     task_state_list = []
 
+    print(workflow_index, invalid_workflow_count)
+
     # Flush the last workflow, if any.
     if tasks and not invalid_workflow:
+        # Since we cannot trust the logs (our validator proved this)
+        # We will have to add both the children and parents manually to be safe.
+        for t in tasks:
+            for child_id in t.children:
+                task_by_id[child_id].parents.add(t.id)
+            for parent_id in t.parents:
+                task_by_id[parent_id].children.add(t.id)
+
         final_task_list.extend(tasks)
         final_taskstate_list.extend(task_state_list)
+
         workflow = get_workflow_from_tasks(tasks, workflow_start, askalon_file, workflow_index)
         final_workflow_list.append(workflow)
 
