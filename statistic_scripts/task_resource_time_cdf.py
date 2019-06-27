@@ -1,9 +1,12 @@
 import os
 
+import pyspark.sql.functions as F
+
 from statistic_scripts.util import generate_cdf
 
 
-class JobCriticalPathTaskCountCDF(object):
+class TaskResourceTimeCDF(object):
+
     def __init__(self, workload_name, df, image_folder_location):
         self.workload_name = workload_name
         self.df = df
@@ -15,9 +18,11 @@ class JobCriticalPathTaskCountCDF(object):
         return None, plot_location
 
     def generate_graphs(self, show=False):
-        filename = "job_cp_task_count_{0}.png".format(self.workload_name)
+        filename = "task_resource_time_cdf_{0}.png".format(self.workload_name)
         if not os.path.isfile(os.path.join(self.folder, filename)):
-            generate_cdf(self.df, "critical_path_task_count", os.path.join(self.folder, filename),
-                         "Num. tasks on critical path", "Num. workflows (CDF)", show)
+            self.df = self.df.withColumn("task_resource_computation_time", F.col("resource_amount_requested") * F.col("runtime"))
+            generate_cdf(self.df, "task_resource_computation_time", os.path.join(self.folder, filename),
+                         "Task Core Time (ms)", "Num. tasks (CDF)", show)
 
         return filename
+

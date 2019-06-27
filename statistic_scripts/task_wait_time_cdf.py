@@ -1,11 +1,16 @@
 import os
 
 import matplotlib
+from pyspark.sql import SparkSession
+
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
+import pyspark.sql.functions as F
+
 
 import numpy as np
 import statsmodels.api as sm
+import pandas as pd
 
 
 class TaskWaitTimeCDF(object):
@@ -21,12 +26,21 @@ class TaskWaitTimeCDF(object):
         return None, plot_location
 
     def generate_graphs(self, show=False):
-        plt.figure()
-        task_wait_times = sorted(self.df["wait_time"].tolist())
+        filename = "task_wait_time_cdf_{0}.png".format(self.workload_name)
+        if os.path.isfile(os.path.join(self.folder, filename)):
+            return filename
 
-        if max(task_wait_times) == -1:
+        plt.figure()
+        df = self.df.filter(F.col("wait_time") >= 0)
+        if df.count() > 1000:
+            permilles = self.df.approxQuantile("wait_time", [float(i) / 1000 for i in range(0, 1001)], 0.001)
+            task_wait_times = sorted(pd.DataFrame({"wait_time": permilles})["wait_time"].tolist())
+        else:
+            task_wait_times = sorted(df.toPandas()["wait_time"].tolist())
+
+        if len(task_wait_times) == 0 or max(task_wait_times) == -1:
             plt.text(0.5, 0.5, 'Not available;\nTrace does not contain this information.', horizontalalignment='center',
-                    verticalalignment='center', transform=plt.axes().transAxes, fontsize=16)
+                     verticalalignment='center', transform=plt.axes().transAxes, fontsize=16)
             plt.grid(False)
         else:
             ecdf = sm.distributions.ECDF(task_wait_times)
@@ -43,9 +57,23 @@ class TaskWaitTimeCDF(object):
         plt.margins(0.05)
         plt.tight_layout()
 
-        filename = "task_wait_time_cdf_{0}".format(self.workload_name)
-        plt.savefig(os.path.join(self.folder, filename), dpi=200)
+        plt.savefig(os.path.join(self.folder, filename), dpi=200, format='png')
         if show:
             plt.show()
 
         return filename
+
+
+if __name__ == '__main__':
+    tasks_loc = "/media/lfdversluis/datastore/SC19-data/parquet-flattened/pegasus_P1_parquet/tasks/schema-1.0"
+    spark = (SparkSession.builder
+                  .master("local[5]")
+                  .appName("WTA Analysis")
+                  .config("spark.executor.memory", "3G")
+                  .config("spark.driver.memory", "12G")
+                  .getOrCreate())
+
+    task_df = spark.read.parquet(tasks_loc)
+
+    gne = TaskWaitTimeCDF("test", task_df, ".")
+    gne.generate_graphs(show=True)

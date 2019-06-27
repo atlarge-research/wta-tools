@@ -1,3 +1,6 @@
+import json
+
+
 class GenericMemoryInformation(object):
 
     def __init__(self, workload_name, json_workload):
@@ -16,3 +19,12 @@ class GenericMemoryInformation(object):
             "cov-memory": self.json_workload["cov_memory"]
 
         }
+
+
+if __name__ == '__main__':
+    wl = "../parse_scripts/chronos/chronos.wtf"
+    with open(wl, "r") as file:
+        wl_data = json.load(file)
+
+    gti = GenericMemoryInformation("askalon", wl_data)
+    print(gti.generate_content())

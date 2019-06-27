@@ -16,5 +16,13 @@ class GenericCPUInformation(object):
             "25th-percentile-cpu-task": self.json_workload["first_quartile_resource_task"],
             "75th-percentile-cpu-task": self.json_workload["third_quartile_resource_task"],
             "std-cpu-task": self.json_workload["std_resource_task"],
-            "cov-cpu-task": self.json_workload["cov_resource_task"]
+            "cov-cpu-task": self.json_workload["cov_resource_task"],
         }
+
+
+if __name__ == '__main__':
+    wl = "../parse_scripts/output_parquet/chronos.wtf"
+    with open(wl, "r") as file:
+        wl_data = ujson.load(file)
+
+    gti = GenericCPUInformation("Chronos", wl_data)

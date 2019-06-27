@@ -1,10 +1,9 @@
-import matplotlib
-matplotlib.use('Agg')
-import matplotlib.pyplot as plt
 import os
-import statsmodels.api as sm
 
-import numpy as np
+from pyspark.sql import SparkSession
+
+from statistic_scripts.util import generate_cdf
+
 
 class JobArrivalCDF(object):
 
@@ -19,25 +18,24 @@ class JobArrivalCDF(object):
         return None, plot_location
 
     def generate_graphs(self, show=False):
-        plt.figure()
-        job_arrivals = sorted(self.df["ts_submit"].tolist())
-
-        ecdf = sm.distributions.ECDF(job_arrivals)
-
-        # Change min to 0 to make it start at 0
-        x = np.linspace(min(job_arrivals), max(job_arrivals))
-        y = ecdf(x)
-        plt.step(x, y)
-
-        plt.xlabel('Arrival time (s)', fontsize=18)
-        plt.ylabel('P', fontsize=18)
-
-        plt.margins(0.05)
-        plt.tight_layout()
-
-        filename = "job_arrival_cdf_{0}".format(self.workload_name)
-        plt.savefig(os.path.join(self.folder, filename), dpi=200)
-        if show:
-            plt.show()
+        filename = "job_arrival_cdf_{0}.png".format(self.workload_name)
+        if not os.path.isfile(os.path.join(self.folder, filename)):
+            generate_cdf(self.df, "ts_submit", os.path.join(self.folder, filename),
+                         "Arrival time (ms)", "Num. workflows (CDF)", show)
 
         return filename
+
+
+if __name__ == '__main__':
+    tasks_loc = "/media/lfdversluis/datastore/SC19-data/parquet-flattened/pegasus_P1_parquet/tasks/schema-1.0"
+    spark = (SparkSession.builder
+                  .master("local[5]")
+                  .appName("WTA Analysis")
+                  .config("spark.executor.memory", "3G")
+                  .config("spark.driver.memory", "12G")
+                  .getOrCreate())
+
+    task_df = spark.read.parquet(tasks_loc)
+
+    gne = JobArrivalCDF("test", task_df, ".")
+    gne.generate_graphs(show=True)

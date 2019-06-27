@@ -1,11 +1,8 @@
 import os
 
-import matplotlib
-matplotlib.use('Agg')
-import matplotlib.pyplot as plt
+from pyspark.sql import SparkSession
 
-import numpy as np
-import statsmodels.api as sm
+from statistic_scripts.util import generate_cdf
 
 
 class TaskRuntimeCDF(object):
@@ -21,34 +18,24 @@ class TaskRuntimeCDF(object):
         return None, plot_location
 
     def generate_graphs(self, show=False):
-        plt.figure()
-        task_runtimes = sorted(self.df["runtime"].tolist())
-
-        ecdf = sm.distributions.ECDF(task_runtimes)
-
-        # Change min to 0 to make it start at 0
-        x = np.linspace(min(task_runtimes), max(task_runtimes))
-        y = ecdf(x)
-        plt.step(x, y)
-
-        # Rotates and right aligns the x labels, and moves the bottom of the
-        # axes up to make room for them
-        # fig.autofmt_xdate()
-        plt.xlabel('Runtime (s)', fontsize=18)
-        plt.ylabel('P', fontsize=18)
-
-        plt.axes().set_xlim(0, None)
-        # plt.axes().set_ylim(0, 1)
-
-        # plt.locator_params(nbins=3, axis='y')
-
-        plt.margins(0.05)
-        # plt.grid(True)
-        plt.tight_layout()
-
-        filename = "task_runtime_cdf_{0}".format(self.workload_name)
-        plt.savefig(os.path.join(self.folder, filename), dpi=200)
-        if show:
-            plt.show()
+        filename = "task_runtime_cdf_{0}.png".format(self.workload_name)
+        if not os.path.isfile(os.path.join(self.folder, filename)):
+            generate_cdf(self.df, "runtime", os.path.join(self.folder, filename),
+                         "Runtime (ms)", "Num. tasks (CDF)", show)
 
         return filename
+
+
+if __name__ == '__main__':
+    tasks_loc = "/media/lfdversluis/datastore/SC19-data/parquet-flattened/pegasus_P1_parquet/tasks/schema-1.0"
+    spark = (SparkSession.builder
+                  .master("local[5]")
+                  .appName("WTA Analysis")
+                  .config("spark.executor.memory", "3G")
+                  .config("spark.driver.memory", "12G")
+                  .getOrCreate())
+
+    task_df = spark.read.parquet(tasks_loc)
+
+    gne = TaskRuntimeCDF("test", task_df, ".")
+    gne.generate_graphs(show=True)

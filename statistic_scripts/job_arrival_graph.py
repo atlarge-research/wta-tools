@@ -2,6 +2,8 @@ import math
 import os
 
 import matplotlib
+from pyspark.sql import SparkSession
+
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from sortedcontainers import SortedDict
@@ -20,6 +22,10 @@ class JobArrivalGraph(object):
         return None, plot_location
 
     def generate_graphs(self, show=False):
+        filename = "job_arrival_{0}.png".format(self.workload_name)
+        if os.path.isfile(os.path.join(self.folder, filename)):
+            return filename
+
         plt.figure()
         granularity_order = [
             "Second",
@@ -29,16 +35,16 @@ class JobArrivalGraph(object):
         ]
 
         granularity_lambdas = {
-            "Second": lambda x: x,
-            "Minute": lambda x: x / 60,
-            "Hour": lambda x: x / (60 * 60),
-            "Day": lambda x: x / (60 * 60 * 24),
+            "Second": lambda x: int(x / 1000),
+            "Minute": lambda x: int(x / 60 / 1000),
+            "Hour": lambda x: int(x / (60 * 60) / 1000),
+            "Day": lambda x: int(x / (60 * 60 * 24) / 1000),
         }
 
         plot_count = 0
         for granularity in granularity_order:
             job_arrivals = SortedDict()
-            for workflow in self.df.itertuples():
+            for workflow in self.df.select("ts_submit").toPandas().itertuples():
                 submit_time = int(workflow.ts_submit)
 
                 submit_time = granularity_lambdas[granularity](submit_time)
@@ -50,13 +56,17 @@ class JobArrivalGraph(object):
 
             ax = plt.subplot2grid((2, 2), (int(math.floor(plot_count / 2)), (plot_count % 2)))
 
-            if max(job_arrivals.keys()) >= 1:
+            if sum(job_arrivals.values()) == 1:
+                ax.text(0.5, 0.5, 'Not available;\nTrace contains one workflow.', horizontalalignment='center',
+                        verticalalignment='center', transform=ax.transAxes, fontsize=10)
+                ax.grid(False)
+            elif len(job_arrivals.keys()) == 1:
+                ax.text(0.5, 0.5, 'Not available;\nTrace is too small.', horizontalalignment='center',
+                        verticalalignment='center', transform=ax.transAxes, fontsize=10)
+                ax.grid(False)
+            else:
                 ax.plot(job_arrivals.keys(), job_arrivals.values(), color="black", linewidth=1.0)
                 ax.grid(True)
-            else:
-                ax.text(0.5, 0.5, 'Not available;\nTrace too small.', horizontalalignment='center',
-                verticalalignment = 'center', transform = ax.transAxes, fontsize=16)
-                ax.grid(False)
 
             ax.locator_params(nbins=3, axis='y')
             ax.set_xlim(0)
@@ -73,9 +83,23 @@ class JobArrivalGraph(object):
 
         plt.tight_layout()
 
-        filename = "job_arrival_{0}".format(self.workload_name)
-        plt.savefig(os.path.join(self.folder, filename), dpi=200)
+        plt.savefig(os.path.join(self.folder, filename), dpi=200, format='png')
         if show:
             plt.show()
 
         return filename
+
+
+if __name__ == '__main__':
+    tasks_loc = "/media/lfdversluis/datastore/SC19-data/parquet-flattened/shell_parquet/workflows/schema-1.0"
+    spark = (SparkSession.builder
+                  .master("local[5]")
+                  .appName("WTA Analysis")
+                  .config("spark.executor.memory", "3G")
+                  .config("spark.driver.memory", "12G")
+                  .getOrCreate())
+
+    task_df = spark.read.parquet(tasks_loc)
+
+    gne = JobArrivalGraph("test", task_df, ".")
+    gne.generate_graphs(show=True)

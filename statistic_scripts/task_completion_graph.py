@@ -1,12 +1,14 @@
 import math
 
 import matplotlib
+from pyspark.sql import Window, SparkSession
+
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import os
-
-import numpy as np
 from sortedcontainers import SortedDict
+import pyspark.sql.functions as F
+import pyspark.sql.types as T
 
 
 class TaskCompletionGraph(object):
@@ -22,6 +24,10 @@ class TaskCompletionGraph(object):
         return None, plot_location
 
     def generate_graphs(self, show=False):
+        filename = "task_completion_graph_{0}.png".format(self.workload_name)
+        if os.path.isfile(os.path.join(self.folder, filename)):
+            return filename
+
         plt.figure()
         granularity_order = [
             "Second",
@@ -31,42 +37,61 @@ class TaskCompletionGraph(object):
         ]
 
         granularity_lambdas = {
-            "Second": lambda x: x,
-            "Minute": lambda x: x / 60,
-            "Hour": lambda x: x / (60 * 60),
-            "Day": lambda x: x / (60 * 60 * 24),
+            "Second": 1000,
+            "Minute": 60 * 1000,
+            "Hour": 60 * 60 * 1000,
+            "Day": 60 * 60 * 24 *  1000,
         }
 
         plot_number = 0
+
+        self.df = self.df.withColumn('completion_time',
+                                F.col("ts_submit") + F.col("runtime") + F.when((F.col("wait_time") > 0),
+                                                                               F.col("wait_time")).otherwise(0))
         for granularity in granularity_order:
             task_completion_times = SortedDict()
 
-            for task in self.df.itertuples():
-                submit_time = int(task.ts_submit)
-                runtime = int(task.runtime)
-                wait_time = int(task.wait_time)
+            df = self.df.withColumn('completion_time', F.col('completion_time') / granularity_lambdas[granularity])
+            df = df.withColumn('completion_time', F.col('completion_time').cast(T.LongType()))
 
-                completion_time = submit_time + runtime
+            if df.count() > 1000:
+                # We compute the cumulative sum of amounts of jobs completed per timestamp.
+                # Next, we assign row ids per timestamp and based on
+                df = df.groupBy("completion_time").count()
 
-                if wait_time > 0:
-                    completion_time += wait_time
+                windowval = Window.orderBy('completion_time').rangeBetween(Window.unboundedPreceding, 0)
+                df = df.withColumn('cum_sum', F.sum('count').over(windowval))
+                window_row_number = Window.orderBy("completion_time")
+                df = df.withColumn("row_number", F.row_number().over(window_row_number))
 
-                completion_time = granularity_lambdas[granularity](completion_time)
+                num_rows = df.count()
+                indices = [int(num_rows * (float(i) / 1000)) for i in
+                           range(0, 1001)]  # Compute the indices needed to fetch 1000 linearly spaced elements
+                completion_times = df.where(df.row_number.isin(indices)).select(
+                    ["completion_time", "cum_sum"]).toPandas()
+            else:
+                df = df.groupBy("completion_time").count()
+                windowval = Window.orderBy('completion_time').rangeBetween(Window.unboundedPreceding, 0)
+                completion_times = df.withColumn('cum_sum', F.sum('count').over(windowval)).select(
+                    ["completion_time", "cum_sum"]).toPandas()
+
+            for task in completion_times.itertuples():
+                completion_time = int(task.completion_time)
+                count = int(task.cum_sum)
 
                 if completion_time not in task_completion_times:
-                    task_completion_times[completion_time] = 0
+                    task_completion_times[completion_time] = count
 
-                task_completion_times[completion_time] += 1
+                task_completion_times[completion_time] += count
 
-            cummulative_times = np.cumsum(task_completion_times.values())
             ax = plt.subplot2grid((2, 2), (int(math.floor(plot_number / 2)), (plot_number % 2)))
 
             if max(task_completion_times.keys()) >= 1:
-                ax.plot(task_completion_times.keys(), cummulative_times, color="black", linewidth=1.0)
+                ax.plot(task_completion_times.keys(), task_completion_times.values(), color="black", linewidth=1.0)
                 ax.grid(True)
             else:
                 ax.text(0.5, 0.5, 'Not available;\nTrace too small.', horizontalalignment='center',
-                verticalalignment = 'center', transform = ax.transAxes, fontsize=16)
+                        verticalalignment='center', transform=ax.transAxes, fontsize=16)
                 ax.grid(False)
 
             # Rotates and right aligns the x labels, and moves the bottom of the
@@ -81,9 +106,23 @@ class TaskCompletionGraph(object):
             plot_number += 1
 
         plt.tight_layout()
-        filename = "task_completion_graph_{0}".format(self.workload_name)
-        plt.savefig(os.path.join(self.folder, filename), dpi=200)
+        plt.savefig(os.path.join(self.folder, filename), dpi=200, format='png')
         if show:
             plt.show()
 
         return filename
+
+
+if __name__ == '__main__':
+    tasks_loc = "/media/lfdversluis/datastore/SC19-data/parquet-flattened/Google_parquet/tasks/schema-1.0"
+    spark = (SparkSession.builder
+                  .master("local[5]")
+                  .appName("WTA Analysis")
+                  .config("spark.executor.memory", "3G")
+                  .config("spark.driver.memory", "12G")
+                  .getOrCreate())
+
+    task_df = spark.read.parquet(tasks_loc)
+
+    gne = TaskCompletionGraph("test", task_df, ".")
+    gne.generate_graphs(show=True)

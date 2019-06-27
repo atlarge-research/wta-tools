@@ -1,10 +1,10 @@
-import matplotlib
-matplotlib.use('Agg')
-import matplotlib.pyplot as plt
 import os
-import statsmodels.api as sm
 
+import matplotlib.pyplot as plt
 import numpy as np
+import pyspark.sql.functions as F
+import statsmodels.api as sm
+import pandas as pd
 
 
 class TaskMemoryConsumptionCDF(object):
@@ -19,13 +19,22 @@ class TaskMemoryConsumptionCDF(object):
         return None, plot_location
 
     def generate_graphs(self, show=False):
+        filename = "task_memory_consumption_cdf_{0}.png".format(self.workload_name)
+        if os.path.isfile(os.path.join(self.folder, filename + ".pdf")):
+            return filename
+
         plt.figure()
-        memory_consumptions = sorted(self.df[self.df["memory_requested"] >= 0]["memory_requested"].tolist())
+        df = self.df.filter(F.col("memory_requested") >= 0)
+        if df.count() > 1000:
+            permilles = self.df.approxQuantile("memory_requested", [float(i) / 1000 for i in range(0, 1001)], 0.001)
+            memory_consumptions = sorted(pd.DataFrame({"memory_requested": permilles})["memory_requested"].tolist())
+        else:
+            memory_consumptions = sorted(df.toPandas()["memory_requested"].tolist())
 
         # If no values are found, we cannot generate a CDF.
         if not memory_consumptions:
             plt.text(0.5, 0.5, 'Not available;\nTrace does not contain this information.', horizontalalignment='center',
-                    verticalalignment='center', transform=plt.axes().transAxes, fontsize=16)
+                     verticalalignment='center', transform=plt.axes().transAxes, fontsize=16)
             plt.grid(False)
         else:
             ecdf = sm.distributions.ECDF(memory_consumptions)
@@ -42,8 +51,7 @@ class TaskMemoryConsumptionCDF(object):
         plt.margins(0.05)
         plt.tight_layout()
 
-        filename = "task_memory_consumption_cdf_{0}".format(self.workload_name)
-        plt.savefig(os.path.join(self.folder, filename), dpi=200)
+        plt.savefig(os.path.join(self.folder, filename), dpi=200, format='png')
         if show:
             plt.show()
 
