@@ -12,7 +12,7 @@ from objects.workflow import Workflow
 from objects.workload import Workload
 
 USAGE = 'Usage: python(3) ./chronos_gwf_to_parquet.py chronos_file'
-NAME = 'chronos'
+NAME = 'Shell'
 TARGET_DIR = os.path.join(os.path.dirname(os.getcwd()), 'output_parquet', NAME)
 
 
@@ -29,7 +29,7 @@ def compute_workflow_features(task_group):
             getattr(row, "runtime"),
             getattr(row, "resource_amount_requested"),
             getattr(row, "parents"),
-            0,  # Not able to get the workflow_id attribute for some reason.
+            task_group['workflow_id'].iloc[0],
             -1,
             "thread",
             resource=-1,
@@ -45,7 +45,7 @@ def compute_workflow_features(task_group):
     workflow.compute_critical_path()
 
     wf_df = pd.concat([wf_agnostic_df, pd.DataFrame(
-        {"ts_submit": pd.Series([np.int64(workflow_ts_submit)], dtype=np.int64),
+        {"id": tasks[0].workflow_id, "ts_submit": pd.Series([np.int64(workflow_ts_submit)], dtype=np.int64),
          "critical_path_length": pd.Series([np.int32(workflow.critical_path_length)], dtype=np.int32),
          "critical_path_task_count": pd.Series([np.int32(workflow.critical_path_task_count)], dtype=np.int32),
          "approx_max_concurrent_tasks": pd.Series([np.int32(workflow.max_concurrent_tasks)], dtype=np.int32),
@@ -65,7 +65,7 @@ def compute_children(task_group):
     for row in task_group.itertuples():
         for parent in getattr(row, "parents"):
             if parent not in task_to_children_map:
-                task_to_children_map[parent] = np.empty(0, dtype=np.int64)
+                task_to_children_map[parent] = np.array([])
 
             task_to_children_map[parent] = np.append(task_to_children_map[parent], getattr(row, "id"))
 
@@ -96,6 +96,7 @@ def parse(gwf_filename):
     })
     del gwf_tasks["ReqNProcs "]
     gwf_tasks.columns = ["workflow_id", "id", "ts_submit", "runtime", "resource_amount_requested", "dependencies"]
+    gwf_tasks['resource_amount_requested'] = gwf_tasks['resource_amount_requested'].astype(np.float64)
 
     gwf_tasks = gwf_tasks.assign(ts_submit=lambda x: x['ts_submit'] * 1000)  # Convert the submit time to milliseconds.
 
