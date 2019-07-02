@@ -1,5 +1,4 @@
 import json
-import math
 import os
 from collections import OrderedDict
 
@@ -50,8 +49,8 @@ class Task(object):
         self.energy_consumption = energy_consumption  # Amount of energy consumed by this task in Watt
         self.network_io_time = network_io_time  # Total time spent on network io
         self.resource_used = resource  # The resource object associated
-        self.datatransfers = datatransfer  # list of data transfers (JSON)
-        self.events = events  # list of data transfers (JSON)
+        self.datatransfers = datatransfer  # list of data transfers
+        self.events = events  # list of task events
 
     def set_workflow_id_propagating(self, task_dict, workflow_id):
         self.workflow_id = workflow_id
@@ -188,44 +187,42 @@ class Task(object):
             "resource_used": np.int64(self.resource_used),
         }
 
-    ordered_dict = OrderedDict(sorted(simple_dict.items(), key=lambda t: t[0]))
+        ordered_dict = OrderedDict(sorted(simple_dict.items(), key=lambda t: t[0]))
 
-    return ordered_dict
-
-
-@staticmethod
-def get_pyarrow_schema():
-    fields = [
-        pa.field('id', pa.int64()),
-        pa.field('ts_submit', pa.int64()),
-        pa.field('submission_site', pa.int32()),
-        pa.field('runtime', pa.int64()),
-        pa.field('resource_type', pa.string()),
-        pa.field('resource_amount_requested', pa.float64()),
-        pa.field('parents', pa.list_(pa.int64())),
-        pa.field('children', pa.list_(pa.int64())),
-        pa.field('user_id', pa.int32()),
-        pa.field('group_id', pa.int32()),
-        pa.field('nfrs', pa.string()),
-        pa.field('workflow_id', pa.int64()),
-        pa.field('wait_time', pa.int64()),
-        pa.field('params', pa.string()),
-        pa.field('memory_requested', pa.float64()),
-        pa.field('network_io_time', pa.int64()),
-        pa.field('disk_io_time', pa.int64()),
-        pa.field('disk_space_requested', pa.float64()),
-        pa.field('energy_consumption', pa.int64()),
-        pa.field('resource_used', pa.int64()),
-    ]
-
-    return pa.schema(fields)
+        return ordered_dict
 
 
-@staticmethod
-def versioned_dir_name():
-    return "schema-{}".format(Task._version)
+    @staticmethod
+    def get_pyarrow_schema():
+        fields = [
+            pa.field('id', pa.int64()),
+            pa.field('ts_submit', pa.int64()),
+            pa.field('submission_site', pa.int32()),
+            pa.field('runtime', pa.int64()),
+            pa.field('resource_type', pa.string()),
+            pa.field('resource_amount_requested', pa.float64()),
+            pa.field('parents', pa.list_(pa.int64())),
+            pa.field('children', pa.list_(pa.int64())),
+            pa.field('user_id', pa.int32()),
+            pa.field('group_id', pa.int32()),
+            pa.field('nfrs', pa.string()),
+            pa.field('workflow_id', pa.int64()),
+            pa.field('wait_time', pa.int64()),
+            pa.field('params', pa.string()),
+            pa.field('memory_requested', pa.float64()),
+            pa.field('network_io_time', pa.int64()),
+            pa.field('disk_io_time', pa.int64()),
+            pa.field('disk_space_requested', pa.float64()),
+            pa.field('energy_consumption', pa.int64()),
+            pa.field('resource_used', pa.int64()),
+        ]
 
+        return pa.schema(fields)
 
-@staticmethod
-def output_path():
-    return os.path.join("tasks", Task.versioned_dir_name())
+    @staticmethod
+    def versioned_dir_name():
+        return "schema-{}".format(Task._version)
+
+    @staticmethod
+    def output_path():
+        return os.path.join("tasks", Task.versioned_dir_name())

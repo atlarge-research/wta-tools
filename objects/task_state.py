@@ -62,6 +62,7 @@ class TaskState(object):
             "maximum_network_bandwidth": self.maximum_network_bandwidth,
             "network_in": self.network_in,
             "network_out": self.network_out,
+            "version": self._version,
         }
 
     @staticmethod
@@ -89,6 +90,7 @@ class TaskState(object):
             StructField("maximum_network_bandwidth", DoubleType(), False),
             StructField("network_in", LongType(), False),
             StructField("network_out", LongType(), False),
+            StructField("version", StringType(), False),
         ]
 
         sorted_type_info = sorted(type_info, key=lambda x: x.name)
@@ -119,6 +121,7 @@ class TaskState(object):
             "maximum_network_bandwidth": np.float64,
             "network_in": np.int64,
             "network_out": np.int64,
+            "version": TaskState._version,
         }
 
         ordered_dict = OrderedDict(sorted(type_info.items(), key=lambda t: t[0]))
@@ -149,6 +152,7 @@ class TaskState(object):
             "maximum_network_bandwidth": np.float64(self.maximum_network_bandwidth),
             "network_in": np.int64(self.network_in),
             "network_out": np.int64(self.network_out),
+            "version": self._version,
         }
 
         ordered_dict = OrderedDict(sorted(simple_dict.items(), key=lambda t: t[0]))
@@ -180,6 +184,7 @@ class TaskState(object):
             pa.field("maximum_network_bandwidth", pa.float64()),
             pa.field("network_in", pa.int64()),
             pa.field("network_out", pa.int64()),
+            pa.field("version", pa.string()),
         ]
 
         return pa.schema(fields)
