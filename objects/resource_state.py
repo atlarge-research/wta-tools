@@ -47,6 +47,7 @@ class ResourceState(object):
             "average_utilization_1_minute": self.average_utilization_1_minute,
             "average_utilization_5_minute": self.average_utilization_5_minute,
             "average_utilization_15_minute": self.average_utilization_15_minute,
+            "version": self._version,
         }
 
     @staticmethod
@@ -63,7 +64,8 @@ class ResourceState(object):
             "available_network_bandwidth": np.float64,
             "average_utilization_1_minute": np.float64,
             "average_utilization_5_minute": np.float64,
-            "average_utilization_15_minute": np.float64
+            "average_utilization_15_minute": np.float64,
+            "version": np.str,
         }
 
     def get_parquet_dict(self):
@@ -79,7 +81,8 @@ class ResourceState(object):
             "available_network_bandwidth": np.float64(self.available_network_bandwidth),
             "average_utilization_1_minute": np.float64(self.average_utilization_1_minute),
             "average_utilization_5_minute": np.float64(self.average_utilization_5_minute),
-            "average_utilization_15_minute": np.float64(self.average_utilization_15_minute)
+            "average_utilization_15_minute": np.float64(self.average_utilization_15_minute),
+            "version": np.str(self._version),
         }
 
     @staticmethod
@@ -96,7 +99,8 @@ class ResourceState(object):
             pa.field("available_network_bandwidth", pa.float64()),
             pa.field("average_utilization_1_minute", pa.float64()),
             pa.field("average_utilization_5_minute", pa.float64()),
-            pa.field("average_utilization_15_minute", pa.float64())
+            pa.field("average_utilization_15_minute", pa.float64()),
+            pa.field("version", pa.string())
         ]
 
         return pa.schema(fields)
