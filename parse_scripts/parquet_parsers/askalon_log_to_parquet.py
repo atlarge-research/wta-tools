@@ -42,8 +42,8 @@ TARGET_DIR = os.path.join(os.path.dirname(os.getcwd()), 'output_parquet', 'askal
 def task_info_from_line(line, workflow_start, workflow_index):
     cols = line.split('\t')
 
-    workflow_id = mmh3.hash64("workflow:{}".format(workflow_index))[0]
-    task_id = mmh3.hash64("workflow:{}_task:{}".format(workflow_index, int(cols[0])))[0]
+    workflow_id = mmh3.hash64("workflow:{}".format(workflow_index), signed=True)[0]
+    task_id = mmh3.hash64("workflow:{}_task:{}".format(workflow_index, int(cols[0])), signed=True)[0]
 
     task_submit_time = int(cols[1])
     wait_time = float(cols[2])
@@ -53,21 +53,24 @@ def task_info_from_line(line, workflow_start, workflow_index):
     if task_submit_time == -1 and wait_time > 1000000000000:
         task_submit_time = wait_time
         wait_time = -1
+    elif task_submit_time == -1 and wait_time == -1:
+        return None, None
+
 
     submit_time = workflow_start - task_submit_time
 
     if not submit_time:
         return None, None
 
-    site_id = mmh3.hash64("site:{}".format(str(cols[16]).strip()))[0]
+    site_id = mmh3.hash("site:{}".format(str(cols[16]).strip()), signed=True)
     run_time = int(cols[3])
     n_procs = int(cols[4])
     req_n_procs = int(n_procs)
     used_memory = float(cols[6])
     used_network = float(cols[20])
     disk_space_used = float(cols[21])
-    user_id = mmh3.hash64("user:{}".format(str(cols[11]).strip()))[0]
-    group_id = mmh3.hash64("group:{}".format(str(cols[12]).strip()))[0]
+    user_id = mmh3.hash("user:{}".format(str(cols[11]).strip()), signed=True)
+    group_id = mmh3.hash("group:{}".format(str(cols[12]).strip()), signed=True)
 
     job_structure = cols[19]
     match = re.search('DAGPrev=([\d,]+);?', job_structure)
@@ -76,7 +79,7 @@ def task_info_from_line(line, workflow_start, workflow_index):
     else:
         dependency_string = match.group(1)
         dependencies = set(
-            mmh3.hash64("workflow:{}_task:{}".format(workflow_index, int(dep)))[0] for dep in dependency_string.split(","))
+            mmh3.hash64("workflow:{}_task:{}".format(workflow_index, int(dep)), signed=True)[0] for dep in dependency_string.split(","))
 
     task = Task(task_id, "composite", submit_time, site_id, run_time, max(n_procs, req_n_procs), dependencies,
                 workflow_id, wait_time=wait_time, user_id=user_id, group_id=group_id, resource=-1)
@@ -91,7 +94,7 @@ def task_info_from_line(line, workflow_start, workflow_index):
     else:
         children_string = match.group(1)
         children = set(
-            mmh3.hash64("workflow:{}_task:{}".format(workflow_index, int(dep)))[0] for dep in children_string.split(","))
+            mmh3.hash64("workflow:{}_task:{}".format(workflow_index, int(dep)), signed=True)[0] for dep in children_string.split(","))
 
     task.children = children
 
@@ -100,7 +103,7 @@ def task_info_from_line(line, workflow_start, workflow_index):
 
 def get_workflow_from_tasks(tasks, workflow_start, askalon_file, workflow_index):
 
-    workflow_id = mmh3.hash64("workflow:{}".format(workflow_index))[0]
+    workflow_id = mmh3.hash64("workflow:{}".format(workflow_index), signed=True)[0]
 
     application_name = "BWA" if "bwa" in askalon_file.lower() else "Wien2k"
 
