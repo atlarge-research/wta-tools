@@ -21,7 +21,7 @@ class TaskArrivalCDF(object):
         filename = "task_arrival_cdf_{0}.png".format(self.workload_name)
         if not os.path.isfile(os.path.join(self.folder, filename)):
             generate_cdf(self.df, "ts_submit", os.path.join(self.folder, filename),
-                         "Time (ms)", "Num. tasks (CDF)", show)
+                         "Time{} [ms]", "Num. tasks (CDF)", show)
 
         return filename
 

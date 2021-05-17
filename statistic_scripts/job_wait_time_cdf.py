@@ -30,7 +30,7 @@ class JobWaitTimeCDF(object):
                                    F.col("ts_submit")))
 
             generate_cdf(self.df, "wf_wait_time", os.path.join(self.folder, filename),
-                         "Wait time (ms)", "Num. workflows (CDF)", show)
+                         "Wait time{} [ms]", "Num. workflows (CDF)", show)
 
         return filename
 

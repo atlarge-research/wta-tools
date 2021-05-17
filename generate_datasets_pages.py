@@ -7,16 +7,16 @@ Usage:
   generate_datasets_pages.py <dir_with_traces> <output_dir>
 
 Options:
+  -u --upload                       Flag indicating if traces should be uploaded to Zenodo.
   -h --help                         Show this screen.
 """
 import glob
 import json
 import os
-from json.decoder import JSONArray
 
-from docopt import docopt
-import yaml
 import matplotlib.pyplot as plt
+import yaml
+from docopt import docopt
 from pyspark.sql import SparkSession
 
 from statistic_scripts.generic_cpu_information import GenericCPUInformation
@@ -29,7 +29,6 @@ from statistic_scripts.job_arrival_cdf import JobArrivalCDF
 from statistic_scripts.job_arrival_graph import JobArrivalGraph
 from statistic_scripts.job_critical_path_task_count_cdf import JobCriticalPathTaskCountCDF
 from statistic_scripts.job_runtime_cdf import JobRuntimeCDF
-from statistic_scripts.job_wait_time_cdf import JobWaitTimeCDF
 from statistic_scripts.task_arrival_cdf import TaskArrivalCDF
 from statistic_scripts.task_arrival_graph import TaskArrivalGraph
 from statistic_scripts.task_completion_graph import TaskCompletionGraph
@@ -139,7 +138,7 @@ class TraceParser:
         with open(os.path.join(self.output_dir, "wta-data", "traces.yml"), "w+") as trace_info_file:
             trace_info_file.write(yaml.safe_dump(trace_dicts, default_flow_style=False))
 
-    def parse_trace(self, file_path):
+    def parse_trace(self, file_path, upload_to_zenodo=False):
         # Get the file name without the extension
         raw_file_name = str(os.path.basename(file_path).split(".")[0])
         file_name = str(os.path.basename(file_path).split(".")[0])
@@ -202,10 +201,16 @@ class TraceParser:
                 if graph_name:
                     trace_yaml_dict[key]["graph"] = graph_name
 
-        # Upload the dataset to Zenodo if not already done so.
+        if upload_to_zenodo:
+            return self.upload_to_zenodo(file_path, raw_file_name, file_name, trace_authors, trace_description,
+                                         trace_yaml_dict)
+        else:
+            return file_name, trace_yaml_dict
+
+    def upload_to_zenodo(self, file_path, raw_file_name, file_name, trace_authors, trace_description, trace_yaml_dict):
+        traces_uploaded = []
 
         # Get information about previous uploaded traces
-        traces_uploaded = []
         if os.path.exists('trace_upload_info.json'):
             traces_uploaded = json.load(open('trace_upload_info.json'))
 
@@ -341,5 +346,6 @@ if __name__ == '__main__':
 
     trace_dir = arguments['<dir_with_traces>']
     output_dir = arguments['<output_dir>']
+    should_upload = arguments['--upload']
 
-    TraceParser(trace_dir, output_dir)
+    TraceParser(trace_dir, output_dir, should_upload)

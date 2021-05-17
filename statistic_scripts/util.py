@@ -1,8 +1,8 @@
 import math
 
-import numpy as np
 import pandas as pd
 import pyspark.sql.functions as F
+from matplotlib.ticker import ScalarFormatter
 from plotnine import *
 
 
@@ -12,7 +12,7 @@ def generate_cdf(spark_dataframe, column, output_path, hor_axis_label, vert_axis
             F.col(column) >= 0).withColumnRenamed(column, "target")
         if df.count() > 1000:  # DF is too large, use sampling to get the distribution.
             # Get the 1000 permilles
-            permilles =  df.approxQuantile("target", range(0, 1.001, 0.001), 0.001)
+            permilles = df.approxQuantile("target", [float(i) / 1000 for i in range(0, 1001)], 0.001)
             df = pd.DataFrame({"target": permilles})
             return df
         else:
@@ -28,7 +28,7 @@ def generate_cdf(spark_dataframe, column, output_path, hor_axis_label, vert_axis
             df["cdf"] = df["pdf"].cumsum()
 
     pdf = get_column(spark_dataframe)
-    
+
     offset_text = ""
 
     if len(pdf) == 0:  # If the dataframe after filtering is empty, then print this metric is not available
@@ -60,28 +60,23 @@ def generate_cdf(spark_dataframe, column, output_path, hor_axis_label, vert_axis
     count_df.sort_index(inplace=True)
 
     plt = ggplot(count_df) + \
-            theme_light(base_size=18) + \
-            geom_step(aes(x="target", y="cdf"), size=1)
-        
-    # Make more readible the labels
-    fig = plt.gcf()
-    ax = plt.gca()
+          theme_light(base_size=18) + \
+          geom_step(aes(x="target", y="cdf"), size=1)
+
+    # Make the labels better readable
+    fig = plt.draw()
+    ax = fig.get_axes()[0]
     ax.get_xaxis().get_offset_text().set_visible(False)
     ax.get_xaxis().set_major_formatter(ScalarFormatter(useMathText=True))
     fig.tight_layout()  # Need to set this to be able to get the offset... for whatever reason
     offset_text = ax.get_xaxis().get_major_formatter().get_offset()
-    
-    ax.set_xlabel("koek", fontsize=18)
-    ax.set_ylabel(vert_axis_label, fontsize=18)
 
-    fig.savefig(output_path, device='png', dpi='600', figsize=(6,3))
-#     ggsave(filename=output_path,
-#            plot=fig,
-#            device='png',
-#            dpi=600,
-#            height=3,
-#            width=6)
+    ax.set_xlabel(hor_axis_label.format(f' {offset_text}' if offset_text else ""), fontsize=18)
+    ax.set_ylabel(vert_axis_label, fontsize=18)
+    ax.tick_params(axis='both', which='major', labelsize=16)
+    ax.tick_params(axis='both', which='minor', labelsize=14)
+
+    fig.savefig(output_path, format='png', dpi=600, figsize=(6, 3))
 
     if show:
-        print(plt)
-
+        fig.show()

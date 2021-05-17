@@ -18,6 +18,6 @@ class JobCriticalPathTaskCountCDF(object):
         filename = "job_cp_task_count_{0}.png".format(self.workload_name)
         if not os.path.isfile(os.path.join(self.folder, filename)):
             generate_cdf(self.df, "critical_path_task_count", os.path.join(self.folder, filename),
-                         "Num. tasks on critical path", "Num. workflows (CDF)", show)
+                         "Num. tasks on critical path {}", "Num. workflows (CDF)", show)
 
         return filename

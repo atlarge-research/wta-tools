@@ -2,12 +2,10 @@ import json
 import os
 import sys
 from datetime import datetime
-import math
 
 import numpy as np
 import pandas as pd
 
-from parquet_helper_functions.workflow_characteristics import compute_characteristics
 from objects.task import Task
 from objects.workflow import Workflow
 from objects.workload import Workload
@@ -161,7 +159,6 @@ def compute_children(step_job_ids, tasks_in_workflow):
                     break
         task.children = children
     for task2 in tasks_in_workflow:
-        #list(set(task2.parents))
         unique_parents = set(task2.parents)
         unique_parents_list = list(unique_parents)
         task2.parents = unique_parents_list
@@ -177,7 +174,7 @@ def parse():
     final_workflows = []
     final_tasks = []
     task_offset = 0
-    workflow_offset
+    workflow_offset = None
 
     for wi_row in WORKFLOW_INVOCATIONS.itertuples():
         flag = False
@@ -188,7 +185,6 @@ def parse():
         # check if workflow contains cycles
         workflow_row = WORKFLOWS.loc[(WORKFLOWS["id"] == getattr(wi_row, "workflow_id"))]
         if workflow_row.iloc[0]["has_cycles"] == "t":
-            print("IT WORKS BITCH")
             continue
 
         # workflows contain a number of workflow steps but this is not the ID of their actual execution
@@ -202,13 +198,11 @@ def parse():
             continue
 
         df = WORKFLOW_INVOKE_STEPS.loc[(WORKFLOW_INVOKE_STEPS["workflow_invocation_id"] == getattr(wi_row, "id"))]
-        df2 = WORKFLOW_STEPS.loc[(WORKFLOW_STEPS["workflow_id"] == workflow_index)]
 
         # check if workflow is not empty
         if df.empty:
             processed_workflows.append(workflow_index)
             continue
-        no_of_steps = len(df)
 
         for wis_row in df.itertuples():
 
@@ -241,7 +235,7 @@ def parse():
                 # used to find the task with lowest submit time, this time will be used ass offset
                 if task_offset == 0:
                     task_offset = submit_time
-                elif sumit_time < offset:
+                elif submit_time < task_offset:
                     task_offset = submit_time
 
                 runtime = runtime.iloc[0]
@@ -267,9 +261,9 @@ def parse():
         workflow_submit_time = int(((datetime.strptime(getattr(wi_row, "create_time"),DATETIME_FORMAT) - EPOCH).total_seconds()) * 1000)
 
         # find smallest workflow submit time as offset
-        if workflow_offset == 0:
+        if workflow_offset is None:
             workflow_offset = workflow_submit_time
-        elif sumit_time < offset:
+        elif workflow_submit_time < workflow_offset:
              workflow_offset = workflow_submit_time
 
         workflow = Workflow(workflow_index, workflow_submit_time, tasks_in_workflow, "core", "Engineering",
@@ -278,7 +272,6 @@ def parse():
         processed_workflows.append(workflow_index)
         final_workflows.append(workflow)
         workflow_counter += 1
-        #print("workflows processed:", workflow_counter)
 
     # apply offset
     for x in final_tasks:

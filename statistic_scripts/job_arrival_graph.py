@@ -2,6 +2,7 @@ import math
 import os
 
 import matplotlib
+from matplotlib.ticker import ScalarFormatter
 from pyspark.sql import SparkSession
 
 matplotlib.use('Agg')
@@ -26,7 +27,7 @@ class JobArrivalGraph(object):
         if os.path.isfile(os.path.join(self.folder, filename)):
             return filename
 
-        plt.figure()
+        fig = plt.figure(figsize=(9, 7))
         granularity_order = [
             "Second",
             "Minute",
@@ -58,11 +59,11 @@ class JobArrivalGraph(object):
 
             if sum(job_arrivals.values()) == 1:
                 ax.text(0.5, 0.5, 'Not available;\nTrace contains one workflow.', horizontalalignment='center',
-                        verticalalignment='center', transform=ax.transAxes, fontsize=10)
+                        verticalalignment='center', transform=ax.transAxes, fontsize=12)
                 ax.grid(False)
             elif len(job_arrivals.keys()) == 1:
                 ax.text(0.5, 0.5, 'Not available;\nTrace is too small.', horizontalalignment='center',
-                        verticalalignment='center', transform=ax.transAxes, fontsize=10)
+                        verticalalignment='center', transform=ax.transAxes, fontsize=12)
                 ax.grid(False)
             else:
                 ax.plot(job_arrivals.keys(), job_arrivals.values(), color="black", linewidth=1.0)
@@ -72,32 +73,41 @@ class JobArrivalGraph(object):
             ax.set_xlim(0)
             ax.set_ylim(0)
             ax.margins(0.05)
+            ax.tick_params(axis='both', which='major', labelsize=16)
+            ax.tick_params(axis='both', which='minor', labelsize=14)
 
-            ax.set_xlabel('Time ({0})'.format(granularity.lower()), fontsize=16)
-            ax.set_ylabel('# Jobs', fontsize=16)
+            ax.get_xaxis().get_offset_text().set_visible(False)
+            formatter = ScalarFormatter(useMathText=True)
+            formatter.set_powerlimits((-4, 5))
+            ax.get_xaxis().set_major_formatter(formatter)
+            fig.tight_layout()  # Need to set this to be able to get the offset... for whatever reason
+            offset_text = ax.get_xaxis().get_major_formatter().get_offset()
+
+            ax.set_xlabel('Time{0} [{1}]'.format(f' {offset_text}' if len(offset_text) else "", granularity.lower()), fontsize=18)
+            ax.set_ylabel('Number of Workflows', fontsize=18)
             plot_count += 1
 
             # Rotates and right aligns the x labels, and moves the bottom of the
             # axes up to make room for them
             # fig.autofmt_xdate()
 
-        plt.tight_layout()
+        fig.tight_layout()
 
-        plt.savefig(os.path.join(self.folder, filename), dpi=200, format='png')
+        fig.savefig(os.path.join(self.folder, filename), dpi=600, format='png')
         if show:
-            plt.show()
+            fig.show()
 
         return filename
 
 
 if __name__ == '__main__':
-    tasks_loc = "/media/lfdversluis/datastore/SC19-data/parquet-flattened/shell_parquet/workflows/schema-1.0"
+    tasks_loc = "C:/Users/L/Downloads/Galaxy/tasks/schema-1.0"
     spark = (SparkSession.builder
-                  .master("local[5]")
-                  .appName("WTA Analysis")
-                  .config("spark.executor.memory", "3G")
-                  .config("spark.driver.memory", "12G")
-                  .getOrCreate())
+             .master("local[5]")
+             .appName("WTA Analysis")
+             .config("spark.executor.memory", "3G")
+             .config("spark.driver.memory", "12G")
+             .getOrCreate())
 
     task_df = spark.read.parquet(tasks_loc)
 

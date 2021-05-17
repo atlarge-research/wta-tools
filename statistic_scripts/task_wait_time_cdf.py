@@ -1,6 +1,7 @@
 import os
 
 import matplotlib
+from matplotlib.ticker import ScalarFormatter
 from pyspark.sql import SparkSession
 
 matplotlib.use('Agg')
@@ -30,7 +31,7 @@ class TaskWaitTimeCDF(object):
         if os.path.isfile(os.path.join(self.folder, filename)):
             return filename
 
-        plt.figure()
+        fig, ax = plt.subplots()
         df = self.df.filter(F.col("wait_time") >= 0)
         if df.count() > 1000:
             permilles = self.df.approxQuantile("wait_time", [float(i) / 1000 for i in range(0, 1001)], 0.001)
@@ -39,33 +40,43 @@ class TaskWaitTimeCDF(object):
             task_wait_times = sorted(df.toPandas()["wait_time"].tolist())
 
         if len(task_wait_times) == 0 or max(task_wait_times) == -1:
-            plt.text(0.5, 0.5, 'Not available;\nTrace does not contain this information.', horizontalalignment='center',
+            fig.text(0.5, 0.5, 'Not available;\nTrace does not contain this information.', horizontalalignment='center',
                      verticalalignment='center', transform=plt.axes().transAxes, fontsize=16)
-            plt.grid(False)
+            ax.grid(False)
         else:
             ecdf = sm.distributions.ECDF(task_wait_times)
 
             # Change min to 0 to make it start at 0
             x = np.linspace(min(task_wait_times), max(task_wait_times))
             y = ecdf(x)
-            plt.step(x, y)
+            fig.step(x, y)
 
-        plt.xlabel('Wait time (s)', fontsize=18)
-        plt.ylabel('P', fontsize=18)
+        ax.tick_params(axis='both', which='major', labelsize=16)
+        ax.tick_params(axis='both', which='minor', labelsize=14)
 
-        plt.axes().set_xlim(0, None)
-        plt.margins(0.05)
-        plt.tight_layout()
+        ax.get_xaxis().get_offset_text().set_visible(False)
+        formatter = ScalarFormatter(useMathText=True)
+        formatter.set_powerlimits((-4, 5))
+        ax.get_xaxis().set_major_formatter(formatter)
+        fig.tight_layout()  # Need to set this to be able to get the offset... for whatever reason
+        offset_text = ax.get_xaxis().get_major_formatter().get_offset()
 
-        plt.savefig(os.path.join(self.folder, filename), dpi=200, format='png')
+        ax.set_xlabel('Wait Time{} [s]'.format(f' {offset_text}' if len(offset_text) else ""), fontsize=18)
+        ax.set_ylabel('Number of Tasks [CDF]', fontsize=18)
+
+        ax.set_xlim(0, None)
+        ax.margins(0.05)
+        fig.tight_layout()
+
+        fig.savefig(os.path.join(self.folder, filename), dpi=600, format='png')
         if show:
-            plt.show()
+            fig.show()
 
         return filename
 
 
 if __name__ == '__main__':
-    tasks_loc = "/media/lfdversluis/datastore/SC19-data/parquet-flattened/pegasus_P1_parquet/tasks/schema-1.0"
+    tasks_loc = "C:/Users/L/Downloads/Galaxy/tasks/schema-1.0"
     spark = (SparkSession.builder
                   .master("local[5]")
                   .appName("WTA Analysis")

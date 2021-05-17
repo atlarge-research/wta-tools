@@ -21,21 +21,21 @@ class JobArrivalCDF(object):
         filename = "job_arrival_cdf_{0}.png".format(self.workload_name)
         if not os.path.isfile(os.path.join(self.folder, filename)):
             generate_cdf(self.df, "ts_submit", os.path.join(self.folder, filename),
-                         "Arrival time (ms)", "Num. workflows (CDF)", show)
+                         "Arrival time{} [ms]", "Num. workflows (CDF)", show)
 
         return filename
 
 
 if __name__ == '__main__':
-    tasks_loc = "/media/lfdversluis/datastore/SC19-data/parquet-flattened/pegasus_P1_parquet/tasks/schema-1.0"
+    workflows_loc = "C:/Users/L/Downloads/Galaxy/workflows/schema-1.0"
     spark = (SparkSession.builder
-                  .master("local[5]")
-                  .appName("WTA Analysis")
-                  .config("spark.executor.memory", "3G")
-                  .config("spark.driver.memory", "12G")
-                  .getOrCreate())
+             .master("local[5]")
+             .appName("WTA Analysis")
+             .config("spark.executor.memory", "3G")
+             .config("spark.driver.memory", "6G")
+             .getOrCreate())
 
-    task_df = spark.read.parquet(tasks_loc)
+    task_df = spark.read.parquet(workflows_loc)
 
     gne = JobArrivalCDF("test", task_df, ".")
     gne.generate_graphs(show=True)

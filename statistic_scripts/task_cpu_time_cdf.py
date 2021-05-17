@@ -1,4 +1,6 @@
 import matplotlib
+from matplotlib.ticker import ScalarFormatter
+
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import os
@@ -21,7 +23,7 @@ class TaskCPUTimeCDF(object):
         return None, plot_location
 
     def generate_graphs(self, show=False):
-        plt.figure()
+        fig, ax = plt.subplots()
         cpu_times = SortedList()
 
         for task in self.df.itertuples():
@@ -34,19 +36,30 @@ class TaskCPUTimeCDF(object):
         # Change min to 0 to make it start at 0
         x = np.linspace(min(cpu_times), max(cpu_times))
         y = ecdf(x)
-        plt.step(x, y)
+        fig.step(x, y)
 
-        plt.ylim(0, None)
-        plt.xlim(0)
-        plt.xlabel('CPU Time (s)', fontsize=18)
-        plt.ylabel('P', fontsize=18)
+        ax.set_ylim(0, None)
+        ax.set_xlime(0, None)
 
-        plt.margins(0.05)
-        plt.tight_layout()
+        ax.tick_params(axis='both', which='major', labelsize=16)
+        ax.tick_params(axis='both', which='minor', labelsize=14)
+
+        ax.get_xaxis().get_offset_text().set_visible(False)
+        formatter = ScalarFormatter(useMathText=True)
+        formatter.set_powerlimits((-4, 5))
+        ax.get_xaxis().set_major_formatter(formatter)
+        fig.tight_layout()  # Need to set this to be able to get the offset... for whatever reason
+        offset_text = ax.get_xaxis().get_major_formatter().get_offset()
+
+        ax.set_xlabel('CPU Time{} [s]'.format(f' {offset_text}' if len(offset_text) else ""), fontsize=18)
+        ax.set_ylabel('Number of Tasks [CDF]', fontsize=18)
+
+        ax.margins(0.05)
+        fig.tight_layout()
 
         filename = "task_cpu_time_cdf_{0}".format(self.workload_name)
-        plt.savefig(os.path.join(self.folder, filename), dpi=200)
+        fig.savefig(os.path.join(self.folder, filename), dpi=600, format='png')
         if show:
-            plt.show()
+            fig.show()
 
         return filename

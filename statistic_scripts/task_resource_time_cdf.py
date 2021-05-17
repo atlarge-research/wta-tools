@@ -22,7 +22,7 @@ class TaskResourceTimeCDF(object):
         if not os.path.isfile(os.path.join(self.folder, filename)):
             self.df = self.df.withColumn("task_resource_computation_time", F.col("resource_amount_requested") * F.col("runtime"))
             generate_cdf(self.df, "task_resource_computation_time", os.path.join(self.folder, filename),
-                         "Task Core Time (ms)", "Num. tasks (CDF)", show)
+                         "Task Core Time{} [ms]", "Num. tasks [CDF]", show)
 
         return filename
 

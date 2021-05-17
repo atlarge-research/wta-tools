@@ -1,6 +1,7 @@
 import math
 
 import matplotlib
+from matplotlib.ticker import ScalarFormatter
 from pyspark.sql import SparkSession
 from sortedcontainers import SortedDict
 
@@ -9,6 +10,7 @@ import matplotlib.pyplot as plt
 import os
 import pyspark.sql.functions as F
 import pyspark.sql.types as T
+
 
 class TaskArrivalGraph(object):
 
@@ -27,7 +29,7 @@ class TaskArrivalGraph(object):
         if os.path.isfile(os.path.join(self.folder, filename)):
             return filename
 
-        plt.figure()
+        fig = plt.figure(figsize=(9, 7))
         granularity_order = [
             "Second",
             "Minute",
@@ -64,14 +66,12 @@ class TaskArrivalGraph(object):
                 ax.grid(True)
             else:
                 ax.text(0.5, 0.5, 'Not available;\nTrace too small.', horizontalalignment='center',
-                        verticalalignment = 'center', transform = ax.transAxes, fontsize=16)
+                        verticalalignment='center', transform=ax.transAxes, fontsize=16)
                 ax.grid(False)
 
             # Rotates and right aligns the x labels, and moves the bottom of the
             # axes up to make room for them
             # fig.autofmt_xdate()
-            ax.set_xlabel('Time ({0})'.format(granularity.lower()), fontsize=16)
-            ax.set_ylabel('# Tasks', fontsize=16)
 
             ax.set_xlim(0)
             ax.set_ylim(0)
@@ -79,25 +79,39 @@ class TaskArrivalGraph(object):
             ax.locator_params(nbins=3, axis='y')
 
             ax.margins(0.05)
+            ax.tick_params(axis='both', which='major', labelsize=16)
+            ax.tick_params(axis='both', which='minor', labelsize=14)
+
+            ax.get_xaxis().get_offset_text().set_visible(False)
+            formatter = ScalarFormatter(useMathText=True)
+            formatter.set_powerlimits((-4, 5))
+            ax.get_xaxis().set_major_formatter(formatter)
+            fig.tight_layout()  # Need to set this to be able to get the offset... for whatever reason
+            offset_text = ax.get_xaxis().get_major_formatter().get_offset()
+
+            ax.set_xlabel('Time{0} [{1}]'.format(f' {offset_text}' if len(offset_text) else "", granularity.lower()),
+                          fontsize=18)
+            ax.set_ylabel('Number of Tasks', fontsize=18)
+
             plot_count += 1
 
-        plt.tight_layout()
+        fig.tight_layout()
 
-        plt.savefig(os.path.join(self.folder, filename), dpi=200, format='png')
+        fig.savefig(os.path.join(self.folder, filename), dpi=600, format='png')
         if show:
-            plt.show()
+            fig.show()
 
         return filename
 
 
 if __name__ == '__main__':
-    tasks_loc = "/media/lfdversluis/datastore/SC19-data/parquet-flattened/pegasus_P1_parquet/tasks/schema-1.0"
+    tasks_loc = "C:/Users/L/Downloads/Galaxy/tasks/schema-1.0"
     spark = (SparkSession.builder
-                  .master("local[5]")
-                  .appName("WTA Analysis")
-                  .config("spark.executor.memory", "3G")
-                  .config("spark.driver.memory", "12G")
-                  .getOrCreate())
+             .master("local[5]")
+             .appName("WTA Analysis")
+             .config("spark.executor.memory", "3G")
+             .config("spark.driver.memory", "12G")
+             .getOrCreate())
 
     task_df = spark.read.parquet(tasks_loc)
 

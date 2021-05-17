@@ -21,7 +21,7 @@ class TaskRuntimeCDF(object):
         filename = "task_runtime_cdf_{0}.png".format(self.workload_name)
         if not os.path.isfile(os.path.join(self.folder, filename)):
             generate_cdf(self.df, "runtime", os.path.join(self.folder, filename),
-                         "Runtime (ms)", "Num. tasks (CDF)", show)
+                         "Runtime{} [ms]", "Num. tasks [CDF]", show)
 
         return filename
 

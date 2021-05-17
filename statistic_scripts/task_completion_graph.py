@@ -1,6 +1,7 @@
 import math
 
 import matplotlib
+from matplotlib.ticker import ScalarFormatter
 from pyspark.sql import Window, SparkSession
 
 matplotlib.use('Agg')
@@ -28,7 +29,7 @@ class TaskCompletionGraph(object):
         if os.path.isfile(os.path.join(self.folder, filename)):
             return filename
 
-        plt.figure()
+        fig = plt.figure(figsize=(9, 7))
         granularity_order = [
             "Second",
             "Minute",
@@ -40,14 +41,14 @@ class TaskCompletionGraph(object):
             "Second": 1000,
             "Minute": 60 * 1000,
             "Hour": 60 * 60 * 1000,
-            "Day": 60 * 60 * 24 *  1000,
+            "Day": 60 * 60 * 24 * 1000,
         }
 
         plot_number = 0
 
         self.df = self.df.withColumn('completion_time',
-                                F.col("ts_submit") + F.col("runtime") + F.when((F.col("wait_time") > 0),
-                                                                               F.col("wait_time")).otherwise(0))
+                                     F.col("ts_submit") + F.col("runtime") + F.when((F.col("wait_time") > 0),
+                                                                                    F.col("wait_time")).otherwise(0))
         for granularity in granularity_order:
             task_completion_times = SortedDict()
 
@@ -94,10 +95,19 @@ class TaskCompletionGraph(object):
                         verticalalignment='center', transform=ax.transAxes, fontsize=16)
                 ax.grid(False)
 
-            # Rotates and right aligns the x labels, and moves the bottom of the
-            # axes up to make room for them
-            ax.set_xlabel('Time ({0})'.format(granularity.lower()), fontsize=14)
-            ax.set_ylabel('# Tasks', fontsize=14)
+            ax.tick_params(axis='both', which='major', labelsize=16)
+            ax.tick_params(axis='both', which='minor', labelsize=14)
+
+            ax.get_xaxis().get_offset_text().set_visible(False)
+            formatter = ScalarFormatter(useMathText=True)
+            formatter.set_powerlimits((-4, 5))
+            ax.get_xaxis().set_major_formatter(formatter)
+            fig.tight_layout()  # Need to set this to be able to get the offset... for whatever reason
+            offset_text = ax.get_xaxis().get_major_formatter().get_offset()
+
+            ax.set_xlabel('Time{0} [{1}]'.format(f' {offset_text}' if len(offset_text) else "", granularity.lower()),
+                          fontsize=18)
+            ax.set_ylabel('# Tasks', fontsize=18)
 
             ax.set_xlim(0)
             ax.set_ylim(0)
@@ -105,22 +115,22 @@ class TaskCompletionGraph(object):
             ax.margins(0.1)
             plot_number += 1
 
-        plt.tight_layout()
-        plt.savefig(os.path.join(self.folder, filename), dpi=200, format='png')
+        fig.tight_layout()
+        fig.savefig(os.path.join(self.folder, filename), dpi=600, format='png')
         if show:
-            plt.show()
+            fig.show()
 
         return filename
 
 
 if __name__ == '__main__':
-    tasks_loc = "/media/lfdversluis/datastore/SC19-data/parquet-flattened/Google_parquet/tasks/schema-1.0"
+    tasks_loc = "C:/Users/L/Downloads/Galaxy/tasks/schema-1.0"
     spark = (SparkSession.builder
-                  .master("local[5]")
-                  .appName("WTA Analysis")
-                  .config("spark.executor.memory", "3G")
-                  .config("spark.driver.memory", "12G")
-                  .getOrCreate())
+             .master("local[5]")
+             .appName("WTA Analysis")
+             .config("spark.executor.memory", "3G")
+             .config("spark.driver.memory", "12G")
+             .getOrCreate())
 
     task_df = spark.read.parquet(tasks_loc)
 

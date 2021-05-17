@@ -19,6 +19,6 @@ class JobRuntimeCDF(object):
         filename = "job_runtime_cdf_{0}.png".format(self.workload_name)
         if not os.path.isfile(os.path.join(self.folder, filename)):
             generate_cdf(self.df, "critical_path_length", os.path.join(self.folder, filename),
-                         "Critical Path (ms)", "Num. workflows (CDF)", show)
+                         "Critical Path{} [ms]", "Num. workflows (CDF)", show)
 
         return filename
