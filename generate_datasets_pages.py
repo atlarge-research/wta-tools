@@ -66,7 +66,7 @@ class TraceParser:
         ("task-waittime-cdf", TaskWaitTimeCDF),
     ]
 
-    def __init__(self, trace_dir, output_dir):
+    def __init__(self, trace_dir, output_dir, upload_data=False):
         self.trace_dir = trace_dir
         self.output_dir = output_dir
 
@@ -124,21 +124,21 @@ class TraceParser:
             os.remove(traces_yml_location)
 
         print("Parsing traces...")
-        self.parse_wtf_traces()
+        self.parse_wtf_traces(upload_data)
 
-    def parse_wtf_traces(self):
+    def parse_wtf_traces(self, upload_data):
 
         trace_dicts = []
 
         for file in glob.iglob(os.path.join(self.trace_dir, '*')):
             if os.path.isdir(file):
-                file_name, trace_dict = self.parse_trace(file)
+                file_name, trace_dict = self.parse_trace(file, upload_data)
                 trace_dicts.append(trace_dict)
 
         with open(os.path.join(self.output_dir, "wta-data", "traces.yml"), "w+") as trace_info_file:
             trace_info_file.write(yaml.safe_dump(trace_dicts, default_flow_style=False))
 
-    def parse_trace(self, file_path, upload_to_zenodo=False):
+    def parse_trace(self, file_path, upload_to_zenodo):
         # Get the file name without the extension
         raw_file_name = str(os.path.basename(file_path).split(".")[0])
         file_name = str(os.path.basename(file_path).split(".")[0])
