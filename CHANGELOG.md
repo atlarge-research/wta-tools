@@ -8,7 +8,7 @@
 - An example changelog entry [@hpage](https://gitlab.ewi.tudelft.nl/hpage)
 
 ### Changed
- 
+
 ### Fixed
 
 ### Deprecated
