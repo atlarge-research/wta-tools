@@ -10,6 +10,7 @@ workflow:
     - if: $CI_COMMIT_REF_NAME == 'main'
 
 stages:
+  - linter
   - build
   - test
 
@@ -17,6 +18,13 @@ cache:
   paths:
     - .m2/repository
     - target
+
+lint_job:
+  stage: linter
+  
+  script:
+    - echo "Spotless check started"
+    - "mvn spotless:check"
 
 build_job:
   stage: build
