@@ -4,15 +4,23 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>org.example</groupId>
-  <artifactId>mavenExampleProject</artifactId>
+  <groupId>com.asml.apa.wta</groupId>
+  <artifactId>wta-parent</artifactId>
   <version>1.0-SNAPSHOT</version>
+  <packaging>pom</packaging>
 
   <properties>
-    <maven.compiler.source>17</maven.compiler.source>
-    <maven.compiler.target>17</maven.compiler.target>
+    <maven.compiler.source>11</maven.compiler.source>
+    <maven.compiler.target>11</maven.compiler.target>
     <spotless.version>2.36.0</spotless.version>
+    <junit.version>5.9.3</junit.version>
+    <surefire.version>3.0.0</surefire.version>
   </properties>
+
+  <modules>
+    <module>core</module>
+    <module>adapter/spark</module>
+  </modules>
 
   <dependencies>
     <!-- https://mvnrepository.com/artifact/com.diffplug.spotless/spotless-maven-plugin -->
@@ -20,6 +28,20 @@
       <groupId>com.diffplug.spotless</groupId>
       <artifactId>spotless-maven-plugin</artifactId>
       <version>${spotless.version}</version>
+    </dependency>
+    <!-- https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api -->
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-api</artifactId>
+      <version>${junit.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <!-- https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-engine -->
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-engine</artifactId>
+      <version>${junit.version}</version>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 
@@ -34,6 +56,7 @@
             <format>
               <includes>
                 <include>*.md</include>
+                <include>*.yml</include>
                 <include>.gitignore</include>
               </includes>
               <trimTrailingWhitespace/>
@@ -45,9 +68,27 @@
             </format>
           </formats>
           <java>
+            <toggleOffOn />
+            <removeUnusedImports />
+            <importOrder />
+            <trimTrailingWhitespace />
             <palantirJavaFormat />
+            <endWithNewline />
+            <formatAnnotations />
+            <indent>
+              <tabs>true</tabs>
+              <spacesPerTab>4</spacesPerTab>
+            </indent>
+            <indent>
+              <spaces>true</spaces>
+              <spacesPerTab>2</spacesPerTab>
+            </indent>
           </java>
         </configuration>
+      </plugin>
+      <plugin>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>${surefire.version}</version>
       </plugin>
     </plugins>
   </build>
