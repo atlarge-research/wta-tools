@@ -30,9 +30,6 @@ spotbugs-sast:
 
   variables:
     COMPILE: "false"
-    artifacts:
-      reports:
-        sast: gl-sast-report.json
 
 
 semgrep-sast:
