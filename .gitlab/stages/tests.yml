@@ -1,0 +1,7 @@
+java-tests:
+  stage: tests
+
+  script:
+    - echo "Java tests started"
+    - "mvn test"
+    # - "" todo, fail when <60% for pitest, or <80% for the rest

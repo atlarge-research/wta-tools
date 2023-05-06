@@ -10,32 +10,18 @@ workflow:
     - if: $CI_COMMIT_REF_NAME == 'main'
 
 stages:
-  - linter
-  - build
-  - test
+  - build-core
+  - build-adapters
+  - tests
+  - checks
+
+include:
+  - local: '.gitlab/workflows/build-core.yml'
+  - local: '.gitlab/workflows/build-adapters.yml'
+  - local: '.gitlab/workflows/tests.yml'
+  - local: '.gitlab/workflows/checks.yml'
 
 cache:
   paths:
     - .m2/repository
     - target
-
-lint_job:
-  stage: linter
-
-  script:
-    - echo "Spotless check started"
-    - "mvn spotless:check"
-
-build_job:
-  stage: build
-
-  script:
-    - echo "Maven compile started"
-    - "mvn clean compile"
-
-test_job:
-  stage: test
-
-  script:
-    - echo "Maven test started"
-    - "mvn test"
