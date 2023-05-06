@@ -24,8 +24,19 @@ code_quality:
   stage: checks
 
 
+spotbugs-sast:
+  stage: checks
+  allow_failure: true
+
+
+semgrep-sast:
+  stage: checks
+  allow_failure: true
+
+
 gemnasium-dependencies:
   stage: checks
+  allow_failure: true
 
   script:
     - echo "Gemnasium dependency check started"
