@@ -16,10 +16,10 @@ stages:
   - checks
 
 include:
-  - local: '.gitlab/workflows/build-core.yml'
-  - local: '.gitlab/workflows/build-adapters.yml'
-  - local: '.gitlab/workflows/tests.yml'
-  - local: '.gitlab/workflows/checks.yml'
+  - local: '.gitlab/stages/build-core.yml'
+  - local: '.gitlab/stages/build-adapters.yml'
+  - local: '.gitlab/stages/tests.yml'
+  - local: '.gitlab/stages/checks.yml'
 
 cache:
   paths:
