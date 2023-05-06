@@ -24,22 +24,6 @@ code_quality:
   stage: checks
 
 
-spotbugs-sast:
-  stage: checks
-  allow_failure: true
-
-  variables:
-    COMPILE: "false"
-
-
-semgrep-sast:
-  stage: checks
-  allow_failure: true
-
-  variables:
-    COMPILE: "false"
-
-
 gemnasium-dependencies:
   stage: checks
   allow_failure: true
@@ -47,8 +31,6 @@ gemnasium-dependencies:
   script:
     - echo "Gemnasium dependency check started"
     - "mvn gemnasium:dump-dependencies"
-    - "mvn -pl core gemnasium:dump-dependencies"
-    - "mvn -pl adapter/spark gemnasium:dump-dependencies"
 
 
 pmd:
