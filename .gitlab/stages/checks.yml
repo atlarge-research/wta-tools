@@ -28,10 +28,19 @@ spotbugs-sast:
   stage: checks
   allow_failure: true
 
+  variables:
+    COMPILE: "false"
+    artifacts:
+      reports:
+        sast: gl-sast-report.json
+
 
 semgrep-sast:
   stage: checks
   allow_failure: true
+
+  variables:
+    COMPILE: "false"
 
 
 gemnasium-dependencies:
