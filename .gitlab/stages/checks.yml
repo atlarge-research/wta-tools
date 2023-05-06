@@ -20,6 +20,10 @@ dependency_scanning:
   stage: checks
 
 
+code_quality:
+  stage: checks
+
+
 gemnasium-dependencies:
   stage: checks
 
