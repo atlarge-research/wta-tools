@@ -21,7 +21,7 @@ cache:
 
 lint_job:
   stage: linter
-  
+
   script:
     - echo "Spotless check started"
     - "mvn spotless:check"
@@ -31,7 +31,7 @@ build_job:
 
   script:
     - echo "Maven compile started"
-    - "mvn compile"
+    - "mvn clean compile"
 
 test_job:
   stage: test
