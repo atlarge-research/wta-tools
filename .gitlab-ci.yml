@@ -20,9 +20,6 @@ include:
   - local: '.gitlab/stages/build-adapters.yml'
   - local: '.gitlab/stages/tests.yml'
   - local: '.gitlab/stages/checks.yml'
-  - template: Jobs/SAST.gitlab-ci.yml
-  - template: Jobs/Dependency-Scanning.gitlab-ci.yml
-  - template: Code-Quality.gitlab-ci.yml
 
 cache:
   paths:

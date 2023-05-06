@@ -1,3 +1,9 @@
+include:
+  - template: Jobs/SAST.gitlab-ci.yml
+  - template: Jobs/Dependency-Scanning.gitlab-ci.yml
+  - template: Code-Quality.gitlab-ci.yml
+
+
 spotless:
   stage: checks
 
@@ -6,7 +12,7 @@ spotless:
     - "mvn spotless:check"
 
 
-semgrep-sast:
+sast:
   stage: checks
 
 
@@ -18,10 +24,6 @@ gemnasium-dependencies:
     - "mvn gemnasium:dump-dependencies"
     - "mvn -pl core gemnasium:dump-dependencies"
     - "mvn -pl adapter/spark gemnasium:dump-dependencies"
-
-
-spotbugs-sast:
-  stage: checks
 
 
 pmd:
