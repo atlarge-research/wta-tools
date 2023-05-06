@@ -16,6 +16,10 @@ sast:
   stage: checks
 
 
+dependency_scanning:
+  stage: checks
+
+
 gemnasium-dependencies:
   stage: checks
 
