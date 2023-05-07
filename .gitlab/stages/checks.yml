@@ -52,15 +52,6 @@ code_quality:
     - if: $CI_COMMIT_REF_NAME == 'main'
 
 
-gemnasium-dependencies:
-  stage: checks
-  allow_failure: true
-
-  script:
-    - echo "Gemnasium dependency check started"
-    - "mvn gemnasium:dump-dependencies"
-
-
 pmd:
   stage: checks
 
