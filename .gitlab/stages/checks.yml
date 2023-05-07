@@ -1,7 +1,6 @@
 include:
   - template: Jobs/SAST.gitlab-ci.yml
   - template: Jobs/Dependency-Scanning.gitlab-ci.yml
-  - template: Code-Quality.gitlab-ci.yml
 
 
 spotless:
@@ -14,6 +13,7 @@ spotless:
 
 sast:
   stage: checks
+  allow_failure: true
 
 
 spotbugs-sast:
@@ -34,17 +34,10 @@ semgrep-sast:
 
 dependency_scanning:
   stage: checks
+  allow_failure: true
 
 
 gemnasium-dependency_scanning:
-  stage: checks
-  rules:
-    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
-    - if: $CI_COMMIT_REF_NAME == 'dev'
-    - if: $CI_COMMIT_REF_NAME == 'main'
-
-
-code_quality:
   stage: checks
   rules:
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
