@@ -16,12 +16,40 @@ sast:
   stage: checks
 
 
+spotbugs-sast:
+  stage: checks
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+    - if: $CI_COMMIT_REF_NAME == 'dev'
+    - if: $CI_COMMIT_REF_NAME == 'main'
+
+
+semgrep-sast:
+  stage: checks
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+    - if: $CI_COMMIT_REF_NAME == 'dev'
+    - if: $CI_COMMIT_REF_NAME == 'main'
+
+
 dependency_scanning:
   stage: checks
 
 
+gemnasium-dependency_scanning:
+  stage: checks
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+    - if: $CI_COMMIT_REF_NAME == 'dev'
+    - if: $CI_COMMIT_REF_NAME == 'main'
+
+
 code_quality:
   stage: checks
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+    - if: $CI_COMMIT_REF_NAME == 'dev'
+    - if: $CI_COMMIT_REF_NAME == 'main'
 
 
 gemnasium-dependencies:
