@@ -43,63 +43,51 @@
   </dependencies>
 
   <build>
-    <pluginManagement>
-      <plugins>
-        <plugin>
-          <groupId>com.diffplug.spotless</groupId>
-          <artifactId>spotless-maven-plugin</artifactId>
-          <version>${spotless.version}</version>
-          <configuration>
-            <formats>
-              <format>
-                <includes>
-                  <include>*.md</include>
-                  <include>*.yml</include>
-                  <include>.gitignore</include>
-                </includes>
-                <trimTrailingWhitespace/>
-                <endWithNewline/>
-                <indent>
-                  <spaces>true</spaces>
-                  <spacesPerTab>2</spacesPerTab>
-                </indent>
-              </format>
-            </formats>
-            <java>
-              <toggleOffOn />
-              <removeUnusedImports />
-              <importOrder />
-              <trimTrailingWhitespace />
-              <palantirJavaFormat />
-              <endWithNewline />
-              <formatAnnotations />
-              <indent>
-                <tabs>true</tabs>
-                <spacesPerTab>4</spacesPerTab>
-              </indent>
+    <plugins>
+      <plugin>
+        <groupId>com.diffplug.spotless</groupId>
+        <artifactId>spotless-maven-plugin</artifactId>
+        <version>${spotless.version}</version>
+        <configuration>
+          <formats>
+            <format>
+              <includes>
+                <include>*.md</include>
+                <include>*.yml</include>
+                <include>.gitignore</include>
+              </includes>
+              <trimTrailingWhitespace/>
+              <endWithNewline/>
               <indent>
                 <spaces>true</spaces>
                 <spacesPerTab>2</spacesPerTab>
               </indent>
-            </java>
-          </configuration>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-surefire-plugin</artifactId>
-          <version>${surefire.version}</version>
-        </plugin>
-        <plugin>
-          <groupId>com.gemnasium</groupId>
-          <artifactId>gemnasium-maven-plugin</artifactId>
-          <version>${gemnasium.version}</version>
-          <configuration>
-            <ignoredScopes>test</ignoredScopes>
-          </configuration>
-        </plugin>
-      </plugins>
-    </pluginManagement>
-    <plugins>
+            </format>
+          </formats>
+          <java>
+            <toggleOffOn />
+            <removeUnusedImports />
+            <importOrder />
+            <trimTrailingWhitespace />
+            <palantirJavaFormat />
+            <endWithNewline />
+            <formatAnnotations />
+            <indent>
+              <tabs>true</tabs>
+              <spacesPerTab>4</spacesPerTab>
+            </indent>
+            <indent>
+              <spaces>true</spaces>
+              <spacesPerTab>2</spacesPerTab>
+            </indent>
+          </java>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>${surefire.version}</version>
+      </plugin>
       <plugin>
         <groupId>com.gemnasium</groupId>
         <artifactId>gemnasium-maven-plugin</artifactId>
