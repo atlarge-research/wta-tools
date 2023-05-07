@@ -1,5 +1,9 @@
 build-spark-adapter:
   stage: build-adapters
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+    - if: $CI_COMMIT_REF_NAME == 'dev'
+    - if: $CI_COMMIT_REF_NAME == 'main'
 
 
 build-spark-image:
