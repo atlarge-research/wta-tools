@@ -17,6 +17,7 @@ stages:
   - checks
 
 include:
+  - local: '.gitlab/stages/build-image.yml'
   - local: '.gitlab/stages/build-core.yml'
   - local: '.gitlab/stages/build-adapters.yml'
   - local: '.gitlab/stages/tests.yml'
