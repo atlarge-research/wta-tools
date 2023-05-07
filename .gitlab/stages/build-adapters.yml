@@ -1,21 +1,13 @@
-build-spark-adapter:
-  stage: build-adapters
-  rules:
-    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
-    - if: $CI_COMMIT_REF_NAME == 'dev'
-    - if: $CI_COMMIT_REF_NAME == 'main'
-
-
 build-spark-image:
+  stage: build-adapters
   script:
     - echo "Build Spark image started"
     - echo "[INFO] the Spark image build stage is unused at the moment, but included for when the need arises"
-  extends: build-spark-adapter
 
 
-build-spark-module:
+build-spark-adapter:
+  stage: build-adapters
   script:
     - echo "Build Spark adapter started"
     - "mvn -pl adapter/spark compile"
-  extends: build-spark-adapter
   needs: [build-spark-image]
