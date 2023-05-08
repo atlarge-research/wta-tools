@@ -1,5 +1,6 @@
 variables:
-  MAVEN_OPTS: -Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository
+  MAVEN_OPTS: "-Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository"
+  SAST_JAVA_VERSION: "11"
 
 image: maven:3-openjdk-11
 
@@ -10,32 +11,20 @@ workflow:
     - if: $CI_COMMIT_REF_NAME == 'main'
 
 stages:
-  - linter
-  - build
-  - test
+  - build-image
+  - build-core
+  - build-adapters
+  - tests
+  - checks
+
+include:
+  - local: '.gitlab/stages/build-image.yml'
+  - local: '.gitlab/stages/build-core.yml'
+  - local: '.gitlab/stages/build-adapters.yml'
+  - local: '.gitlab/stages/tests.yml'
+  - local: '.gitlab/stages/checks.yml'
 
 cache:
   paths:
     - .m2/repository
     - target
-
-lint_job:
-  stage: linter
-
-  script:
-    - echo "Spotless check started"
-    - "mvn spotless:check"
-
-build_job:
-  stage: build
-
-  script:
-    - echo "Maven compile started"
-    - "mvn clean compile"
-
-test_job:
-  stage: test
-
-  script:
-    - echo "Maven test started"
-    - "mvn test"

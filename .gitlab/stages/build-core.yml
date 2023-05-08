@@ -1,0 +1,6 @@
+build-core:
+  stage: build-core
+
+  script:
+    - echo "Build core started"
+    - "mvn -pl core compile"

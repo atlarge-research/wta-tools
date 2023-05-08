@@ -53,3 +53,9 @@ buildNumber.properties
 .project
 # JDT-specific (Eclipse Java Development Tools)
 .classpath
+
+# Gemnasium
+gemnasium-maven-plugin.json
+
+# pipeline reports (JaCoCo, pit)
+reports

@@ -5,6 +5,7 @@
 ## [Unreleased]
 ### Added
 - Initial project setup & pipeline fix [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
+- Augmented the pipeline [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 - Added basic config file & read utils [@lyadalachanchu](https://gitlab.ewi.tudelft.nl/lyadalachanchu)
 
 ### Changed
