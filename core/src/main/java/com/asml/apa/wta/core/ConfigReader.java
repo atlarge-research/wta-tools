@@ -2,8 +2,10 @@ package com.asml.apa.wta.core;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.io.File;
+import lombok.Getter;
 
+import java.io.File;
+@Getter
 public class ConfigReader {
   String author;
   String domain;
