@@ -20,8 +20,8 @@ public class ConfigReader {
       // extract the author, domain, and description fields from the JsonNode object
       this.author = rootNode.get("author").asText();
       this.domain = rootNode.get("domain").asText();
-      String description = rootNode.has("description") ? rootNode.get("description").asText() : "";
-
+      String description =
+          rootNode.has("description") ? rootNode.get("description").asText() : "";
 
     } catch (Exception e) {
       System.out.println("Config file error");
