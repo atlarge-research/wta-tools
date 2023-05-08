@@ -1,7 +1,25 @@
-java-tests:
+unit-tests:
   stage: tests
 
   script:
-    - echo "Java tests started"
-    - "mvn test"
-    # - "" todo, fail when <60% for pitest, or <80% for the rest
+    - echo "Unit tests started"
+    - "mvn surefire:unit-tests"
+#    - "mvn jacoco:check" todo, fail when <80%
+
+
+integration-tests:
+  stage: tests
+
+  script:
+    - echo "Integration tests started"
+    - "mvn surefire:integration-tests"
+#    - todo, fail when <80%
+
+
+mutation-tests:
+  stage: tests
+
+  script:
+    - echo "Mutation tests started"
+    - "mvn pitest:mutationCoverage"
+#    - todo, fail when <60%
