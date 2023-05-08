@@ -13,13 +13,13 @@ public class ConfigReader {
   private String domain;
   private String description;
 
-  public ConfigReader() {
+  public ConfigReader(String configDir) {
     try {
       // create ObjectMapper instance
       ObjectMapper mapper = new ObjectMapper();
 
       // read JSON file into a JsonNode object
-      JsonNode rootNode = mapper.readTree(new File("config.json"));
+      JsonNode rootNode = mapper.readTree(new File(configDir));
 
       // extract the author, domain, and description fields from the JsonNode object
       JsonNode workloadNode = rootNode.get("workloadSettings");
@@ -29,8 +29,10 @@ public class ConfigReader {
           ? workloadNode.get("description").asText()
           : "";
 
-    } catch (Exception e) {
+    } catch (NullPointerException e) {
       System.err.println("A mandatory field is missing");
+    } catch (Exception e) {
+      e.printStackTrace();
     }
   }
 }
