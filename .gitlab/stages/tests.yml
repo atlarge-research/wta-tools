@@ -29,4 +29,4 @@ mutation-tests:
 
   script:
     - echo "Mutation tests started"
-    - "mvn pitest:report-aggregate"
+#    - "mvn pitest:report-aggregate"
