@@ -27,6 +27,7 @@ mutation-tests-core:
   allow_failure: true
   script:
     - echo "Mutation tests core started"
+    - "mvn -pl core pitest:mutationCoverage"
     - "mvn -pl core pitest:report-aggregate"
 #    - "cat reports/pitest/index | grep todo something"
 
