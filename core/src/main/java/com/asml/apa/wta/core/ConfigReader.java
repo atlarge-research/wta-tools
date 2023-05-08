@@ -25,8 +25,9 @@ public class ConfigReader {
       JsonNode workloadNode = rootNode.get("workloadSettings");
       this.author = workloadNode.get("author").asText();
       this.domain = workloadNode.get("domain").asText();
-      this.description =
-          workloadNode.has("description") ? workloadNode.get("description").asText() : "";
+      this.description = workloadNode.has("description")
+          ? workloadNode.get("description").asText()
+          : "";
 
     } catch (Exception e) {
       System.err.println("A mandatory field is missing");
