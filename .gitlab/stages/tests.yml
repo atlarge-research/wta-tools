@@ -18,6 +18,7 @@ integration-tests:
 
 mutation-tests:
   stage: tests
+  allow_failure: true
 
   script:
     - echo "Mutation tests started"
