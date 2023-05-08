@@ -1,0 +1,49 @@
+include:
+  - template: Jobs/SAST.gitlab-ci.yml
+  - template: Jobs/Dependency-Scanning.gitlab-ci.yml
+
+
+spotless:
+  stage: checks
+
+  script:
+    - echo "Spotless check started"
+    - "mvn spotless:check"
+
+pmd:
+  stage: checks
+
+  script:
+    - echo "PMD checks started"
+    - "mvn pmd:check"
+
+
+sast:
+  stage: checks
+  allow_failure: true
+
+spotbugs-sast:
+  stage: checks
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+    - if: $CI_COMMIT_REF_NAME == 'dev'
+    - if: $CI_COMMIT_REF_NAME == 'main'
+
+semgrep-sast:
+  stage: checks
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+    - if: $CI_COMMIT_REF_NAME == 'dev'
+    - if: $CI_COMMIT_REF_NAME == 'main'
+
+
+dependency_scanning:
+  stage: checks
+  allow_failure: true
+
+gemnasium-dependency_scanning:
+  stage: checks
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+    - if: $CI_COMMIT_REF_NAME == 'dev'
+    - if: $CI_COMMIT_REF_NAME == 'main'
