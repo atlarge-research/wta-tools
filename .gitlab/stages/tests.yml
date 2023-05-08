@@ -22,12 +22,9 @@ integration-tests:
 #  coverage: /Total.*?([0-9]{1,3})%/
 
 
-mutation-tests:
+mutation-tests-core:
   stage: tests
   allow_failure: true
-
-mutation-tests-core:
-  extends: mutation-tests
   script:
     - echo "Mutation tests core started"
     - "mvn -pl core pitest:report-aggregate"
@@ -36,7 +33,8 @@ mutation-tests-core:
 #  coverage: /Total.*?([0-9]{1,3})%/
 
 mutation-tests-adapter-spark:
-  extends: mutation-tests
+  stage: tests
+  allow_failure: true
   script:
     - echo "Mutation tests adapter/spark started"
     - "mvn -pl adapter/spark pitest:report-aggregate"
