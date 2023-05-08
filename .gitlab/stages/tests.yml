@@ -4,10 +4,11 @@ unit-tests:
   script:
     - echo "Unit tests started"
     - "mvn surefire:test"
-    - "mvn jacoco:report-aggregate"
-    - "cat reports/jacoco/index.html | grep -Po 'Total.*?([0-9]{1,3})%'"
+#    - "mvn jacoco:report-aggregate"
+#    - "cat reports/jacoco/index.html | grep -Po 'Total.*?([0-9]{1,3})%'"
 
-  coverage: /Total.*?([0-9]{1,3})%/
+
+#  coverage: /Total.*?([0-9]{1,3})%/
 
 
 integration-tests:
@@ -16,10 +17,10 @@ integration-tests:
   script:
     - echo "Integration tests started"
     - "mvn failsafe:integration-test"
-    - "mvn jacoco:report-aggregate"
-    - "cat reports/jacoco/index.html | grep -Po 'Total.*?([0-9]{1,3})%'"
+#    - "mvn jacoco:report-aggregate"
+#    - "cat reports/jacoco/index.html | grep -Po 'Total.*?([0-9]{1,3})%'"
 
-  coverage: /Total.*?([0-9]{1,3})%/
+#  coverage: /Total.*?([0-9]{1,3})%/
 
 
 mutation-tests:
