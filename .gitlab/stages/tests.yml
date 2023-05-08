@@ -32,3 +32,10 @@ mutation-tests:
     - echo "Mutation tests started"
     - "mvn pitest:report-aggregate"
 # todo, fail when <60%
+
+ls:
+  stage: tests
+  script:
+    - echo "try to ls"
+    - ls -la
+    - echo "tried to ls"
