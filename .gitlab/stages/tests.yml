@@ -6,7 +6,6 @@ unit-tests:
     - "mvn surefire:test"
     - "mvn jacoco:report-aggregate"
     - "cat reports/jacoco/index.html | grep -Po 'Total.*?([0-9]{1,3})%'"
-  # todo, fail when <80%
 
   coverage: /Total.*?([0-9]{1,3})%/
 
@@ -18,8 +17,7 @@ integration-tests:
     - echo "Integration tests started"
     - "mvn failsafe:integration-test"
     - "mvn jacoco:report-aggregate"
-    - "cat reports/jacoco/index.html | grep -Po 'Total.*?([0-9]{1,3})%'"
-  # todo, fail when <80%
+    - "cat reports/jacoco/index.html | grep -Po 'Total.*?([0-9]{1,3})%' | cat"
 
   coverage: /Total.*?([0-9]{1,3})%/
 
@@ -31,4 +29,3 @@ mutation-tests:
   script:
     - echo "Mutation tests started"
     - "mvn pitest:report-aggregate"
-# todo, fail when <60%
