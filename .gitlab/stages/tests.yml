@@ -7,7 +7,6 @@ unit-tests:
 #    - "mvn jacoco:report-aggregate"
 #    - "cat reports/jacoco/index.html | grep -Po 'Total.*?([0-9]{1,3})%'"
 
-
 #  coverage: /Total.*?([0-9]{1,3})%/
 
 
@@ -27,6 +26,20 @@ mutation-tests:
   stage: tests
   allow_failure: true
 
+mutation-tests-core:
+  extends: mutation-tests
   script:
-    - echo "Mutation tests started"
-    - "mvn pitest:report-aggregate"
+    - echo "Mutation tests core started"
+    - "mvn -pl core pitest:report-aggregate"
+#    - "cat reports/pitest/index | grep todo something"
+
+#  coverage: /Total.*?([0-9]{1,3})%/
+
+mutation-tests-adapter-spark:
+  extends: mutation-tests
+  script:
+    - echo "Mutation tests adapter/spark started"
+    - "mvn -pl adapter/spark pitest:report-aggregate"
+#    - "cat reports/pitest/index | grep todo something"
+
+#  coverage: /Total.*?([0-9]{1,3})%/

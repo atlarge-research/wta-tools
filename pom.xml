@@ -166,10 +166,13 @@
         <artifactId>pitest-maven</artifactId>
         <version>${pitest.version}</version>
         <configuration>
+          <reportsDirectory>reports/pitest</reportsDirectory>
+          <timestampedReports>false</timestampedReports>
           <exportLineCoverage>true</exportLineCoverage>
           <outputFormats>
             <value>XML</value>
           </outputFormats>
+          <failWhenNoMutations>false</failWhenNoMutations>
         </configuration>
       </plugin>
     </plugins>
