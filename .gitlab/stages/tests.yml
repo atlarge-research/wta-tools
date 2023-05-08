@@ -8,7 +8,7 @@ unit-tests:
     - "cat reports/jacoco/index.html | grep -Po 'Total.*?([0-9]{1,3})%'"
   # todo, fail when <80%
 
-  coverage: /([0-9]{1,3})%/
+  coverage: /Total.*?([0-9]{1,3})%/
 
 
 integration-tests:
@@ -21,7 +21,7 @@ integration-tests:
     - "cat reports/jacoco/index.html | grep -Po 'Total.*?([0-9]{1,3})%'"
   # todo, fail when <80%
 
-  coverage: /([0-9]{1,3})%/
+  coverage: /Total.*?([0-9]{1,3})%/
 
 
 mutation-tests:
