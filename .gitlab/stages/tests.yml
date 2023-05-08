@@ -3,7 +3,7 @@ unit-tests:
 
   script:
     - echo "Unit tests started"
-    - "mvn surefire:unit-tests"
+    - "mvn surefire:test"
 #    - "mvn jacoco:check" todo, fail when <80%
 
 
@@ -12,7 +12,7 @@ integration-tests:
 
   script:
     - echo "Integration tests started"
-    - "mvn surefire:integration-tests"
+    - "mvn failsafe:integration-tests"
 #    - todo, fail when <80%
 
 
