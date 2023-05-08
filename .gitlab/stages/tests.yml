@@ -12,7 +12,7 @@ integration-tests:
 
   script:
     - echo "Integration tests started"
-    - "mvn failsafe:integration-tests"
+    - "mvn failsafe:integration-test"
 #    - todo, fail when <80%
 
 
