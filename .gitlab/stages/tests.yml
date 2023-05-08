@@ -37,5 +37,5 @@ ls:
   stage: tests
   script:
     - echo "try to ls"
-    - ls -la
+    - ls -Rla
     - echo "tried to ls"
