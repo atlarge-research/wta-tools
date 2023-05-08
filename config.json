@@ -1,4 +1,5 @@
 {
   "author": "John Smith",
-  "domain": "example.com"
+  "domain": "example.com",
+  "description": "This is a description."
 }
