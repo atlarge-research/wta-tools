@@ -4,7 +4,11 @@ unit-tests:
   script:
     - echo "Unit tests started"
     - "mvn surefire:test"
-#    - "mvn jacoco:check" todo, fail when <80%
+    - "mvn jacoco:report-aggregate"
+    - "cat reports/jacoco/jacoco.html | grep -Po 'Total.*?([0-9]{1,3})%'"
+  # todo, fail when <80%
+
+  coverage: /([0-9]{1,3})%/
 
 
 integration-tests:
@@ -13,7 +17,11 @@ integration-tests:
   script:
     - echo "Integration tests started"
     - "mvn failsafe:integration-test"
-#    - todo, fail when <80%
+    - "mvn jacoco:report-aggregate"
+    - "cat reports/jacoco/jacoco.html | grep -Po 'Total.*?([0-9]{1,3})%'"
+  # todo, fail when <80%
+
+  coverage: /([0-9]{1,3})%/
 
 
 mutation-tests:
@@ -22,5 +30,5 @@ mutation-tests:
 
   script:
     - echo "Mutation tests started"
-    - "mvn pitest:mutationCoverage"
-#    - todo, fail when <60%
+    - "mvn pitest:report-aggregate"
+# todo, fail when <60%

@@ -21,6 +21,7 @@
     <jacoco.version>0.8.10</jacoco.version>
     <pitest.version>1.13.1</pitest.version>
     <failsafe.version>3.1.0</failsafe.version>
+    <lombok.version>1.18.26</lombok.version>
   </properties>
 
   <modules>
@@ -47,7 +48,7 @@
     <dependency>
       <groupId>org.projectlombok</groupId>
       <artifactId>lombok</artifactId>
-      <version>1.18.26</version>
+      <version>${lombok.version}</version>
       <scope>provided</scope>
     </dependency>
   </dependencies>
@@ -137,6 +138,12 @@
         <groupId>org.jacoco</groupId>
         <artifactId>jacoco-maven-plugin</artifactId>
         <version>${jacoco.version}</version>
+        <configuration>
+          <formats>
+            <format>HTML</format>
+          </formats>
+          <outputDirectory>reports/jacoco</outputDirectory>
+        </configuration>
         <executions>
           <execution>
             <goals>

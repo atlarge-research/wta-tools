@@ -56,3 +56,6 @@ buildNumber.properties
 
 # Gemnasium
 gemnasium-maven-plugin.json
+
+# JaCoCo
+reports/jacoco/
