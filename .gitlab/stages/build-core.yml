@@ -4,3 +4,4 @@ build-core:
   script:
     - echo "Build core started"
     - "mvn -pl core compile"
+    - "mvn -pl core test-compile"

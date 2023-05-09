@@ -6,7 +6,7 @@ unit-tests-core:
     - "mvn -pl core surefire:test"
     - "mvn -pl core jacoco:report"
     - "ls -la"
-    - "cat asml-dev/core/reports/jacoco/index.html | grep -Po 'Total.*?([0-9]{1,3})%'"
+    - "cat core/reports/jacoco/index.html | grep -Po 'Total.*?([0-9]{1,3})%'"
 
   coverage: /([0-9]{1,3})%/
 
@@ -48,6 +48,7 @@ integration-tests-adapter-spark:
 mutation-tests-core:
   stage: tests
   allow_failure: true
+
   script:
     - echo "Mutation tests core started"
     - "mvn -pl core pitest:mutationCoverage"
@@ -58,6 +59,7 @@ mutation-tests-core:
 mutation-tests-adapter-spark:
   stage: tests
   allow_failure: true
+
   script:
     - echo "Mutation tests adapter/spark started"
     - "mvn -pl adapter/spark pitest:mutationCoverage"

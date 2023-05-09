@@ -10,4 +10,5 @@ build-spark-adapter:
   script:
     - echo "Build Spark adapter started"
     - "mvn -pl adapter/spark compile"
+    - "mvn -pl adapter/spark test-compile"
   needs: [build-spark-image]
