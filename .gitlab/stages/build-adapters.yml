@@ -6,7 +6,8 @@ build-spark-adapter:
     - "mvn -pl adapter/spark test-compile compile"
 
   artifacts:
-    name: build-spark-adapter-artefact
-    expire_in: 2 hours
-    paths:
-      - adapter/spark/target/
+    build:
+      spark-adapter:
+        expire_in: 2 hours
+        paths:
+          - adapter/spark/target/

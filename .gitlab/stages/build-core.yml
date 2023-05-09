@@ -6,7 +6,8 @@ build-core:
     - "mvn -pl core test-compile compile"
 
   artifacts:
-    name: build-core-artefact
-    expire_in: 2 hours
-    paths:
-      - core/target/
+    build:
+      core:
+        expire_in: 2 hours
+        paths:
+          - core/target/
