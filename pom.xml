@@ -25,6 +25,7 @@
     <failsafe.version>3.1.0</failsafe.version>
     <lombok.version>1.18.26</lombok.version>
     <pitest.junit.version>1.1.2</pitest.junit.version>
+    <checkstyle.version>3.2.2</checkstyle.version>
   </properties>
 
   <modules>
@@ -186,6 +187,18 @@
             <version>${pitest.junit.version}</version>
           </dependency>
         </dependencies>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+        <version>${checkstyle.version}</version>
+        <configuration>
+          <configLocation>config/checkstyle.xml</configLocation>
+          <encoding>UTF-8</encoding>
+          <consoleOutput>true</consoleOutput>
+          <failsOnError>true</failsOnError>
+          <linkXRef>false</linkXRef>
+        </configuration>
       </plugin>
     </plugins>
   </build>

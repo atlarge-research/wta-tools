@@ -17,6 +17,13 @@ pmd:
     - echo "PMD checks started"
     - "mvn pmd:check"
 
+checkstyle:
+  stage: checks
+
+  script:
+    - echo "Checkstyle checks started"
+    - "mvn checkstyle:check"
+
 
 sast:
   stage: checks
