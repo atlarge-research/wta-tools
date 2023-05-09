@@ -9,4 +9,4 @@ build-core:
     name: build-core-artefact
     expire_in: 2 hours
     paths:
-      - build/
+      - core/target/

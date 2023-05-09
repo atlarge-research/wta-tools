@@ -16,6 +16,6 @@ build-spark-adapter:
     name: build-spark-adapter-artefact
     expire_in: 2 hours
     paths:
-      - build/
+      - adapter/spark/target/
 
   needs: [build-spark-image]
