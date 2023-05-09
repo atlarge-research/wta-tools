@@ -1,6 +1,7 @@
 package com.asml.apa.wta.spark.Executor;
 
-import com.asml.apa.wta.spark.WTAPlugin;
+import com.asml.apa.wta.spark.Driver.WtaDriverPlugin;
+import com.asml.apa.wta.spark.WtaPlugin;
 import java.util.Map;
 import org.apache.spark.SparkContext;
 import org.apache.spark.TaskFailedReason;
@@ -11,9 +12,9 @@ import org.apache.spark.api.plugin.PluginContext;
  * Executor component of the plugin.
  *
  * @author Henry Page
- * @version 1.0.0
+ * @since 1.0.0
  */
-public class WTAExecutorComponent implements ExecutorPlugin {
+public class WtaExecutorPlugin implements ExecutorPlugin {
 
   /**
    * This method is called when the plugin is initialized on the executor.
@@ -22,8 +23,8 @@ public class WTAExecutorComponent implements ExecutorPlugin {
    *
    * @param ctx The PluginContext object that represents the context of the plugin.
    * @param extraConf A Map<String,String> object that contains any extra configuration information. This map
-   *                  is directly returned from {@link com.asml.apa.wta.spark.Driver.WTADriverComponent#init(SparkContext, PluginContext)}
-   * @see WTAPlugin#executorPlugin() where a new instance of the plugin is created. This gets called as soon
+   *                  is directly returned from {@link WtaDriverPlugin#init(SparkContext, PluginContext)}
+   * @see WtaPlugin#executorPlugin() where a new instance of the plugin is created. This gets called as soon
    * as it is loaded on to the executor.
    */
   @Override

@@ -1,7 +1,7 @@
 package com.asml.apa.wta.spark;
 
-import com.asml.apa.wta.spark.Driver.WTADriverComponent;
-import com.asml.apa.wta.spark.Executor.WTAExecutorComponent;
+import com.asml.apa.wta.spark.Driver.WtaDriverPlugin;
+import com.asml.apa.wta.spark.Executor.WtaExecutorPlugin;
 import org.apache.spark.api.plugin.DriverPlugin;
 import org.apache.spark.api.plugin.ExecutorPlugin;
 import org.apache.spark.api.plugin.SparkPlugin;
@@ -12,9 +12,9 @@ import org.apache.spark.api.plugin.SparkPlugin;
  * It includes driver- and executor-side plugins that can be loaded when the plugin is used.
  *
  * @author Henry Page
- * @version 1.0.0
+ * @since 1.0.0
  */
-public class WTAPlugin implements SparkPlugin {
+public class WtaPlugin implements SparkPlugin {
 
   /**
    * Returns the driver-side component of the plugin.
@@ -23,7 +23,7 @@ public class WTAPlugin implements SparkPlugin {
    */
   @Override
   public DriverPlugin driverPlugin() {
-    return new WTADriverComponent();
+    return new WtaDriverPlugin();
   }
 
   /**
@@ -33,6 +33,6 @@ public class WTAPlugin implements SparkPlugin {
    */
   @Override
   public ExecutorPlugin executorPlugin() {
-    return new WTAExecutorComponent();
+    return new WtaExecutorPlugin();
   }
 }

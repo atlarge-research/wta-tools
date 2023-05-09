@@ -10,9 +10,9 @@ import org.apache.spark.api.plugin.PluginContext;
  * Driver component of the plugin.
  *
  * @author Henry Page
- * @version 1.0.0
+ * @since 1.0.0
  */
-public class WTADriverComponent implements DriverPlugin {
+public class WtaDriverPlugin implements DriverPlugin {
 
   /**
    * This method is called early in the initialization of the Spark driver.
@@ -24,6 +24,7 @@ public class WTADriverComponent implements DriverPlugin {
    * @param pCtx Additional plugin-specific about the Spark application where the plugin is running.
    * @return Extra information provided to the executor.
    */
+  @Override
   public Map<String, String> init(SparkContext sCtx, PluginContext pCtx) {
     return new HashMap<>();
   }
