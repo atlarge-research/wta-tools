@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.FileInputStream;
 
 public class WTAUtils {
-  static final String CONFIG_DIR = "config.json";
+  private static final String CONFIG_DIR = "config.json";
 
   /**
    * Reads the config file and creates the associated config object.
