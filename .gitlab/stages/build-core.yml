@@ -3,4 +3,10 @@ build-core:
 
   script:
     - echo "Build core started"
-    - "mvn -pl core compile"
+    - "mvn -pl core test-compile compile"
+
+  artifacts:
+    name: build-core-artefact
+    expire_in: 2 hours
+    paths:
+      - core/target/

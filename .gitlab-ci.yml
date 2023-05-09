@@ -11,14 +11,12 @@ workflow:
     - if: $CI_COMMIT_REF_NAME == 'main'
 
 stages:
-  - build-image
   - build-core
   - build-adapters
   - tests
   - checks
 
 include:
-  - local: '.gitlab/stages/build-image.yml'
   - local: '.gitlab/stages/build-core.yml'
   - local: '.gitlab/stages/build-adapters.yml'
   - local: '.gitlab/stages/tests.yml'
@@ -27,4 +25,3 @@ include:
 cache:
   paths:
     - .m2/repository
-    - target

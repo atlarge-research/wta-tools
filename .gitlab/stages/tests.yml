@@ -1,32 +1,84 @@
-unit-tests:
+variables:
+  PITEST_OPTS: "-DwithHistory"
+
+unit-tests-core:
   stage: tests
 
+  dependencies:
+    - build-core
+
   script:
-    - echo "Unit tests started"
-    - "mvn surefire:test"
-#    - "mvn jacoco:report-aggregate"
-#    - "cat reports/jacoco/index.html | grep -Po 'Total.*?([0-9]{1,3})%'"
+    - echo "Core unit tests started"
+    - "mvn -pl core jacoco:prepare-agent surefire:test jacoco:report"
+    - "cat core/reports/jacoco/index.html | grep -Po 'Total.*?([0-9]{1,3})%' || echo '0%'"
 
+  coverage: /([0-9]{1,3})%/
 
-#  coverage: /Total.*?([0-9]{1,3})%/
-
-
-integration-tests:
+unit-tests-spark-adapter:
   stage: tests
 
+  dependencies:
+    - build-spark-adapter
+
   script:
-    - echo "Integration tests started"
-    - "mvn failsafe:integration-test"
-#    - "mvn jacoco:report-aggregate"
-#    - "cat reports/jacoco/index.html | grep -Po 'Total.*?([0-9]{1,3})%'"
+    - echo "Spark adapter unit tests started"
+    - "mvn -pl adapter/spark jacoco:prepare-agent surefire:test jacoco:report"
+    - "cat adapter/spark/reports/jacoco/index.html | grep -Po 'Total.*?([0-9]{1,3})%' || echo '0%'"
 
-#  coverage: /Total.*?([0-9]{1,3})%/
+  coverage: /([0-9]{1,3})%/
 
 
-mutation-tests:
+integration-tests-core:
+  stage: tests
+
+  dependencies:
+    - build-core
+
+  script:
+    - echo "Core integration tests started"
+    - "mvn -pl core jacoco:prepare-agent-integration failsafe:integration-test jacoco:report-integration"
+    - "cat core/reports/jacoco/index.html | grep -Po 'Total.*?([0-9]{1,3})%' || echo '0%'"
+
+  coverage: /([0-9]{1,3})%/
+
+integration-tests-spark-adapter:
+  stage: tests
+
+  dependencies:
+    - build-spark-adapter
+
+  script:
+    - echo "Spark adapter integration tests started"
+    - "mvn -pl adapter/spark jacoco:prepare-agent-integration failsafe:integration-test jacoco:report-integration"
+    - "cat adapter/spark/reports/jacoco/index.html | grep -Po 'Total.*?([0-9]{1,3})%' || echo '0%'"
+
+  coverage: /([0-9]{1,3})%/
+
+
+mutation-tests-core:
   stage: tests
   allow_failure: true
 
+  dependencies:
+    - build-core
+
   script:
-    - echo "Mutation tests started"
-#    - "mvn pitest:report-aggregate"
+    - echo "Core mutation tests core started"
+    - "mvn -pl core $PITEST_OPTS pitest:mutationCoverage"
+    - "cat core/reports/pitest/index.html | awk -F '</?td>' 'FNR == 25 { print $2 }' || echo '0%'"
+
+  coverage: /([0-9]{1,3})%/
+
+mutation-tests-spark-adapter:
+  stage: tests
+  allow_failure: true
+
+  dependencies:
+    - build-spark-adapter
+
+  script:
+    - echo "Spark adapter mutation tests adapter/spark started"
+    - "mvn -pl adapter/spark $PITEST_OPTS pitest:mutationCoverage"
+    - "cat adapter/spark/reports/pitest/index.html | awk -F '</?td>' 'FNR == 25 { print $2 }' || echo '0%'"
+
+  coverage: /([0-9]{1,3})%/

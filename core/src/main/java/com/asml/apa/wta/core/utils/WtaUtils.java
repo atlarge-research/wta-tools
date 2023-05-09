@@ -1,18 +1,26 @@
-package com.asml.apa.wta.core.Utils;
+package com.asml.apa.wta.core.utils;
 
-import com.asml.apa.wta.core.Config.RuntimeConfig;
+import com.asml.apa.wta.core.config.RuntimeConfig;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.FileInputStream;
 
-public class WTAUtils {
+public class WtaUtils {
+
   private static final String CONFIG_DIR = "config.json";
+
+  /**
+   * Utility classes should not have a public or default constructor.
+   */
+  private WtaUtils() {
+    throw new IllegalStateException();
+  }
 
   /**
    * Reads the config file and creates the associated config object.
    *
    * @param configDir The directory where the config is located.
-   * @return The associated config object.
+   * @return The associated config object
    */
   public static RuntimeConfig readConfig(String configDir) {
     var configBuilder = RuntimeConfig.builder();
