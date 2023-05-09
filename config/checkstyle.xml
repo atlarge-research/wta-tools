@@ -9,8 +9,8 @@
   <property name="severity" value="error"/>
 
   <module name="FileTabCharacter"/> <!-- Java Style Guide: Whitespace characters -->
-  <module name="NewlineAtEndOfFile"> <!-- Java Style Guide: Line ending: LF, modified to CRLF -->
-    <property name="lineSeparator" value="crlf"/>
+  <module name="NewlineAtEndOfFile"> <!-- Java Style Guide: Line ending: LF -->
+    <property name="lineSeparator" value="lf"/>
   </module>
   <module name="RegexpSingleline"> <!-- No reference needed as this is evident. -->
     <property name="format" value="&lt;&lt;&lt;&lt;&lt;&lt;&lt;"/>
