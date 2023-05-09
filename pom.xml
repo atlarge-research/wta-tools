@@ -24,6 +24,7 @@
     <pitest.version>1.13.1</pitest.version>
     <failsafe.version>3.1.0</failsafe.version>
     <lombok.version>1.18.26</lombok.version>
+    <pitest.junit.version>1.1.2</pitest.junit.version>
   </properties>
 
   <modules>
@@ -173,7 +174,18 @@
             <value>XML</value>
           </outputFormats>
           <failWhenNoMutations>false</failWhenNoMutations>
+          <targetClasses>
+            <targetClass>com.asml.apa.wta.*</targetClass>
+          </targetClasses>
         </configuration>
+        <dependencies>
+          <!-- https://mvnrepository.com/artifact/org.pitest/pitest-junit5-plugin -->
+          <dependency>
+            <groupId>org.pitest</groupId>
+            <artifactId>pitest-junit5-plugin</artifactId>
+            <version>${pitest.junit.version}</version>
+          </dependency>
+        </dependencies>
       </plugin>
     </plugins>
   </build>

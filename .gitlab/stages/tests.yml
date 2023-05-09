@@ -28,6 +28,7 @@ mutation-tests-core:
   script:
     - echo "Mutation tests core started"
     - "mvn -pl core pitest:mutationCoverage"
+    - "mvn -pl core pitest:report"
     - "mvn -pl core pitest:report-aggregate"
 #    - "cat reports/pitest/index | grep todo something"
 
@@ -38,7 +39,7 @@ mutation-tests-adapter-spark:
   allow_failure: true
   script:
     - echo "Mutation tests adapter/spark started"
-    - "mvn -pl adapter/spark pitest:report-aggregate"
+    - "mvn -e -pl adapter/spark pitest:report-aggregate"
 #    - "cat reports/pitest/index | grep todo something"
 
 #  coverage: /Total.*?([0-9]{1,3})%/
