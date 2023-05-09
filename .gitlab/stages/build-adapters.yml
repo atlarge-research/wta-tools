@@ -7,8 +7,15 @@ build-spark-image:
 
 build-spark-adapter:
   stage: build-adapters
+
   script:
     - echo "Build Spark adapter started"
-    - "mvn -pl adapter/spark compile"
-    - "mvn -pl adapter/spark test-compile"
+    - "mvn -pl adapter/spark test-compile compile"
+
+  artifacts:
+    name: build-spark-adapter-artefact
+    expire_in: 2 hours
+    paths:
+      - build/
+
   needs: [build-spark-image]
