@@ -8,6 +8,7 @@
 - Augmented the pipeline [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 - Added basic config file & read utils [@lyadalachanchu](https://gitlab.ewi.tudelft.nl/lyadalachanchu)
 - Fixed the pipeline's testing stage, added checkstyle, and incorporated basic coverage reporting to GitLab CI/CD in the pipeline [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
+- Created the benchmarking module for performance evaluation of plugins [@pcho](https://gitlab.ewi.tudelft.nl/pcho)
 
 ### Changed
 

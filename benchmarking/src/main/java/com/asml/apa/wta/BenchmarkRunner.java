@@ -8,12 +8,12 @@ import org.openjdk.jmh.runner.options.OptionsBuilder;
 
 public class BenchmarkRunner {
 
-    public static void main(String[] args) throws Exception {
-        Options options = new OptionsBuilder()
-                .include(SparkSQLBenchmark.class.getSimpleName())
-                .addProfiler(StackProfiler.class)
-                .addProfiler(GCProfiler.class)
-                .build();
-        new Runner(options).run();
-    }
+  public static void main(String[] args) throws Exception {
+    Options options = new OptionsBuilder()
+        .include(SparkSQLBenchmark.class.getSimpleName())
+        .addProfiler(StackProfiler.class)
+        .addProfiler(GCProfiler.class)
+        .build();
+    new Runner(options).run();
+  }
 }
