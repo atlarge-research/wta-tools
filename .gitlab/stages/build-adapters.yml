@@ -1,13 +1,12 @@
-build-spark-image:
-  stage: build-adapters
-  script:
-    - echo "Build Spark image started"
-    - echo "[INFO] the Spark image build stage is unused at the moment, but included for when the need arises"
-
-
 build-spark-adapter:
   stage: build-adapters
+
   script:
     - echo "Build Spark adapter started"
-    - "mvn -pl adapter/spark compile"
-  needs: [build-spark-image]
+    - "mvn -pl adapter/spark test-compile compile"
+
+  artifacts:
+    name: build-spark-adapter-artefact
+    expire_in: 2 hours
+    paths:
+      - adapter/spark/target/

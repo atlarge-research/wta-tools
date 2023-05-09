@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<!DOCTYPE suppressions PUBLIC
+        "-//Checkstyle//DTD SuppressionFilter Configuration 1.2//EN"
+        "https://checkstyle.org/dtds/suppressions_1_2.dtd">
+
+<suppressions>
+  <!-- HideUtilityClassConstructor enforces the existence of an explicit constructor for Main, we consider this nonsense. -->
+  <suppress files="Main.java" checks="HideUtilityClassConstructor" />
+</suppressions>
