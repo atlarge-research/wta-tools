@@ -7,7 +7,7 @@
 - Initial project setup & pipeline fix [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 - Augmented the pipeline [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 - Added basic config file & read utils [@lyadalachanchu](https://gitlab.ewi.tudelft.nl/lyadalachanchu)
-
+- Added plugin initialisation support [@hpage](https://gitlab.ewi.tudelft.nl/hpage)
 ### Changed
 
 ### Fixed
