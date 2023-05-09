@@ -1,6 +1,0 @@
-build-base-image:
-  stage: build-image
-
-  script:
-    - echo "Build base image started"
-    - echo "[INFO] the base image build stage is unused at the moment, but included for when the need arises"
