@@ -10,6 +10,7 @@
     </parent>
 
     <artifactId>benchmarking</artifactId>
+
     <dependencies>
         <dependency>
             <groupId>org.openjdk.jmh</groupId>
@@ -26,7 +27,6 @@
             <artifactId>spark-sql_2.13</artifactId>
             <version>3.2.0</version>
         </dependency>
-        <!--        &lt;!&ndash; https://mvnrepository.com/artifact/org.apache.spark/spark-core &ndash;&gt;-->
         <dependency>
             <groupId>org.apache.spark</groupId>
             <artifactId>spark-core_2.13</artifactId>
@@ -38,11 +38,4 @@
             <version>0.22</version>
         </dependency>
     </dependencies>
-
-<!--    <properties>-->
-<!--        <maven.compiler.source>11</maven.compiler.source>-->
-<!--        <maven.compiler.target>11</maven.compiler.target>-->
-<!--        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>-->
-<!--    </properties>-->
-
 </project>
