@@ -194,7 +194,7 @@
           <timestampedReports>false</timestampedReports>
           <exportLineCoverage>true</exportLineCoverage>
           <outputFormats>
-            <value>XML</value>
+            <value>HTML</value>
           </outputFormats>
           <failWhenNoMutations>false</failWhenNoMutations>
           <targetClasses>
