@@ -7,7 +7,7 @@ import com.asml.apa.wta.core.config.RuntimeConfig;
 import com.asml.apa.wta.core.utils.WtaUtils;
 import org.junit.jupiter.api.Test;
 
-public class ConfigReaderTests {
+public class ConfigReaderTest {
   @Test
   void readsConfigFileCorrectly() {
     RuntimeConfig cr = WtaUtils.readConfig("src/test/resources/testConfig.json");

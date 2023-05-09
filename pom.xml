@@ -86,7 +86,7 @@
         <version>${failsafe.version}</version>
         <configuration>
           <includes>
-            <include>**/*IntegrationTests.java</include>
+            <include>**/*IntegrationTest.java</include>
           </includes>
         </configuration>
       </plugin>
@@ -97,10 +97,10 @@
         <configuration>
           <argLine>${argLine}</argLine>
           <includes>
-            <include>**/*Tests.java</include>
+            <include>**/*Test.java</include>
           </includes>
           <excludes>
-            <exclude>**/*IntegrationTests.java</exclude>
+            <exclude>**/*IntegrationTest.java</exclude>
           </excludes>
         </configuration>
       </plugin>
