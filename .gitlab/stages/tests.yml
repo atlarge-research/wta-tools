@@ -1,3 +1,6 @@
+variables:
+  PITEST_OPTS: "-DwithHistory"
+
 unit-tests-core:
   stage: tests
 
@@ -61,8 +64,8 @@ mutation-tests-core:
 
   script:
     - echo "Core mutation tests core started"
-    - "mvn -pl core pitest:mutationCoverage"
-    - "cat core/reports/pitest/index.html | grep -Po '<tbody><tr><td>.*?<td>.*?<td>.*?([0-9]{1,3})%'"
+    - "mvn -pl core $PITEST_OPTS pitest:mutationCoverage"
+    - "cat core/reports/pitest/index.html | awk -F '</?td[^>]*>' '{ print $6 }' | grep -Po '([0-9]{1,3})%'"
 
   coverage: /([0-9]{1,3})%/
 
@@ -75,7 +78,7 @@ mutation-tests-spark-adapter:
 
   script:
     - echo "Spark adapter mutation tests adapter/spark started"
-    - "mvn -pl adapter/spark pitest:mutationCoverage"
-    - "cat adapter/spark/reports/pitest/index.html | grep -Po '<tbody><tr><td>.*?<td>.*?<td>.*?([0-9]{1,3})%'"
+    - "mvn -pl adapter/spark $PITEST_OPTS pitest:mutationCoverage"
+    - "cat adapter/spark/reports/pitest/index.html | awk -F '</?td[^>]*>' '{ print $6 }' | grep -Po '([0-9]{1,3})%'"
 
   coverage: /([0-9]{1,3})%/
