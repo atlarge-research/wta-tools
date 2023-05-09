@@ -5,9 +5,8 @@ unit-tests-core:
     - build-core
 
   script:
-    - echo "Unit tests started"
-    - "mvn -pl core surefire:test"
-    - "mvn -pl core jacoco:report"
+    - echo "Core unit tests started"
+    - "mvn -pl core jacoco:prepare-agent surefire:test jacoco:report"
     - "cat core/reports/jacoco/index.html | grep -Po 'Total.*?([0-9]{1,3})%'"
 
   coverage: /([0-9]{1,3})%/
@@ -19,9 +18,8 @@ unit-tests-spark-adapter:
     - build-spark-adapter
 
   script:
-    - echo "Unit tests started"
-    - "mvn -pl adapter/spark surefire:test"
-    - "mvn -pl adapter/spark jacoco:report"
+    - echo "Spark adapter unit tests started"
+    - "mvn -pl adapter/spark jacoco:prepare-agent surefire:test jacoco:report"
 #    - "cat adapter/spark/reports/jacoco/index.html | grep -Po 'Total.*?([0-9]{1,3})%'"
 
 #  coverage: /([0-9]{1,3})%/
@@ -34,7 +32,7 @@ integration-tests-core:
     - build-core
 
   script:
-    - echo "Integration tests started"
+    - echo "Core integration tests started"
     - "mvn -pl core failsafe:integration-test"
     - "mvn -pl core jacoco:report-integration"
 #    - "cat reports/jacoco/index.html | grep -Po 'Total.*?([0-9]{1,3})%'"
@@ -48,7 +46,7 @@ integration-tests-spark-adapter:
     - build-spark-adapter
 
   script:
-    - echo "Integration tests started"
+    - echo "Spark adapter integration tests started"
     - "mvn -pl adapter/spark failsafe:integration-test"
     - "mvn -pl adapter/spark jacoco:report-integration"
 #    - "cat reports/jacoco/index.html | grep -Po 'Total.*?([0-9]{1,3})%'"
@@ -64,7 +62,7 @@ mutation-tests-core:
     - build-core
 
   script:
-    - echo "Mutation tests core started"
+    - echo "Core mutation tests core started"
     - "mvn -pl core pitest:mutationCoverage"
 #    - "cat reports/pitest/pit-report/ | grep todo something"
 
@@ -78,7 +76,7 @@ mutation-tests-spark-adapter:
     - build-spark-adapter
 
   script:
-    - echo "Mutation tests adapter/spark started"
+    - echo "Spark adapter mutation tests adapter/spark started"
     - "mvn -pl adapter/spark pitest:mutationCoverage"
 #    - "cat reports/pitest/pit-report/ | grep todo something"
 
