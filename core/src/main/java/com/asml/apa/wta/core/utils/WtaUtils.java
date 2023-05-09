@@ -1,6 +1,7 @@
 package com.asml.apa.wta.core.utils;
 
 import com.asml.apa.wta.core.config.RuntimeConfig;
+import com.asml.apa.wta.core.model.Workflow;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.FileInputStream;
@@ -31,13 +32,15 @@ public class WtaUtils {
       JsonNode rootNode = mapper.readTree(fis);
 
       JsonNode workloadNode = rootNode.get("workloadSettings");
+      JsonNode workflowNode = rootNode.get("workflowSettings");
       String author = workloadNode.get("author").asText();
       String domain = workloadNode.get("domain").asText();
       String description = workloadNode.has("description")
           ? workloadNode.get("description").asText()
           : "";
-
-      configBuilder = configBuilder.author(author).domain(domain).description(description);
+      String schemaVersion = workflowNode.get("schemaVersion").asText();
+      Workflow.setSchemaVersion(schemaVersion);
+      configBuilder = configBuilder.author(author).domain(domain).description(description).schemaVersion(schemaVersion);
 
     } catch (Exception e) {
       throw new IllegalArgumentException(

@@ -4,10 +4,12 @@
 
 ## [Unreleased]
 ### Added
+- Basic pipeline setup [@lyadalachanchu](https://gitlab.ewi.tudelft.nl/lyadalachanchu)
 - Initial project setup & pipeline fix [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 - Augmented the pipeline [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 - Added basic config file & read utils [@lyadalachanchu](https://gitlab.ewi.tudelft.nl/lyadalachanchu)
 - Fixed the pipeline's testing stage, added checkstyle, and incorporated basic coverage reporting to GitLab CI/CD in the pipeline [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
+- Created basic skeleton of Workflow object [@lyadalachanchu](https://gitlab.ewi.tudelft.nl/lyadalachanchu)
 
 ### Changed
 

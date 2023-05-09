@@ -17,6 +17,8 @@ public class RuntimeConfig {
 
   private String domain;
 
+  private String schemaVersion;
+
   @Builder.Default
   private String description = "";
 }

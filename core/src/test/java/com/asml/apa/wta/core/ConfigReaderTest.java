@@ -14,6 +14,7 @@ public class ConfigReaderTest {
     assertThat(cr.getAuthor()).isEqualTo("Test Name");
     assertThat(cr.getDomain()).isEqualTo("Test Domain");
     assertThat(cr.getDescription()).isEqualTo("Test Description");
+    assertThat(cr.getSchemaVersion()).isEqualTo("1.0.0");
   }
 
   @Test
@@ -22,6 +23,7 @@ public class ConfigReaderTest {
     assertThat(cr.getAuthor()).isEqualTo("Test Name");
     assertThat(cr.getDomain()).isEqualTo("Test Domain");
     assertThat(cr.getDescription()).isEqualTo("");
+    assertThat(cr.getSchemaVersion()).isEqualTo("1.0.0");
   }
 
   @Test
