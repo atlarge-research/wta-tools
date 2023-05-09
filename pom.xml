@@ -16,7 +16,7 @@
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <spotless.version>2.36.0</spotless.version>
     <junit.version>5.9.3</junit.version>
-    <surefire.version>3.0.0</surefire.version>
+    <surefire.version>3.1.0</surefire.version>
     <error-prone.version>2.18.0</error-prone.version>
     <gemnasium.version>0.5.1</gemnasium.version>
     <pmd.version>3.20.0</pmd.version>
@@ -52,6 +52,13 @@
     <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter-api</artifactId>
+      <version>${junit.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <!-- https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-engine -->
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-engine</artifactId>
       <version>${junit.version}</version>
       <scope>test</scope>
     </dependency>
@@ -208,10 +215,8 @@
         <version>${checkstyle.version}</version>
         <configuration>
           <configLocation>config/checkstyle.xml</configLocation>
-          <encoding>UTF-8</encoding>
-          <consoleOutput>true</consoleOutput>
+          <consoleOutput>false</consoleOutput>
           <failsOnError>true</failsOnError>
-          <linkXRef>false</linkXRef>
         </configuration>
       </plugin>
     </plugins>
