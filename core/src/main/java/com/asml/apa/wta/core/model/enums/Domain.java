@@ -7,7 +7,7 @@ import lombok.Getter;
  * Domain enum
  *
  * @author Lohithsai Yadala Chanchu
- * @version 1.0.0
+ * @since 1.0.0
  */
 @AllArgsConstructor
 public enum Domain {

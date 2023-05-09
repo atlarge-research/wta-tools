@@ -2,17 +2,23 @@ package com.asml.apa.wta.core.model;
 
 import com.asml.apa.wta.core.model.enums.Domain;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 /**
  * Workflow class
  *
  * @author Lohithsai Yadala Chanchu
- * @version 1.0.0
+ * @since 1.0.0
  */
 @Data
-@Builder
-@AllArgsConstructor
-public class Workflow {
+@SuperBuilder
+@EqualsAndHashCode(callSuper = true)
+public class Workflow extends SchemaObject {
+
+  private static final long serialVersionUID = 2L;
+
+  // Current assumption is that schemaVersion is the same across all Workflow objects, but it might be different
+  // across different SchemaObjects
   @Setter
   private static String schemaVersion;
 
