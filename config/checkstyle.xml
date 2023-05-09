@@ -410,8 +410,8 @@
     </module>
     <module name="JavadocMethod"> <!-- Java Style Guide: Where Javadoc is used -->
       <property name="accessModifiers" value="public"/>
-      <property name="allowMissingParamTags" value="true"/>
-      <property name="allowMissingReturnTag" value="true"/>
+<!--      <property name="allowMissingParamTags" value="true"/> modified, removed -->
+<!--      <property name="allowMissingReturnTag" value="true"/> modified, removed -->
       <property name="allowedAnnotations" value="Override, Test"/>
     </module>
     <module name="JavadocStyle"/> <!-- Java Style Guide: Javadoc -->
