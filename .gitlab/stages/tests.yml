@@ -65,7 +65,7 @@ mutation-tests-core:
   script:
     - echo "Core mutation tests core started"
     - "mvn -pl core $PITEST_OPTS pitest:mutationCoverage"
-    - "cat core/reports/pitest/index.html | awk -F '</?td>' 'FNR == 25 { print $2 }'"
+    - "cat core/reports/pitest/index.html | awk -F '</?td>' 'FNR == 25 { print $2 }' || echo '0%'"
 
   coverage: /([0-9]{1,3})%/
 
@@ -79,6 +79,6 @@ mutation-tests-spark-adapter:
   script:
     - echo "Spark adapter mutation tests adapter/spark started"
     - "mvn -pl adapter/spark $PITEST_OPTS pitest:mutationCoverage"
-    - "cat adapter/spark/reports/pitest/index.html | awk -F '</?td>' 'FNR == 25 { print $2 }'"
+    - "cat adapter/spark/reports/pitest/index.html | awk -F '</?td>' 'FNR == 25 { print $2 }' || echo '0%'"
 
   coverage: /([0-9]{1,3})%/
