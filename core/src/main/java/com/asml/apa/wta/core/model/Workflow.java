@@ -13,7 +13,8 @@ import lombok.*;
 @Builder
 @AllArgsConstructor
 public class Workflow {
-  private final String schemaVersion;
+  @Setter
+  private static String schemaVersion;
 
   private final long id;
 
