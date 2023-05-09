@@ -3,8 +3,7 @@ package com.asml.apa.wta.core.WTAClasses;
 import com.asml.apa.wta.core.WTAClasses.enums.Domain;
 import lombok.*;
 
-@Getter
-@Setter
+@Data
 @Builder
 @AllArgsConstructor
 public class Workflow {
