@@ -7,13 +7,21 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.apache.spark.SparkConf;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
-import org.openjdk.jmh.annotations.*;
+import org.openjdk.jmh.annotations.Benchmark;
+import org.openjdk.jmh.annotations.BenchmarkMode;
+import org.openjdk.jmh.annotations.Fork;
+import org.openjdk.jmh.annotations.Measurement;
+import org.openjdk.jmh.annotations.Mode;
+import org.openjdk.jmh.annotations.OutputTimeUnit;
+import org.openjdk.jmh.annotations.Scope;
+import org.openjdk.jmh.annotations.Setup;
+import org.openjdk.jmh.annotations.State;
+import org.openjdk.jmh.annotations.TearDown;
+import org.openjdk.jmh.annotations.Warmup;
 import org.openjdk.jmh.infra.Blackhole;
 
 @State(Scope.Thread)
@@ -22,20 +30,20 @@ import org.openjdk.jmh.infra.Blackhole;
 @Warmup(iterations = 20)
 @Measurement(iterations = 50)
 @OutputTimeUnit(TimeUnit.NANOSECONDS)
-public class SparkSQLBenchmark {
+public class SparkBenchmark {
 
   private SparkSession spark;
   private TaskMetrics taskMetrics;
   private String baseQueryFilePath = "benchmarking/src/main/resources/sql_files/query";
 
   /**
-   * utility method to get the query String from SQL file
+   * utility method to get the query String from SQL file.
    *
-   * @param filepath  Filepath of the SQL file
-   * @return          Query String
-   * @throws IOException
+   * @param filepath      Filepath of the SQL file
+   * @return              Query String
+   * @throws IOException  throws IOException
    */
-  private static String getSQLQuery(String filepath) throws IOException {
+  private static String getQuery(String filepath) throws IOException {
     return Files.lines(Paths.get(filepath), StandardCharsets.UTF_8)
         .filter(line -> !line.startsWith("--")) // exclude SQL comments
         .filter(line -> !line.isBlank()) // exclude empty lines
@@ -44,11 +52,11 @@ public class SparkSQLBenchmark {
   }
 
   /**
-   * Reads each dataset parquet file and compile them into a single dataframe of tables
+   * Reads each dataset parquet file and compile them into a single dataframe of tables.
    *
-   * @param spark                 SparkSession instances
+   * @param spark           SparkSession instance
    */
-  private static void exportTCPDSData(
+  private static void importData(
       SparkSession spark,
       String parquetFilepath1,
       String parquetFilepath2,
@@ -130,9 +138,7 @@ public class SparkSQLBenchmark {
    * runtime measurements.
    */
   @Setup
-  public void setup() {
-    System.out.println("Setting up Spark session");
-
+  public void before() {
     SparkConf conf = new SparkConf()
         .setAppName("SparkSQLBenchmark")
         .setMaster("local[1]")
@@ -140,13 +146,13 @@ public class SparkSQLBenchmark {
         .set("spark.executor.instances", "1")
         // 4 cores on each executor
         .set("spark.executor.cores", "4");
+
     spark = SparkSession.builder().config(conf).getOrCreate();
+    spark.sparkContext().setLogLevel("ERROR");
     taskMetrics = new TaskMetrics(spark);
-    Logger.getLogger("org").setLevel(Level.OFF);
-    Logger.getLogger("akka").setLevel(Level.OFF);
 
     String resourcesPath = "benchmarking/src/main/resources/tpcds_data/";
-    exportTCPDSData(
+    importData(
         spark,
         resourcesPath + "call_center/part-00000-52733cca-0604-4ebb-ba8f-612f9aa375ab-c000.snappy.parquet",
         resourcesPath + "catalog_page/part-00000-4b931ee0-00f2-4b2d-958e-fbdca8b1ed70-c000.snappy.parquet",
@@ -177,11 +183,10 @@ public class SparkSQLBenchmark {
   }
 
   /**
-   * Teardown method that shuts down the Spark session after every iteration
+   * Teardown method that shuts down the Spark session after every iteration.
    */
   @TearDown
-  public void tearDown() {
-    System.out.println("Tearing down Spark session");
+  public void after() {
     spark.stop();
   }
 
@@ -191,13 +196,13 @@ public class SparkSQLBenchmark {
    * @param blackhole Blackhole to consume the result of the query
    */
   @Benchmark
-  public void coreRunAllQueries(Blackhole blackhole) {
+  public void coreRunAllQueries(Blackhole blackhole) throws IOException {
     for (int i = 1; i < 100; i++) {
       try {
-        String query = getSQLQuery(baseQueryFilePath + i + ".sql");
+        String query = getQuery(baseQueryFilePath + i + ".sql");
         blackhole.consume(spark.sql(query).showString(1, 0, false));
       } catch (Exception e) {
-        System.out.println("Query " + i + " failed");
+        throw new IOException("Failed to run query " + i);
       }
     }
   }
@@ -209,14 +214,14 @@ public class SparkSQLBenchmark {
    * @param blackhole Blackhole to consume the result of the query
    */
   @Benchmark
-  public void pluginRunAllQueries(Blackhole blackhole) {
+  public void pluginRunAllQueries(Blackhole blackhole) throws IOException {
     for (int i = 1; i < 100; i++) {
       try {
-        String query = getSQLQuery(baseQueryFilePath + i + ".sql");
+        String query = getQuery(baseQueryFilePath + i + ".sql");
         blackhole.consume(
             taskMetrics.runAndMeasure(() -> spark.sql(query).showString(1, 0, false)));
       } catch (Exception e) {
-        System.out.println("Query " + i + " failed");
+        throw new IOException("Failed to run query " + i);
       }
     }
   }

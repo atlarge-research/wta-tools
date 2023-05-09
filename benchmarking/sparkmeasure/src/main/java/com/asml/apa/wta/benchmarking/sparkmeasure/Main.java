@@ -6,11 +6,11 @@ import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 
-public class BenchmarkRunner {
+public class Main {
 
   public static void main(String[] args) throws Exception {
     Options options = new OptionsBuilder()
-        .include(SparkSQLBenchmark.class.getSimpleName())
+        .include(SparkBenchmark.class.getSimpleName())
         .addProfiler(StackProfiler.class)
         .addProfiler(GCProfiler.class)
         .build();

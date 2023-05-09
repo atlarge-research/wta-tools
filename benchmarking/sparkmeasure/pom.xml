@@ -16,7 +16,7 @@
   <properties>
     <jmh.version>1.36</jmh.version>
     <sparkmeasure.version>0.23</sparkmeasure.version>
-    <jackson.databind.version>2.13.0</jackson.databind.version>
+    <jackson.databind.version>2.12.4</jackson.databind.version>
   </properties>
 
   <dependencies>
