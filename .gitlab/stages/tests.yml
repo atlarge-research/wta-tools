@@ -14,6 +14,12 @@ unit-tests-core:
 
   coverage: /([0-9]{1,3})%/
 
+  artifacts:
+    name: unit-tests-core-jacoco
+    expire_in: 3 days
+    paths:
+      - core/reports/jacoco/index.html
+
 unit-tests-spark-adapter:
   stage: tests
 
@@ -26,6 +32,12 @@ unit-tests-spark-adapter:
     - "cat adapter/spark/reports/jacoco/index.html | grep -Po 'Total.*?([0-9]{1,3})%' || echo '0%'"
 
   coverage: /([0-9]{1,3})%/
+
+  artifacts:
+    name: unit-tests-spark-adapter-jacoco
+    expire_in: 3 days
+    paths:
+      - adapter/spark/reports/jacoco/index.html
 
 
 integration-tests-core:
@@ -41,6 +53,12 @@ integration-tests-core:
 
   coverage: /([0-9]{1,3})%/
 
+  artifacts:
+    name: integration-tests-core-jacoco
+    expire_in: 3 days
+    paths:
+      - core/reports/jacoco/index.html
+
 integration-tests-spark-adapter:
   stage: tests
 
@@ -53,6 +71,12 @@ integration-tests-spark-adapter:
     - "cat adapter/spark/reports/jacoco/index.html | grep -Po 'Total.*?([0-9]{1,3})%' || echo '0%'"
 
   coverage: /([0-9]{1,3})%/
+
+  artifacts:
+    name: integration-tests-spark-adapter-jacoco
+    expire_in: 3 days
+    paths:
+      - adapter/spark/reports/jacoco/index.html
 
 
 mutation-tests-core:
@@ -69,6 +93,12 @@ mutation-tests-core:
 
   coverage: /([0-9]{1,3})%/
 
+  artifacts:
+    name: mutation-tests-core-pitest
+    expire_in: 3 days
+    paths:
+      - core/reports/pitest/index.html
+
 mutation-tests-spark-adapter:
   stage: tests
   allow_failure: true
@@ -82,3 +112,9 @@ mutation-tests-spark-adapter:
     - "cat adapter/spark/reports/pitest/index.html | awk -F '</?td>' 'FNR == 25 { print $2 }' || echo '0%'"
 
   coverage: /([0-9]{1,3})%/
+
+  artifacts:
+    name: mutation-tests-spark-adapter-pitest
+    expire_in: 3 days
+    paths:
+      - adapter/spark/reports/pitest/index.html

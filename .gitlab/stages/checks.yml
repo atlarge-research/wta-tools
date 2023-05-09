@@ -26,6 +26,13 @@ checkstyle:
     - echo "Checkstyle checks started"
     - "mvn checkstyle:check"
 
+  artifacts:
+    name: checkstyle
+    expire_in: 3 days
+    paths:
+      - core/reports/checkstyle/violations.txt
+      - adapter/spark/reports/checkstyle/violations.txt
+
 
 sast:
   stage: checks
