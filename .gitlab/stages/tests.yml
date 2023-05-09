@@ -5,7 +5,7 @@ unit-tests-core:
     - echo "Unit tests started"
     - "mvn -pl core surefire:test"
     - "mvn -pl core jacoco:report"
-    - "cat reports/jacoco/index.html | grep -Po 'Total.*?([0-9]{1,3})%'"
+    - "cat core/reports/jacoco/index.html | grep -Po 'Total.*?([0-9]{1,3})%'"
 
   coverage: /([0-9]{1,3})%/
 
@@ -16,7 +16,7 @@ unit-tests-adapter-spark:
     - echo "Unit tests started"
     - "mvn -pl adapter/spark surefire:test"
     - "mvn -pl adapter/spark jacoco:report"
-#    - "cat reports/jacoco/index.html | grep -Po 'Total.*?([0-9]{1,3})%'"
+#    - "cat adapter/spark/reports/jacoco/index.html | grep -Po 'Total.*?([0-9]{1,3})%'"
 
 #  coverage: /([0-9]{1,3})%/
 
