@@ -1,4 +1,4 @@
-package com.asml.apa.wta;
+package com.asml.apa.wta.benchmarking.sparkmeasure;
 
 import org.openjdk.jmh.profile.GCProfiler;
 import org.openjdk.jmh.profile.StackProfiler;

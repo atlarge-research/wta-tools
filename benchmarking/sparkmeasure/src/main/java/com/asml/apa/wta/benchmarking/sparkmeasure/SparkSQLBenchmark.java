@@ -1,4 +1,4 @@
-package com.asml.apa.wta;
+package com.asml.apa.wta.benchmarking.sparkmeasure;
 
 import ch.cern.sparkmeasure.TaskMetrics;
 import java.io.IOException;
