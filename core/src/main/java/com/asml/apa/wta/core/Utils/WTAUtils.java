@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.FileInputStream;
 
 public class WTAUtils {
+  static final String CONFIG_DIR = "config.json";
 
   /**
    * Reads the config file and creates the associated config object.
@@ -35,5 +36,9 @@ public class WTAUtils {
           "The config file has missing/invalid fields or no config file was found");
     }
     return configBuilder.build();
+  }
+
+  public static RuntimeConfig readConfig() {
+    return readConfig(CONFIG_DIR);
   }
 }

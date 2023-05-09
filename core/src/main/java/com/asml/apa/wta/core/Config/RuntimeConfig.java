@@ -1,6 +1,5 @@
 package com.asml.apa.wta.core.Config;
 
-import javax.validation.constraints.NotBlank;
 import lombok.*;
 
 @Getter
@@ -10,10 +9,8 @@ import lombok.*;
 @NoArgsConstructor
 public class RuntimeConfig {
 
-  @NotBlank(message = "Author is mandatory")
   private String author;
 
-  @NotBlank(message = "Domain is mandatory")
   private String domain;
 
   @Builder.Default
