@@ -4,9 +4,11 @@
 
 ## [Unreleased]
 ### Added
+- Basic pipeline setup [@lyadalachanchu](https://gitlab.ewi.tudelft.nl/lyadalachanchu)
 - Initial project setup & pipeline fix [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 - Augmented the pipeline [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 - Added basic config file & read utils [@lyadalachanchu](https://gitlab.ewi.tudelft.nl/lyadalachanchu)
+- Created basic skeleton of Workflow object [@lyadalachanchu](https://gitlab.ewi.tudelft.nl/lyadalachanchu)
 
 ### Changed
 
