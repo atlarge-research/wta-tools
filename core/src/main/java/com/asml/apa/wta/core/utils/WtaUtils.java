@@ -40,7 +40,11 @@ public class WtaUtils {
           : "";
       String schemaVersion = workflowNode.get("schemaVersion").asText();
       Workflow.setSchemaVersion(schemaVersion);
-      configBuilder = configBuilder.author(author).domain(domain).description(description).schemaVersion(schemaVersion);
+      configBuilder = configBuilder
+          .author(author)
+          .domain(domain)
+          .description(description)
+          .schemaVersion(schemaVersion);
 
     } catch (Exception e) {
       throw new IllegalArgumentException(
