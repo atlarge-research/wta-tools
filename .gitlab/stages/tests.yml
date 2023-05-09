@@ -1,17 +1,22 @@
 unit-tests-core:
   stage: tests
 
+  dependencies:
+    - build-core
+
   script:
     - echo "Unit tests started"
     - "mvn -pl core surefire:test"
     - "mvn -pl core jacoco:report"
-    - "ls -la"
     - "cat core/reports/jacoco/index.html | grep -Po 'Total.*?([0-9]{1,3})%'"
 
   coverage: /([0-9]{1,3})%/
 
-unit-tests-adapter-spark:
+unit-tests-spark-adapter:
   stage: tests
+
+  dependencies:
+    - build-spark-adapter
 
   script:
     - echo "Unit tests started"
@@ -25,6 +30,9 @@ unit-tests-adapter-spark:
 integration-tests-core:
   stage: tests
 
+  dependencies:
+    - build-core
+
   script:
     - echo "Integration tests started"
     - "mvn -pl core failsafe:integration-test"
@@ -33,8 +41,11 @@ integration-tests-core:
 
 #  coverage: /([0-9]{1,3})/
 
-integration-tests-adapter-spark:
+integration-tests-spark-adapter:
   stage: tests
+
+  dependencies:
+    - build-spark-adapter
 
   script:
     - echo "Integration tests started"
@@ -49,6 +60,9 @@ mutation-tests-core:
   stage: tests
   allow_failure: true
 
+  dependencies:
+    - build-core
+
   script:
     - echo "Mutation tests core started"
     - "mvn -pl core pitest:mutationCoverage"
@@ -56,9 +70,12 @@ mutation-tests-core:
 
 #  coverage: /([0-9]{1,3})/
 
-mutation-tests-adapter-spark:
+mutation-tests-spark-adapter:
   stage: tests
   allow_failure: true
+
+  dependencies:
+    - build-spark-adapter
 
   script:
     - echo "Mutation tests adapter/spark started"
