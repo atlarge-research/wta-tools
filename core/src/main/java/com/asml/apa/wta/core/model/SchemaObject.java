@@ -10,6 +10,6 @@ import lombok.experimental.SuperBuilder;
  * @since 1.0.0
  */
 @SuperBuilder
-abstract public class SchemaObject implements Serializable {
+public abstract class SchemaObject implements Serializable {
   private static final long serialVersionUID = 1L;
 }
