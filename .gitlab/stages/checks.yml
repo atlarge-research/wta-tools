@@ -57,7 +57,7 @@ dependency_scanning:
   stage: checks
   allow_failure: true
 
-gemnasium-dependency_scanning:
+gemnasium-maven-dependency_scanning:
   stage: checks
   rules:
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
