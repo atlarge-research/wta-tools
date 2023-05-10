@@ -11,6 +11,7 @@ For the most part, since we are pre-release this will serve no real purpose, oth
 - Fixed the pipeline's testing stage, added checkstyle, and incorporated basic coverage reporting to GitLab CI/CD in the pipeline [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 - Created basic skeleton of Workflow object [@lyadalachanchu](https://gitlab.ewi.tudelft.nl/lyadalachanchu)
 - Created the benchmarking module for performance evaluation of SparkMeasure plugin [@pcho](https://gitlab.ewi.tudelft.nl/pcho)
+- Implemented basic methods of CollectorInterface [@hpage](https://gitlab.ewi.tudelft.nl/hpage)
 - Creates report artefacts in the pipeline and removed a job [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 - Patched report artefacts in the pipeline [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 
