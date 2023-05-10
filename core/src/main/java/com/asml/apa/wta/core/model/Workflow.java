@@ -1,10 +1,9 @@
 package com.asml.apa.wta.core.model;
 
 import com.asml.apa.wta.core.model.enums.Domain;
+import lombok.Builder;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.Setter;
-import lombok.experimental.SuperBuilder;
 
 /**
  * Workflow class corresponding to WTA format.
@@ -13,9 +12,8 @@ import lombok.experimental.SuperBuilder;
  * @since 1.0.0
  */
 @Data
-@SuperBuilder
-@EqualsAndHashCode(callSuper = true)
-public class Workflow extends SchemaObject {
+@Builder
+public class Workflow implements BaseSchema {
 
   private static final long serialVersionUID = 2L;
 

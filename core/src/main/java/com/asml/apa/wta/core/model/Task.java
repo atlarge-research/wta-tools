@@ -1,8 +1,7 @@
 package com.asml.apa.wta.core.model;
 
+import lombok.Builder;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.experimental.SuperBuilder;
 
 /**
  * Task class corresponding to WTA format.
@@ -11,8 +10,7 @@ import lombok.experimental.SuperBuilder;
  * @since 1.0.0
  */
 @Data
-@SuperBuilder
-@EqualsAndHashCode(callSuper = true)
-public class Task extends SchemaObject {
+@Builder
+public class Task implements BaseSchema {
   private static final long serialVersionUID = 3L;
 }
