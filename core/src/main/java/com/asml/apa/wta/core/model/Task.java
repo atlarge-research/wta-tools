@@ -24,7 +24,7 @@ public class Task implements BaseTraceObject {
 
   private final long submitType;
 
-  private final int submission_site;
+  private final int submissionSite;
 
   private final long runtime;
 
@@ -50,9 +50,9 @@ public class Task implements BaseTraceObject {
 
   private final double memoryRequested;
 
-  private final long networkIOTime;
+  private final long networkIoTime;
 
-  private final long diskIOTime;
+  private final long diskIoTime;
 
   private final double diskSpaceRequested;
 
