@@ -35,6 +35,7 @@ checkstyle:
   artifacts:
     name: checkstyle
     expire_in: 3 days
+    when: always
     paths:
       - core/reports/checkstyle/violations.txt
       - adapter/spark/reports/checkstyle/violations.txt

@@ -36,7 +36,6 @@ public class WtaUtils {
       String description = workloadNode.has("description")
           ? workloadNode.get("description").asText()
           : "";
-
       configBuilder = configBuilder.author(author).domain(domain).description(description);
 
     } catch (Exception e) {
