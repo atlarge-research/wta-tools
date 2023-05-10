@@ -63,7 +63,7 @@ integration-tests-spark-adapter:
   stage: test
 
   dependencies:
-    - build-spark-adapter
+    - build-adapters
 
   script:
     - echo "Spark adapter integration tests started"
@@ -104,7 +104,7 @@ mutation-tests-spark-adapter:
   allow_failure: true
 
   dependencies:
-    - build-spark-adapter
+    - build-adapters
 
   script:
     - echo "Spark adapter mutation tests adapter/spark started"
