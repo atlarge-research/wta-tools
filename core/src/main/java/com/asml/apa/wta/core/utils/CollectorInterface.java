@@ -16,7 +16,7 @@ public interface CollectorInterface {
    * Reads the config file, and processes any required information from config file.
    * This method is meant to be overrided as the base implementation merely reads the config and returns it.
    *
-   * @return The associated config file
+   * @return The associated config object
    */
   default RuntimeConfig processConfig() {
     return WtaUtils.readConfig();
