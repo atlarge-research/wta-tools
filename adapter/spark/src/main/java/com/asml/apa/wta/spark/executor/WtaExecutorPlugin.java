@@ -1,7 +1,7 @@
-package com.asml.apa.wta.spark.Executor;
+package com.asml.apa.wta.spark.executor;
 
-import com.asml.apa.wta.spark.Driver.WtaDriverPlugin;
 import com.asml.apa.wta.spark.WtaPlugin;
+import com.asml.apa.wta.spark.driver.WtaDriverPlugin;
 import java.util.Map;
 import org.apache.spark.SparkContext;
 import org.apache.spark.TaskFailedReason;
@@ -22,7 +22,7 @@ public class WtaExecutorPlugin implements ExecutorPlugin {
    * it is completed.
    *
    * @param ctx The PluginContext object that represents the context of the plugin.
-   * @param extraConf A Map<String,String> object that contains any extra configuration information. This map
+   * @param extraConf A map object that contains any extra configuration information. This map
    *                  is directly returned from {@link WtaDriverPlugin#init(SparkContext, PluginContext)}
    * @see WtaPlugin#executorPlugin() where a new instance of the plugin is created. This gets called as soon
    * as it is loaded on to the executor.
@@ -47,7 +47,7 @@ public class WtaExecutorPlugin implements ExecutorPlugin {
   public void onTaskSucceeded() {}
 
   /**
-   * Gets called if a task fails
+   * Gets called if a task fails.
    *
    * @param failureReason The reason the task failed, accessible through a string.
    */

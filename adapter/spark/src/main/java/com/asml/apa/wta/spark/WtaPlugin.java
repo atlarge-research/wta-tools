@@ -1,7 +1,7 @@
 package com.asml.apa.wta.spark;
 
-import com.asml.apa.wta.spark.Driver.WtaDriverPlugin;
-import com.asml.apa.wta.spark.Executor.WtaExecutorPlugin;
+import com.asml.apa.wta.spark.driver.WtaDriverPlugin;
+import com.asml.apa.wta.spark.executor.WtaExecutorPlugin;
 import org.apache.spark.api.plugin.DriverPlugin;
 import org.apache.spark.api.plugin.ExecutorPlugin;
 import org.apache.spark.api.plugin.SparkPlugin;
@@ -19,7 +19,7 @@ public class WtaPlugin implements SparkPlugin {
   /**
    * Returns the driver-side component of the plugin.
    *
-   * @return The driver-side component initialised at startup.
+   * @return The driver-side component initialised at startup
    */
   @Override
   public DriverPlugin driverPlugin() {
@@ -29,7 +29,7 @@ public class WtaPlugin implements SparkPlugin {
   /**
    * Returns the executor-side component of the plugin.
    *
-   * @return The executor-side component initialised at startup.
+   * @return The executor-side component initialised at startup
    */
   @Override
   public ExecutorPlugin executorPlugin() {

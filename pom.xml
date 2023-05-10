@@ -16,7 +16,7 @@
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <spotless.version>2.36.0</spotless.version>
     <junit.version>5.9.3</junit.version>
-    <surefire.version>3.0.0</surefire.version>
+    <surefire.version>3.1.0</surefire.version>
     <error-prone.version>2.18.0</error-prone.version>
     <gemnasium.version>0.5.1</gemnasium.version>
     <pmd.version>3.20.0</pmd.version>
@@ -24,6 +24,10 @@
     <pitest.version>1.13.1</pitest.version>
     <failsafe.version>3.1.0</failsafe.version>
     <lombok.version>1.18.26</lombok.version>
+    <pitest.junit.version>1.1.2</pitest.junit.version>
+    <checkstyle.version>3.2.2</checkstyle.version>
+    <jackson.databind.version>2.15.0</jackson.databind.version>
+    <assertj.version>3.24.2</assertj.version>
   </properties>
 
   <modules>
@@ -32,27 +36,18 @@
   </modules>
 
   <dependencies>
-    <dependency>
-      <groupId>org.projectlombok</groupId>
-      <artifactId>lombok</artifactId>
-      <version>1.18.26</version>
-      <scope>provided</scope>
-    </dependency>
-
     <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind -->
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-databind</artifactId>
-      <version>2.15.0</version>
+      <version>${jackson.databind.version}</version>
     </dependency>
-
     <!-- https://mvnrepository.com/artifact/com.diffplug.spotless/spotless-maven-plugin -->
     <dependency>
       <groupId>com.diffplug.spotless</groupId>
       <artifactId>spotless-maven-plugin</artifactId>
       <version>${spotless.version}</version>
     </dependency>
-
     <!-- https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api -->
     <dependency>
       <groupId>org.junit.jupiter</groupId>
@@ -60,15 +55,20 @@
       <version>${junit.version}</version>
       <scope>test</scope>
     </dependency>
-
+    <!-- https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-engine -->
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-engine</artifactId>
+      <version>${junit.version}</version>
+      <scope>test</scope>
+    </dependency>
     <!-- https://mvnrepository.com/artifact/org.assertj/assertj-core -->
     <dependency>
       <groupId>org.assertj</groupId>
       <artifactId>assertj-core</artifactId>
-      <version>3.24.2</version>
+      <version>${assertj.version}</version>
       <scope>test</scope>
     </dependency>
-
     <!-- https://mvnrepository.com/artifact/org.projectlombok/lombok -->
     <dependency>
       <groupId>org.projectlombok</groupId>
@@ -86,7 +86,7 @@
         <version>${failsafe.version}</version>
         <configuration>
           <includes>
-            <include>**/*IntegrationTests.java</include>
+            <include>**/*IntegrationTest.java</include>
           </includes>
         </configuration>
       </plugin>
@@ -95,11 +95,12 @@
         <artifactId>maven-surefire-plugin</artifactId>
         <version>${surefire.version}</version>
         <configuration>
+          <argLine>${argLine}</argLine>
           <includes>
-            <include>**/*Tests.java</include>
+            <include>**/*Test.java</include>
           </includes>
           <excludes>
-            <exclude>**/*IntegrationTests.java</exclude>
+            <exclude>**/*IntegrationTest.java</exclude>
           </excludes>
         </configuration>
       </plugin>
@@ -189,58 +190,36 @@
         <artifactId>pitest-maven</artifactId>
         <version>${pitest.version}</version>
         <configuration>
+          <reportsDirectory>reports/pitest</reportsDirectory>
+          <timestampedReports>false</timestampedReports>
           <exportLineCoverage>true</exportLineCoverage>
           <outputFormats>
-            <value>XML</value>
+            <value>HTML</value>
           </outputFormats>
+          <failWhenNoMutations>false</failWhenNoMutations>
+          <targetClasses>
+            <targetClass>com.asml.apa.wta.*</targetClass>
+          </targetClasses>
         </configuration>
+        <dependencies>
+          <!-- https://mvnrepository.com/artifact/org.pitest/pitest-junit5-plugin -->
+          <dependency>
+            <groupId>org.pitest</groupId>
+            <artifactId>pitest-junit5-plugin</artifactId>
+            <version>${pitest.junit.version}</version>
+          </dependency>
+        </dependencies>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-pmd-plugin</artifactId>
-        <version>${pmd.version}</version>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+        <version>${checkstyle.version}</version>
         <configuration>
-          <inputEncoding>utf-8</inputEncoding>
-          <minimumTokens>100</minimumTokens>
+          <configLocation>config/checkstyle.xml</configLocation>
+          <consoleOutput>false</consoleOutput>
+          <failsOnError>true</failsOnError>
         </configuration>
       </plugin>
-      <plugin>
-        <groupId>org.jacoco</groupId>
-        <artifactId>jacoco-maven-plugin</artifactId>
-        <version>${jacoco.version}</version>
-        <configuration>
-          <formats>
-            <format>HTML</format>
-          </formats>
-          <outputDirectory>reports/jacoco</outputDirectory>
-        </configuration>
-        <executions>
-          <execution>
-            <goals>
-              <goal>prepare-agent</goal>
-            </goals>
-          </execution>
-          <execution>
-            <id>report</id>
-            <phase>prepare-package</phase>
-            <goals>
-              <goal>report</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <groupId>org.pitest</groupId>
-        <artifactId>pitest-maven</artifactId>
-        <version>${pitest.version}</version>
-        <configuration>
-          <exportLineCoverage>true</exportLineCoverage>
-          <outputFormats>
-            <value>XML</value>
-          </outputFormats>
-        </configuration>
-      </plugin>
-
     </plugins>
   </build>
 

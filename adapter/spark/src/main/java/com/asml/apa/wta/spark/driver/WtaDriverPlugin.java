@@ -1,4 +1,4 @@
-package com.asml.apa.wta.spark.Driver;
+package com.asml.apa.wta.spark.driver;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -22,7 +22,7 @@ public class WtaDriverPlugin implements DriverPlugin {
    *
    * @param sCtx The current SparkContext.
    * @param pCtx Additional plugin-specific about the Spark application where the plugin is running.
-   * @return Extra information provided to the executor.
+   * @return Extra information provided to the executor
    */
   @Override
   public Map<String, String> init(SparkContext sCtx, PluginContext pCtx) {
