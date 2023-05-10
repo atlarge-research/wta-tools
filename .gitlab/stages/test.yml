@@ -24,7 +24,7 @@ unit-tests-spark-adapter:
   stage: test
 
   dependencies:
-    - build-spark-adapter
+    - build-adapters
 
   script:
     - echo "Spark adapter unit tests started"
