@@ -5,7 +5,7 @@ import lombok.EqualsAndHashCode;
 import lombok.experimental.SuperBuilder;
 
 /**
- * Task class
+ * Task class corresponding to WTA format.
  *
  * @author  Lohithsai Yadala Chanchu
  * @since 1.0.0

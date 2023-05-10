@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 /**
- * Domain enum
+ * Domain enum for WTA traces.
  *
  * @author Lohithsai Yadala Chanchu
  * @since 1.0.0

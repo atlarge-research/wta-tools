@@ -1,11 +1,13 @@
 package com.asml.apa.wta.core.model;
 
 import com.asml.apa.wta.core.model.enums.Domain;
-import lombok.*;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 /**
- * Workflow class
+ * Workflow class corresponding to WTA format.
  *
  * @author Lohithsai Yadala Chanchu
  * @since 1.0.0

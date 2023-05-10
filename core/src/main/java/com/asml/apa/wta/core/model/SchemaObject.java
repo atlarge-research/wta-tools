@@ -4,7 +4,7 @@ import java.io.Serializable;
 import lombok.experimental.SuperBuilder;
 
 /**
- * Base WTA object class
+ * Base WTA object class that all WTA objects extend from.
  *
  * @author  Lohithsai Yadala Chanchu
  * @since 1.0.0
