@@ -20,7 +20,7 @@ unit-tests-core:
     name: unit-tests-core
     expire_in: 3 days
     paths:
-      - core/reports/jacoco/index.html
+      - core/reports/jacoco/
 
 unit-tests-spark-adapter:
   stage: test
@@ -41,7 +41,7 @@ unit-tests-spark-adapter:
     name: unit-tests-spark-adapter
     expire_in: 3 days
     paths:
-      - adapter/spark/reports/jacoco/index.html
+      - adapter/spark/reports/jacoco/
 
 
 integration-tests-core:
@@ -63,7 +63,7 @@ integration-tests-core:
     name: integration-tests-core
     expire_in: 3 days
     paths:
-      - core/reports/jacoco/index.html
+      - core/reports/jacoco/
 
 integration-tests-spark-adapter:
   stage: test
@@ -84,7 +84,7 @@ integration-tests-spark-adapter:
     name: integration-tests-spark-adapter
     expire_in: 3 days
     paths:
-      - adapter/spark/reports/jacoco/index.html
+      - adapter/spark/reports/jacoco/
 
 
 mutation-tests-core:
@@ -107,7 +107,7 @@ mutation-tests-core:
     name: mutation-tests-core
     expire_in: 3 days
     paths:
-      - core/reports/pitest/index.html
+      - core/reports/pitest/
 
 mutation-tests-spark-adapter:
   stage: test
@@ -129,4 +129,4 @@ mutation-tests-spark-adapter:
     name: mutation-tests-spark-adapter
     expire_in: 3 days
     paths:
-      - adapter/spark/reports/pitest/index.html
+      - adapter/spark/reports/pitest/
