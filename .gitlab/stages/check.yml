@@ -8,6 +8,7 @@ include:
 spotless:
   stage: check
   dependencies: []
+  needs: []
 
   script:
     - echo "Spotless check started"
@@ -16,6 +17,7 @@ spotless:
 pmd:
   stage: check
   dependencies: []
+  needs: []
 
   script:
     - echo "PMD checks started"
@@ -24,6 +26,7 @@ pmd:
 checkstyle:
   stage: check
   dependencies: []
+  needs: []
 
   script:
     - echo "Checkstyle checks started"
@@ -43,6 +46,7 @@ sast:
 
 spotbugs-sast:
   stage: check
+  needs: []
   rules:
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
     - if: $CI_COMMIT_REF_NAME == 'dev'
@@ -50,6 +54,7 @@ spotbugs-sast:
 
 semgrep-sast:
   stage: check
+  needs: []
   rules:
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
     - if: $CI_COMMIT_REF_NAME == 'dev'
@@ -62,6 +67,7 @@ dependency_scanning:
 
 gemnasium-maven-dependency_scanning:
   stage: check
+  needs: []
   rules:
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
     - if: $CI_COMMIT_REF_NAME == 'dev'
