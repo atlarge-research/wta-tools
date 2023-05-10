@@ -11,10 +11,10 @@ import lombok.Getter;
  */
 @AllArgsConstructor
 public enum Domain {
-  BIOMEDICAL("BIOMEDICAL"),
-  ENGINEERING("ENGINEERING"),
-  INDUSTRIAL("INDUSTRIAL"),
-  SCIENTIFIC("SCIENTIFIC");
+  BIOMEDICAL("Biomedical"),
+  ENGINEERING("Engineering"),
+  INDUSTRIAL("Industrial"),
+  SCIENTIFIC("Scientific");
 
   @Getter
   private String value;
