@@ -1,0 +1,25 @@
+build-core:
+  stage: build
+
+  script:
+    - echo "Build core started"
+    - "mvn -pl core test-compile compile"
+
+  artifacts:
+    name: build-core
+    expire_in: 2 hours
+    paths:
+      - core/target/
+
+build-adapters:
+  stage: build
+
+  script:
+    - echo "Build Spark adapter started"
+    - "mvn -pl adapter/spark test-compile compile"
+
+  artifacts:
+    name: build-adapters
+    expire_in: 2 hours
+    paths:
+      - adapter/spark/target/

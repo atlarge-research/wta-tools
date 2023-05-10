@@ -2,7 +2,7 @@ variables:
   PITEST_OPTS: "-DwithHistory"
 
 unit-tests-core:
-  stage: tests
+  stage: test
 
   dependencies:
     - build-core
@@ -21,7 +21,7 @@ unit-tests-core:
       - core/reports/jacoco/index.html
 
 unit-tests-spark-adapter:
-  stage: tests
+  stage: test
 
   dependencies:
     - build-spark-adapter
@@ -41,7 +41,7 @@ unit-tests-spark-adapter:
 
 
 integration-tests-core:
-  stage: tests
+  stage: test
 
   dependencies:
     - build-core
@@ -60,7 +60,7 @@ integration-tests-core:
       - core/reports/jacoco/index.html
 
 integration-tests-spark-adapter:
-  stage: tests
+  stage: test
 
   dependencies:
     - build-spark-adapter
@@ -80,7 +80,7 @@ integration-tests-spark-adapter:
 
 
 mutation-tests-core:
-  stage: tests
+  stage: test
   allow_failure: true
 
   dependencies:
@@ -100,7 +100,7 @@ mutation-tests-core:
       - core/reports/pitest/index.html
 
 mutation-tests-spark-adapter:
-  stage: tests
+  stage: test
   allow_failure: true
 
   dependencies:

@@ -1,9 +1,12 @@
+variables:
+  SAST_JAVA_VERSION: "11"
+
 include:
   - template: Jobs/SAST.gitlab-ci.yml
   - template: Jobs/Dependency-Scanning.gitlab-ci.yml
 
 spotless:
-  stage: checks
+  stage: check
   dependencies: []
 
   script:
@@ -11,7 +14,7 @@ spotless:
     - "mvn spotless:check"
 
 pmd:
-  stage: checks
+  stage: check
   dependencies: []
 
   script:
@@ -19,7 +22,7 @@ pmd:
     - "mvn pmd:check"
 
 checkstyle:
-  stage: checks
+  stage: check
   dependencies: []
 
   script:
@@ -35,18 +38,18 @@ checkstyle:
 
 
 sast:
-  stage: checks
+  stage: check
   allow_failure: true
 
 spotbugs-sast:
-  stage: checks
+  stage: check
   rules:
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
     - if: $CI_COMMIT_REF_NAME == 'dev'
     - if: $CI_COMMIT_REF_NAME == 'main'
 
 semgrep-sast:
-  stage: checks
+  stage: check
   rules:
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
     - if: $CI_COMMIT_REF_NAME == 'dev'
@@ -54,11 +57,11 @@ semgrep-sast:
 
 
 dependency_scanning:
-  stage: checks
+  stage: check
   allow_failure: true
 
 gemnasium-maven-dependency_scanning:
-  stage: checks
+  stage: check
   rules:
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
     - if: $CI_COMMIT_REF_NAME == 'dev'
