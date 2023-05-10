@@ -22,14 +22,6 @@ public interface CollectorInterface {
   }
 
   /**
-   * Should be called on plugin shutdown to ensure that parquet is valid.
-   *
-   * @param config The config file to get the path where the validation script is located.
-   * @throws IllegalStateException if the parquet is invalid, (according to WTA rules)
-   */
-  void validateFormat(RuntimeConfig config) throws IllegalStateException;
-
-  /**
    * Extracts the kafka config and tests the connection if necessary.
    *
    * @param config The config to extract kafka broker url
