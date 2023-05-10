@@ -25,9 +25,10 @@ public interface CollectorInterface {
   /**
    * Should be called on plugin shutdown to ensure that parquet is valid.
    *
+   * @param config The config file to get the path where the validation script is located.
    * @throws IllegalStateException if the parquet is invalid, (according to WTA rules)
    */
-  void validateFormat() throws IllegalStateException;
+  void validateFormat(RuntimeConfig config) throws IllegalStateException;
 
   /**
    * Initializes logger at start of application.
