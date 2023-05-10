@@ -26,22 +26,17 @@
     <lombok.version>1.18.26</lombok.version>
     <pitest.junit.version>1.1.2</pitest.junit.version>
     <checkstyle.version>3.2.2</checkstyle.version>
-    <jackson.databind.version>2.15.0</jackson.databind.version>
     <assertj.version>3.24.2</assertj.version>
+    <spark.support.version>3.2.0</spark.support.version>
   </properties>
 
   <modules>
     <module>core</module>
     <module>adapter/spark</module>
+    <module>benchmarking/sparkmeasure</module>
   </modules>
 
   <dependencies>
-    <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind -->
-    <dependency>
-      <groupId>com.fasterxml.jackson.core</groupId>
-      <artifactId>jackson-databind</artifactId>
-      <version>${jackson.databind.version}</version>
-    </dependency>
     <!-- https://mvnrepository.com/artifact/com.diffplug.spotless/spotless-maven-plugin -->
     <dependency>
       <groupId>com.diffplug.spotless</groupId>
