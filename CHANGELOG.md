@@ -13,6 +13,7 @@ For the most part, since we are pre-release this will serve no real purpose, oth
 - Created the benchmarking module for performance evaluation of SparkMeasure plugin [@pcho](https://gitlab.ewi.tudelft.nl/pcho)
 - Creates report artefacts in the pipeline and removed a job [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 - Created basic skeleton of Task object [@lyadalachanchu](https://gitlab.ewi.tudelft.nl/lyadalachanchu)
+- Patched report artefacts in the pipeline [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 
 ### Changed
 
