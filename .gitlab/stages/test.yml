@@ -7,6 +7,8 @@ unit-tests-core:
   dependencies:
     - build-core
 
+  needs: [build-core]
+
   script:
     - echo "Core unit tests started"
     - "mvn -pl core jacoco:prepare-agent surefire:test jacoco:report"
@@ -25,6 +27,8 @@ unit-tests-spark-adapter:
 
   dependencies:
     - build-adapters
+
+  needs: [build-adapters]
 
   script:
     - echo "Spark adapter unit tests started"
@@ -46,6 +50,8 @@ integration-tests-core:
   dependencies:
     - build-core
 
+  needs: [build-core]
+
   script:
     - echo "Core integration tests started"
     - "mvn -pl core jacoco:prepare-agent-integration failsafe:integration-test jacoco:report-integration"
@@ -65,6 +71,8 @@ integration-tests-spark-adapter:
   dependencies:
     - build-adapters
 
+  needs: [build-adapters]
+
   script:
     - echo "Spark adapter integration tests started"
     - "mvn -pl adapter/spark jacoco:prepare-agent-integration failsafe:integration-test jacoco:report-integration"
@@ -82,6 +90,8 @@ integration-tests-spark-adapter:
 mutation-tests-core:
   stage: test
   allow_failure: true
+
+  needs: [build-core]
 
   dependencies:
     - build-core
@@ -102,6 +112,8 @@ mutation-tests-core:
 mutation-tests-spark-adapter:
   stage: test
   allow_failure: true
+
+  needs: [build-adapters]
 
   dependencies:
     - build-adapters
