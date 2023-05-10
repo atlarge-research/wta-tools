@@ -2,10 +2,12 @@ variables:
   PITEST_OPTS: "-DwithHistory"
 
 unit-tests-core:
-  stage: tests
+  stage: test
 
   dependencies:
     - build-core
+
+  needs: [build-core]
 
   script:
     - echo "Core unit tests started"
@@ -14,11 +16,19 @@ unit-tests-core:
 
   coverage: /([0-9]{1,3})%/
 
+  artifacts:
+    name: unit-tests-core
+    expire_in: 3 days
+    paths:
+      - core/reports/jacoco/
+
 unit-tests-spark-adapter:
-  stage: tests
+  stage: test
 
   dependencies:
-    - build-spark-adapter
+    - build-adapters
+
+  needs: [build-adapters]
 
   script:
     - echo "Spark adapter unit tests started"
@@ -27,12 +37,20 @@ unit-tests-spark-adapter:
 
   coverage: /([0-9]{1,3})%/
 
+  artifacts:
+    name: unit-tests-spark-adapter
+    expire_in: 3 days
+    paths:
+      - adapter/spark/reports/jacoco/
+
 
 integration-tests-core:
-  stage: tests
+  stage: test
 
   dependencies:
     - build-core
+
+  needs: [build-core]
 
   script:
     - echo "Core integration tests started"
@@ -41,11 +59,19 @@ integration-tests-core:
 
   coverage: /([0-9]{1,3})%/
 
+  artifacts:
+    name: integration-tests-core
+    expire_in: 3 days
+    paths:
+      - core/reports/jacoco/
+
 integration-tests-spark-adapter:
-  stage: tests
+  stage: test
 
   dependencies:
-    - build-spark-adapter
+    - build-adapters
+
+  needs: [build-adapters]
 
   script:
     - echo "Spark adapter integration tests started"
@@ -54,10 +80,18 @@ integration-tests-spark-adapter:
 
   coverage: /([0-9]{1,3})%/
 
+  artifacts:
+    name: integration-tests-spark-adapter
+    expire_in: 3 days
+    paths:
+      - adapter/spark/reports/jacoco/
+
 
 mutation-tests-core:
-  stage: tests
+  stage: test
   allow_failure: true
+
+  needs: [build-core]
 
   dependencies:
     - build-core
@@ -69,12 +103,20 @@ mutation-tests-core:
 
   coverage: /([0-9]{1,3})%/
 
+  artifacts:
+    name: mutation-tests-core
+    expire_in: 3 days
+    paths:
+      - core/reports/pitest/
+
 mutation-tests-spark-adapter:
-  stage: tests
+  stage: test
   allow_failure: true
 
+  needs: [build-adapters]
+
   dependencies:
-    - build-spark-adapter
+    - build-adapters
 
   script:
     - echo "Spark adapter mutation tests adapter/spark started"
@@ -82,3 +124,9 @@ mutation-tests-spark-adapter:
     - "cat adapter/spark/reports/pitest/index.html | awk -F '</?td>' 'FNR == 25 { print $2 }' || echo '0%'"
 
   coverage: /([0-9]{1,3})%/
+
+  artifacts:
+    name: mutation-tests-spark-adapter
+    expire_in: 3 days
+    paths:
+      - adapter/spark/reports/pitest/
