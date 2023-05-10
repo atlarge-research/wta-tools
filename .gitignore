@@ -60,5 +60,7 @@ gemnasium-maven-plugin.json
 # pipeline reports (JaCoCo, pit)
 reports
 
+config.json
+
 benchmarking/src/main/resources/sql_files
 benchmarking/src/main/resources/tpcds_data
