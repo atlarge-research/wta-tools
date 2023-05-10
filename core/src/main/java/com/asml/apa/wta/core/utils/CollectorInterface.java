@@ -37,11 +37,4 @@ public interface CollectorInterface {
    */
   void configureKafka(RuntimeConfig config) throws KafkaException;
 
-  /**
-   * Extracts the arrow config.
-   *
-   * @param config The config to extract
-   * @throws IllegalArgumentException if arrow can not be initialised
-   */
-  void configureArrow(RuntimeConfig config) throws IllegalArgumentException;
 }
