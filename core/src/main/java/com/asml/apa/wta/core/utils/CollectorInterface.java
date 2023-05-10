@@ -1,7 +1,6 @@
 package com.asml.apa.wta.core.utils;
 
 import com.asml.apa.wta.core.config.RuntimeConfig;
-import java.io.IOException;
 import org.apache.kafka.common.KafkaException;
 
 /**
@@ -29,21 +28,6 @@ public interface CollectorInterface {
    * @throws IllegalStateException if the parquet is invalid, (according to WTA rules)
    */
   void validateFormat(RuntimeConfig config) throws IllegalStateException;
-
-  /**
-   * Initializes logger at start of application.
-   *
-   * @param config The config file to get Log4J properties.
-   * @throws IOException if the logger cannot be initialized
-   */
-  void initializeLogger(RuntimeConfig config) throws IOException;
-
-  /**
-   * Closes the logger resource.
-   *
-   * @throws IOException if the logger cannot be closed
-   */
-  void flushAndCloseLogger() throws IOException;
 
   /**
    * Extracts the kafka config and tests the connection if necessary.
