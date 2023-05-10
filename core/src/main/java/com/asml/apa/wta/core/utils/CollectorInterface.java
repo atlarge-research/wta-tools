@@ -36,5 +36,4 @@ public interface CollectorInterface {
    * @throws KafkaException If a connection can't be established
    */
   void configureKafka(RuntimeConfig config) throws KafkaException;
-
 }
