@@ -31,7 +31,6 @@ public class WtaUtils {
       JsonNode rootNode = mapper.readTree(fis);
 
       JsonNode workloadNode = rootNode.get("workloadSettings");
-      JsonNode workflowNode = rootNode.get("workflowSettings");
       String author = workloadNode.get("author").asText();
       String domain = workloadNode.get("domain").asText();
       String description = workloadNode.has("description")
