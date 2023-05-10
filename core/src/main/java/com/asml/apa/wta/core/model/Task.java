@@ -11,6 +11,6 @@ import lombok.Data;
  */
 @Data
 @Builder
-public class Task implements BaseSchema {
-  private static final long serialVersionUID = 3L;
+public class Task implements BaseTraceObject {
+  private static final long serialVersionUID = -1372345471722101373L;
 }

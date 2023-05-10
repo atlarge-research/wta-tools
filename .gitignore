@@ -59,3 +59,5 @@ gemnasium-maven-plugin.json
 
 # pipeline reports (JaCoCo, pit)
 reports
+
+config.json

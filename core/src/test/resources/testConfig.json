@@ -4,9 +4,5 @@
     "author": "Test Name",
     "domain": "Test Domain",
     "description": "Test Description"
-  },
-  "workflowSettings":
-  {
-    "schemaVersion": "1.0.0"
   }
 }

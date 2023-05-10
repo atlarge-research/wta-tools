@@ -13,9 +13,9 @@ import lombok.Setter;
  */
 @Data
 @Builder
-public class Workflow implements BaseSchema {
+public class Workflow implements BaseTraceObject {
 
-  private static final long serialVersionUID = 2L;
+  private static final long serialVersionUID = 9065743819019553490L;
 
   // Current assumption is that schemaVersion is the same across all Workflow objects, but it might be different
   // across different SchemaObjects

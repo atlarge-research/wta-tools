@@ -8,4 +8,4 @@ import java.io.Serializable;
  * @author  Lohithsai Yadala Chanchu
  * @since 1.0.0
  */
-public interface BaseSchema extends Serializable {}
+public interface BaseTraceObject extends Serializable {}
