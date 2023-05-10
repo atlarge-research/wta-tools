@@ -46,6 +46,11 @@ public class WtaUtils {
     return configBuilder.build();
   }
 
+  /**
+   * Reads the config file at the specified directory.
+   *
+   * @return The config file
+   */
   public static RuntimeConfig readConfig() {
     return readConfig(CONFIG_DIR);
   }
