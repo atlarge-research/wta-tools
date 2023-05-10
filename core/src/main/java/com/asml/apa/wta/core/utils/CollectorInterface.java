@@ -48,7 +48,7 @@ public interface CollectorInterface {
    * Extracts the kafka config and tests the connection if necessary.
    *
    * @param config The config to extract kafka broker url
-   * @throws ConnectException If a connection can't be established
+   * @throws KafkaException If a connection can't be established
    */
   void configureKafka(RuntimeConfig config) throws KafkaException;
 
@@ -56,6 +56,7 @@ public interface CollectorInterface {
    * Extracts the arrow config.
    *
    * @param config The config to extract
+   * @throws IllegalArgumentException if arrow can not be initialised
    */
-  void configureArrow(RuntimeConfig config);
+  void configureArrow(RuntimeConfig config) throws IllegalArgumentException;
 }
