@@ -60,20 +60,18 @@ public class SparkDatasource {
   }
 
   /**
-   * This method returns a list of task metrics.
-   *
-   * @return List<TaskMetrics>  List of task metrics
+   * This method gets a list of TaskMetrics from the registered task listener.
+   * @return List of task metrics
    */
   public List<TaskMetrics> getTaskMetrics() {
-    return taskLevelListener.taskMetricsList;
+    return taskLevelListener.getTaskMetricsList();
   }
 
   /**
-   * This method returns a list of stage information.
-   *
-   * @return List<StageInfo>    list of stage information
+   * This method gets a list of StageInfo from the registered stage listener.
+   * @return List of StageInfo
    */
   public List<StageInfo> getStageInfo() {
-    return stageLevelListener.stageInfoList;
+    return stageLevelListener.getStageInfoList();
   }
 }

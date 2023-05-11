@@ -7,7 +7,7 @@ import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 
 /**
- * Entry point for running the Spark benchmark
+ * Entry point for running the Spark benchmark.
  *
  * @author Pil Kyu CHo
  * @since 1.0.0
