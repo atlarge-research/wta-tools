@@ -8,7 +8,7 @@ import lombok.Setter;
 /**
  * Workload class corresponding to WTA format.
  *
- * @author  Lohithsai Yadala Chanchu and Henry Page
+ * @author  Lohithsai Yadala Chanchu
  * @since 1.0.0
  */
 @Data
