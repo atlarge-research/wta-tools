@@ -3,7 +3,7 @@ build-core:
 
   script:
     - echo "Build core started"
-    - "mvn -pl core process-test-classes"
+    - "mvn -pl core package"
 
   artifacts:
     name: build-core
