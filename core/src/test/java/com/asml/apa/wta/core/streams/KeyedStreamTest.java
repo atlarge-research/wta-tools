@@ -1,8 +1,10 @@
 package com.asml.apa.wta.core.streams;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -40,6 +42,16 @@ class KeyedStreamTest {
   }
 
   @Test
+  void addsEntriesToKeyedStream() {
+    stream.addToStream(1, new DummyStreamRecord());
+    stream.addToStream(2, new DummyStreamRecord());
+    stream.addToStream(3, new DummyStreamRecord());
+    stream.addToStream(1, new DummyStreamRecord());
+    assertFalse(stream.onKey(1).isEmpty());
+    assertTrue(stream.onKey(2).isEmpty());
+  }
+
+  @Test
   void onKeyWithNullOnEmptyStream() {
     assertThrows(NullPointerException.class, () -> stream.onKey(null));
   }
@@ -52,13 +64,13 @@ class KeyedStreamTest {
 
   @Test
   void onKeyWithNonExistentKeyOnEmptyStream() {
-    assertThrows(KeyNotFoundException.class, () -> stream.onKey(6));
+    assertTrue(stream.onKey(6).isEmpty());
   }
 
   @Test
   void onKeyWithNonExistentKey() {
     stream.addToStream(9, new DummyStreamRecord());
-    assertThrows(KeyNotFoundException.class, () -> stream.onKey(1));
+    assertTrue(stream.onKey(1).isEmpty());
   }
 
   @Test

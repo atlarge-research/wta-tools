@@ -41,8 +41,7 @@ public class KeyedStream<K, V extends StreamRecord<V>> {
   public Stream<V> onKey(K key) {
     if (streams.containsKey(key)) {
       return streams.get(key);
-    } else {
-      throw new KeyNotFoundException(key);
     }
+    return streams.put(key, new Stream<>());
   }
 }
