@@ -3,24 +3,28 @@ build-core:
 
   script:
     - echo "Build core started"
-    - "mvn -pl core process-test-classes"
+    - "mvn -pl core install -DskipTests"
 
   artifacts:
     name: build-core
     expire_in: 2 hours
     paths:
-      - core/target/
+      - core/target
+      - .m2/repository/com/asml/apa
 
 build-adapters:
   stage: build
 
+  needs: [build-core]
+  dependencies:
+    - build-core
+
   script:
     - echo "Build Spark adapter started"
-    - "mvn -pl core,adapter/spark process-test-classes"
+    - "mvn -pl adapter/spark process-test-classes"
 
   artifacts:
     name: build-adapters
     expire_in: 2 hours
     paths:
-      - adapter/spark/target/
-      - core/target/
+      - adapter/spark/target
