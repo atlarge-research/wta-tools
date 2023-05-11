@@ -12,28 +12,28 @@ import lombok.Setter;
  */
 @Data
 @Builder
-public class Resource implements BaseTraceObject{
+public class Resource implements BaseTraceObject {
 
-    private static final long serialVersionUID = 3002249398331752973L;
+  private static final long serialVersionUID = 3002249398331752973L;
 
-    @Setter
-    private static String schemaVersion;
+  @Setter
+  private static String schemaVersion;
 
-    private final long id;
+  private final long id;
 
-    private final String type;
+  private final String type;
 
-    private final double numResources;
+  private final double numResources;
 
-    private final String procModel;
+  private final String procModel;
 
-    private final long memory;
+  private final long memory;
 
-    private final long diskSpace;
+  private final long diskSpace;
 
-    private final long networkSpeed;
+  private final long networkSpeed;
 
-    private final String os;
+  private final String os;
 
-    private final String details;
+  private final String details;
 }

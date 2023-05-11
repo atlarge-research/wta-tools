@@ -5,8 +5,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.Setter;
 
-import java.io.DataOutput;
-
 /**
  * Workload class corresponding to WTA format.
  *
@@ -16,110 +14,112 @@ import java.io.DataOutput;
 @Data
 @Builder
 public class Workload implements BaseTraceObject {
-    private static final long serialVersionUID = -4547341610378381743L;
+  private static final long serialVersionUID = -4547341610378381743L;
 
-    @Setter
-    private static String schemaVersion;
+  @Setter
+  private static String schemaVersion;
 
-    private final int totalWorkflows;
+  private final long totalWorkflows;
 
-    private final int totalTasks;
+  private final long totalTasks;
 
-    private final Domain domain;
+  private final Domain domain;
 
-    private final long startDate;
+  private final long startDate;
 
-    private final long endDate;
+  private final long endDate;
 
-    private final int numSites;
+  private final long numSites;
 
-    private final int numResources;
+  private final long numResources;
 
-    private final int numUsers;
+  private final long numUsers;
 
-    private final int numGroups;
+  private final long numGroups;
 
-    private final double totalResourceSeconds;
+  private final double totalResourceSeconds;
 
-    private final String[] authors;
+  private final String[] authors;
 
-    private final double minResourceTask;
+  private final double minResourceTask;
 
-    private final double stdResourceTask;
+  private final double maxResourceTask;
 
-    private final double meanResourceTask;
+  private final double stdResourceTask;
 
-    private final double medianResourceTask;
+  private final double meanResourceTask;
 
-    private final double firstQuartileResourceTask;
+  private final double medianResourceTask;
 
-    private final double thirdQuartileResourceTask;
+  private final double firstQuartileResourceTask;
 
-    private final double covResourceTask;
+  private final double thirdQuartileResourceTask;
 
-    private final double minMemory;
+  private final double covResourceTask;
 
-    private final double maxMemory;
+  private final double minMemory;
 
-    private final double stdMemory;
+  private final double maxMemory;
 
-    private final double meanMemory;
+  private final double stdMemory;
 
-    private final double medianMemory;
+  private final double meanMemory;
 
-    private final long firstQuartileMemory;
+  private final double medianMemory;
 
-    private final long thirdQuartileMemory;
+  private final long firstQuartileMemory;
 
-    private final double covMemory;
+  private final long thirdQuartileMemory;
 
-    private final long minNetworkUsage;
+  private final double covMemory;
 
-    private final long maxNetworkUsage;
+  private final long minNetworkUsage;
 
-    private final double stdNetworkUsage;
+  private final long maxNetworkUsage;
 
-    private final double meanNetworkUsage;
+  private final double stdNetworkUsage;
 
-    private final double medianNetworkUsage;
+  private final double meanNetworkUsage;
 
-    private final long firstQuartileNetworkUsage;
+  private final double medianNetworkUsage;
 
-    private final long thirdQuartileNetworkUsage;
+  private final long firstQuartileNetworkUsage;
 
-    private final double covNetworkUsage;
+  private final long thirdQuartileNetworkUsage;
 
-    private final double minDiskSpaceUsage;
+  private final double covNetworkUsage;
 
-    private final double maxDiskSpaceUsage;
+  private final double minDiskSpaceUsage;
 
-    private final double stdDiskSpaceUsage;
+  private final double maxDiskSpaceUsage;
 
-    private final double meanDiskSpaceUsage;
+  private final double stdDiskSpaceUsage;
 
-    private final long medianDiskSpaceUsage;
+  private final double meanDiskSpaceUsage;
 
-    private final long firstQuartileDiskSpaceUsage;
+  private final long medianDiskSpaceUsage;
 
-    private final long thirdQuartileDiskSpaceUsage;
+  private final long firstQuartileDiskSpaceUsage;
 
-    private final double covDiskSpaceUsage;
+  private final long thirdQuartileDiskSpaceUsage;
 
-    private final int minEnergy;
+  private final double covDiskSpaceUsage;
 
-    private final int maxEnergy;
+  private final int minEnergy;
 
-    private final double stdEnergy;
+  private final int maxEnergy;
 
-    private final double meanEnergy;
+  private final double stdEnergy;
 
-    private final int medianEnergy;
+  private final double meanEnergy;
 
-    private final int firstQuartileEnergy;
+  private final int medianEnergy;
 
-    private final int thirdQuartileEnergy;
+  private final int firstQuartileEnergy;
 
-    private final double covEnergy;
+  private final int thirdQuartileEnergy;
 
-    private final String workloadDescription;
+  private final double covEnergy;
+
+  private final String workloadDescription;
 }
