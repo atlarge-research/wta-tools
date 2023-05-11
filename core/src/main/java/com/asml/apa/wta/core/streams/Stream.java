@@ -105,11 +105,12 @@ public class Stream<V extends StreamRecord<V>> {
    */
   public <R extends StreamRecord<R>> Stream<R> map(@NonNull Function<V, R> map) {
     Stream<R> stream = new Stream<>(map.apply(head));
-    head.setNext(null);
+    V prev = head;
     V next = head.getNext();
+    prev.setNext(null);
     while (next != null) {
       stream.addToStream(map.apply(next));
-      V prev = next;
+      prev = next;
       next = next.getNext();
       prev.setNext(null);
     }
