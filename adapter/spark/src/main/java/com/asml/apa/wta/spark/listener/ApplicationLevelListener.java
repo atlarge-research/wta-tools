@@ -11,7 +11,7 @@ import org.apache.spark.scheduler.SparkListenerApplicationStart;
  * @since 1.0.0
  */
 public class ApplicationLevelListener extends SparkListener {
-        public void onApplicationStart(SparkListenerApplicationStart applicationStart) {}
+  public void onApplicationStart(SparkListenerApplicationStart applicationStart) {}
 
-        public void onApplicationEnd(SparkListenerApplicationEnd applicationEnd) {}
+  public void onApplicationEnd(SparkListenerApplicationEnd applicationEnd) {}
 }

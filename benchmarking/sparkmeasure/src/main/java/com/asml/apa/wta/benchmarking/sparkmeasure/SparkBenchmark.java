@@ -24,7 +24,6 @@ import org.openjdk.jmh.annotations.TearDown;
 import org.openjdk.jmh.annotations.Warmup;
 import org.openjdk.jmh.infra.Blackhole;
 
-
 /**
  * Benchmarking class for Apache Spark
  *
