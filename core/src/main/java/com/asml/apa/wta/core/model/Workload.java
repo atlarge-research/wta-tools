@@ -19,6 +19,8 @@ public class Workload implements BaseTraceObject {
   @Setter
   private static String schemaVersion;
 
+  private final Workflow[] workflows;
+
   private final long totalWorkflows;
 
   private final long totalTasks;
