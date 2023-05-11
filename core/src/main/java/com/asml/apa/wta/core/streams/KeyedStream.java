@@ -38,11 +38,11 @@ public class KeyedStream<K, V extends StreamRecord<V>> {
    * @author Atour Mousavi Gourabi
    * @since 1.0.0
    */
-  public Stream<V> onKey(@NonNull K key) {
+  public Stream<V> onKey(K key) {
     if (streams.containsKey(key)) {
       return streams.get(key);
     } else {
-      throw new RuntimeException("Key does not exist in the KeyedStream");
+      throw new KeyNotFoundException(key);
     }
   }
 }
