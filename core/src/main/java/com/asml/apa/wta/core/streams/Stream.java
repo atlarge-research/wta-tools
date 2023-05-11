@@ -16,19 +16,58 @@ public class Stream<V extends StreamRecord<V>> {
   private V tail;
 
   /**
+   * Constructs an empty stream.
+   *
+   * @author Atour Mousavi Gourabi
+   * @since 1.0.0
+   */
+  public Stream() {
+    head = null;
+    tail = null;
+  }
+
+  /**
    * Constructs a stream with one element.
    *
    * @param record the initial stream element
    * @author Atour Mousavi Gourabi
    * @since 1.0.0
    */
-  public Stream(V record) {
+  public Stream(@NonNull V record) {
     head = record;
     tail = record;
   }
 
   /**
+   * Checks whether the {@link com.asml.apa.wta.core.streams.Stream} is empty.
+   *
+   * @return a {@code boolean} indicating whether the {@link com.asml.apa.wta.core.streams.Stream} is empty.
+   * @author Atour Mousavi Gourabi
+   * @since 1.0.0
+   */
+  public boolean isEmpty() {
+    return head == null;
+  }
+
+  /**
+   * Consumes the head of the stream.
+   *
+   * @return the head of the stream.
+   * @author Atour Mousavi Gourabi
+   * @since 1.0.0
+   */
+  public final V head() {
+    if (tail == head) {
+      tail = null;
+    }
+    V ret = head;
+    head = head.getNext();
+    return ret;
+  }
+
+  /**
    * Adds a record to the stream.
+   * As records themselves contain the pointers, it is possible to create circular streams.
    *
    * @param value the value to add to stream, should not be {@code null}
    * @author Atour Mousavi Gourabi
@@ -39,7 +78,24 @@ public class Stream<V extends StreamRecord<V>> {
   }
 
   /**
+   * Adds a record to a possibly empty stream.
+   *
+   * @param value the value to add to stream, should not be {@code null}
+   * @author Atour Mousavi Gourabi
+   * @since 1.0.0
+   */
+  public void safeAddToStream(@NonNull V value) {
+    if (tail == null) {
+      head = value;
+      tail = value;
+    } else {
+      this.addToStream(value);
+    }
+  }
+
+  /**
    * Maps a stream.
+   * Does not maintain a circular stream.
    *
    * @param map the function to map the stream over, should not be {@code null}
    * @param <R> the return type of the function
@@ -49,16 +105,20 @@ public class Stream<V extends StreamRecord<V>> {
    */
   public <R extends StreamRecord<R>> Stream<R> map(@NonNull Function<V, R> map) {
     Stream<R> stream = new Stream<>(map.apply(head));
+    head.setNext(null);
     V next = head.getNext();
     while (next != null) {
       stream.addToStream(map.apply(next));
+      V prev = next;
       next = next.getNext();
+      prev.setNext(null);
     }
     return stream;
   }
 
   /**
    * Folds left on the stream.
+   * Does not maintain a circular stream.
    *
    * @param init the initial value of the fold
    * @param op the fold operation
@@ -72,13 +132,16 @@ public class Stream<V extends StreamRecord<V>> {
     V next = head;
     while (next != null) {
       acc = op.apply(acc, next);
+      V prev = next;
       next = next.getNext();
+      prev.setNext(null);
     }
     return acc;
   }
 
   /**
    * Filters the stream.
+   * Does not maintain a circular stream.
    *
    * @param predicate the function to filter the stream with, should not be {@code null}
    * @return the filtered stream
@@ -86,17 +149,15 @@ public class Stream<V extends StreamRecord<V>> {
    * @since 1.0.0
    */
   public Stream<V> filter(@NonNull Function<V, Boolean> predicate) {
+    Stream<V> stream = new Stream<>();
     V next = head;
-    while (!predicate.apply(next)) {
-      next = next.getNext();
-    }
-    Stream<V> stream = new Stream<>(next);
-    next = next.getNext();
     while (next != null) {
       if (predicate.apply(next)) {
-        stream.addToStream(next);
+        stream.safeAddToStream(next);
       }
+      V prev = next;
       next = next.getNext();
+      prev.setNext(null);
     }
     return stream;
   }
