@@ -1,9 +1,11 @@
 package com.asml.apa.wta.core.streams;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * General test fixture for the {@link com.asml.apa.wta.core.streams.KeyedStream} class' methods.
