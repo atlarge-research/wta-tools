@@ -9,6 +9,14 @@ import org.junit.jupiter.api.Test;
 
 class StreamTest {
 
+  Stream<IntegerStreamRecord> generateNaturalNumbersUpToAndIncluding(int n) {
+    Stream<IntegerStreamRecord> nats = new Stream<>(new IntegerStreamRecord(0));
+    for (int i = 1; i <= n; i++) {
+      nats.addToStream(new IntegerStreamRecord(i));
+    }
+    return nats;
+  }
+
   @Test
   void constructStreamAsNull() {
     assertThrows(NullPointerException.class, () -> new Stream<>(null));
@@ -56,10 +64,7 @@ class StreamTest {
 
   @Test
   void mapNonCircularStream() {
-    Stream<IntegerStreamRecord> nats = new Stream<>(new IntegerStreamRecord(0));
-    for (int i = 1; i <= 10; i++) {
-      nats.addToStream(new IntegerStreamRecord(i));
-    }
+    Stream<IntegerStreamRecord> nats = generateNaturalNumbersUpToAndIncluding(10);
     Stream<IntegerStreamRecord> pos = nats.map((n) -> new IntegerStreamRecord(n.getField() + 1));
     assertEquals(pos.head().getField(), 1);
   }
@@ -74,11 +79,18 @@ class StreamTest {
   }
 
   @Test
+  void mapNaturalNumbersToNegative() {
+    Stream<IntegerStreamRecord> nats = generateNaturalNumbersUpToAndIncluding(3);
+    Stream<IntegerStreamRecord> negs = nats.map((n) -> new IntegerStreamRecord(-n.getField()));
+    assertEquals(negs.head().getField(), 0);
+    assertEquals(negs.head().getField(), -1);
+    assertEquals(negs.head().getField(), -2);
+    assertEquals(negs.head().getField(), -3);
+  }
+
+  @Test
   void foldLeft() {
-    Stream<IntegerStreamRecord> nats = new Stream<>(new IntegerStreamRecord(0));
-    for (int i = 1; i <= 10; i++) {
-      nats.addToStream(new IntegerStreamRecord(i));
-    }
+    Stream<IntegerStreamRecord> nats = generateNaturalNumbersUpToAndIncluding(10);
     assertEquals(55, nats.foldLeft(0, (i, r) -> r.getField() + i));
   }
 
@@ -88,6 +100,12 @@ class StreamTest {
     Stream<DummyStreamRecord> stream = new Stream<>(new DummyStreamRecord());
     stream.addToStream(record);
     assertEquals(stream.filter((n) -> n == record).head(), record);
+  }
+
+  @Test
+  void filterNaturalNumbersOverFive() {
+    Stream<IntegerStreamRecord> nats = generateNaturalNumbersUpToAndIncluding(10);
+    assertEquals(nats.filter((n) -> n.getField() > 5).head().getField(), 6);
   }
 
   @Test
