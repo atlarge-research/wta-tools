@@ -17,6 +17,6 @@ public class CannotConsumeEmptyStreamException extends Exception {
    * @since 1.0.0
    */
   public CannotConsumeEmptyStreamException() {
-    super("Empty streams cannot be consumed");
+    super("Empty streams cannot be consumed.");
   }
 }

@@ -97,6 +97,12 @@ class StreamTest {
     Stream<DummyStreamRecord> stream = new Stream<>(record);
     assertDoesNotThrow(() -> stream.addToStream(record));
   }
+  
+  @Test
+  void safeAddNullToStream() {
+    Stream<DummyStreamRecord> stream = new Stream<>(new DummyStreamRecord());
+    assertThrows(NullPointerException.class, () -> stream.safeAddToStream(null));
+  }
 
   @Test
   void map() {
