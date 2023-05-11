@@ -50,7 +50,7 @@ public class Stream<V extends StreamRecord<V>> {
   }
 
   /**
-   * Consumes the head of the stream.
+   * Returns the head of the stream.
    *
    * @return the head of the stream
    * @author Atour Mousavi Gourabi
@@ -63,6 +63,22 @@ public class Stream<V extends StreamRecord<V>> {
     V ret = head;
     head = head.getNext();
     return ret;
+  }
+
+  /**
+   * Returns the head of the stream.
+   * Guarantees safety by forcing the catch of the exception.
+   *
+   * @return the head of the stream
+   * @throws CannotConsumeEmptyStreamException when an empty stream is being consumed
+   * @author Atour Mousavi Gourabi
+   * @since 1.0.0
+   */
+  public final V safeHead() throws CannotConsumeEmptyStreamException {
+    if (head == null) {
+      throw new CannotConsumeEmptyStreamException();
+    }
+    return head();
   }
 
   /**

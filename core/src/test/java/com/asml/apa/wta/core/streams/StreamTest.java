@@ -95,6 +95,12 @@ class StreamTest {
   }
 
   @Test
+  void foldLeftWithNullOp() {
+    Stream<IntegerStreamRecord> nats = generateNaturalNumbersUpToAndIncluding(10);
+    assertThrows(NullPointerException.class, () -> nats.foldLeft(0, null));
+  }
+
+  @Test
   void filter() {
     DummyStreamRecord record = new DummyStreamRecord();
     Stream<DummyStreamRecord> stream = new Stream<>(new DummyStreamRecord());
@@ -114,5 +120,17 @@ class StreamTest {
     Stream<DummyStreamRecord> stream = new Stream<>(record);
     stream.addToStream(record);
     assertTrue(stream.filter((n) -> false).isEmpty());
+  }
+
+  @Test
+  void filterOnEmptyStream() {
+    Stream<DummyStreamRecord> stream = new Stream<>();
+    assertTrue(stream.filter((n) -> true).isEmpty());
+  }
+
+  @Test
+  void filterWithNullPredicate() {
+    Stream<DummyStreamRecord> stream = new Stream<>(new DummyStreamRecord());
+    assertThrows(NullPointerException.class, () -> stream.filter(null));
   }
 }
