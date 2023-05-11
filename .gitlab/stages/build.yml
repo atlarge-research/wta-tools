@@ -13,6 +13,7 @@ build-core:
 
 build-adapters:
   stage: build
+  needs: [build-core]
 
   script:
     - echo "Build Spark adapter started"
