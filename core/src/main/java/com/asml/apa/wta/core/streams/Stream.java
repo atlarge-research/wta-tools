@@ -11,7 +11,7 @@ import lombok.NonNull;
  * @author Atour Mousavi Gourabi
  * @since 1.0.0
  */
-public class Stream<V extends StreamRecord> {
+public class Stream<V extends StreamRecord<V>> {
   private V head;
   private V tail;
 
@@ -47,7 +47,7 @@ public class Stream<V extends StreamRecord> {
    * @author Atour Mousavi Gourabi
    * @since 1.0.0
    */
-  public <R extends StreamRecord> Stream<R> map(@NonNull Function<V, R> map) {
+  public <R extends StreamRecord<R>> Stream<R> map(@NonNull Function<V, R> map) {
     Stream<R> stream = new Stream<>(map.apply(head));
     V next = head.getNext();
     while (next != null) {

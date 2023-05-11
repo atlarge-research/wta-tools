@@ -10,7 +10,7 @@ import lombok.NonNull;
  * @author Atour Mousavi Gourabi
  * @since 1.0.0
  */
-public class KeyedStream<K, V extends StreamRecord> {
+public class KeyedStream<K, V extends StreamRecord<V>> {
 
   private final Map<K, Stream<V>> streams = new ConcurrentHashMap<>();
 

@@ -6,26 +6,24 @@ package com.asml.apa.wta.core.streams;
  * @author Atour Mousavi Gourabi
  * @since 1.0.0
  */
-public interface StreamRecord {
+public interface StreamRecord<E extends StreamRecord<E>> {
 
   /**
    * Sets the following record.
    *
    * @param next the record to add
-   * @param <V> the concrete implementation type of StreamRecord
    * @return the new record
    * @author Atour Mousavi Gourabi
    * @since 1.0.0
    */
-  <V extends StreamRecord> V setNext(V next);
+  E setNext(E next);
 
   /**
    * Gets the following record.
    *
-   * @param <V> the concrete implementation type of StreamRecord
    * @return the next record
    * @author Atour Mousavi Gourabi
    * @since 1.0.0
    */
-  <V extends StreamRecord> V getNext();
+  E getNext();
 }
