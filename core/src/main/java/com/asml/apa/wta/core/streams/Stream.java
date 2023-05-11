@@ -41,7 +41,7 @@ public class Stream<V extends StreamRecord<V>> {
   /**
    * Checks whether the {@link com.asml.apa.wta.core.streams.Stream} is empty.
    *
-   * @return a {@code boolean} indicating whether the {@link com.asml.apa.wta.core.streams.Stream} is empty.
+   * @return a {@code boolean} indicating whether the {@link com.asml.apa.wta.core.streams.Stream} is empty
    * @author Atour Mousavi Gourabi
    * @since 1.0.0
    */
@@ -52,7 +52,7 @@ public class Stream<V extends StreamRecord<V>> {
   /**
    * Consumes the head of the stream.
    *
-   * @return the head of the stream.
+   * @return the head of the stream
    * @author Atour Mousavi Gourabi
    * @since 1.0.0
    */

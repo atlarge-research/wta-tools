@@ -1,7 +1,6 @@
 package com.asml.apa.wta.core.streams;
 
 import lombok.Getter;
-import lombok.Setter;
 
 /**
  * Dummy StreamRecord implementation for core module testing.
