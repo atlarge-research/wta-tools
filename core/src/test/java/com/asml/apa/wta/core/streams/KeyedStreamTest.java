@@ -48,7 +48,7 @@ class KeyedStreamTest {
     stream.addToStream(3, new DummyStreamRecord());
     stream.addToStream(1, new DummyStreamRecord());
     assertFalse(stream.onKey(1).isEmpty());
-    assertTrue(stream.onKey(2).isEmpty());
+    assertFalse(stream.onKey(2).isEmpty());
   }
 
   @Test
