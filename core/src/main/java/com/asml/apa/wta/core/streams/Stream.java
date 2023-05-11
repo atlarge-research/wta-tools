@@ -122,7 +122,8 @@ public class Stream<V extends StreamRecord<V>> {
   public <R extends StreamRecord<R>> Stream<R> map(@NonNull Function<V, R> map) {
     Stream<R> stream = new Stream<>(map.apply(head));
     V prev = head;
-    V next = head.getNext();
+    head = null;
+    V next = prev.getNext();
     prev.setNext(null);
     while (next != null) {
       stream.addToStream(map.apply(next));
@@ -147,6 +148,7 @@ public class Stream<V extends StreamRecord<V>> {
   public <R> R foldLeft(R init, @NonNull BiFunction<R, V, R> op) {
     R acc = init;
     V next = head;
+    head = null;
     while (next != null) {
       acc = op.apply(acc, next);
       V prev = next;
@@ -168,6 +170,7 @@ public class Stream<V extends StreamRecord<V>> {
   public Stream<V> filter(@NonNull Function<V, Boolean> predicate) {
     Stream<V> stream = new Stream<>();
     V next = head;
+    head = null;
     while (next != null) {
       if (predicate.apply(next)) {
         stream.safeAddToStream(next);

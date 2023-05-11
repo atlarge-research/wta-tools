@@ -30,11 +30,35 @@ class StreamTest {
   }
 
   @Test
-  void headWithEmptyStream() {
-    IntegerStreamRecord record = new IntegerStreamRecord(1);
-    Stream<IntegerStreamRecord> stream = new Stream<>(record);
+  void headVerifyConsumedStream() {
+    Stream<DummyStreamRecord> stream = new Stream<>(new DummyStreamRecord());
     stream.head();
+    assertTrue(stream.isEmpty());
+  }
+
+  @Test
+  void headWithEmptyStream() {
+    Stream<IntegerStreamRecord> stream = new Stream<>();
     assertThrows(NullPointerException.class, stream::head);
+  }
+
+  @Test
+  void safeHeadWithValidStream() throws CannotConsumeEmptyStreamException {
+    Stream<IntegerStreamRecord> stream = new Stream<>(new IntegerStreamRecord(1));
+    assertEquals(1, stream.safeHead().getField());
+  }
+
+  @Test
+  void safeHeadVerifyConsumedStream() throws CannotConsumeEmptyStreamException {
+    Stream<DummyStreamRecord> stream = new Stream<>(new DummyStreamRecord());
+    stream.safeHead();
+    assertTrue(stream.isEmpty());
+  }
+
+  @Test
+  void safeHeadWithEmptyStream() {
+    Stream<IntegerStreamRecord> stream = new Stream<>();
+    assertThrows(CannotConsumeEmptyStreamException.class, stream::safeHead);
   }
 
   @Test
@@ -57,16 +81,17 @@ class StreamTest {
   }
 
   @Test
-  void mapWithNullFunction() {
-    Stream<DummyStreamRecord> stream = new Stream<>(new DummyStreamRecord());
-    assertThrows(NullPointerException.class, () -> stream.map(null));
-  }
-
-  @Test
-  void mapNonCircularStream() {
+  void map() {
     Stream<IntegerStreamRecord> nats = generateNaturalNumbersUpToAndIncluding(10);
     Stream<IntegerStreamRecord> pos = nats.map((n) -> new IntegerStreamRecord(n.getField() + 1));
     assertEquals(pos.head().getField(), 1);
+  }
+
+  @Test
+  void mapVerifyConsumedStream() {
+    Stream<IntegerStreamRecord> nats = generateNaturalNumbersUpToAndIncluding(10);
+    nats.map((n) -> n);
+    assertTrue(nats.isEmpty());
   }
 
   @Test
@@ -76,6 +101,12 @@ class StreamTest {
     stream.addToStream(record);
     DummyStreamRecord record2 = new DummyStreamRecord();
     assertEquals(stream.map((n) -> record2).head(), record2);
+  }
+
+  @Test
+  void mapWithNullFunction() {
+    Stream<DummyStreamRecord> stream = new Stream<>(new DummyStreamRecord());
+    assertThrows(NullPointerException.class, () -> stream.map(null));
   }
 
   @Test
@@ -101,11 +132,25 @@ class StreamTest {
   }
 
   @Test
+  void foldLeftVerifyConsumedStream() {
+    Stream<IntegerStreamRecord> nats = generateNaturalNumbersUpToAndIncluding(10);
+    nats.foldLeft(0, (i, r) -> r.getField() + i);
+    assertTrue(nats.isEmpty());
+  }
+
+  @Test
   void filter() {
     DummyStreamRecord record = new DummyStreamRecord();
     Stream<DummyStreamRecord> stream = new Stream<>(new DummyStreamRecord());
     stream.addToStream(record);
     assertEquals(stream.filter((n) -> n == record).head(), record);
+  }
+
+  @Test
+  void filterVerifyConsumedStream() {
+    Stream<IntegerStreamRecord> nats = generateNaturalNumbersUpToAndIncluding(10);
+    nats.filter((n) -> n.getField() > 5);
+    assertTrue(nats.isEmpty());
   }
 
   @Test
