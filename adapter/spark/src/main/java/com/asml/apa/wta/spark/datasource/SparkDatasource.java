@@ -20,9 +20,10 @@ public class SparkDatasource {
   private final StageLevelListener stageLevelListener;
 
   /**
+   * Constructor for the Spark data source. This requires a Spark context to ensure a Spark session
+   * is available before the data source is initialized.
    *
-   *
-   * @param sparkContext
+   * @param sparkContext  SparkContext of the running Spark session
    */
   public SparkDatasource(SparkContext sparkContext) {
     this.sparkContext = sparkContext;
@@ -61,7 +62,7 @@ public class SparkDatasource {
   /**
    * This method returns a list of task metrics.
    *
-   * @return List<TaskMetrics>    List of task metrics
+   * @return List<TaskMetrics>  List of task metrics
    */
   public List<TaskMetrics> getTaskMetrics() {
     return taskLevelListener.taskMetricsList;
@@ -70,7 +71,7 @@ public class SparkDatasource {
   /**
    * This method returns a list of stage information.
    *
-   * @return List<StageInfo>      List of stage information
+   * @return List<StageInfo>    list of stage information
    */
   public List<StageInfo> getStageInfo() {
     return stageLevelListener.stageInfoList;

@@ -18,7 +18,6 @@ public class SparkDatasourceTest {
     private SparkSession spark;
     private SparkDatasource sut;
 
-    private String resourcePath = "src/test/resources/wordcount.txt";
     private JavaRDD<String> testFile;
 
     @BeforeEach
@@ -26,14 +25,13 @@ public class SparkDatasourceTest {
         SparkConf conf = new SparkConf()
                 .setAppName("SparkTestRunner")
                 .setMaster("local[1]")
-                // 1 executor per instance of each worker
-                .set("spark.executor.instances", "1")
-                // 2 cores on each executor
-                .set("spark.executor.cores", "2");
+                .set("spark.executor.instances", "1")   // 1 executor per instance of each worker
+                .set("spark.executor.cores", "2");      // 2 cores on each executor
         spark = SparkSession.builder().config(conf).getOrCreate();
         spark.sparkContext().setLogLevel("ERROR");
 
         sut = new SparkDatasource(spark.sparkContext());
+        String resourcePath = "src/test/resources/wordcount.txt";
         testFile = JavaSparkContext.fromSparkContext(spark.sparkContext()).textFile(resourcePath);
     }
 
@@ -63,8 +61,28 @@ public class SparkDatasourceTest {
     }
 
     @Test
+    public void registeredTaskListenerKeepsCollectingMetrics() {
+        sut.registerTaskListener();
+        assertThat(sut.getTaskMetrics()).isEmpty();
+        invokeJob();
+        int size1 = sut.getTaskMetrics().size();
+        assertThat(sut.getTaskMetrics()).isNotEmpty();
+        invokeJob();
+        int size2 = sut.getTaskMetrics().size();
+        assertThat(size2).isGreaterThan(size1);
+    }
+
+    @Test
     public void unregisteredTaskListenerDoesNotCollect() {
         assertThat(sut.getTaskMetrics()).isEmpty();
+        invokeJob();
+        assertThat(sut.getTaskMetrics()).isEmpty();
+    }
+
+    @Test
+    public void removedTaskListenerDoesNotCollect() {
+        sut.registerTaskListener();
+        sut.removeTaskListener();
         invokeJob();
         assertThat(sut.getTaskMetrics()).isEmpty();
     }
@@ -85,6 +103,14 @@ public class SparkDatasourceTest {
     @Test
     public void unregisteredStageListenerDoesNotCollect() {
         assertThat(sut.getStageInfo()).isEmpty();
+        invokeJob();
+        assertThat(sut.getStageInfo()).isEmpty();
+    }
+
+    @Test
+    public void removedStageListenerDoesNotCollect() {
+        sut.registerStageListener();
+        sut.removeStageListener();
         invokeJob();
         assertThat(sut.getStageInfo()).isEmpty();
     }
