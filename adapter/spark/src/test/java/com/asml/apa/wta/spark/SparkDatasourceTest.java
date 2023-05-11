@@ -51,7 +51,6 @@ public class SparkDatasourceTest {
 
     @Test
     public void taskListenerReturnsList() {
-        sut.getTaskMetrics();
         assertThat(sut.getTaskMetrics()).isEmpty();
     }
 
@@ -68,5 +67,25 @@ public class SparkDatasourceTest {
         assertThat(sut.getTaskMetrics()).isEmpty();
         invokeJob();
         assertThat(sut.getTaskMetrics()).isEmpty();
+    }
+
+    @Test
+    public void stageListenerReturnsList() {
+        assertThat(sut.getStageInfo()).isEmpty();
+    }
+
+    @Test
+    public void registeredStageListenerCollectsInfo() {
+        sut.registerStageListener();
+        assertThat(sut.getStageInfo()).isEmpty();
+        invokeJob();
+        assertThat(sut.getStageInfo()).isNotEmpty();
+    }
+
+    @Test
+    public void unregisteredStageListenerDoesNotCollect() {
+        assertThat(sut.getStageInfo()).isEmpty();
+        invokeJob();
+        assertThat(sut.getStageInfo()).isEmpty();
     }
 }
