@@ -26,11 +26,10 @@ unit-tests-core:
 unit-tests-spark-adapter:
   stage: test
 
-  needs: [build-core, build-adapters]
+  needs: [build-adapters]
 
   dependencies:
     - build-adapters
-    - build-core
 
   script:
     - echo "Spark adapter unit tests started"
@@ -72,11 +71,10 @@ integration-tests-core:
 integration-tests-spark-adapter:
   stage: test
 
-  needs: [build-core, build-adapters]
+  needs: [build-adapters]
 
   dependencies:
     - build-adapters
-    - build-core
 
   script:
     - echo "Spark adapter integration tests started"
@@ -120,11 +118,10 @@ mutation-tests-spark-adapter:
   stage: test
   allow_failure: true
 
-  needs: [build-core, build-adapters]
+  needs: [build-adapters]
 
   dependencies:
     - build-adapters
-    - build-core
 
   script:
     - echo "Spark adapter mutation tests adapter/spark started"
