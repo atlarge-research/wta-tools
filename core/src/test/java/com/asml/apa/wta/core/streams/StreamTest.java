@@ -2,6 +2,7 @@ package com.asml.apa.wta.core.streams;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -20,6 +21,23 @@ class StreamTest {
   @Test
   void constructStreamAsNull() {
     assertThrows(NullPointerException.class, () -> new Stream<>(null));
+  }
+
+  @Test
+  void constructsEmptyStream() {
+    assertDoesNotThrow(() -> new Stream<>());
+  }
+
+  @Test
+  void isEmptyOnEmptyStream() {
+    Stream<DummyStreamRecord> emptyStream = new Stream<>();
+    assertTrue(emptyStream.isEmpty());
+  }
+
+  @Test
+  void isEmpty() {
+    Stream<IntegerStreamRecord> emptyStream = new Stream<>(new IntegerStreamRecord(1));
+    assertFalse(emptyStream.isEmpty());
   }
 
   @Test
@@ -113,6 +131,7 @@ class StreamTest {
   void mapNaturalNumbersToNegative() {
     Stream<IntegerStreamRecord> nats = generateNaturalNumbersUpToAndIncluding(3);
     Stream<IntegerStreamRecord> negs = nats.map((n) -> new IntegerStreamRecord(-n.getField()));
+    assertFalse(negs.isEmpty());
     assertEquals(negs.head().getField(), 0);
     assertEquals(negs.head().getField(), -1);
     assertEquals(negs.head().getField(), -2);
