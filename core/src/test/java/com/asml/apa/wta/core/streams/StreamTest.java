@@ -97,7 +97,14 @@ class StreamTest {
     Stream<DummyStreamRecord> stream = new Stream<>(record);
     assertDoesNotThrow(() -> stream.addToStream(record));
   }
-  
+
+  @Test
+  void safeAddToStream() {
+    DummyStreamRecord record = new DummyStreamRecord();
+    Stream<DummyStreamRecord> stream = new Stream<>();
+    assertEquals(record, stream.safeAddToStream(record).head());
+  }
+
   @Test
   void safeAddNullToStream() {
     Stream<DummyStreamRecord> stream = new Stream<>(new DummyStreamRecord());

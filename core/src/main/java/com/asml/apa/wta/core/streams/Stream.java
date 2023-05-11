@@ -86,27 +86,31 @@ public class Stream<V extends StreamRecord<V>> {
    * As records themselves contain the pointers, it is possible to create circular streams.
    *
    * @param value the value to add to stream, should not be {@code null}
+   * @return the stream the value was appended to
    * @author Atour Mousavi Gourabi
    * @since 1.0.0
    */
-  public void addToStream(@NonNull V value) {
+  public Stream<V> addToStream(@NonNull V value) {
     tail = tail.setNext(value);
+    return this;
   }
 
   /**
    * Adds a record to a possibly empty stream.
    *
    * @param value the value to add to stream, should not be {@code null}
+   * @return the stream the value was appended to
    * @author Atour Mousavi Gourabi
    * @since 1.0.0
    */
-  public void safeAddToStream(@NonNull V value) {
+  public Stream<V> safeAddToStream(@NonNull V value) {
     if (tail == null) {
       head = value;
       tail = value;
     } else {
       this.addToStream(value);
     }
+    return this;
   }
 
   /**
