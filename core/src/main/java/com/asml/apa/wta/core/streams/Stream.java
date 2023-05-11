@@ -57,9 +57,6 @@ public class Stream<V extends StreamRecord<V>> {
    * @since 1.0.0
    */
   public final V head() {
-    if (tail == head) {
-      tail = null;
-    }
     V ret = head;
     head = head.getNext();
     return ret;
