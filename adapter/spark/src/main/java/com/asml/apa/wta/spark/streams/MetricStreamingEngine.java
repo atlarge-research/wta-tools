@@ -10,8 +10,19 @@ import com.asml.apa.wta.core.streams.KeyedStream;
  */
 public class MetricStreamingEngine {
 
-  private KeyedStream<ResourceKey, ResourceMetricsRecord> resourceStream;
-  private KeyedStream<TaskKey, TaskMetricsRecord> taskStream;
+  private final KeyedStream<ResourceKey, ResourceMetricsRecord> resourceStream;
+  private final KeyedStream<TaskKey, TaskMetricsRecord> taskStream;
+
+  /**
+   * Initializes the streams.
+   *
+   * @author Atour Mousavi Gourabi
+   * @since 1.0.0
+   */
+  public MetricStreamingEngine() {
+    resourceStream = new KeyedStream<>();
+    taskStream = new KeyedStream<>();
+  }
 
   /**
    * Adds a resource metrics to the resource stream.
