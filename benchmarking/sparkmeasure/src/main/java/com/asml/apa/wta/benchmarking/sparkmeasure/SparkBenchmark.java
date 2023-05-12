@@ -28,7 +28,6 @@ import org.openjdk.jmh.infra.Blackhole;
  * Benchmarking class for Apache Spark.
  *
  * @author Pil Kyu CHo
- * @since 1.0.0
  */
 @State(Scope.Thread)
 @BenchmarkMode(Mode.AverageTime)

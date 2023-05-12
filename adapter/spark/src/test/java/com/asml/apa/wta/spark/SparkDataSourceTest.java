@@ -42,11 +42,6 @@ public class SparkDataSourceTest {
   }
 
   @Test
-  public void sparkDatasourceIsNotNull() {
-    assertThat(sut).isNotNull();
-  }
-
-  @Test
   public void taskListenerReturnsList() {
     assertThat(sut.getTaskMetrics()).isEmpty();
   }
