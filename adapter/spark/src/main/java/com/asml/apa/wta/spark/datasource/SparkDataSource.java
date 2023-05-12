@@ -13,7 +13,7 @@ import org.apache.spark.scheduler.StageInfo;
  * @author Pil Kyu Cho
  * @since 1.0.0
  */
-public class SparkDatasource {
+public class SparkDataSource {
 
   private final SparkContext sparkContext;
   private final TaskLevelListener taskLevelListener;
@@ -24,8 +24,10 @@ public class SparkDatasource {
    * is available before the data source is initialized.
    *
    * @param sparkContext  SparkContext of the running Spark session
+   * @author Pil Kyu Cho
+   * @since 1.0.0
    */
-  public SparkDatasource(SparkContext sparkContext) {
+  public SparkDataSource(SparkContext sparkContext) {
     this.sparkContext = sparkContext;
     taskLevelListener = new TaskLevelListener();
     stageLevelListener = new StageLevelListener();
@@ -33,6 +35,9 @@ public class SparkDatasource {
 
   /**
    * This method registers a task listener to the Spark context.
+   *
+   * @author Pil Kyu Cho
+   * @since 1.0.0
    */
   public void registerTaskListener() {
     sparkContext.addSparkListener(taskLevelListener);
@@ -40,6 +45,9 @@ public class SparkDatasource {
 
   /**
    * This method removes a task listener from the Spark context.
+   *
+   * @author Pil Kyu Cho
+   * @since 1.0.0
    */
   public void removeTaskListener() {
     sparkContext.removeSparkListener(taskLevelListener);
@@ -47,6 +55,9 @@ public class SparkDatasource {
 
   /**
    * This method registers a stage listener to the Spark context.
+   *
+   * @author Pil Kyu Cho
+   * @since 1.0.0
    */
   public void registerStageListener() {
     sparkContext.addSparkListener(stageLevelListener);
@@ -54,6 +65,9 @@ public class SparkDatasource {
 
   /**
    * This method removes a stage listener from the Spark context.
+   *
+   * @author Pil Kyu Cho
+   * @since 1.0.0
    */
   public void removeStageListener() {
     sparkContext.removeSparkListener(stageLevelListener);
@@ -62,6 +76,8 @@ public class SparkDatasource {
   /**
    * This method gets a list of TaskMetrics from the registered task listener.
    * @return List of task metrics
+   * @author Pil Kyu Cho
+   * @since 1.0.0
    */
   public List<TaskMetrics> getTaskMetrics() {
     return taskLevelListener.getTaskMetricsList();
@@ -70,6 +86,8 @@ public class SparkDatasource {
   /**
    * This method gets a list of StageInfo from the registered stage listener.
    * @return List of StageInfo
+   * @author Pil Kyu Cho
+   * @since 1.0.0
    */
   public List<StageInfo> getStageInfo() {
     return stageLevelListener.getStageInfoList();

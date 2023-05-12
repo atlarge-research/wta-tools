@@ -2,7 +2,7 @@ package com.asml.apa.wta.spark;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.asml.apa.wta.spark.datasource.SparkDatasource;
+import com.asml.apa.wta.spark.datasource.SparkDataSource;
 import java.util.Arrays;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
@@ -12,10 +12,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import scala.Tuple2;
 
-public class SparkDatasourceTest {
+public class SparkDataSourceTest {
 
   private SparkSession spark;
-  private SparkDatasource sut;
+  private SparkDataSource sut;
 
   private JavaRDD<String> testFile;
 
@@ -29,7 +29,7 @@ public class SparkDatasourceTest {
     spark = SparkSession.builder().config(conf).getOrCreate();
     spark.sparkContext().setLogLevel("ERROR");
 
-    sut = new SparkDatasource(spark.sparkContext());
+    sut = new SparkDataSource(spark.sparkContext());
     String resourcePath = "src/test/resources/wordcount.txt";
     testFile = JavaSparkContext.fromSparkContext(spark.sparkContext()).textFile(resourcePath);
   }
