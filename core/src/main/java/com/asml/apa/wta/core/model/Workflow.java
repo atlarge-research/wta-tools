@@ -17,7 +17,6 @@ public class Workflow implements BaseTraceObject {
   private static final long serialVersionUID = 9065743819019553490L;
 
   private final String schemaVersion = this.getSchemaVersion();
-  ;
 
   private final long id;
 

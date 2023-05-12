@@ -16,7 +16,6 @@ public class Resource implements BaseTraceObject {
   private static final long serialVersionUID = 3002249398331752973L;
 
   private final String schemaVersion = this.getSchemaVersion();
-  ;
 
   private final long id;
 

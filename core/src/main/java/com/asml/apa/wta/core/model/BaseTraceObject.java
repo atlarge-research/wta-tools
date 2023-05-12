@@ -10,7 +10,7 @@ import java.io.Serializable;
  */
 public interface BaseTraceObject extends Serializable {
   /**
-   * Returns a hardcoded schema version
+   * Returns a hardcoded schema version.
    *
    * @return The associated config object
    */

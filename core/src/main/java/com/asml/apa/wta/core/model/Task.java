@@ -15,7 +15,6 @@ public class Task implements BaseTraceObject {
   private static final long serialVersionUID = -1372345471722101373L;
 
   private final String schemaVersion = this.getSchemaVersion();
-  ;
 
   private final long id;
 
