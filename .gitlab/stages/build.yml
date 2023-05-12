@@ -28,3 +28,4 @@ build-adapters:
     expire_in: 2 hours
     paths:
       - adapter/spark/target
+      - .m2/repository/com/asml/apa
