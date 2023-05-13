@@ -22,7 +22,7 @@ public class KeyedStream<K, V> {
    * @author Atour Mousavi Gourabi
    * @since 1.0.0
    */
-  public void addToStream(@NonNull K key, @NonNull V record) {
+  public void addToStream(K key, @NonNull V record) {
     if (streams.containsKey(key)) {
       streams.get(key).addToStream(record);
     } else {
