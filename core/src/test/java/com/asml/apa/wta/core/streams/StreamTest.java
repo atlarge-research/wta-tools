@@ -4,7 +4,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.asml.apa.wta.core.exceptions.StreamSerializationException;
+import java.io.File;
 import java.util.NoSuchElementException;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -18,6 +20,11 @@ class StreamTest {
       stream.addToStream(i);
     }
     return stream;
+  }
+
+  @BeforeAll
+  static void setUpTmpDirectory() {
+    new File("tmp").mkdirs();
   }
 
   @Test
