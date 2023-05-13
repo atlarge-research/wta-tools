@@ -1,7 +1,9 @@
 package com.asml.apa.wta.core.streams;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import java.util.NoSuchElementException;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -60,5 +62,29 @@ class StreamTest {
     Stream<Integer> stream = createStreamOfNaturalNumbers(10);
     int sum = stream.foldLeft(0, Integer::sum);
     assertThat(sum).isEqualTo(55);
+  }
+
+  @Test
+  void headOfEmptyStream() {
+    Stream<Integer> stream = new Stream<>();
+    assertThatThrownBy(stream::head).isInstanceOf(NoSuchElementException.class);
+  }
+
+  @Test
+  void mapUsingNullOperation() {
+    Stream<Integer> stream = createStreamOfNaturalNumbers(1309);
+    assertThatThrownBy(() -> stream.map(null)).isInstanceOf(NullPointerException.class);
+  }
+
+  @Test
+  void filterUsingNullOperation() {
+    Stream<Integer> stream = createStreamOfNaturalNumbers(102);
+    assertThatThrownBy(() -> stream.filter(null)).isInstanceOf(NullPointerException.class);
+  }
+
+  @Test
+  void foldUsingNullOperation() {
+    Stream<Integer> stream = createStreamOfNaturalNumbers(457);
+    assertThatThrownBy(() -> stream.foldLeft(0, null)).isInstanceOf(NullPointerException.class);
   }
 }

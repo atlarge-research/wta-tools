@@ -1,6 +1,7 @@
 package com.asml.apa.wta.core.streams;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import org.junit.jupiter.api.Test;
 
@@ -34,5 +35,36 @@ class KeyedStreamTest {
     keyedStream.addToStream(3, "World!");
     Stream<String> emptyStream = keyedStream.onKey(17);
     assertThat(emptyStream.isEmpty()).isTrue();
+  }
+
+  @Test
+  void keyedStreamToCollectionTwoStrings() {
+    KeyedStream<Boolean, String> keyedStream = new KeyedStream<>();
+    keyedStream.addToStream(true, "Hello");
+    keyedStream.addToStream(false, "Lorem");
+    keyedStream.addToStream(true, "World!");
+    keyedStream.addToStream(false, "Ipsum");
+    String helloWorld = keyedStream
+        .onKey(true)
+        .foldLeft(new StringBuilder(), (acc, curr) -> acc.append(curr).append(' '))
+        .toString();
+    String loremIpsum = keyedStream
+        .onKey(false)
+        .foldLeft(new StringBuilder(), StringBuilder::append)
+        .toString();
+    assertThat(helloWorld).isEqualTo("Hello World! ");
+    assertThat(loremIpsum).isEqualTo("LoremIpsum");
+  }
+
+  @Test
+  void addToNullKeyStream() {
+    KeyedStream<Boolean, String> keyedStream = new KeyedStream<>();
+    assertThatThrownBy(() -> keyedStream.addToStream(null, "some string")).isInstanceOf(NullPointerException.class);
+  }
+
+  @Test
+  void addNullRecordToStream() {
+    KeyedStream<Boolean, String> keyedStream = new KeyedStream<>();
+    assertThatThrownBy(() -> keyedStream.addToStream(true, null)).isInstanceOf(NullPointerException.class);
   }
 }
