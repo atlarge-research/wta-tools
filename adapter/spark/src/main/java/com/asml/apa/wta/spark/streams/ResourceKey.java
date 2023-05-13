@@ -11,6 +11,4 @@ import lombok.Getter;
  */
 @Getter
 @AllArgsConstructor
-public class ResourceKey {
-  private final long id;
-}
+public class ResourceKey {}

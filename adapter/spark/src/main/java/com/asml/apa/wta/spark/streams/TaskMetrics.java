@@ -4,11 +4,11 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 /**
- * Task key value object.
+ * Task metrics record.
  *
  * @author Atour Mousavi Gourabi
  * @since 1.0.0
  */
 @Getter
 @AllArgsConstructor
-public class TaskKey {}
+public class TaskMetrics {}

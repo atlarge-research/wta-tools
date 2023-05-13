@@ -10,7 +10,7 @@ import lombok.NonNull;
  * @author Atour Mousavi Gourabi
  * @since 1.0.0
  */
-public class KeyedStream<K, V extends StreamRecord<V>> {
+public class KeyedStream<K, V> {
 
   private final Map<K, Stream<V>> streams = new ConcurrentHashMap<>();
 
@@ -31,7 +31,7 @@ public class KeyedStream<K, V extends StreamRecord<V>> {
   }
 
   /**
-   * Consume the key.
+   * Get the message stream at a given key.
    *
    * @param key the key
    * @return the stream of objects with the provided key
@@ -39,11 +39,7 @@ public class KeyedStream<K, V extends StreamRecord<V>> {
    * @since 1.0.0
    */
   public Stream<V> onKey(K key) {
-    if (streams.containsKey(key)) {
-      return streams.get(key);
-    }
-    Stream<V> val = new Stream<>();
-    streams.put(key, val);
-    return val;
+    streams.putIfAbsent(key, new Stream<>());
+    return streams.get(key);
   }
 }

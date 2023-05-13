@@ -10,8 +10,8 @@ import com.asml.apa.wta.core.streams.KeyedStream;
  */
 public class MetricStreamingEngine {
 
-  private final KeyedStream<ResourceKey, ResourceMetricsRecord> resourceStream;
-  private final KeyedStream<TaskKey, TaskMetricsRecord> taskStream;
+  private final KeyedStream<ResourceKey, ResourceMetrics> resourceStream;
+  private final KeyedStream<TaskKey, TaskMetrics> taskStream;
 
   /**
    * Initializes the streams.
@@ -28,11 +28,11 @@ public class MetricStreamingEngine {
    * Adds a resource metrics to the resource stream.
    *
    * @param resource the {@link com.asml.apa.wta.spark.streams.ResourceKey} of the resource
-   * @param record the {@link com.asml.apa.wta.spark.streams.ResourceMetricsRecord} containing the metrics
+   * @param record the {@link com.asml.apa.wta.spark.streams.ResourceMetrics} containing the metrics
    * @author Atour Mousavi Gourabi
    * @since 1.0.0
    */
-  public void addToResourceStream(ResourceKey resource, ResourceMetricsRecord record) {
+  public void addToResourceStream(ResourceKey resource, ResourceMetrics record) {
     resourceStream.addToStream(resource, record);
   }
 
@@ -40,11 +40,11 @@ public class MetricStreamingEngine {
    * Adds a resource metrics to the resource stream.
    *
    * @param task the {@link com.asml.apa.wta.spark.streams.TaskKey} of the task
-   * @param record the {@link com.asml.apa.wta.spark.streams.TaskMetricsRecord} containing the metrics
+   * @param record the {@link com.asml.apa.wta.spark.streams.TaskMetrics} containing the metrics
    * @author Atour Mousavi Gourabi
    * @since 1.0.0
    */
-  public void addToTaskStream(TaskKey task, TaskMetricsRecord record) {
+  public void addToTaskStream(TaskKey task, TaskMetrics record) {
     taskStream.addToStream(task, record);
   }
 }
