@@ -3,6 +3,7 @@ package com.asml.apa.wta.core.streams;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import com.asml.apa.wta.core.exceptions.StreamSerializationException;
 import java.util.NoSuchElementException;
 import org.junit.jupiter.api.Test;
 
@@ -99,5 +100,41 @@ class StreamTest {
     assertThat(one).isEqualTo(1);
     assertThat(two).isEqualTo(2);
     assertThat(sum).isEqualTo(55);
+  }
+
+  @Test
+  void streamSerialization() throws StreamSerializationException {
+    Stream<Integer> stream = createStreamOfNaturalNumbers(10);
+    stream.serializeInternals();
+    for (int i = 1; i <= 9; i++) {
+      stream.addToStream(i);
+    }
+    stream.serializeInternals();
+    stream.addToStream(10);
+    stream.addToStream(5);
+    stream.deserializeAll();
+    assertThat(stream.foldLeft(0, Integer::sum)).isEqualTo(115);
+    assertThat(stream.head()).isEqualTo(1);
+    assertThat(stream.head()).isEqualTo(2);
+    assertThat(stream.head()).isEqualTo(3);
+    assertThat(stream.head()).isEqualTo(4);
+    assertThat(stream.head()).isEqualTo(5);
+    assertThat(stream.head()).isEqualTo(6);
+    assertThat(stream.head()).isEqualTo(7);
+    assertThat(stream.head()).isEqualTo(8);
+    assertThat(stream.head()).isEqualTo(9);
+    assertThat(stream.head()).isEqualTo(10);
+    assertThat(stream.head()).isEqualTo(1);
+    assertThat(stream.head()).isEqualTo(2);
+    assertThat(stream.head()).isEqualTo(3);
+    assertThat(stream.head()).isEqualTo(4);
+    assertThat(stream.head()).isEqualTo(5);
+    assertThat(stream.head()).isEqualTo(6);
+    assertThat(stream.head()).isEqualTo(7);
+    assertThat(stream.head()).isEqualTo(8);
+    assertThat(stream.head()).isEqualTo(9);
+    assertThat(stream.head()).isEqualTo(10);
+    assertThat(stream.head()).isEqualTo(5);
+    assertThat(stream.isEmpty()).isTrue();
   }
 }

@@ -1,5 +1,6 @@
 package com.asml.apa.wta.spark.streams;
 
+import java.io.Serializable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -11,4 +12,6 @@ import lombok.Getter;
  */
 @Getter
 @AllArgsConstructor
-public class ResourceMetrics {}
+public class ResourceMetrics implements Serializable {
+  private static final long serialVersionUID = -3101218638564306099L;
+}

@@ -1,5 +1,6 @@
 package com.asml.apa.wta.core.streams;
 
+import java.io.Serializable;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.NonNull;
@@ -7,10 +8,12 @@ import lombok.NonNull;
 /**
  * Keyed stream.
  *
+ * @param <K> the key
+ * @param <V> the class to hold, to extend serializable
  * @author Atour Mousavi Gourabi
  * @since 1.0.0
  */
-public class KeyedStream<K, V> {
+public class KeyedStream<K, V extends Serializable> {
 
   private final Map<K, Stream<V>> streams = new ConcurrentHashMap<>();
 
