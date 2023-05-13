@@ -87,4 +87,17 @@ class StreamTest {
     Stream<Integer> stream = createStreamOfNaturalNumbers(457);
     assertThatThrownBy(() -> stream.foldLeft(0, null)).isInstanceOf(NullPointerException.class);
   }
+
+  @Test
+  void simpleStreamWorkflow() {
+    Stream<Integer> stream = createStreamOfNaturalNumbers(10);
+    int one = stream.head();
+    stream.addToStream(1);
+    int two = stream.head();
+    stream.addToStream(2);
+    int sum = stream.foldLeft(0, Integer::sum);
+    assertThat(one).isEqualTo(1);
+    assertThat(two).isEqualTo(2);
+    assertThat(sum).isEqualTo(55);
+  }
 }
