@@ -66,7 +66,6 @@ integration-tests-core:
     expire_in: 3 days
     when: always
     paths:
-      - core/tmp/
       - core/reports/jacoco/
 
 integration-tests-spark-adapter:

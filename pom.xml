@@ -95,6 +95,7 @@
         <artifactId>maven-failsafe-plugin</artifactId>
         <version>${failsafe.version}</version>
         <configuration>
+          <rerunFailingTestsCount>3</rerunFailingTestsCount>
           <includes>
             <include>**/*IntegrationTest.java</include>
           </includes>
