@@ -4,7 +4,7 @@ import com.asml.apa.wta.core.exceptions.FailedToSerializeStreamException;
 import com.asml.apa.wta.core.streams.KeyedStream;
 
 /**
- * Maintains the resource and task streams.
+ * Facade that maintains the resource and task streams.
  *
  * @author Atour Mousavi Gourabi
  * @since 1.0.0
@@ -26,7 +26,7 @@ public class MetricStreamingEngine {
   }
 
   /**
-   * Adds a resource metrics to the resource stream.
+   * Adds resource metrics to the resource stream.
    *
    * @param resource the {@link com.asml.apa.wta.spark.streams.ResourceKey} of the resource
    * @param record the {@link com.asml.apa.wta.spark.streams.ResourceMetrics} containing the metrics
@@ -41,7 +41,7 @@ public class MetricStreamingEngine {
   }
 
   /**
-   * Adds a resource metrics to the resource stream.
+   * Adds resource metrics to the resource stream.
    *
    * @param task the {@link com.asml.apa.wta.spark.streams.TaskKey} of the task
    * @param record the {@link com.asml.apa.wta.spark.streams.TaskMetrics} containing the metrics
