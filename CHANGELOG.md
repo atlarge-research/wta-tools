@@ -17,7 +17,8 @@ For the most part, since we are pre-release this will serve no real purpose, oth
 - Patched report artefacts in the pipeline [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 - Created basic skeleton of Resource and Workload objects [@lyadalachanchu](https://gitlab.ewi.tudelft.nl/lyadalachanchu)
 - Created the Spark datasource class to access Spark metrics [@pcho](https://gitlab.ewi.tudelft.nl/pcho)
-
+- Set up basic streaming infrastructure [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
+- Added a build dependency to PMD [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 
 ### Changed
 

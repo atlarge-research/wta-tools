@@ -26,6 +26,13 @@
       <artifactId>spark-sql_2.13</artifactId>
       <version>${spark.support.version}</version>
     </dependency>
+    <!-- internal dependency -->
+    <dependency>
+      <groupId>com.asml.apa.wta</groupId>
+      <artifactId>core</artifactId>
+      <version>${project.version}</version>
+      <scope>compile</scope>
+    </dependency>
   </dependencies>
 
 </project>

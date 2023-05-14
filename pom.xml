@@ -28,6 +28,7 @@
     <checkstyle.version>3.2.2</checkstyle.version>
     <assertj.version>3.24.2</assertj.version>
     <spark.support.version>3.2.0</spark.support.version>
+    <mockito.version>5.3.1</mockito.version>
   </properties>
 
   <modules>
@@ -71,11 +72,19 @@
       <version>${lombok.version}</version>
       <scope>provided</scope>
     </dependency>
-    <!-- https://mvnrepository.com/artifact/org.apache.kafka/kafka-clients -->
+    <!-- https://mvnrepository.com/artifact/org.mockito/mockito-core -->
     <dependency>
-      <groupId>org.apache.kafka</groupId>
-      <artifactId>kafka-clients</artifactId>
-      <version>3.4.0</version>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-core</artifactId>
+      <version>${mockito.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <!-- https://mvnrepository.com/artifact/org.mockito/mockito-junit-jupiter -->
+    <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-junit-jupiter</artifactId>
+      <version>${mockito.version}</version>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 
