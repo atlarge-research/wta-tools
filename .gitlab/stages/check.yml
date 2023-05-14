@@ -16,8 +16,8 @@ spotless:
 
 pmd:
   stage: check
-  dependencies: []
-  needs: []
+  dependencies: [build-core]
+  needs: [build-core]
 
   script:
     - echo "PMD checks started"

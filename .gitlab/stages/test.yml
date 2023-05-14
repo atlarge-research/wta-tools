@@ -4,10 +4,10 @@ variables:
 unit-tests-core:
   stage: test
 
+  needs: [build-core]
+
   dependencies:
     - build-core
-
-  needs: [build-core]
 
   script:
     - echo "Core unit tests started"
@@ -26,10 +26,10 @@ unit-tests-core:
 unit-tests-spark-adapter:
   stage: test
 
+  needs: [build-adapters]
+
   dependencies:
     - build-adapters
-
-  needs: [build-adapters]
 
   script:
     - echo "Spark adapter unit tests started"
@@ -49,10 +49,10 @@ unit-tests-spark-adapter:
 integration-tests-core:
   stage: test
 
+  needs: [build-core]
+
   dependencies:
     - build-core
-
-  needs: [build-core]
 
   script:
     - echo "Core integration tests started"
@@ -71,10 +71,10 @@ integration-tests-core:
 integration-tests-spark-adapter:
   stage: test
 
+  needs: [build-adapters]
+
   dependencies:
     - build-adapters
-
-  needs: [build-adapters]
 
   script:
     - echo "Spark adapter integration tests started"

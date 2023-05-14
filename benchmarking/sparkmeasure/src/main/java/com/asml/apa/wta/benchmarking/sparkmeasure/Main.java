@@ -6,6 +6,11 @@ import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 
+/**
+ * Entry point for running the Spark benchmark.
+ *
+ * @author Pil Kyu CHo
+ */
 public class Main {
 
   public static void main(String[] args) throws Exception {
