@@ -23,7 +23,7 @@ import lombok.Setter;
 /**
  * Message stream, used for processing incoming metrics.
  *
- * @param <V> the metrics class to hold, to extend serializable.
+ * @param <V> the metrics class to hold, to extend {@link java.io.Serializable}
  * @author Atour Mousavi Gourabi
  * @since 1.0.0
  */
@@ -32,7 +32,7 @@ public class Stream<V extends Serializable> {
   /**
    * Internal node of the {@link com.asml.apa.wta.core.streams.Stream}.
    *
-   * @param <V> the metrics class to hold, to extend serializable.
+   * @param <V> the metrics class to hold, to extend {@link java.io.Serializable}
    * @author Atour Mousavi Gourabi
    * @since 1.0.0
    */
@@ -131,6 +131,7 @@ public class Stream<V extends Serializable> {
 
   /**
    * Temporarily used for testing.
+   * To be removed when the serialization engine is up and running.
    */
   public void deserializeAll() throws FailedToDeserializeStreamException {
     while (!diskLocations.isEmpty()) {

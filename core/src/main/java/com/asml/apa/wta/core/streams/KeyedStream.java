@@ -9,7 +9,7 @@ import lombok.NonNull;
  * Keyed stream.
  *
  * @param <K> the key
- * @param <V> the class to hold, to extend serializable
+ * @param <V> the class to hold, to extend {@link java.io.Serializable}
  * @author Atour Mousavi Gourabi
  * @since 1.0.0
  */
@@ -20,8 +20,8 @@ public class KeyedStream<K, V extends Serializable> {
   /**
    * Add to the keyed stream.
    *
-   * @param key the record key.
-   * @param record the record.
+   * @param key the record key
+   * @param record the record
    * @author Atour Mousavi Gourabi
    * @since 1.0.0
    */

@@ -118,7 +118,7 @@ class StreamTest {
   }
 
   @Test
-  void streamSerializationWithManualDeserialization() throws StreamSerializationException {
+  void manualStreamSerializationWithManualDeserialization() throws StreamSerializationException {
     Stream<Integer> stream = createStreamOfNaturalNumbers(10);
     stream.serializeInternals();
     for (int i = 1; i <= 9; i++) {
@@ -154,7 +154,7 @@ class StreamTest {
   }
 
   @Test
-  void streamSerializationWithMapAndAutomaticDeserialization()
+  void manualStreamSerializationWithMapAndAutomaticDeserialization()
       throws FailedToSerializeStreamException, FailedToDeserializeStreamException {
     Stream<Integer> stream = createStreamOfNaturalNumbers(10);
     stream.serializeInternals();
@@ -220,7 +220,7 @@ class StreamTest {
   }
 
   @Test
-  void streamSerializationWithFilterAndAutomaticDeserialization()
+  void manualStreamSerializationWithFilterAndAutomaticDeserialization()
       throws FailedToSerializeStreamException, FailedToDeserializeStreamException {
     Stream<Integer> stream = createStreamOfNaturalNumbers(10);
     stream.serializeInternals();
@@ -269,7 +269,7 @@ class StreamTest {
   }
 
   @Test
-  void streamSerializationWithFoldLeftAndAutomaticDeserialization() throws StreamSerializationException {
+  void manualStreamSerializationWithFoldLeftAndAutomaticDeserialization() throws StreamSerializationException {
     Stream<Integer> stream = createStreamOfNaturalNumbers(10);
     stream.serializeInternals();
     for (int i = 1; i <= 9; i++) {
@@ -304,7 +304,7 @@ class StreamTest {
   }
 
   @Test
-  void streamSerializationWithHeadAndAutomaticDeserialization() throws StreamSerializationException {
+  void manualStreamSerializationWithHeadAndAutomaticDeserialization() throws StreamSerializationException {
     Stream<Integer> stream = createStreamOfNaturalNumbers(10);
     stream.serializeInternals();
     for (int i = 1; i <= 9; i++) {
