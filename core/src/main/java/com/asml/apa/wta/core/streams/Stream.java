@@ -296,7 +296,6 @@ public class Stream<V extends Serializable> {
       ret.addToStream(op.apply(next.getContent()));
       next = next.getNext();
     }
-    ret.serializeInternals();
     return ret;
   }
 
@@ -322,7 +321,6 @@ public class Stream<V extends Serializable> {
       }
       next = next.getNext();
     }
-    ret.serializeInternals();
     return ret;
   }
 

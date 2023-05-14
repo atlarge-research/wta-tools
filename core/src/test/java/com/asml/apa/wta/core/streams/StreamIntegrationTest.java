@@ -2,7 +2,6 @@ package com.asml.apa.wta.core.streams;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.asml.apa.wta.core.exceptions.FailedToDeserializeStreamException;
 import com.asml.apa.wta.core.exceptions.FailedToSerializeStreamException;
 import com.asml.apa.wta.core.exceptions.StreamSerializationException;
 import java.io.File;
@@ -34,7 +33,7 @@ public class StreamIntegrationTest {
   }
 
   @Test
-  void streamSerializationWithMap() throws FailedToSerializeStreamException, FailedToDeserializeStreamException {
+  void streamSerializationWithMap() throws StreamSerializationException {
     Stream<Integer> stream = createSerializingStreamOfNaturalNumbers(10);
     for (int i = 1; i <= 10; i++) {
       stream.addToStream(i);
@@ -97,7 +96,7 @@ public class StreamIntegrationTest {
   }
 
   @Test
-  void streamSerializationWithFilter() throws FailedToSerializeStreamException, FailedToDeserializeStreamException {
+  void streamSerializationWithFilter() throws StreamSerializationException {
     Stream<Integer> stream = createSerializingStreamOfNaturalNumbers(10);
     for (int i = 1; i <= 10; i++) {
       stream.addToStream(i);

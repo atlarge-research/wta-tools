@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.asml.apa.wta.core.exceptions.FailedToDeserializeStreamException;
 import com.asml.apa.wta.core.exceptions.FailedToSerializeStreamException;
+import com.asml.apa.wta.core.exceptions.StreamSerializationException;
 import java.util.NoSuchElementException;
 import org.junit.jupiter.api.Test;
 
@@ -35,7 +36,7 @@ class StreamTest {
   }
 
   @Test
-  void mapStream() throws FailedToDeserializeStreamException, FailedToSerializeStreamException {
+  void mapStream() throws StreamSerializationException {
     Stream<Integer> stream = createStreamOfNaturalNumbers(10);
     Stream<Integer> mappedStream = stream.map((i) -> {
       if (i < 3) {
@@ -51,7 +52,7 @@ class StreamTest {
   }
 
   @Test
-  void filterStream() throws FailedToDeserializeStreamException, FailedToSerializeStreamException {
+  void filterStream() throws StreamSerializationException {
     Stream<Integer> stream = createStreamOfNaturalNumbers(11);
     Stream<Integer> filteredStream = stream.filter((i) -> i > 9);
     assertThat(filteredStream.head()).isEqualTo(10);
