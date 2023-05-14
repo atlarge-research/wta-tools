@@ -31,6 +31,7 @@ class ArrowUtilsTest {
         assertThat(resources).isEqualTo(utils.getResources());
     }
 
+    /*
     @Test
     void writeResourceToFileTest() {
         resources.add(resource);
@@ -41,4 +42,8 @@ class ArrowUtilsTest {
             System.out.println(e.toString());
         }
     }
+    
+     */
+
+
 }

@@ -60,7 +60,7 @@ public class ParquetWriterUtils implements AutoCloseable {
                 .build();
         */
         writer = AvroParquetWriter
-                .<GenericRecord>builder(hadoopPath)
+                .<GenericRecord>builder(HadoopOutputFile.fromPath(hadoopPath,new Configuration()))
                 .withSchema(avroSchema)
                 .build();
     }
