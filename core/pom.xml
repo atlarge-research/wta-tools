@@ -24,6 +24,54 @@
       <artifactId>jackson-databind</artifactId>
       <version>${jackson.databind.version}</version>
     </dependency>
+    <!-- https://mvnrepository.com/artifact/org.apache.avro/avro -->
+    <dependency>
+      <groupId>org.apache.avro</groupId>
+      <artifactId>avro</artifactId>
+      <version>1.8.2</version>
+    </dependency>
+
+    <!-- https://mvnrepository.com/artifact/org.apache.parquet/parquet-hadoop -->
+    <dependency>
+      <groupId>org.apache.parquet</groupId>
+      <artifactId>parquet-hadoop</artifactId>
+      <version>1.12.3</version>
+    </dependency>
+    <!-- https://mvnrepository.com/artifact/org.apache.parquet/parquet-avro -->
+    <dependency>
+      <groupId>org.apache.parquet</groupId>
+      <artifactId>parquet-avro</artifactId>
+      <version>1.12.2</version>
+    </dependency>
+    <!-- https://mvnrepository.com/artifact/org.apache.hadoop/hadoop-common -->
+    <dependency>
+      <groupId>org.apache.hadoop</groupId>
+      <artifactId>hadoop-common</artifactId>
+      <version>3.3.4</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.hadoop</groupId>
+      <artifactId>hadoop-client-api</artifactId>
+      <version>3.3.4</version>
+      <scope>compile</scope>
+    </dependency>
+
+    <!-- https://mvnrepository.com/artifact/commons-lang/commons-lang -->
+    <dependency>
+      <groupId>commons-lang</groupId>
+      <artifactId>commons-lang</artifactId>
+      <version>2.6</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.arrow</groupId>
+      <artifactId>arrow-memory-core</artifactId>
+      <version>2.0.0</version>
+      <scope>compile</scope>
+    </dependency>
+
+
+
   </dependencies>
 
 </project>
