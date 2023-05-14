@@ -2,6 +2,7 @@ package com.asml.apa.wta.core.streams;
 
 import com.asml.apa.wta.core.exceptions.FailedToDeserializeStreamException;
 import com.asml.apa.wta.core.exceptions.FailedToSerializeStreamException;
+import com.asml.apa.wta.core.exceptions.StreamSerializationException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -209,6 +210,8 @@ public class Stream<V extends Serializable> {
    * Retrieves the head of the stream, which is then removed.
    *
    * @return the head of the {@link com.asml.apa.wta.core.streams.Stream}
+   * @throws FailedToDeserializeStreamException when some error occurred during routine deserialization of parts of
+   *                                            the {@link com.asml.apa.wta.core.streams.Stream}
    * @author Atour Mousavi Gourabi
    * @since 1.0.0
    */
@@ -250,6 +253,8 @@ public class Stream<V extends Serializable> {
    * Adds content to the stream.
    *
    * @param content the content to add to this {@link com.asml.apa.wta.core.streams.Stream}
+   * @throws FailedToSerializeStreamException when some error occurred during routine serialization of parts of
+   *                                          the {@link com.asml.apa.wta.core.streams.Stream}
    * @author Atour Mousavi Gourabi
    * @since 1.0.0
    */
@@ -275,11 +280,13 @@ public class Stream<V extends Serializable> {
    * @param op the operation to perform over the {@link com.asml.apa.wta.core.streams.Stream}
    * @param <R> generic return type of the mapping operation
    * @return the mapped stream
+   * @throws StreamSerializationException when some error occurred during routine (de)serialization of parts of
+   *                                      the {@link com.asml.apa.wta.core.streams.Stream}
    * @author Atour Mousavi Gourabi
    * @since 1.0.0
    */
   public synchronized <R extends Serializable> Stream<R> map(@NonNull Function<V, R> op)
-      throws FailedToDeserializeStreamException, FailedToSerializeStreamException {
+      throws StreamSerializationException {
     StreamNode<V> next = head;
     Stream<R> ret = new Stream<>();
     while (next != null) {
@@ -298,11 +305,12 @@ public class Stream<V extends Serializable> {
    *
    * @param predicate the predicate used for filtering, elements that return false get filtered out
    * @return the filtered {@link com.asml.apa.wta.core.streams.Stream}
+   * @throws StreamSerializationException when some error occurred during routine (de)serialization of parts of
+   *                                      the {@link com.asml.apa.wta.core.streams.Stream}
    * @author Atour Mousavi Gourabi
    * @since 1.0.0
    */
-  public synchronized Stream<V> filter(@NonNull Function<V, Boolean> predicate)
-      throws FailedToDeserializeStreamException, FailedToSerializeStreamException {
+  public synchronized Stream<V> filter(@NonNull Function<V, Boolean> predicate) throws StreamSerializationException {
     StreamNode<V> next = head;
     Stream<V> ret = new Stream<>();
     while (next != null) {
@@ -325,6 +333,8 @@ public class Stream<V extends Serializable> {
    * @param op the fold operation to perform over the {@link com.asml.apa.wta.core.streams.Stream}
    * @param <R> generic return type of the fold operation
    * @return the resulting accumulator
+   * @throws FailedToDeserializeStreamException when some error occurred during routine deserialization of parts of
+   *                                            the {@link com.asml.apa.wta.core.streams.Stream}
    * @author Atour Mousavi Gourabi
    * @since 1.0.0
    */
