@@ -30,7 +30,8 @@ public class MetricStreamingEngine {
    *
    * @param resource the {@link com.asml.apa.wta.spark.streams.ResourceKey} of the resource
    * @param record the {@link com.asml.apa.wta.spark.streams.ResourceMetrics} containing the metrics
-   * @throws FailedToSerializeStreamException when some error occurred during routine serialization of parts of the stream
+   * @throws FailedToSerializeStreamException when some error occurred during routine serialization of parts of
+   *                                          the {@link com.asml.apa.wta.core.streams.KeyedStream}
    * @author Atour Mousavi Gourabi
    * @since 1.0.0
    */
@@ -44,7 +45,8 @@ public class MetricStreamingEngine {
    *
    * @param task the {@link com.asml.apa.wta.spark.streams.TaskKey} of the task
    * @param record the {@link com.asml.apa.wta.spark.streams.TaskMetrics} containing the metrics
-   * @throws FailedToSerializeStreamException when some error occurred during routine serialization of parts of the stream
+   * @throws FailedToSerializeStreamException when some error occurred during routine serialization of parts of
+   *                                          the {@link com.asml.apa.wta.core.streams.KeyedStream}
    * @author Atour Mousavi Gourabi
    * @since 1.0.0
    */
