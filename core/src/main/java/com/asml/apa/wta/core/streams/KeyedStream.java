@@ -1,5 +1,6 @@
 package com.asml.apa.wta.core.streams;
 
+import com.asml.apa.wta.core.exceptions.FailedToSerializeStreamException;
 import java.io.Serializable;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -25,7 +26,7 @@ public class KeyedStream<K, V extends Serializable> {
    * @author Atour Mousavi Gourabi
    * @since 1.0.0
    */
-  public void addToStream(K key, @NonNull V record) {
+  public void addToStream(K key, @NonNull V record) throws FailedToSerializeStreamException {
     if (streams.containsKey(key)) {
       streams.get(key).addToStream(record);
     } else {

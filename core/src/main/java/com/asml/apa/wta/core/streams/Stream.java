@@ -62,12 +62,34 @@ public class Stream<V extends Serializable> {
   private final UUID id;
 
   private final Queue<String> diskLocations;
+  private int additionsSinceLastWriteToDisk;
+  private final int serializationTrigger;
 
   private StreamNode<V> deserializationStart;
   private StreamNode<V> deserializationEnd;
 
   private StreamNode<V> head;
   private StreamNode<V> tail;
+
+  /**
+   * Constructs a stream with one element.
+   *
+   * @param content the element to hold in the {@link com.asml.apa.wta.core.streams.Stream}
+   * @param serializationTrigger the amount of additions to the {@link com.asml.apa.wta.core.streams.Stream} after
+   *                             which serialization is triggered.
+   * @author Atour Mousavi Gourabi
+   * @since 1.0.0
+   */
+  public Stream(V content, int serializationTrigger) {
+    head = new StreamNode<>(content);
+    diskLocations = new ArrayDeque<>();
+    tail = head;
+    deserializationStart = head;
+    deserializationEnd = head;
+    id = UUID.randomUUID();
+    additionsSinceLastWriteToDisk = 0;
+    this.serializationTrigger = serializationTrigger;
+  }
 
   /**
    * Constructs a stream with one element.
@@ -83,6 +105,8 @@ public class Stream<V extends Serializable> {
     deserializationStart = head;
     deserializationEnd = head;
     id = UUID.randomUUID();
+    additionsSinceLastWriteToDisk = 0;
+    serializationTrigger = 1800;
   }
 
   /**
@@ -98,6 +122,8 @@ public class Stream<V extends Serializable> {
     tail = null;
     diskLocations = new ArrayDeque<>();
     id = UUID.randomUUID();
+    additionsSinceLastWriteToDisk = 0;
+    serializationTrigger = 1800;
   }
 
   /**
@@ -107,7 +133,7 @@ public class Stream<V extends Serializable> {
    * @author Atour Mousavi Gourabi
    * @since 1.0.0
    */
-  public synchronized void serializeInternals() throws FailedToSerializeStreamException {
+  private synchronized void serializeInternals() throws FailedToSerializeStreamException {
     StreamNode<V> current;
     if (head == deserializationEnd) {
       current = head.getNext();
@@ -128,16 +154,8 @@ public class Stream<V extends Serializable> {
       deserializationEnd = tail;
     } catch (IOException e) {
       throw new FailedToSerializeStreamException();
-    }
-  }
-
-  /**
-   * Temporarily used for testing.
-   * To be removed when the serialization engine is up and running.
-   */
-  public void deserializeAll() throws FailedToDeserializeStreamException {
-    while (!diskLocations.isEmpty()) {
-      deserializeInternals(diskLocations.poll());
+    } finally {
+      additionsSinceLastWriteToDisk = 0;
     }
   }
 
@@ -145,11 +163,12 @@ public class Stream<V extends Serializable> {
    * Deserializes the internals of the stream on demand.
    *
    * @param filePath the chunk of internals to deserialize
+   * @return the amount of {@link com.asml.apa.wta.core.streams.Stream.StreamNode} objects deserialized
    * @throws FailedToDeserializeStreamException if an exception occurred when deserializing this batch of the stream
    * @author Atour Mousavi Gourabi
    * @since 1.0.0
    */
-  private synchronized void deserializeInternals(String filePath) throws FailedToDeserializeStreamException {
+  private synchronized int deserializeInternals(String filePath) throws FailedToDeserializeStreamException {
     try (ObjectInputStream objectInputStream = new ObjectInputStream(new FileInputStream(filePath))) {
       List<StreamNode<V>> nodes = (ArrayList<StreamNode<V>>) objectInputStream.readObject();
       StreamNode<V> previous = null;
@@ -165,6 +184,7 @@ public class Stream<V extends Serializable> {
         deserializationStart = previous;
         previous.setNext(deserializationEnd);
       }
+      return nodes.size();
     } catch (IOException | ClassNotFoundException | ClassCastException e) {
       throw new FailedToDeserializeStreamException();
     }
@@ -195,8 +215,9 @@ public class Stream<V extends Serializable> {
     if (head == deserializationStart) {
       if (diskLocations.isEmpty()) {
         deserializationStart = head.getNext();
+        additionsSinceLastWriteToDisk--;
       } else {
-        deserializeInternals(diskLocations.poll());
+        additionsSinceLastWriteToDisk += deserializeInternals(diskLocations.poll());
       }
     }
     V ret = head.getContent();
@@ -228,7 +249,7 @@ public class Stream<V extends Serializable> {
    * @author Atour Mousavi Gourabi
    * @since 1.0.0
    */
-  public synchronized void addToStream(V content) {
+  public synchronized void addToStream(V content) throws FailedToSerializeStreamException {
     if (head == null) {
       head = new StreamNode<>(content);
       tail = head;
@@ -237,6 +258,10 @@ public class Stream<V extends Serializable> {
     } else {
       tail.setNext(new StreamNode<>(content));
       tail = tail.getNext();
+    }
+    additionsSinceLastWriteToDisk++;
+    if (additionsSinceLastWriteToDisk > serializationTrigger) {
+      serializeInternals();
     }
   }
 
@@ -250,7 +275,7 @@ public class Stream<V extends Serializable> {
    * @since 1.0.0
    */
   public synchronized <R extends Serializable> Stream<R> map(@NonNull Function<V, R> op)
-      throws FailedToDeserializeStreamException {
+      throws FailedToDeserializeStreamException, FailedToSerializeStreamException {
     StreamNode<V> next = head;
     Stream<R> ret = new Stream<>();
     while (next != null) {
@@ -260,6 +285,7 @@ public class Stream<V extends Serializable> {
       ret.addToStream(op.apply(next.getContent()));
       next = next.getNext();
     }
+    ret.serializeInternals();
     return ret;
   }
 
@@ -272,7 +298,7 @@ public class Stream<V extends Serializable> {
    * @since 1.0.0
    */
   public synchronized Stream<V> filter(@NonNull Function<V, Boolean> predicate)
-      throws FailedToDeserializeStreamException {
+      throws FailedToDeserializeStreamException, FailedToSerializeStreamException {
     StreamNode<V> next = head;
     Stream<V> ret = new Stream<>();
     while (next != null) {
@@ -284,6 +310,7 @@ public class Stream<V extends Serializable> {
       }
       next = next.getNext();
     }
+    ret.serializeInternals();
     return ret;
   }
 
