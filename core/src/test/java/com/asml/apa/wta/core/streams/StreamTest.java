@@ -7,6 +7,9 @@ import com.asml.apa.wta.core.exceptions.FailedToDeserializeStreamException;
 import com.asml.apa.wta.core.exceptions.FailedToSerializeStreamException;
 import com.asml.apa.wta.core.exceptions.StreamSerializationException;
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.NoSuchElementException;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -25,8 +28,11 @@ class StreamTest {
   }
 
   @BeforeAll
-  static void setUpTmpDirectory() {
+  static void setUpTmpDirectory() throws IOException {
     new File("tmp").mkdirs();
+    if (!Files.exists(Path.of("tmp"))) {
+      throw new IOException();
+    }
   }
 
   @Test
