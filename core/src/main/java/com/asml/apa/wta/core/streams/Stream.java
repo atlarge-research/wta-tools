@@ -105,15 +105,21 @@ public class Stream<V extends Serializable> {
    * @since 1.0.0
    */
   public synchronized void serializeInternals() throws FailedToSerializeStreamException {
-    StreamNode<V> current = head.getNext();
+    StreamNode<V> current;
+    if (head == deserializationEnd) {
+      current = head.getNext();
+    } else {
+      current = deserializationEnd;
+    }
     String filePath = "tmp/" + id + System.currentTimeMillis() + ".ser";
     List<StreamNode<V>> toSerialize = new ArrayList<>();
     try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream(filePath))) {
-      while (current != tail) {
+      while (current != tail && current != null) {
         toSerialize.add(current);
         current = current.getNext();
       }
       objectOutputStream.writeObject(toSerialize);
+      head.setNext(null);
       diskLocations.add(filePath);
       deserializationEnd = tail;
     } catch (IOException e) {
@@ -151,6 +157,7 @@ public class Stream<V extends Serializable> {
         previous = node;
       }
       if (previous != null) {
+        deserializationStart = previous;
         previous.setNext(deserializationEnd);
       }
     } catch (IOException | ClassNotFoundException | ClassCastException e) {
