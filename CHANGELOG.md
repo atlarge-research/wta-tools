@@ -16,6 +16,7 @@ For the most part, since we are pre-release this will serve no real purpose, oth
 - Created basic skeleton of Task object [@lyadalachanchu](https://gitlab.ewi.tudelft.nl/lyadalachanchu)
 - Patched report artefacts in the pipeline [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 - Created basic skeleton of Resource and Workload objects [@lyadalachanchu](https://gitlab.ewi.tudelft.nl/lyadalachanchu)
+- Set up basic streaming infrastructure [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 
 ### Changed
 
