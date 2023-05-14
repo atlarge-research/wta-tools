@@ -72,6 +72,19 @@ class StreamTest {
   }
 
   @Test
+  void peekAtStream() {
+    Stream<Integer> stream = new Stream<>(2);
+    assertThat(stream.peek()).isEqualTo(2);
+    assertThat(stream.isEmpty()).isFalse();
+  }
+
+  @Test
+  void peekAtEmptyStream() {
+    Stream<Integer> stream = new Stream<>();
+    assertThatThrownBy(stream::peek).isInstanceOf(NoSuchElementException.class);
+  }
+
+  @Test
   void mapUsingNullOperation() {
     Stream<Integer> stream = createStreamOfNaturalNumbers(1309);
     assertThatThrownBy(() -> stream.map(null)).isInstanceOf(NullPointerException.class);

@@ -182,7 +182,7 @@ public class Stream<V extends Serializable> {
   }
 
   /**
-   * Retrieves the head of the stream.
+   * Retrieves the head of the stream, which is then removed.
    *
    * @return the head of the {@link com.asml.apa.wta.core.streams.Stream}
    * @author Atour Mousavi Gourabi
@@ -205,6 +205,20 @@ public class Stream<V extends Serializable> {
       tail = null;
     }
     return ret;
+  }
+
+  /**
+   * Peeks at the head of the stream.
+   *
+   * @return the head of the {@link com.asml.apa.wta.core.streams.Stream}
+   * @author Atour Mousavi Gourabi
+   * @since 1.0.0
+   */
+  public synchronized V peek() {
+    if (head == null) {
+      throw new NoSuchElementException();
+    }
+    return head.getContent();
   }
 
   /**
