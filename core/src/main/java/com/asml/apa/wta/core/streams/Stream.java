@@ -8,9 +8,11 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Queue;
 import java.util.UUID;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -58,7 +60,7 @@ public class Stream<V extends Serializable> {
 
   private final UUID id;
 
-  private final List<String> diskLocations;
+  private final Queue<String> diskLocations;
 
   private StreamNode<V> deserializationStart;
   private StreamNode<V> deserializationEnd;
@@ -75,7 +77,7 @@ public class Stream<V extends Serializable> {
    */
   public Stream(V content) {
     head = new StreamNode<>(content);
-    diskLocations = new ArrayList<>();
+    diskLocations = new ArrayDeque<>();
     tail = head;
     deserializationStart = head;
     deserializationEnd = head;
@@ -93,7 +95,7 @@ public class Stream<V extends Serializable> {
     deserializationEnd = null;
     head = null;
     tail = null;
-    diskLocations = new ArrayList<>();
+    diskLocations = new ArrayDeque<>();
     id = UUID.randomUUID();
   }
 
@@ -131,8 +133,8 @@ public class Stream<V extends Serializable> {
    * Temporarily used for testing.
    */
   public void deserializeAll() throws FailedToDeserializeStreamException {
-    for (String filePath : diskLocations) {
-      deserializeInternals(filePath);
+    while (!diskLocations.isEmpty()) {
+      deserializeInternals(diskLocations.poll());
     }
   }
 
@@ -183,12 +185,16 @@ public class Stream<V extends Serializable> {
    * @author Atour Mousavi Gourabi
    * @since 1.0.0
    */
-  public synchronized V head() {
+  public synchronized V head() throws FailedToDeserializeStreamException {
     if (head == null) {
       throw new NoSuchElementException();
     }
     if (head == deserializationStart) {
-      deserializationStart = head.getNext();
+      if (diskLocations.isEmpty()) {
+        deserializationStart = head.getNext();
+      } else {
+        deserializeInternals(diskLocations.poll());
+      }
     }
     V ret = head.getContent();
     head = head.getNext();
@@ -226,10 +232,14 @@ public class Stream<V extends Serializable> {
    * @author Atour Mousavi Gourabi
    * @since 1.0.0
    */
-  public synchronized <R extends Serializable> Stream<R> map(@NonNull Function<V, R> op) {
+  public synchronized <R extends Serializable> Stream<R> map(@NonNull Function<V, R> op)
+      throws FailedToDeserializeStreamException {
     StreamNode<V> next = head;
     Stream<R> ret = new Stream<>();
     while (next != null) {
+      if (next == deserializationStart && !diskLocations.isEmpty()) {
+        deserializeInternals(diskLocations.poll());
+      }
       ret.addToStream(op.apply(next.getContent()));
       next = next.getNext();
     }
@@ -244,10 +254,14 @@ public class Stream<V extends Serializable> {
    * @author Atour Mousavi Gourabi
    * @since 1.0.0
    */
-  public synchronized Stream<V> filter(@NonNull Function<V, Boolean> predicate) {
+  public synchronized Stream<V> filter(@NonNull Function<V, Boolean> predicate)
+      throws FailedToDeserializeStreamException {
     StreamNode<V> next = head;
     Stream<V> ret = new Stream<>();
     while (next != null) {
+      if (next == deserializationStart && !diskLocations.isEmpty()) {
+        deserializeInternals(diskLocations.poll());
+      }
       if (predicate.apply(next.getContent())) {
         ret.addToStream(next.getContent());
       }
@@ -266,10 +280,14 @@ public class Stream<V extends Serializable> {
    * @author Atour Mousavi Gourabi
    * @since 1.0.0
    */
-  public synchronized <R> R foldLeft(R init, @NonNull BiFunction<R, V, R> op) {
+  public synchronized <R> R foldLeft(R init, @NonNull BiFunction<R, V, R> op)
+      throws FailedToDeserializeStreamException {
     R acc = init;
     StreamNode<V> next = head;
     while (next != null) {
+      if (next == deserializationStart && !diskLocations.isEmpty()) {
+        deserializeInternals(diskLocations.poll());
+      }
       acc = op.apply(acc, next.getContent());
       next = next.getNext();
     }

@@ -3,8 +3,13 @@ package com.asml.apa.wta.core.streams;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import com.asml.apa.wta.core.exceptions.FailedToDeserializeStreamException;
+import com.asml.apa.wta.core.exceptions.FailedToSerializeStreamException;
 import com.asml.apa.wta.core.exceptions.StreamSerializationException;
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.NoSuchElementException;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -23,8 +28,11 @@ class StreamTest {
   }
 
   @BeforeAll
-  static void setUpTmpDirectory() {
+  static void setUpTmpDirectory() throws IOException {
     new File("tmp").mkdirs();
+    if (!Files.exists(Path.of("tmp"))) {
+      throw new IOException();
+    }
   }
 
   @Test
@@ -34,14 +42,14 @@ class StreamTest {
   }
 
   @Test
-  void setsUpStreamWithOneElement() {
+  void setsUpStreamWithOneElement() throws FailedToDeserializeStreamException {
     Stream<Integer> stream = new Stream<>(2);
     assertThat(stream.isEmpty()).isFalse();
     assertThat(stream.head()).isEqualTo(2);
   }
 
   @Test
-  void mapStream() {
+  void mapStream() throws FailedToDeserializeStreamException {
     Stream<Integer> stream = createStreamOfNaturalNumbers(10);
     Stream<Integer> mappedStream = stream.map((i) -> {
       if (i < 3) {
@@ -57,7 +65,7 @@ class StreamTest {
   }
 
   @Test
-  void filterStream() {
+  void filterStream() throws FailedToDeserializeStreamException {
     Stream<Integer> stream = createStreamOfNaturalNumbers(11);
     Stream<Integer> filteredStream = stream.filter((i) -> i > 9);
     assertThat(filteredStream.head()).isEqualTo(10);
@@ -66,7 +74,7 @@ class StreamTest {
   }
 
   @Test
-  void foldStream() {
+  void foldStream() throws FailedToDeserializeStreamException {
     Stream<Integer> stream = createStreamOfNaturalNumbers(10);
     int sum = stream.foldLeft(0, Integer::sum);
     assertThat(sum).isEqualTo(55);
@@ -97,7 +105,7 @@ class StreamTest {
   }
 
   @Test
-  void simpleStreamWorkflow() {
+  void simpleStreamWorkflow() throws FailedToDeserializeStreamException {
     Stream<Integer> stream = createStreamOfNaturalNumbers(10);
     int one = stream.head();
     stream.addToStream(1);
@@ -110,7 +118,7 @@ class StreamTest {
   }
 
   @Test
-  void streamSerialization() throws StreamSerializationException {
+  void streamSerializationWithManualDeserialization() throws StreamSerializationException {
     Stream<Integer> stream = createStreamOfNaturalNumbers(10);
     stream.serializeInternals();
     for (int i = 1; i <= 9; i++) {
@@ -121,6 +129,190 @@ class StreamTest {
     stream.addToStream(5);
     stream.deserializeAll();
     assertThat(stream.foldLeft(0, Integer::sum)).isEqualTo(115);
+    assertThat(stream.head()).isEqualTo(1);
+    assertThat(stream.head()).isEqualTo(2);
+    assertThat(stream.head()).isEqualTo(3);
+    assertThat(stream.head()).isEqualTo(4);
+    assertThat(stream.head()).isEqualTo(5);
+    assertThat(stream.head()).isEqualTo(6);
+    assertThat(stream.head()).isEqualTo(7);
+    assertThat(stream.head()).isEqualTo(8);
+    assertThat(stream.head()).isEqualTo(9);
+    assertThat(stream.head()).isEqualTo(10);
+    assertThat(stream.head()).isEqualTo(1);
+    assertThat(stream.head()).isEqualTo(2);
+    assertThat(stream.head()).isEqualTo(3);
+    assertThat(stream.head()).isEqualTo(4);
+    assertThat(stream.head()).isEqualTo(5);
+    assertThat(stream.head()).isEqualTo(6);
+    assertThat(stream.head()).isEqualTo(7);
+    assertThat(stream.head()).isEqualTo(8);
+    assertThat(stream.head()).isEqualTo(9);
+    assertThat(stream.head()).isEqualTo(10);
+    assertThat(stream.head()).isEqualTo(5);
+    assertThat(stream.isEmpty()).isTrue();
+  }
+
+  @Test
+  void streamSerializationWithMapAndAutomaticDeserialization()
+      throws FailedToSerializeStreamException, FailedToDeserializeStreamException {
+    Stream<Integer> stream = createStreamOfNaturalNumbers(10);
+    stream.serializeInternals();
+    for (int i = 1; i <= 10; i++) {
+      stream.addToStream(i);
+    }
+    stream.serializeInternals();
+    for (int i = 1; i <= 10; i++) {
+      stream.addToStream(i);
+    }
+    stream.serializeInternals();
+    for (int i = 1; i <= 10; i++) {
+      stream.addToStream(i);
+    }
+    stream = stream.map((i) -> {
+      if (i > 5) {
+        return 5;
+      } else {
+        return 0;
+      }
+    });
+    assertThat(stream.head()).isEqualTo(0);
+    assertThat(stream.head()).isEqualTo(0);
+    assertThat(stream.head()).isEqualTo(0);
+    assertThat(stream.head()).isEqualTo(0);
+    assertThat(stream.head()).isEqualTo(0);
+    assertThat(stream.head()).isEqualTo(5);
+    assertThat(stream.head()).isEqualTo(5);
+    assertThat(stream.head()).isEqualTo(5);
+    assertThat(stream.head()).isEqualTo(5);
+    assertThat(stream.head()).isEqualTo(5);
+    assertThat(stream.head()).isEqualTo(0);
+    assertThat(stream.head()).isEqualTo(0);
+    assertThat(stream.head()).isEqualTo(0);
+    assertThat(stream.head()).isEqualTo(0);
+    assertThat(stream.head()).isEqualTo(0);
+    assertThat(stream.head()).isEqualTo(5);
+    assertThat(stream.head()).isEqualTo(5);
+    assertThat(stream.head()).isEqualTo(5);
+    assertThat(stream.head()).isEqualTo(5);
+    assertThat(stream.head()).isEqualTo(5);
+    assertThat(stream.head()).isEqualTo(0);
+    assertThat(stream.head()).isEqualTo(0);
+    assertThat(stream.head()).isEqualTo(0);
+    assertThat(stream.head()).isEqualTo(0);
+    assertThat(stream.head()).isEqualTo(0);
+    assertThat(stream.head()).isEqualTo(5);
+    assertThat(stream.head()).isEqualTo(5);
+    assertThat(stream.head()).isEqualTo(5);
+    assertThat(stream.head()).isEqualTo(5);
+    assertThat(stream.head()).isEqualTo(5);
+    assertThat(stream.head()).isEqualTo(0);
+    assertThat(stream.head()).isEqualTo(0);
+    assertThat(stream.head()).isEqualTo(0);
+    assertThat(stream.head()).isEqualTo(0);
+    assertThat(stream.head()).isEqualTo(0);
+    assertThat(stream.head()).isEqualTo(5);
+    assertThat(stream.head()).isEqualTo(5);
+    assertThat(stream.head()).isEqualTo(5);
+    assertThat(stream.head()).isEqualTo(5);
+    assertThat(stream.head()).isEqualTo(5);
+    assertThat(stream.isEmpty()).isTrue();
+  }
+
+  @Test
+  void streamSerializationWithFilterAndAutomaticDeserialization()
+      throws FailedToSerializeStreamException, FailedToDeserializeStreamException {
+    Stream<Integer> stream = createStreamOfNaturalNumbers(10);
+    stream.serializeInternals();
+    for (int i = 1; i <= 10; i++) {
+      stream.addToStream(i);
+    }
+    stream.addToStream(1);
+    stream.serializeInternals();
+    for (int i = 10; i > 0; i--) {
+      stream.addToStream(i);
+    }
+    for (int i = 1; i <= 10; i++) {
+      stream.addToStream(i);
+    }
+    stream.serializeInternals();
+    for (int i = 1; i <= 10; i++) {
+      stream.addToStream(i);
+    }
+    stream = stream.filter((i) -> i > 5);
+    assertThat(stream.head()).isEqualTo(6);
+    assertThat(stream.head()).isEqualTo(7);
+    assertThat(stream.head()).isEqualTo(8);
+    assertThat(stream.head()).isEqualTo(9);
+    assertThat(stream.head()).isEqualTo(10);
+    assertThat(stream.head()).isEqualTo(6);
+    assertThat(stream.head()).isEqualTo(7);
+    assertThat(stream.head()).isEqualTo(8);
+    assertThat(stream.head()).isEqualTo(9);
+    assertThat(stream.head()).isEqualTo(10);
+    assertThat(stream.head()).isEqualTo(10);
+    assertThat(stream.head()).isEqualTo(9);
+    assertThat(stream.head()).isEqualTo(8);
+    assertThat(stream.head()).isEqualTo(7);
+    assertThat(stream.head()).isEqualTo(6);
+    assertThat(stream.head()).isEqualTo(6);
+    assertThat(stream.head()).isEqualTo(7);
+    assertThat(stream.head()).isEqualTo(8);
+    assertThat(stream.head()).isEqualTo(9);
+    assertThat(stream.head()).isEqualTo(10);
+    assertThat(stream.head()).isEqualTo(6);
+    assertThat(stream.head()).isEqualTo(7);
+    assertThat(stream.head()).isEqualTo(8);
+    assertThat(stream.head()).isEqualTo(9);
+    assertThat(stream.head()).isEqualTo(10);
+    assertThat(stream.isEmpty()).isTrue();
+  }
+
+  @Test
+  void streamSerializationWithFoldLeftAndAutomaticDeserialization() throws StreamSerializationException {
+    Stream<Integer> stream = createStreamOfNaturalNumbers(10);
+    stream.serializeInternals();
+    for (int i = 1; i <= 9; i++) {
+      stream.addToStream(i);
+    }
+    stream.serializeInternals();
+    stream.addToStream(10);
+    stream.addToStream(5);
+    assertThat(stream.foldLeft(0, Integer::sum)).isEqualTo(115);
+    assertThat(stream.head()).isEqualTo(1);
+    assertThat(stream.head()).isEqualTo(2);
+    assertThat(stream.head()).isEqualTo(3);
+    assertThat(stream.head()).isEqualTo(4);
+    assertThat(stream.head()).isEqualTo(5);
+    assertThat(stream.head()).isEqualTo(6);
+    assertThat(stream.head()).isEqualTo(7);
+    assertThat(stream.head()).isEqualTo(8);
+    assertThat(stream.head()).isEqualTo(9);
+    assertThat(stream.head()).isEqualTo(10);
+    assertThat(stream.head()).isEqualTo(1);
+    assertThat(stream.head()).isEqualTo(2);
+    assertThat(stream.head()).isEqualTo(3);
+    assertThat(stream.head()).isEqualTo(4);
+    assertThat(stream.head()).isEqualTo(5);
+    assertThat(stream.head()).isEqualTo(6);
+    assertThat(stream.head()).isEqualTo(7);
+    assertThat(stream.head()).isEqualTo(8);
+    assertThat(stream.head()).isEqualTo(9);
+    assertThat(stream.head()).isEqualTo(10);
+    assertThat(stream.head()).isEqualTo(5);
+    assertThat(stream.isEmpty()).isTrue();
+  }
+
+  @Test
+  void streamSerializationWithHeadAndAutomaticDeserialization() throws StreamSerializationException {
+    Stream<Integer> stream = createStreamOfNaturalNumbers(10);
+    stream.serializeInternals();
+    for (int i = 1; i <= 9; i++) {
+      stream.addToStream(i);
+    }
+    stream.serializeInternals();
+    stream.addToStream(10);
+    stream.addToStream(5);
     assertThat(stream.head()).isEqualTo(1);
     assertThat(stream.head()).isEqualTo(2);
     assertThat(stream.head()).isEqualTo(3);
