@@ -2,6 +2,7 @@ package com.asml.apa.wta.core.streams;
 
 import com.asml.apa.wta.core.exceptions.FailedToDeserializeStreamException;
 import com.asml.apa.wta.core.exceptions.FailedToSerializeStreamException;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -140,7 +141,7 @@ public class Stream<V extends Serializable> {
     } else {
       current = deserializationEnd;
     }
-    String filePath = "tmp/" + id + "-" + System.currentTimeMillis() + "-"
+    String filePath = "tmp\\" + id + "-" + System.currentTimeMillis() + "-"
         + Instant.now().getNano() + ".ser";
     List<StreamNode<V>> toSerialize = new ArrayList<>();
     try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream(filePath))) {
@@ -169,6 +170,7 @@ public class Stream<V extends Serializable> {
    * @since 1.0.0
    */
   private synchronized int deserializeInternals(String filePath) throws FailedToDeserializeStreamException {
+    int amountOfNodes;
     try (ObjectInputStream objectInputStream = new ObjectInputStream(new FileInputStream(filePath))) {
       List<StreamNode<V>> nodes = (ArrayList<StreamNode<V>>) objectInputStream.readObject();
       StreamNode<V> previous = null;
@@ -184,10 +186,12 @@ public class Stream<V extends Serializable> {
         deserializationStart = previous;
         previous.setNext(deserializationEnd);
       }
-      return nodes.size();
+      amountOfNodes = nodes.size();
     } catch (IOException | ClassNotFoundException | ClassCastException e) {
       throw new FailedToDeserializeStreamException();
     }
+    new File(filePath).delete();
+    return amountOfNodes;
   }
 
   /**
