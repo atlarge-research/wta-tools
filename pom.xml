@@ -29,7 +29,6 @@
     <assertj.version>3.24.2</assertj.version>
     <spark.support.version>3.2.0</spark.support.version>
     <mockito.version>5.3.1</mockito.version>
-    <surefire.rerunFailingTestsCount>3</surefire.rerunFailingTestsCount>
   </properties>
 
   <modules>
@@ -106,6 +105,7 @@
         <artifactId>maven-surefire-plugin</artifactId>
         <version>${surefire.version}</version>
         <configuration>
+          <rerunFailingTestsCount>3</rerunFailingTestsCount>
           <argLine>${argLine}</argLine>
           <includes>
             <include>**/*Test.java</include>
