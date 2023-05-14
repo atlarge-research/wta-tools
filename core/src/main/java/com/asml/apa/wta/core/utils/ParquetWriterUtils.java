@@ -1,131 +1,93 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package com.asml.apa.wta.core.utils;
 
-import java.io.File;
-import java.net.URI;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Random;
-
-import org.apache.arrow.util.Preconditions;
+import com.asml.apa.wta.core.model.Resource;
+import com.asml.apa.wta.core.model.Task;
+import com.asml.apa.wta.core.model.Workflow;
+import com.asml.apa.wta.core.model.Workload;
 import org.apache.avro.Schema;
+import org.apache.avro.SchemaBuilder;
 import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.GenericRecord;
-import org.apache.hadoop.conf.Configuration;
-import org.apache.parquet.avro.AvroParquetWriter;
-import org.apache.parquet.hadoop.ParquetWriter;
-import org.apache.parquet.hadoop.util.*;
 
-/**
- * Utility class for writing Parquet files using Avro based tools.
- */
-public class ParquetWriterUtils implements AutoCloseable {
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
-    private final URI path;
-    private final String uri;
-    private final ParquetWriter<GenericRecord> writer;
-    private final Schema avroSchema;
-    private final GenericRecordListBuilder recordListBuilder = new GenericRecordListBuilder();
-    private final Random random = new Random();
+public class ParquetWriterUtils {
 
-
-    public ParquetWriterUtils(Schema schema, File outputFolder) throws Exception {
-        avroSchema = schema;
-        path = outputFolder.toURI();
-        org.apache.hadoop.fs.Path hadoopPath = new org.apache.hadoop.fs.Path(path);
-        uri = "file://" + path;
-        /*
-        writer = AvroParquetWriter
-                .<GenericRecord>builder(new org.apache.hadoop.fs.Path(path))
-                .withSchema(avroSchema)
-                .build();
-        */
-        writer = AvroParquetWriter
-                .<GenericRecord>builder(HadoopOutputFile.fromPath(hadoopPath,new Configuration()))
-                .withSchema(avroSchema)
-                .build();
+    private File path;
+    private List<Resource> resources ;
+    private List<Task> tasks;
+    private List<Workflow> workflows;
+    private List<Workload> workloads;
+    private Schema resourceSchema;
+    public ParquetWriterUtils(File path){
+        resources = new ArrayList<>();
+        tasks = new ArrayList<>();
+        workflows = new ArrayList<>();
+        workloads = new ArrayList<>();
+        resourceSchema = SchemaBuilder.record("resource").namespace("com.asml.apa.wta.core.utils").fields()
+                .name("id").type().longType().noDefault()
+                .name("type").type().nullable().stringType().noDefault()
+                .name("numResources").type().doubleType().noDefault()
+                .name("procModel").type().nullable().stringType().noDefault()
+                .name("memory").type().longType().noDefault()
+                .name("diskSpace").type().longType().noDefault()
+                .name("networkSpeed").type().longType().noDefault()
+                .name("os").type().nullable().stringType().noDefault()
+                .name("details").type().nullable().stringType().noDefault()
+                .endRecord();
+        this.path = path;
     }
-
-    private static Schema readSchemaFromFile(String schemaName) throws Exception {
-        Path schemaPath = Paths.get(ParquetWriterUtils.class.getResource("/").getPath(),
-                "avroschema", schemaName);
-        return new org.apache.avro.Schema.Parser().parse(schemaPath.toFile());
+    public List<Resource> getResources() {
+        return resources;
     }
+    public void readResource(Resource resource){
+        resources.add(resource);
+    }
+    public void readTask(Task task){
+        tasks.add(task);
+    }
+    public void readWorkflow(Workflow workflow){
+        workflows.add(workflow);
+    }
+    public void readWorkload(Workload workload){
+        workloads.add(workload);
+    }
+    public void writeToFile(){
 
-    public static ParquetWriterUtils writeTempFile(Schema schema, File outputFolder,
-                                                   Object... values) throws Exception {
-        try (final ParquetWriterUtils writeSupport = new ParquetWriterUtils(schema, outputFolder)) {
-            writeSupport.writeRecords(values);
-            return writeSupport;
+    }
+    public void writeResourceToFile(String resourceFileName) throws Exception {
+        AvroUtils resourceWriter = new AvroUtils(resourceSchema,new File(path,"/resources/schema-1.0/"+resourceFileName+".parquet"));
+        List<GenericRecord> resourceList = new ArrayList<>();
+        for(Resource resource : resources){
+            resourceList.add(this.convertResourceToRecord(resource));
         }
+        resourceWriter.writeRecords(resourceList);
+    }
+    /*public static NullableVarCharHolder getNullableVarCharHolder(ArrowBuf buf, String s){
+        NullableVarCharHolder vch = new NullableVarCharHolder();
+        byte[] b = s.getBytes(Charsets.UTF_8);
+        vch.start = 0;
+        vch.end = b.length;
+        vch.buffer = buf.reallocIfNeeded(b.length);
+        vch.buffer.setBytes(0, b);
+        vch.isSet = 1;
+        return vch;
     }
 
-    public void writeRecords(Object... values) throws Exception {
-        final List<GenericRecord> valueList = getRecordListBuilder().createRecordList(values);
-        writeRecords(valueList);
-    }
-
-    public void writeRecords(List<GenericRecord> records) throws Exception {
-        for (GenericRecord record : records) {
-            writeRecord(record);
-        }
-    }
-
-    public void writeRecord(GenericRecord record) throws Exception {
-        writer.write(record);
-    }
-
-    public String getOutputURI() {
-        return uri;
-    }
-
-    public Schema getAvroSchema() {
-        return avroSchema;
-    }
-
-    public GenericRecordListBuilder getRecordListBuilder() {
-        return recordListBuilder;
-    }
-
-
-    @Override
-    public void close() throws Exception {
-        writer.close();
-    }
-
-    public class GenericRecordListBuilder {
-        public final List<GenericRecord> createRecordList(Object... values) {
-            final int fieldCount = avroSchema.getFields().size();
-            Preconditions.checkArgument(values.length % fieldCount == 0,
-                    "arg count of values should be divide by field number");
-            final List<GenericRecord> recordList = new ArrayList<>();
-            for (int i = 0; i < values.length / fieldCount; i++) {
-                final GenericRecord record = new GenericData.Record(avroSchema);
-                for (int j = 0; j < fieldCount; j++) {
-                    record.put(j, values[i * fieldCount + j]);
-                }
-                recordList.add(record);
-            }
-            return Collections.unmodifiableList(recordList);
-        }
+     */
+    private GenericRecord convertResourceToRecord(Resource resource){
+        GenericData.Record record = new GenericData.Record(resourceSchema);
+        record.put("id",resource.getId());
+        record.put("type",resource.getType());
+        record.put("numResources",resource.getNumResources());
+        record.put("procModel",resource.getProcModel());
+        record.put("memory",resource.getMemory());
+        record.put("diskSpace",resource.getDiskSpace());
+        record.put("networkSpeed",resource.getNetworkSpeed());
+        record.put("os",resource.getOs());
+        record.put("details",resource.getDetails());
+        return record;
     }
 }

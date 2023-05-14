@@ -9,19 +9,17 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
-
-class ArrowUtilsTest {
+class ParquetWriterUtilsTest {
 
     private Resource resource;
-    private ArrowUtils utils;
+    private ParquetWriterUtils utils;
     List<Resource> resources;
     @BeforeEach
     void init(){
         var resourceBuilder = Resource.builder().id(1).type("test").os("test os").details("None").diskSpace(2).numResources(4.0).memory(8).networkSpeed(16).procModel("test model");
         resource = resourceBuilder.build();
         resources = new ArrayList<>();
-        utils = new ArrowUtils(new File("."));
+        utils = new ParquetWriterUtils(new File("."));
     }
 
     @Test
