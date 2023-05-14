@@ -114,7 +114,8 @@ public class Stream<V extends Serializable> {
     } else {
       current = deserializationEnd;
     }
-    String filePath = "tmp/" + id + "-" + System.currentTimeMillis() + "-" + Instant.now().getNano() + ".ser";
+    String filePath = "tmp/" + id + "-" + System.currentTimeMillis() + "-"
+        + Instant.now().getNano() + ".ser";
     List<StreamNode<V>> toSerialize = new ArrayList<>();
     try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream(filePath))) {
       while (current != tail && current != null) {
