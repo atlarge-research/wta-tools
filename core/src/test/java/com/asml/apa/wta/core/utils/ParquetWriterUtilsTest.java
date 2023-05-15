@@ -29,7 +29,7 @@ class ParquetWriterUtilsTest {
         .procModel("test model");
     resource = resourceBuilder.build();
     resources = new ArrayList<>();
-    utils = new ParquetWriterUtils(new File("."),"schema-1.0");
+    utils = new ParquetWriterUtils(new File("."), "schema-1.0");
   }
 
   @Test
@@ -44,7 +44,7 @@ class ParquetWriterUtilsTest {
     resources.add(resource);
     utils.readResource(resource);
     try {
-      utils.writeToFile("test1","test2","test3","test4");
+      utils.writeToFile("test1", "test2", "test3", "test4");
     } catch (Exception e) {
       System.out.println(e.toString());
     }
