@@ -15,6 +15,7 @@ import net.jqwik.api.Arbitrary;
 import net.jqwik.api.ForAll;
 import net.jqwik.api.Property;
 import net.jqwik.api.Provide;
+import net.jqwik.api.constraints.UniqueElements;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -271,5 +272,42 @@ public class StreamIntegrationTest {
       actualLength++;
     }
     assertThat(actualLength).isEqualTo(expectedLength);
+  }
+
+  @Property
+  void propertyBasedPeekObjectWillBeTheSameAsHead(
+      @ForAll("largeListOfStrings") @UniqueElements @NonNull List<String> strings)
+      throws StreamSerializationException {
+    Stream<String> stream = new Stream<>();
+    for (String s : strings) {
+      stream.addToStream(s);
+    }
+    int amountOfElements = 0;
+    while (!stream.isEmpty()) {
+      amountOfElements++;
+      assertThat(stream.peek()).isEqualTo(stream.head());
+    }
+    assertThat(amountOfElements).isEqualTo(strings.size());
+  }
+
+  @Property
+  void propertyBasedHeadObjectWillNotBeTheSameAsPeekAfterwards(
+      @ForAll("largeListOfStrings") @UniqueElements @NonNull List<String> strings)
+      throws StreamSerializationException {
+    Stream<String> stream = new Stream<>();
+    for (String s : strings) {
+      stream.addToStream(s);
+    }
+    int amountOfElements = 0;
+    while (true) {
+      String head = stream.head();
+      amountOfElements++;
+      if (!stream.isEmpty()) {
+        assertThat(head).isNotEqualTo(stream.peek());
+      } else {
+        break;
+      }
+    }
+    assertThat(amountOfElements).isEqualTo(strings.size());
   }
 }
