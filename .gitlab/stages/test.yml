@@ -93,7 +93,6 @@ integration-tests-spark-adapter:
 
 mutation-tests-core:
   stage: test
-  allow_failure: true
 
   needs: [build-core]
 
@@ -116,7 +115,6 @@ mutation-tests-core:
 
 mutation-tests-spark-adapter:
   stage: test
-  allow_failure: true
 
   needs: [build-adapters]
 
