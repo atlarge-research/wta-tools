@@ -1,5 +1,6 @@
 package com.asml.apa.wta.core.config;
 
+import java.util.HashMap;
 import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -18,7 +19,9 @@ public class RuntimeConfig {
 
   private String domain;
 
-  private String description;
+  @Builder.Default
+  private String description = "";
 
-  private Map<String, String> events;
+  @Builder.Default
+  private Map<String, String> events = new HashMap<>();
 }
