@@ -12,6 +12,7 @@ import lombok.Getter;
  */
 @Getter
 @AllArgsConstructor
-public class TaskMetrics implements Serializable {
+public class TaskMetricsRecord implements Serializable {
+
   private static final long serialVersionUID = 7460356013925149105L;
 }
