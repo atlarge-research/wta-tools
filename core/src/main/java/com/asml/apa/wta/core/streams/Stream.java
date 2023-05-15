@@ -291,11 +291,14 @@ public class Stream<V extends Serializable> {
     Stream<R> ret = new Stream<>();
     while (next != null) {
       if (next == deserializationStart && !diskLocations.isEmpty()) {
+        head = next;
         deserializeInternals(diskLocations.poll());
       }
       ret.addToStream(op.apply(next.getContent()));
       next = next.getNext();
     }
+    head = null;
+    tail = null;
     return ret;
   }
 
@@ -314,6 +317,7 @@ public class Stream<V extends Serializable> {
     Stream<V> ret = new Stream<>();
     while (next != null) {
       if (next == deserializationStart && !diskLocations.isEmpty()) {
+        head = next;
         deserializeInternals(diskLocations.poll());
       }
       if (predicate.apply(next.getContent())) {
@@ -321,6 +325,8 @@ public class Stream<V extends Serializable> {
       }
       next = next.getNext();
     }
+    head = null;
+    tail = null;
     return ret;
   }
 
@@ -342,11 +348,14 @@ public class Stream<V extends Serializable> {
     StreamNode<V> next = head;
     while (next != null) {
       if (next == deserializationStart && !diskLocations.isEmpty()) {
+        head = next;
         deserializeInternals(diskLocations.poll());
       }
       acc = op.apply(acc, next.getContent());
       next = next.getNext();
     }
+    head = null;
+    tail = null;
     return acc;
   }
 }
