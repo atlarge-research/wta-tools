@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.asml.apa.wta.core.config.RuntimeConfig;
 import com.asml.apa.wta.core.utils.WtaUtils;
+import java.util.HashMap;
 import org.junit.jupiter.api.Test;
 
 public class ConfigReaderTest {
@@ -14,6 +15,12 @@ public class ConfigReaderTest {
     assertThat(cr.getAuthor()).isEqualTo("Test Name");
     assertThat(cr.getDomain()).isEqualTo("Test Domain");
     assertThat(cr.getDescription()).isEqualTo("Test Description");
+    assertThat(cr.getEvents()).isEqualTo(new HashMap<String, String>() {
+      {
+        put("f1", "v1");
+        put("f2", "v2");
+      }
+    });
   }
 
   @Test
@@ -22,6 +29,21 @@ public class ConfigReaderTest {
     assertThat(cr.getAuthor()).isEqualTo("Test Name");
     assertThat(cr.getDomain()).isEqualTo("Test Domain");
     assertThat(cr.getDescription()).isEqualTo("");
+    assertThat(cr.getEvents()).isEqualTo(new HashMap<String, String>() {
+      {
+        put("f1", "v1");
+        put("f2", "v2");
+      }
+    });
+  }
+
+  @Test
+  void readsConfigFileWhereTheEventsAreNotThere() {
+    RuntimeConfig cr = WtaUtils.readConfig("src/test/resources/testConfigNoEvents.json");
+    assertThat(cr.getAuthor()).isEqualTo("Test Name");
+    assertThat(cr.getDomain()).isEqualTo("Test Domain");
+    assertThat(cr.getDescription()).isEqualTo("Test Description");
+    assertThat(cr.getEvents()).isEqualTo(new HashMap<String, String>());
   }
 
   @Test
