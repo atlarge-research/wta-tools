@@ -43,6 +43,11 @@ public class StreamIntegrationTest {
   }
 
   @Provide
+  Arbitrary<List<String>> largeListOfLargeStrings() {
+    return Arbitraries.strings().ofMinLength(10).ofMaxLength(20).collect(list -> list.size() >= 1800);
+  }
+
+  @Provide
   Arbitrary<List<String>> largeListOfStrings() {
     return Arbitraries.strings().ofMinLength(0).ofMaxLength(10).collect(list -> list.size() >= 1800);
   }
@@ -276,7 +281,7 @@ public class StreamIntegrationTest {
 
   @Property
   void propertyBasedPeekObjectWillBeTheSameAsHead(
-      @ForAll("largeListOfStrings") @UniqueElements @NonNull List<String> strings)
+      @ForAll("largeListOfLargeStrings") @UniqueElements @NonNull List<String> strings)
       throws StreamSerializationException {
     Stream<String> stream = new Stream<>();
     for (String s : strings) {
@@ -292,7 +297,7 @@ public class StreamIntegrationTest {
 
   @Property
   void propertyBasedHeadObjectWillNotBeTheSameAsPeekAfterwards(
-      @ForAll("largeListOfStrings") @UniqueElements @NonNull List<String> strings)
+      @ForAll("largeListOfLargeStrings") @UniqueElements @NonNull List<String> strings)
       throws StreamSerializationException {
     Stream<String> stream = new Stream<>();
     for (String s : strings) {
