@@ -70,3 +70,6 @@ benchmarking/src/main/resources/tpcds_data
 # serialization files
 *.ser
 tmp
+
+# jqwik
+.jqwik-database

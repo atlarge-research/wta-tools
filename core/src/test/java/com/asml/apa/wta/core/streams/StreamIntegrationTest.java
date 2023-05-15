@@ -8,11 +8,18 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
+import lombok.NonNull;
+import net.jqwik.api.Arbitraries;
+import net.jqwik.api.Arbitrary;
+import net.jqwik.api.ForAll;
+import net.jqwik.api.Property;
+import net.jqwik.api.Provide;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 /**
- * Fixture for stream integration testing on serialization
+ * Fixture for stream integration testing on serialization.
  */
 public class StreamIntegrationTest {
 
@@ -22,6 +29,21 @@ public class StreamIntegrationTest {
       stream.addToStream(i);
     }
     return stream;
+  }
+
+  @Provide
+  Arbitrary<List<Integer>> largeListOfIntegers() {
+    return Arbitraries.integers().between(-65536, 65536).collect(list -> list.size() >= 1800);
+  }
+
+  @Provide
+  Arbitrary<List<Double>> largeListOfDoubles() {
+    return Arbitraries.doubles().collect(list -> list.size() >= 1800);
+  }
+
+  @Provide
+  Arbitrary<List<String>> largeListOfStrings() {
+    return Arbitraries.strings().ofMinLength(0).ofMaxLength(10).collect(list -> list.size() >= 1800);
   }
 
   @BeforeAll
@@ -206,5 +228,48 @@ public class StreamIntegrationTest {
     assertThat(stream.head()).isEqualTo(10);
     assertThat(stream.head()).isEqualTo(5);
     assertThat(stream.isEmpty()).isTrue();
+  }
+
+  @Property
+  void propertyBasedFoldLeftOnStreams(@ForAll("largeListOfIntegers") @NonNull List<Integer> integers)
+      throws StreamSerializationException {
+    Stream<Integer> stream = new Stream<>();
+    int expected = 0;
+    for (int i : integers) {
+      stream.addToStream(i);
+      expected += i;
+    }
+    assertThat(stream.foldLeft(0, Integer::sum)).isEqualTo(expected);
+  }
+
+  @Property
+  void propertyBasedMapOnStreams(@ForAll("largeListOfDoubles") @NonNull List<Double> doubles)
+      throws StreamSerializationException {
+    Stream<Double> stream = new Stream<>();
+    for (double d : doubles) {
+      stream.addToStream(d);
+    }
+    double expected = Math.pow(doubles.get(0), 2.0) + 7.22;
+    assertThat(stream.map(i -> Math.pow(i, 2.0) + 7.22).head()).isEqualTo(expected);
+  }
+
+  @Property
+  void propertyBasedFilterOnStreams(@ForAll("largeListOfStrings") @NonNull List<String> strings)
+      throws StreamSerializationException {
+    Stream<String> stream = new Stream<>();
+    int expectedLength = 0;
+    for (String s : strings) {
+      stream.addToStream(s);
+      if (s.length() > 3) {
+        expectedLength++;
+      }
+    }
+    stream = stream.filter(s -> s.length() > 3);
+    int actualLength = 0;
+    while (!stream.isEmpty()) {
+      stream.head();
+      actualLength++;
+    }
+    assertThat(actualLength).isEqualTo(expectedLength);
   }
 }
