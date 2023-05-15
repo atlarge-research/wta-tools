@@ -19,113 +19,84 @@ package com.asml.apa.wta.core.utils;
 
 import java.io.File;
 import java.net.URI;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Random;
-
-import org.apache.arrow.util.Preconditions;
 import org.apache.avro.Schema;
-import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.GenericRecord;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.parquet.avro.AvroParquetWriter;
 import org.apache.parquet.hadoop.ParquetWriter;
-import org.apache.parquet.hadoop.util.*;
+import org.apache.parquet.hadoop.util.HadoopOutputFile;
 
 /**
  * Utility class for writing Parquet files using Avro based tools.
  */
 public class AvroUtils implements AutoCloseable {
 
-    private final URI path;
-    private final String uri;
-    private final ParquetWriter<GenericRecord> writer;
-    private final Schema avroSchema;
-    private final GenericRecordListBuilder recordListBuilder = new GenericRecordListBuilder();
-    private final Random random = new Random();
+  private final URI path;
+  private final String uri;
+  private final ParquetWriter<GenericRecord> writer;
+  private final Schema avroSchema;
+  private final Random random = new Random();
 
+  public AvroUtils(Schema schema, File outputFolder) throws Exception {
+    avroSchema = schema;
+    path = outputFolder.toURI();
+    org.apache.hadoop.fs.Path hadoopPath = new org.apache.hadoop.fs.Path(path);
+    uri = "file://" + path;
+    /*
+    writer = AvroParquetWriter
+    .<GenericRecord>builder(new org.apache.hadoop.fs.Path(path))
+    .withSchema(avroSchema)
+    .build();
+    */
+    writer = AvroParquetWriter.<GenericRecord>builder(HadoopOutputFile.fromPath(hadoopPath, new Configuration()))
+        .withSchema(avroSchema)
+        .build();
+  }
 
-    public AvroUtils(Schema schema, File outputFolder) throws Exception {
-        avroSchema = schema;
-        path = outputFolder.toURI();
-        org.apache.hadoop.fs.Path hadoopPath = new org.apache.hadoop.fs.Path(path);
-        uri = "file://" + path;
-        /*
-        writer = AvroParquetWriter
-                .<GenericRecord>builder(new org.apache.hadoop.fs.Path(path))
-                .withSchema(avroSchema)
-                .build();
-        */
-        writer = AvroParquetWriter
-                .<GenericRecord>builder(HadoopOutputFile.fromPath(hadoopPath,new Configuration()))
-                .withSchema(avroSchema)
-                .build();
+  /**write batches into the disk.
+   *
+   * @param records list of records
+   * @throws Exception possible io exception
+   */
+  public void writeRecords(List<GenericRecord> records) throws Exception {
+    for (GenericRecord record : records) {
+      writeRecord(record);
     }
+  }
 
-    private static Schema readSchemaFromFile(String schemaName) throws Exception {
-        Path schemaPath = Paths.get(AvroUtils.class.getResource("/").getPath(),
-                "avroschema", schemaName);
-        return new org.apache.avro.Schema.Parser().parse(schemaPath.toFile());
-    }
+  /**write single record to disk.
+   *
+   * @param record record
+   * @throws Exception possible io exception
+   */
+  public void writeRecord(GenericRecord record) throws Exception {
+    writer.write(record);
+  }
 
-    public static AvroUtils writeTempFile(Schema schema, File outputFolder,
-                                          Object... values) throws Exception {
-        try (final AvroUtils writeSupport = new AvroUtils(schema, outputFolder)) {
-            writeSupport.writeRecords(values);
-            return writeSupport;
-        }
-    }
+  /**getter.
+   *
+   * @return output uri
+   */
+  public String getOutputUri() {
+    return uri;
+  }
 
-    public void writeRecords(Object... values) throws Exception {
-        final List<GenericRecord> valueList = getRecordListBuilder().createRecordList(values);
-        writeRecords(valueList);
-    }
+  /**getter.
+   *
+   * @return schema for the record to be written
+   */
+  public Schema getAvroSchema() {
+    return avroSchema;
+  }
 
-    public void writeRecords(List<GenericRecord> records) throws Exception {
-        for (GenericRecord record : records) {
-            writeRecord(record);
-        }
-    }
-
-    public void writeRecord(GenericRecord record) throws Exception {
-        writer.write(record);
-    }
-
-    public String getOutputURI() {
-        return uri;
-    }
-
-    public Schema getAvroSchema() {
-        return avroSchema;
-    }
-
-    public GenericRecordListBuilder getRecordListBuilder() {
-        return recordListBuilder;
-    }
-
-
-    @Override
-    public void close() throws Exception {
-        writer.close();
-    }
-
-    public class GenericRecordListBuilder {
-        public final List<GenericRecord> createRecordList(Object... values) {
-            final int fieldCount = avroSchema.getFields().size();
-            Preconditions.checkArgument(values.length % fieldCount == 0,
-                    "arg count of values should be divide by field number");
-            final List<GenericRecord> recordList = new ArrayList<>();
-            for (int i = 0; i < values.length / fieldCount; i++) {
-                final GenericRecord record = new GenericData.Record(avroSchema);
-                for (int j = 0; j < fieldCount; j++) {
-                    record.put(j, values[i * fieldCount + j]);
-                }
-                recordList.add(record);
-            }
-            return Collections.unmodifiableList(recordList);
-        }
-    }
+  /**closes the writer.
+   *
+   * @throws Exception possible io exception
+   */
+  @Override
+  public void close() throws Exception {
+    writer.close();
+  }
 }

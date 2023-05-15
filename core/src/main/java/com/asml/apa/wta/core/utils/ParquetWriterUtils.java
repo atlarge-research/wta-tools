@@ -4,90 +4,125 @@ import com.asml.apa.wta.core.model.Resource;
 import com.asml.apa.wta.core.model.Task;
 import com.asml.apa.wta.core.model.Workflow;
 import com.asml.apa.wta.core.model.Workload;
-import org.apache.avro.Schema;
-import org.apache.avro.SchemaBuilder;
-import org.apache.avro.generic.GenericData;
-import org.apache.avro.generic.GenericRecord;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import org.apache.avro.generic.GenericRecord;
 
 public class ParquetWriterUtils {
 
-    private File path;
-    private List<Resource> resources ;
-    private List<Task> tasks;
-    private List<Workflow> workflows;
-    private List<Workload> workloads;
-    private Schema resourceSchema;
-    public ParquetWriterUtils(File path){
-        resources = new ArrayList<>();
-        tasks = new ArrayList<>();
-        workflows = new ArrayList<>();
-        workloads = new ArrayList<>();
-        resourceSchema = SchemaBuilder.record("resource").namespace("com.asml.apa.wta.core.utils").fields()
-                .name("id").type().longType().noDefault()
-                .name("type").type().nullable().stringType().noDefault()
-                .name("numResources").type().doubleType().noDefault()
-                .name("procModel").type().nullable().stringType().noDefault()
-                .name("memory").type().longType().noDefault()
-                .name("diskSpace").type().longType().noDefault()
-                .name("networkSpeed").type().longType().noDefault()
-                .name("os").type().nullable().stringType().noDefault()
-                .name("details").type().nullable().stringType().noDefault()
-                .endRecord();
-        this.path = path;
-    }
-    public List<Resource> getResources() {
-        return resources;
-    }
-    public void readResource(Resource resource){
-        resources.add(resource);
-    }
-    public void readTask(Task task){
-        tasks.add(task);
-    }
-    public void readWorkflow(Workflow workflow){
-        workflows.add(workflow);
-    }
-    public void readWorkload(Workload workload){
-        workloads.add(workload);
-    }
-    public void writeToFile(){
+  private String version;
+  private File path;
+  private List<Resource> resources;
+  private List<Task> tasks;
+  private List<Workflow> workflows;
+  private List<Workload> workloads;
 
-    }
-    public void writeResourceToFile(String resourceFileName) throws Exception {
-        AvroUtils resourceWriter = new AvroUtils(resourceSchema,new File(path,"/resources/schema-1.0/"+resourceFileName+".parquet"));
-        List<GenericRecord> resourceList = new ArrayList<>();
-        for(Resource resource : resources){
-            resourceList.add(this.convertResourceToRecord(resource));
-        }
-        resourceWriter.writeRecords(resourceList);
-    }
-    /*public static NullableVarCharHolder getNullableVarCharHolder(ArrowBuf buf, String s){
-        NullableVarCharHolder vch = new NullableVarCharHolder();
-        byte[] b = s.getBytes(Charsets.UTF_8);
-        vch.start = 0;
-        vch.end = b.length;
-        vch.buffer = buf.reallocIfNeeded(b.length);
-        vch.buffer.setBytes(0, b);
-        vch.isSet = 1;
-        return vch;
-    }
+  public ParquetWriterUtils(File path, String version) {
+    resources = new ArrayList<>();
+    tasks = new ArrayList<>();
+    workflows = new ArrayList<>();
+    workloads = new ArrayList<>();
+    this.path = path;
+    this.version = version;
+  }
 
-     */
-    private GenericRecord convertResourceToRecord(Resource resource){
-        GenericData.Record record = new GenericData.Record(resourceSchema);
-        record.put("id",resource.getId());
-        record.put("type",resource.getType());
-        record.put("numResources",resource.getNumResources());
-        record.put("procModel",resource.getProcModel());
-        record.put("memory",resource.getMemory());
-        record.put("diskSpace",resource.getDiskSpace());
-        record.put("networkSpeed",resource.getNetworkSpeed());
-        record.put("os",resource.getOs());
-        record.put("details",resource.getDetails());
-        return record;
+  /**getter for resources, only for tests.
+   *
+   * @return the resources
+   */
+  public List<Resource> getResources() {
+    return resources;
+  }
+
+  /**reads the resource object from kafka stream and feed into the writer.
+   *
+   * @param resource the resource
+   */
+  public void readResource(Resource resource) {
+    resources.add(resource);
+  }
+
+  /**reads the task object from kafka.
+   *
+   * @param task the task
+   */
+  public void readTask(Task task) {
+    tasks.add(task);
+  }
+
+  /**reads the workflow object from kafka.
+   *
+   * @param workflow the workflow
+   */
+  public void readWorkflow(Workflow workflow) {
+    workflows.add(workflow);
+  }
+
+  /**reads the workload object from kafka.
+   *
+   * @param workload the workload
+   */
+  public void readWorkload(Workload workload) {
+    workloads.add(workload);
+  }
+
+  /**given the output name, output the trace.
+   *
+   * @param resourceFileName resource file name
+   * @param taskFileName task file name
+   * @param workflowFileName workflow file name
+   * @param workloadFileName workload file name
+   * @throws Exception possible exception due to io
+   */
+  public void writeToFile(String resourceFileName, String taskFileName,
+                          String workflowFileName, String workloadFileName) throws Exception {
+    writeResourceToFile(resourceFileName);
+    writeTaskToFile(taskFileName);
+    writeWorkflowToFile(workflowFileName);
+    writeWorkloadToFile(workloadFileName);
+  }
+
+  private void writeResourceToFile(String resourceFileName) throws Exception {
+    AvroUtils resourceWriter =
+        new AvroUtils(Resource.getResourceSchema(),
+                new File(path, "/resources/"+version+"/" + resourceFileName + ".parquet"));
+    List<GenericRecord> resourceList = new ArrayList<>();
+    for (Resource resource : resources) {
+      resourceList.add(Resource.convertResourceToRecord(resource));
     }
+    resourceWriter.writeRecords(resourceList);
+  }
+
+  private void writeTaskToFile(String taskFileName) throws Exception {
+    AvroUtils taskWriter =
+            new AvroUtils(Task.getTaskSchema(), new File(path, "/tasks/schema-1.0/" + taskFileName + ".parquet"));
+    List<GenericRecord> taskList = new ArrayList<>();
+    for (Task task : tasks) {
+      taskList.add(Task.convertTaskToRecord(task));
+    }
+    taskWriter.writeRecords(taskList);
+  }
+
+  private void writeWorkflowToFile(String workflowFileName) throws Exception {
+    AvroUtils workflowWriter =
+            new AvroUtils(Workflow.getWorkflowSchema(),
+                    new File(path, "/workflows/schema-1.0/" + workflowFileName + ".parquet"));
+    List<GenericRecord> workflowList = new ArrayList<>();
+    for (Workflow workflow : workflows) {
+      workflowList.add(Workflow.convertWorkflowToRecord(workflow));
+    }
+    workflowWriter.writeRecords(workflowList);
+  }
+
+  private void writeWorkloadToFile(String workloadFileName) throws Exception {
+    AvroUtils workloadWriter =
+            new AvroUtils(Workload.getWorkloadSchema(),
+                    new File(path, "/workloads/schema-1.0/" + workloadFileName + ".parquet"));
+    List<GenericRecord> workloadList = new ArrayList<>();
+    for (Workload workload : workloads) {
+      workloadList.add(Workload.convertWorkloadToRecord(workload));
+    }
+    workloadWriter.writeRecords(workloadList);
+  }
 }

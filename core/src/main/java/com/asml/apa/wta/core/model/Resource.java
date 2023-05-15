@@ -3,6 +3,10 @@ package com.asml.apa.wta.core.model;
 import lombok.Builder;
 import lombok.Data;
 import lombok.Setter;
+import org.apache.avro.Schema;
+import org.apache.avro.SchemaBuilder;
+import org.apache.avro.generic.GenericData;
+import org.apache.avro.generic.GenericRecord;
 
 /**
  * Resource class corresponding to WTA format.
@@ -36,4 +40,67 @@ public class Resource implements BaseTraceObject {
   private final String os;
 
   private final String details;
+
+  private static Schema resourceSchema = SchemaBuilder.record("resource")
+      .namespace("com.asml.apa.wta.core.model")
+      .fields()
+      .name("id")
+      .type()
+      .longType()
+      .noDefault()
+      .name("type")
+      .type()
+      .nullable()
+      .stringType()
+      .noDefault()
+      .name("numResources")
+      .type()
+      .doubleType()
+      .noDefault()
+      .name("procModel")
+      .type()
+      .nullable()
+      .stringType()
+      .noDefault()
+      .name("memory")
+      .type()
+      .longType()
+      .noDefault()
+      .name("diskSpace")
+      .type()
+      .longType()
+      .noDefault()
+      .name("networkSpeed")
+      .type()
+      .longType()
+      .noDefault()
+      .name("os")
+      .type()
+      .nullable()
+      .stringType()
+      .noDefault()
+      .name("details")
+      .type()
+      .nullable()
+      .stringType()
+      .noDefault()
+      .endRecord();
+
+  public static GenericRecord convertResourceToRecord(Resource resource) {
+    GenericData.Record record = new GenericData.Record(resourceSchema);
+    record.put("id", resource.getId());
+    record.put("type", resource.getType());
+    record.put("numResources", resource.getNumResources());
+    record.put("procModel", resource.getProcModel());
+    record.put("memory", resource.getMemory());
+    record.put("diskSpace", resource.getDiskSpace());
+    record.put("networkSpeed", resource.getNetworkSpeed());
+    record.put("os", resource.getOs());
+    record.put("details", resource.getDetails());
+    return record;
+  }
+
+  public static Schema getResourceSchema() {
+    return resourceSchema;
+  }
 }
