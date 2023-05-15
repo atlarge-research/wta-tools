@@ -116,4 +116,25 @@ class StreamTest {
     assertThat(two).isEqualTo(2);
     assertThat(sum).isEqualTo(55);
   }
+
+  @Test
+  void mapConsumesStream() throws StreamSerializationException {
+    Stream<Integer> stream = createStreamOfNaturalNumbers(10);
+    stream.map((i) -> 2);
+    assertThat(stream.isEmpty()).isTrue();
+  }
+
+  @Test
+  void filterConsumesStream() throws StreamSerializationException {
+    Stream<Integer> stream = createStreamOfNaturalNumbers(10);
+    stream.filter((i) -> i % 2 == 0);
+    assertThat(stream.isEmpty()).isTrue();
+  }
+
+  @Test
+  void foldLeftConsumesStream() throws StreamSerializationException {
+    Stream<Integer> stream = createStreamOfNaturalNumbers(10);
+    stream.foldLeft(0, Integer::sum);
+    assertThat(stream.isEmpty()).isTrue();
+  }
 }

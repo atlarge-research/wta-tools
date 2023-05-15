@@ -164,13 +164,13 @@ public class Stream<V extends Serializable> {
   /**
    * Deserializes the internals of the stream on demand.
    *
-   * @param filePath the chunk of internals to deserialize
+   * @param filePath the chunk of internals to deserialize, to not be {@code null}
    * @return the amount of {@link com.asml.apa.wta.core.streams.Stream.StreamNode} objects deserialized
    * @throws FailedToDeserializeStreamException if an exception occurred when deserializing this batch of the stream
    * @author Atour Mousavi Gourabi
    * @since 1.0.0
    */
-  private synchronized int deserializeInternals(String filePath) throws FailedToDeserializeStreamException {
+  private synchronized int deserializeInternals(@NonNull String filePath) throws FailedToDeserializeStreamException {
     int amountOfNodes;
     try (ObjectInputStream objectInputStream = new ObjectInputStream(new FileInputStream(filePath))) {
       List<StreamNode<V>> nodes = (ArrayList<StreamNode<V>>) objectInputStream.readObject();
