@@ -1,7 +1,9 @@
 package com.asml.apa.wta.core.model;
 
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Data;
+import lombok.Getter;
 
 /**
  * Task class corresponding to WTA format.
@@ -14,6 +16,7 @@ import lombok.Data;
 public class Task implements BaseTraceObject {
   private static final long serialVersionUID = -1372345471722101373L;
 
+  @Getter(value = AccessLevel.NONE)
   private final String schemaVersion = this.getSchemaVersion();
 
   private final long id;
