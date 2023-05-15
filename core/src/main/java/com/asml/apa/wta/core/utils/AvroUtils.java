@@ -20,7 +20,6 @@ package com.asml.apa.wta.core.utils;
 import java.io.File;
 import java.net.URI;
 import java.util.List;
-import java.util.Random;
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericRecord;
 import org.apache.hadoop.conf.Configuration;
@@ -37,7 +36,6 @@ public class AvroUtils implements AutoCloseable {
   private final String uri;
   private final ParquetWriter<GenericRecord> writer;
   private final Schema avroSchema;
-  private final Random random = new Random();
 
   public AvroUtils(Schema schema, File outputFolder) throws Exception {
     avroSchema = schema;
