@@ -1,9 +1,12 @@
 package com.asml.apa.wta.core.utils;
 
 import com.asml.apa.wta.core.config.RuntimeConfig;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.FileInputStream;
+import java.util.HashMap;
+import java.util.Map;
 
 public class WtaUtils {
 
@@ -36,11 +39,18 @@ public class WtaUtils {
       String description = workloadNode.has("description")
           ? workloadNode.get("description").asText()
           : "";
-      configBuilder = configBuilder.author(author).domain(domain).description(description);
+      Map<String, String> events = workloadNode.has("events")
+          ? mapper.convertValue(workloadNode.get("events"), new TypeReference<Map<String, String>>() {})
+          : new HashMap<>();
+      configBuilder = configBuilder
+          .author(author)
+          .domain(domain)
+          .description(description)
+          .events(events);
 
     } catch (Exception e) {
       throw new IllegalArgumentException(
-          "The config file has missing/invalid fields or no config file was found");
+          "The config file has missing/invalid fields or no config file was found" + e);
     }
     return configBuilder.build();
   }

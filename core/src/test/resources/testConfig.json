@@ -3,6 +3,10 @@
   {
     "author": "Test Name",
     "domain": "Test Domain",
-    "description": "Test Description"
+    "description": "Test Description",
+    "events": {
+      "f1": "v1",
+      "f2": "v2"
+    }
   }
 }
