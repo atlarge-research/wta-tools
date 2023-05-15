@@ -19,7 +19,7 @@ public class RuntimeConfig {
 
   private String domain;
 
-  private String description = "";
+  private String description;
 
-  private Map<String, String> events = new HashMap<>();
+  private Map<String, String> events;
 }
