@@ -19,9 +19,7 @@ public class RuntimeConfig {
 
   private String domain;
 
-  @Builder.Default
   private String description = "";
 
-  @Builder.Default
   private Map<String, String> events = new HashMap<>();
 }
