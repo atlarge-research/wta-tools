@@ -1,5 +1,6 @@
 package com.asml.apa.wta.spark.datasource;
 
+import com.asml.apa.wta.core.model.Task;
 import com.asml.apa.wta.spark.listener.StageLevelListener;
 import com.asml.apa.wta.spark.listener.TaskLevelListener;
 import java.util.List;
@@ -29,7 +30,7 @@ public class SparkDataSource {
    */
   public SparkDataSource(SparkContext sparkContext) {
     this.sparkContext = sparkContext;
-    taskLevelListener = new TaskLevelListener();
+    taskLevelListener = new TaskLevelListener(sparkContext);
     stageLevelListener = new StageLevelListener();
   }
 
@@ -79,8 +80,8 @@ public class SparkDataSource {
    * @author Pil Kyu Cho
    * @since 1.0.0
    */
-  public List<TaskMetrics> getTaskMetrics() {
-    return taskLevelListener.getTaskMetricsList();
+  public List<Task> getTaskMetrics() {
+    return taskLevelListener.getProcessedTasks();
   }
 
   /**

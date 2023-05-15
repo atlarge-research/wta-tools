@@ -1,12 +1,20 @@
 package com.asml.apa.wta.spark.executor;
 
+import com.asml.apa.wta.core.model.Task;
 import com.asml.apa.wta.spark.WtaPlugin;
 import com.asml.apa.wta.spark.driver.WtaDriverPlugin;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+
+import com.asml.apa.wta.spark.streams.TaskMetrics;
 import org.apache.spark.SparkContext;
+import org.apache.spark.TaskContext;
 import org.apache.spark.TaskFailedReason;
 import org.apache.spark.api.plugin.ExecutorPlugin;
 import org.apache.spark.api.plugin.PluginContext;
+import org.apache.spark.scheduler.Stage;
 
 /**
  * Executor component of the plugin.
@@ -37,14 +45,16 @@ public class WtaExecutorPlugin implements ExecutorPlugin {
    * <a href="https://spark.apache.org/docs/3.2.1/api/java/org/apache/spark/api/plugin/ExecutorPlugin.html#init-org.apache.spark.api.plugin.PluginContext-java.util.Map-">Refer to the docs</a> for more information.
    */
   @Override
-  public void onTaskStart() {}
+  public void onTaskStart() {
+  }
 
   /**
    * Gets called when a task is successfully completed.
    * Gets called even if {@link #onTaskStart()} threw an exception.
    */
   @Override
-  public void onTaskSucceeded() {}
+  public void onTaskSucceeded() {
+  }
 
   /**
    * Gets called if a task fails.
