@@ -24,6 +24,11 @@ import org.openjdk.jmh.annotations.TearDown;
 import org.openjdk.jmh.annotations.Warmup;
 import org.openjdk.jmh.infra.Blackhole;
 
+/**
+ * Benchmarking class for Apache Spark.
+ *
+ * @author Pil Kyu CHo
+ */
 @State(Scope.Thread)
 @BenchmarkMode(Mode.AverageTime)
 @Fork(value = 1)

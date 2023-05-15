@@ -1,5 +1,7 @@
 package com.asml.apa.wta.core.config;
 
+import java.util.HashMap;
+import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -19,4 +21,7 @@ public class RuntimeConfig {
 
   @Builder.Default
   private String description = "";
+
+  @Builder.Default
+  private Map<String, String> events = new HashMap<>();
 }
