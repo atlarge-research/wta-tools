@@ -210,6 +210,8 @@
         <artifactId>pitest-maven</artifactId>
         <version>${pitest.version}</version>
         <configuration>
+          <include>**/*Test.java</include>
+          <parseSurefireConfig>false</parseSurefireConfig>
           <reportsDirectory>reports/pitest</reportsDirectory>
           <timestampedReports>false</timestampedReports>
           <exportLineCoverage>true</exportLineCoverage>
