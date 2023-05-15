@@ -2,7 +2,10 @@
   "workloadSettings":
   {
     "author": "Test Name",
-    "domain": "Test Domain",
+    "domain": "Test Domain"
+  },
+  "resourceSettings":
+  {
     "events": {
       "f1": "v1",
       "f2": "v2"

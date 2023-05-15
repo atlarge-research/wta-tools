@@ -34,13 +34,15 @@ public class WtaUtils {
       JsonNode rootNode = mapper.readTree(fis);
 
       JsonNode workloadNode = rootNode.get("workloadSettings");
+      JsonNode resourceNode = rootNode.get("resourceSettings");
+
       String author = workloadNode.get("author").asText();
       String domain = workloadNode.get("domain").asText();
       String description = workloadNode.has("description")
           ? workloadNode.get("description").asText()
           : "";
-      Map<String, String> events = workloadNode.has("events")
-          ? mapper.convertValue(workloadNode.get("events"), new TypeReference<Map<String, String>>() {})
+      Map<String, String> events = resourceNode.has("events")
+          ? mapper.convertValue(resourceNode.get("events"), new TypeReference<Map<String, String>>() {})
           : new HashMap<>();
       configBuilder = configBuilder
           .author(author)
@@ -50,7 +52,7 @@ public class WtaUtils {
 
     } catch (Exception e) {
       throw new IllegalArgumentException(
-          "The config file has missing/invalid fields or no config file was found" + e);
+          "The config file has missing/invalid fields or no config file was found");
     }
     return configBuilder.build();
   }
