@@ -20,6 +20,7 @@ For the most part, since we are pre-release this will serve no real purpose, oth
 - Set up basic streaming infrastructure [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 - Added a build dependency to PMD [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 - Added events field for resource object to be configurable [@lyadalachanchu](https://gitlab.ewi.tudelft.nl/lyadalachanchu)
+- Standardize schema version across all objects [@lyadalachanchu](https://gitlab.ewi.tudelft.nl/lyadalachanchu)
 
 ### Changed
 
