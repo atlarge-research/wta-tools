@@ -1,6 +1,5 @@
 package com.asml.apa.wta.core.config;
 
-import java.util.HashMap;
 import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
