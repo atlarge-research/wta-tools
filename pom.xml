@@ -176,8 +176,10 @@
         <artifactId>maven-pmd-plugin</artifactId>
         <version>${pmd.version}</version>
         <configuration>
+          <format>net.sourceforge.pmd.renderers.SummaryHTMLRenderer</format>
           <inputEncoding>utf-8</inputEncoding>
           <minimumTokens>100</minimumTokens>
+          <targetDirectory>reports/pmd</targetDirectory>
         </configuration>
       </plugin>
       <plugin>
