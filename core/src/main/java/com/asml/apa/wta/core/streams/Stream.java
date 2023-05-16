@@ -220,9 +220,9 @@ public class Stream<V extends Serializable> {
       throw new NoSuchElementException();
     }
     if (head == deserializationStart) {
+      additionsSinceLastWriteToDisk--;
       if (diskLocations.isEmpty()) {
         deserializationStart = head.getNext();
-        additionsSinceLastWriteToDisk--;
       } else {
         additionsSinceLastWriteToDisk += deserializeInternals(diskLocations.poll());
       }
