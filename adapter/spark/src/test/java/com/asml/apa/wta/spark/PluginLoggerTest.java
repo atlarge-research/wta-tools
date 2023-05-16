@@ -3,8 +3,8 @@ package com.asml.apa.wta.spark;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
-import org.apache.log4j.Logger;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
 
 class PluginLoggerTest {
 
