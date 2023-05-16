@@ -40,16 +40,14 @@ public class PluginLogger {
   /**
    * This method should be in called in the entry point of the plugin. It loads the
    * log4j2.properties file.
+   * @param filePath      The path to the log4j2.properties file
+   * @throws IOException  If the file is not found
    * @author Pil Kyu Cho
    * @since 1.0.0
    */
-  public static void loadConfig() {
-    try {
-      Properties props = new Properties();
-      props.load(new FileInputStream("adapter/spark/log4j2.properties"));
-      PropertyConfigurator.configure(props);
-    } catch (IOException e) {
-      System.out.println("Error in loading log4j2.properties file");
-    }
+  public static void loadConfig(String filePath) throws IOException {
+    Properties props = new Properties();
+    props.load(new FileInputStream(filePath));
+    PropertyConfigurator.configure(props);
   }
 }
