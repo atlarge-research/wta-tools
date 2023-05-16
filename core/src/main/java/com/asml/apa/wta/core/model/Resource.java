@@ -1,7 +1,9 @@
 package com.asml.apa.wta.core.model;
 
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Data;
+import lombok.Getter;
 import lombok.Setter;
 import org.apache.avro.Schema;
 import org.apache.avro.SchemaBuilder;
@@ -20,8 +22,8 @@ public class Resource implements BaseTraceObject {
 
   private static final long serialVersionUID = 3002249398331752973L;
 
-  @Setter
-  private static String schemaVersion;
+  @Getter(value = AccessLevel.NONE)
+  private final String schemaVersion = this.getSchemaVersion();
 
   private final long id;
 

@@ -1,9 +1,11 @@
 package com.asml.apa.wta.core.model;
 
 import com.asml.apa.wta.core.model.enums.Domain;
+import lombok.AccessLevel;
 import java.util.Arrays;
 import lombok.Builder;
 import lombok.Data;
+import lombok.Getter;
 import lombok.Setter;
 import org.apache.avro.Schema;
 import org.apache.avro.SchemaBuilder;
@@ -22,8 +24,8 @@ public class Workflow implements BaseTraceObject {
 
   private static final long serialVersionUID = 9065743819019553490L;
 
-  @Setter
-  private static String schemaVersion;
+  @Getter(value = AccessLevel.NONE)
+  private final String schemaVersion = this.getSchemaVersion();
 
   private final long id;
 

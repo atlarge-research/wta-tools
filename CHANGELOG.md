@@ -16,6 +16,11 @@ For the most part, since we are pre-release this will serve no real purpose, oth
 - Created basic skeleton of Task object [@lyadalachanchu](https://gitlab.ewi.tudelft.nl/lyadalachanchu)
 - Patched report artefacts in the pipeline [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 - Created basic skeleton of Resource and Workload objects [@lyadalachanchu](https://gitlab.ewi.tudelft.nl/lyadalachanchu)
+- Created the Spark datasource class to access Spark metrics [@pcho](https://gitlab.ewi.tudelft.nl/pcho)
+- Set up basic streaming infrastructure [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
+- Added a build dependency to PMD [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
+- Added events field for resource object to be configurable [@lyadalachanchu](https://gitlab.ewi.tudelft.nl/lyadalachanchu)
+- Standardize schema version across all objects [@lyadalachanchu](https://gitlab.ewi.tudelft.nl/lyadalachanchu)
 - Created utility class for writing WTA trace to parquet files [@sqak-sqak-izardrone](https://github.com/sqak-sqak-izardrone)
 
 ### Changed

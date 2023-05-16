@@ -1,9 +1,12 @@
 package com.asml.apa.wta.core.utils;
 
 import com.asml.apa.wta.core.config.RuntimeConfig;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.FileInputStream;
+import java.util.HashMap;
+import java.util.Map;
 
 public class WtaUtils {
 
@@ -31,12 +34,21 @@ public class WtaUtils {
       JsonNode rootNode = mapper.readTree(fis);
 
       JsonNode workloadNode = rootNode.get("workloadSettings");
+      JsonNode resourceNode = rootNode.get("resourceSettings");
+
       String author = workloadNode.get("author").asText();
       String domain = workloadNode.get("domain").asText();
       String description = workloadNode.has("description")
           ? workloadNode.get("description").asText()
           : "";
-      configBuilder = configBuilder.author(author).domain(domain).description(description);
+      Map<String, String> events = resourceNode.has("events")
+          ? mapper.convertValue(resourceNode.get("events"), new TypeReference<Map<String, String>>() {})
+          : new HashMap<>();
+      configBuilder = configBuilder
+          .author(author)
+          .domain(domain)
+          .description(description)
+          .events(events);
 
     } catch (Exception e) {
       throw new IllegalArgumentException(

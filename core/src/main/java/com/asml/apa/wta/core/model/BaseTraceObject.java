@@ -8,4 +8,15 @@ import java.io.Serializable;
  * @author  Lohithsai Yadala Chanchu
  * @since 1.0.0
  */
-public interface BaseTraceObject extends Serializable {}
+public interface BaseTraceObject extends Serializable {
+  /**
+   * Returns a hardcoded schema version.
+   *
+   * @return The associated config object
+   * @author Lohithsai Yadala Chanchu
+   * @since 1.0.0
+   */
+  default String getSchemaVersion() {
+    return "1.0";
+  }
+}
