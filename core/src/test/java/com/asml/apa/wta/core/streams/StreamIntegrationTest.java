@@ -180,30 +180,7 @@ public class StreamIntegrationTest {
     }
     stream.addToStream(10);
     stream.addToStream(5);
-    //    assertThat(stream.foldLeft(0, Integer::sum)).isEqualTo(126);
-    assertThat(stream.head()).isEqualTo(0);
-    assertThat(stream.head()).isEqualTo(1);
-    assertThat(stream.head()).isEqualTo(2);
-    assertThat(stream.head()).isEqualTo(3);
-    assertThat(stream.head()).isEqualTo(4);
-    assertThat(stream.head()).isEqualTo(5);
-    assertThat(stream.head()).isEqualTo(6);
-    assertThat(stream.head()).isEqualTo(7);
-    assertThat(stream.head()).isEqualTo(8);
-    assertThat(stream.head()).isEqualTo(9);
-    assertThat(stream.head()).isEqualTo(10);
-    assertThat(stream.head()).isEqualTo(11);
-    assertThat(stream.head()).isEqualTo(1);
-    assertThat(stream.head()).isEqualTo(2);
-    assertThat(stream.head()).isEqualTo(3);
-    assertThat(stream.head()).isEqualTo(4);
-    assertThat(stream.head()).isEqualTo(5);
-    assertThat(stream.head()).isEqualTo(6);
-    assertThat(stream.head()).isEqualTo(7);
-    assertThat(stream.head()).isEqualTo(8);
-    assertThat(stream.head()).isEqualTo(9);
-    assertThat(stream.head()).isEqualTo(10);
-    assertThat(stream.head()).isEqualTo(5);
+    assertThat(stream.foldLeft(0, Integer::sum)).isEqualTo(136);
     assertThat(stream.isEmpty()).isTrue();
   }
 

@@ -151,7 +151,7 @@ public class Stream<V extends Serializable> {
         current = current.getNext();
       }
       objectOutputStream.writeObject(toSerialize);
-      head.setNext(null);
+      deserializationEnd.setNext(null);
       diskLocations.add(filePath);
       deserializationEnd = tail;
     } catch (IOException e) {
@@ -276,6 +276,7 @@ public class Stream<V extends Serializable> {
 
   /**
    * Maps the stream.
+   * Consumes the stream.
    *
    * @param op the operation to perform over the {@link com.asml.apa.wta.core.streams.Stream}
    * @param <R> generic return type of the mapping operation
@@ -304,6 +305,7 @@ public class Stream<V extends Serializable> {
 
   /**
    * Filters the stream.
+   * Consumes the stream.
    *
    * @param predicate the predicate used for filtering, elements that return false get filtered out
    * @return the filtered {@link com.asml.apa.wta.core.streams.Stream}
@@ -331,7 +333,8 @@ public class Stream<V extends Serializable> {
   }
 
   /**
-   * Fold the stream.
+   * Fold over the stream.
+   * Consumes the stream.
    *
    * @param init the initial value
    * @param op the fold operation to perform over the {@link com.asml.apa.wta.core.streams.Stream}

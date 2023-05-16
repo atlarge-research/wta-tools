@@ -41,7 +41,7 @@ public class MetricStreamingEngine {
   }
 
   /**
-   * Adds resource metrics to the resource stream.
+   * Adds task metrics to the task stream.
    *
    * @param task the {@link com.asml.apa.wta.spark.streams.TaskKey} of the task
    * @param record the {@link TaskMetricsRecord} containing the metrics
