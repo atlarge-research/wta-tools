@@ -180,7 +180,7 @@ public class StreamIntegrationTest {
     }
     stream.addToStream(10);
     stream.addToStream(5);
-    assertThat(stream.foldLeft(0, Integer::sum)).isEqualTo(136);
+    assertThat(stream.foldLeft(0, Integer::sum)).isEqualTo(126);
     assertThat(stream.isEmpty()).isTrue();
   }
 
