@@ -7,7 +7,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.RequiredArgsConstructor;
 import org.apache.spark.SparkContext;
-import org.apache.spark.TaskContext;
 import org.apache.spark.scheduler.*;
 
 /**
@@ -27,13 +26,12 @@ public class TaskLevelListener extends SparkListener {
   private final List<Task> processedTasks = new LinkedList<>();
 
   /**
-   * This method is called every time a task ends, where task-level metrics are added to the list.
+   * This method is called every time a task ends, task-level metrics should be collected here, and added.
    *
    * @param taskEnd   SparkListenerTaskEnd
    */
   @Override
   public void onTaskEnd(SparkListenerTaskEnd taskEnd) {
-    TaskContext context = TaskContext.get();
     final var curTaskInfo = taskEnd.taskInfo();
     final var curTaskMetrics = taskEnd.taskMetrics();
 
