@@ -8,8 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.condition.EnabledOnOs;
-import org.junit.jupiter.api.condition.OS;
 
 class ParquetWriterUtilsTest {
 
@@ -31,7 +29,7 @@ class ParquetWriterUtilsTest {
         .procModel("test model");
     resource = resourceBuilder.build();
     resources = new ArrayList<>();
-    utils = new ParquetWriterUtils(new File("."), "schema-1.0");
+    utils = new ParquetWriterUtils(new File("./WTA"), "schema-1.0");
   }
 
   @Test
@@ -42,7 +40,7 @@ class ParquetWriterUtilsTest {
   }
 
   @Test
-  void writeResourceToFileTest() {
+  void writeToFileTest() {
     resources.add(resource);
     utils.readResource(resource);
     try {

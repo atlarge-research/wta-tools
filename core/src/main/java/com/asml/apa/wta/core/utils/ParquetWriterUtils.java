@@ -96,8 +96,8 @@ public class ParquetWriterUtils {
   }
 
   private void writeTaskToFile(String taskFileName) throws Exception {
-    AvroUtils taskWriter =
-        new AvroUtils(Task.getTaskSchema(), new File(path, "/tasks/schema-1.0/" + taskFileName + ".parquet"));
+    AvroUtils taskWriter = new AvroUtils(
+        Task.getTaskSchema(), new File(path, "/tasks/" + version + "/" + taskFileName + ".parquet"));
     List<GenericRecord> taskList = new ArrayList<>();
     for (Task task : tasks) {
       taskList.add(Task.convertTaskToRecord(task));
@@ -107,7 +107,8 @@ public class ParquetWriterUtils {
 
   private void writeWorkflowToFile(String workflowFileName) throws Exception {
     AvroUtils workflowWriter = new AvroUtils(
-        Workflow.getWorkflowSchema(), new File(path, "/workflows/schema-1.0/" + workflowFileName + ".parquet"));
+        Workflow.getWorkflowSchema(),
+        new File(path, "/workflows/" + version + "/" + workflowFileName + ".parquet"));
     List<GenericRecord> workflowList = new ArrayList<>();
     for (Workflow workflow : workflows) {
       workflowList.add(Workflow.convertWorkflowToRecord(workflow));
@@ -117,7 +118,8 @@ public class ParquetWriterUtils {
 
   private void writeWorkloadToFile(String workloadFileName) throws Exception {
     AvroUtils workloadWriter = new AvroUtils(
-        Workload.getWorkloadSchema(), new File(path, "/workloads/schema-1.0/" + workloadFileName + ".parquet"));
+        Workload.getWorkloadSchema(),
+        new File(path, "/workloads/" + version + "/" + workloadFileName + ".parquet"));
     List<GenericRecord> workloadList = new ArrayList<>();
     for (Workload workload : workloads) {
       workloadList.add(Workload.convertWorkloadToRecord(workload));
