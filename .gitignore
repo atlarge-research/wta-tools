@@ -8,6 +8,7 @@
 *.class
 
 # Log file
+logging
 *.log
 
 # BlueJ files
@@ -62,5 +63,6 @@ reports
 
 config.json
 
+# benchmarking resources
 benchmarking/src/main/resources/sql_files
 benchmarking/src/main/resources/tpcds_data
