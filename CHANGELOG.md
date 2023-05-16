@@ -22,6 +22,7 @@ For the most part, since we are pre-release this will serve no real purpose, oth
 - Added events field for resource object to be configurable [@lyadalachanchu](https://gitlab.ewi.tudelft.nl/lyadalachanchu)
 - Standardize schema version across all objects [@lyadalachanchu](https://gitlab.ewi.tudelft.nl/lyadalachanchu)
 - Created utility class for writing WTA trace to parquet files [@sqak-sqak-izardrone](https://github.com/sqak-sqak-izardrone)
+- Improved PMD in the pipeline [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 
 ### Changed
 
