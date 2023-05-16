@@ -64,6 +64,3 @@ config.json
 
 benchmarking/src/main/resources/sql_files
 benchmarking/src/main/resources/tpcds_data
-
-# Zenodo
-aksalon_example_trace/
