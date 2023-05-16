@@ -16,6 +16,7 @@ For the most part, since we are pre-release this will serve no real purpose, oth
 - Created basic skeleton of Task object [@lyadalachanchu](https://gitlab.ewi.tudelft.nl/lyadalachanchu)
 - Patched report artefacts in the pipeline [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 - Created basic skeleton of Resource and Workload objects [@lyadalachanchu](https://gitlab.ewi.tudelft.nl/lyadalachanchu)
+- Created utility class for writing WTA trace to parquet files [@sqak-sqak-izardrone](https://github.com/sqak-sqak-izardrone)
 
 ### Changed
 
