@@ -23,6 +23,14 @@ pmd:
     - echo "PMD checks started"
     - "mvn pmd:check"
 
+  artifacts:
+    name: pmd
+    expire_in: 3 days
+    when: always
+    paths:
+      - core/reports/pmd
+      - adapter/spark/reports/pmd
+
 checkstyle:
   stage: check
   dependencies: []
