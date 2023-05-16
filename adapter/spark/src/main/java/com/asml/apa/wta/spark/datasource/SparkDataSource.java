@@ -5,7 +5,6 @@ import com.asml.apa.wta.spark.listener.StageLevelListener;
 import com.asml.apa.wta.spark.listener.TaskLevelListener;
 import java.util.List;
 import org.apache.spark.SparkContext;
-import org.apache.spark.executor.TaskMetrics;
 import org.apache.spark.scheduler.StageInfo;
 
 /**

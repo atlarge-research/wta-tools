@@ -23,7 +23,7 @@ public class Task implements BaseTraceObject {
 
   private final String type;
 
-  private final long submitType;
+  private final long submitTime;
 
   private final int submissionSite;
 

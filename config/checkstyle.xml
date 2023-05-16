@@ -75,7 +75,6 @@
     <module name="AvoidNestedBlocks"> <!-- Java Coding Guidelines: Avoid nested blocks -->
       <property name="allowInSwitchCase" value="true"/>
     </module>
-    <module name="AvoidStarImport"/> <!-- Java Style Guide: No wildcard imports -->
     <module name="AvoidStaticImport"> <!-- Java Style Guide: No static imports -->
       <property name="excludes" value="com.google.common.base.Preconditions.*, com.palantir.logsafe.Preconditions.*, java.util.Collections.*, java.util.stream.Collectors.*, org.apache.commons.lang3.Validate.*, org.assertj.core.api.Assertions.*, org.mockito.Mockito.*"/>
     </module>
