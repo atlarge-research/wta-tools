@@ -3,14 +3,13 @@ package com.asml.apa.wta.spark;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Properties;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Logger for the Spark plugin. Singleton design pattern so that one Logger is present
  * at all times.
- *
  * @author Pil Kyu Cho
  * @since 1.0.0
  */
@@ -19,20 +18,23 @@ public class PluginLogger {
   private static Logger instance;
 
   /**
-   * Private constructor to prevent instantiation from other classes
+   * Private constructor to prevent instantiation from other classes.
+   * @author Pil Kyu Cho
+   * @since 1.0.0
    */
   private PluginLogger() {
-    instance = LogManager.getLogger(PluginLogger.class);
+    instance = LoggerFactory.getLogger(PluginLogger.class);
   }
 
   /**
    * Returns the instance of the Logger. If the instance is null, it will create a new one.
+   * @return Logger The instance of the Logger
    * @author Pil Kyu Cho
    * @since 1.0.0
    */
   public static Logger getInstance() {
     if (instance == null) {
-      instance = LogManager.getLogger(PluginLogger.class);
+      instance = LoggerFactory.getLogger(PluginLogger.class);
     }
     return instance;
   }
