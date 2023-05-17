@@ -8,7 +8,7 @@ import com.asml.apa.wta.core.utils.WtaUtils;
 import java.util.HashMap;
 import org.junit.jupiter.api.Test;
 
-class ConfigReaderTest {
+class ConfigReaderIntegrationTest {
   @Test
   void readsConfigFileCorrectly() {
     RuntimeConfig cr = WtaUtils.readConfig("src/test/resources/testConfig.json");
