@@ -35,6 +35,18 @@ public class ParquetWriterUtils {
     return resources;
   }
 
+  public List<Task> getTasks() {
+    return tasks;
+  }
+
+  public List<Workflow> getWorkflows() {
+    return workflows;
+  }
+
+  public List<Workload> getWorkloads() {
+    return workloads;
+  }
+
   /**reads the resource object from kafka stream and feed into the writer.
    *
    * @param resource the resource

@@ -90,7 +90,7 @@ public class Workflow implements BaseTraceObject {
       .type()
       .intType()
       .noDefault()
-      .name("maxNumberOfCocurrentTasks")
+      .name("maxNumberOfConcurrentTasks")
       .type()
       .intType()
       .noDefault()
@@ -146,7 +146,13 @@ public class Workflow implements BaseTraceObject {
     record.put("id", workflow.id);
     record.put("applicationField", workflow.applicationField);
     record.put("applicationName", workflow.applicationName);
-    record.put("domain", workflow.domain.getValue());
+    String domain;
+    if (workflow.domain == null) {
+      domain = null;
+    } else {
+      domain = workflow.domain.getValue();
+    }
+    record.put("domain", domain);
     record.put("nfrs", workflow.nfrs);
     record.put("criticalPathLength", workflow.criticalPathLength);
     record.put("criticalPathTaskCount", workflow.criticalPathTaskCount);
@@ -154,8 +160,13 @@ public class Workflow implements BaseTraceObject {
     record.put("numberOfTasks", workflow.numberOfTasks);
     record.put("scheduler", workflow.scheduler);
     record.put("submitTime", workflow.submitTime);
-    record.put("tasks", (Long[])
-        Arrays.stream(workflow.tasks).map(x -> x.getId()).toArray());
+    Long[] tasks;
+    if (workflow.tasks == null) {
+      tasks = null;
+    } else {
+      tasks = (Long[]) Arrays.stream(workflow.tasks).map(x -> x.getId()).toArray();
+    }
+    record.put("tasks", tasks);
     record.put("totalDiskSpaceUsage", workflow.totalDiskSpaceUsage);
     record.put("totalEnergyConsumption", workflow.totalEnergyConsumption);
     record.put("totalMemoryUsage", workflow.totalMemoryUsage);

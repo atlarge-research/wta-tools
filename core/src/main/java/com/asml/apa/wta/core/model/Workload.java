@@ -151,6 +151,7 @@ public class Workload implements BaseTraceObject {
       .noDefault()
       .name("domain")
       .type()
+      .nullable()
       .stringType()
       .noDefault()
       .name("startDate")
@@ -225,7 +226,7 @@ public class Workload implements BaseTraceObject {
       .type()
       .doubleType()
       .noDefault()
-      .name("maxMeemory")
+      .name("maxMemory")
       .type()
       .doubleType()
       .noDefault()
@@ -358,60 +359,72 @@ public class Workload implements BaseTraceObject {
 
   public static GenericRecord convertWorkloadToRecord(Workload workload) {
     GenericData.Record record = new GenericData.Record(workloadSchema);
-    record.put("", workload.authors);
-    record.put("", workload.covDiskSpaceUsage);
-    record.put("", workload.covEnergy);
-    record.put("", workload.covMemory);
-    record.put("", workload.covNetworkUsage);
-    record.put("", workload.covResourceTask);
-    record.put("", workload.domain.getValue());
-    record.put("", workload.endDate);
-    record.put("", workload.firstQuartileDiskSpaceUsage);
-    record.put("", workload.firstQuartileEnergy);
-    record.put("", workload.firstQuartileMemory);
-    record.put("", workload.firstQuartileNetworkUsage);
-    record.put("", workload.firstQuartileResourceTask);
-    record.put("", workload.maxDiskSpaceUsage);
-    record.put("", workload.maxEnergy);
-    record.put("", workload.maxMemory);
-    record.put("", workload.maxResourceTask);
-    record.put("", workload.maxNetworkUsage);
-    record.put("", workload.meanDiskSpaceUsage);
-    record.put("", workload.meanEnergy);
-    record.put("", workload.meanMemory);
-    record.put("", workload.meanNetworkUsage);
-    record.put("", workload.meanResourceTask);
-    record.put("", workload.medianDiskSpaceUsage);
-    record.put("", workload.medianEnergy);
-    record.put("", workload.medianMemory);
-    record.put("", workload.medianNetworkUsage);
-    record.put("", workload.medianResourceTask);
-    record.put("", workload.minDiskSpaceUsage);
-    record.put("", workload.minEnergy);
-    record.put("", workload.minMemory);
-    record.put("", workload.minNetworkUsage);
-    record.put("", workload.minResourceTask);
-    record.put("", workload.numGroups);
-    record.put("", workload.numResources);
-    record.put("", workload.numSites);
-    record.put("", workload.numUsers);
-    record.put("", workload.startDate);
-    record.put("", workload.stdEnergy);
-    record.put("", workload.stdDiskSpaceUsage);
-    record.put("", workload.stdMemory);
-    record.put("", workload.stdNetworkUsage);
-    record.put("", workload.stdResourceTask);
-    record.put("", workload.thirdQuartileDiskSpaceUsage);
-    record.put("", workload.thirdQuartileEnergy);
-    record.put("", workload.thirdQuartileMemory);
-    record.put("", workload.thirdQuartileNetworkUsage);
-    record.put("", workload.thirdQuartileResourceTask);
-    record.put("", workload.totalResourceSeconds);
-    record.put("", workload.totalTasks);
-    record.put("", workload.totalWorkflows);
-    record.put("", (Long[])
-        Arrays.stream(workload.workflows).map(x -> x.getId()).toArray());
-    record.put("", workload.workloadDescription);
+    record.put("authors", workload.authors);
+    record.put("covDiskSpaceUsage", workload.covDiskSpaceUsage);
+    record.put("covEnergy", workload.covEnergy);
+    record.put("covMemory", workload.covMemory);
+    record.put("covNetworkUsage", workload.covNetworkUsage);
+    record.put("covResourceTask", workload.covResourceTask);
+    String domain;
+    if (workload.domain == null) {
+      domain = null;
+    } else {
+      domain = workload.domain.getValue();
+    }
+    record.put("domain", domain);
+    record.put("endDate", workload.endDate);
+    record.put("firstQuartileDiskSpaceUsage", workload.firstQuartileDiskSpaceUsage);
+    record.put("firstQuartileEnergy", workload.firstQuartileEnergy);
+    record.put("firstQuartileMemory", workload.firstQuartileMemory);
+    record.put("firstQuartileNetworkUsage", workload.firstQuartileNetworkUsage);
+    record.put("firstQuartileResourceTask", workload.firstQuartileResourceTask);
+    record.put("maxDiskSpaceUsage", workload.maxDiskSpaceUsage);
+    record.put("maxEnergy", workload.maxEnergy);
+    record.put("maxMemory", workload.maxMemory);
+    record.put("maxResourceTask", workload.maxResourceTask);
+    record.put("maxNetworkUsage", workload.maxNetworkUsage);
+    record.put("meanDiskSpaceUsage", workload.meanDiskSpaceUsage);
+    record.put("meanEnergy", workload.meanEnergy);
+    record.put("meanMemory", workload.meanMemory);
+    record.put("meanNetworkUsage", workload.meanNetworkUsage);
+    record.put("meanResourceTask", workload.meanResourceTask);
+    record.put("medianDiskSpaceUsage", workload.medianDiskSpaceUsage);
+    record.put("medianEnergy", workload.medianEnergy);
+    record.put("medianMemory", workload.medianMemory);
+    record.put("medianNetworkUsage", workload.medianNetworkUsage);
+    record.put("medianResourceTask", workload.medianResourceTask);
+    record.put("minDiskSpaceUsage", workload.minDiskSpaceUsage);
+    record.put("minEnergy", workload.minEnergy);
+    record.put("minMemory", workload.minMemory);
+    record.put("minNetworkUsage", workload.minNetworkUsage);
+    record.put("minResourceTask", workload.minResourceTask);
+    record.put("numGroups", workload.numGroups);
+    record.put("numResources", workload.numResources);
+    record.put("numSites", workload.numSites);
+    record.put("numUsers", workload.numUsers);
+    record.put("startDate", workload.startDate);
+    record.put("stdEnergy", workload.stdEnergy);
+    record.put("stdDiskSpaceUsage", workload.stdDiskSpaceUsage);
+    record.put("stdMemory", workload.stdMemory);
+    record.put("stdNetworkUsage", workload.stdNetworkUsage);
+    record.put("stdResourceTask", workload.stdResourceTask);
+    record.put("thirdQuartileDiskSpaceUsage", workload.thirdQuartileDiskSpaceUsage);
+    record.put("thirdQuartileEnergy", workload.thirdQuartileEnergy);
+    record.put("thirdQuartileMemory", workload.thirdQuartileMemory);
+    record.put("thirdQuartileNetworkUsage", workload.thirdQuartileNetworkUsage);
+    record.put("thirdQuartileResourceTask", workload.thirdQuartileResourceTask);
+    record.put("totalResourceSeconds", workload.totalResourceSeconds);
+    record.put("totalTasks", workload.totalTasks);
+    record.put("totalWorkflows", workload.totalWorkflows);
+    Long[] workflows;
+    if (workload.workflows == null) {
+      workflows = null;
+    } else {
+      workflows = (Long[])
+          Arrays.stream(workload.workflows).map(x -> x.getId()).toArray();
+    }
+    record.put("workflows", workflows);
+    record.put("workloadDescription", workload.workloadDescription);
     return record;
   }
 
