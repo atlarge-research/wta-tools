@@ -27,15 +27,15 @@ class ParquetWriterUtilsTest {
   @BeforeEach
   void init() {
     var resourceBuilder = Resource.builder()
-            .id(1)
-            .type("test")
-            .os("test os")
-            .details("None")
-            .diskSpace(2)
-            .numResources(4.0)
-            .memory(8)
-            .networkSpeed(16)
-            .procModel("test model");
+        .id(1)
+        .type("test")
+        .os("test os")
+        .details("None")
+        .diskSpace(2)
+        .numResources(4.0)
+        .memory(8)
+        .networkSpeed(16)
+        .procModel("test model");
     resource = resourceBuilder.build();
     resources = new ArrayList<>();
     var taskBuilder = Task.builder();
@@ -123,8 +123,3 @@ class ParquetWriterUtilsTest {
     assertThat(workloads).isEqualTo(utils.getWorkloads());
   }
 }
-
-
-
-
-

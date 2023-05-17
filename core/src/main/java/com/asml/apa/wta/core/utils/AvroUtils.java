@@ -41,7 +41,7 @@ public class AvroUtils implements AutoCloseable {
     avroSchema = schema;
     path = outputFolder.toURI();
     org.apache.hadoop.fs.Path hadoopPath = new org.apache.hadoop.fs.Path(path);
-    uri = "file://" + path;
+    uri = path.getPath();
     /*
     writer = AvroParquetWriter
     .<GenericRecord>builder(new org.apache.hadoop.fs.Path(path))
