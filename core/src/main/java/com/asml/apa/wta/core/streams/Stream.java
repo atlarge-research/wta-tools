@@ -219,8 +219,8 @@ public class Stream<V extends Serializable> {
     if (head == null) {
       throw new NoSuchElementException();
     }
+    additionsSinceLastWriteToDisk--;
     if (head == deserializationStart) {
-      additionsSinceLastWriteToDisk--;
       if (diskLocations.isEmpty()) {
         deserializationStart = head.getNext();
       } else {
