@@ -22,9 +22,7 @@ public class PluginLogger {
    * @author Pil Kyu Cho
    * @since 1.0.0
    */
-  private PluginLogger() {
-    instance = LoggerFactory.getLogger(PluginLogger.class);
-  }
+  private PluginLogger() {}
 
   /**
    * Returns the instance of the Logger. If the instance is null, it will create a new one.
