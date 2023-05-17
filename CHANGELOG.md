@@ -22,7 +22,7 @@ For the most part, since we are pre-release this will serve no real purpose, oth
 - Added a build dependency to PMD [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 - Added events field for resource object to be configurable [@lyadalachanchu](https://gitlab.ewi.tudelft.nl/lyadalachanchu)
 - Standardize schema version across all objects [@lyadalachanchu](https://gitlab.ewi.tudelft.nl/lyadalachanchu)
-- Collected stuff that was able to be collected from the task listeners. [@hpage](https://gitlab.ewi.tudelft.nl/hpage)
+- Updated TaskLevelLIstener to collect as much information from Spark for the Task object [@hpage](https://gitlab.ewi.tudelft.nl/hpage)
 - Improved PMD in the pipeline [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 
 ### Changed

@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.RequiredArgsConstructor;
 import org.apache.spark.SparkContext;
+import org.apache.spark.executor.TaskMetrics;
 import org.apache.spark.scheduler.*;
 
 /**
@@ -32,15 +33,15 @@ public class TaskLevelListener extends SparkListener {
    */
   @Override
   public void onTaskEnd(SparkListenerTaskEnd taskEnd) {
-    final var curTaskInfo = taskEnd.taskInfo();
-    final var curTaskMetrics = taskEnd.taskMetrics();
+    final TaskInfo curTaskInfo = taskEnd.taskInfo();
+    final TaskMetrics curTaskMetrics = taskEnd.taskMetrics();
 
-    final var taskId = curTaskInfo.taskId();
-    final var type = taskEnd.taskType();
-    final var submitTime = curTaskInfo.launchTime();
-    final Long runTime = curTaskMetrics.executorRunTime();
+    final long taskId = curTaskInfo.taskId();
+    final String type = taskEnd.taskType();
+    final long submitTime = curTaskInfo.launchTime();
+    final long runTime = curTaskMetrics.executorRunTime();
     final int userId = sparkContext.sparkUser().hashCode();
-    var workflowId = stageIdstoJobs.get(taskEnd.stageId());
+    long workflowId = stageIdstoJobs.get(taskEnd.stageId());
 
     // unknown
     final int submissionSite = -1;
