@@ -21,7 +21,7 @@ class ConfigReaderIntegrationTest {
         put("f2", "v2");
       }
     });
-    assertThat(cr.getLogLevel()).isEqualTo("DEBUG");
+    assertThat(cr.getLogLevel()).isEqualTo("INFO");
     assertThat(cr.isDoConsoleLog()).isFalse();
     assertThat(cr.isDoFileLog()).isTrue();
   }
@@ -38,7 +38,7 @@ class ConfigReaderIntegrationTest {
         put("f2", "v2");
       }
     });
-    assertThat(cr.getLogLevel()).isEqualTo("DEBUG");
+    assertThat(cr.getLogLevel()).isEqualTo("INFO");
     assertThat(cr.isDoConsoleLog()).isFalse();
     assertThat(cr.isDoFileLog()).isTrue();
   }

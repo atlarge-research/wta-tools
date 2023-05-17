@@ -47,17 +47,19 @@ public class WtaUtils {
           : new HashMap<>();
 
       String logLevel = logNode.has("logLevel") ? logNode.get("logLevel").asText() : "INFO";
-      boolean doConsoleLog = !logNode.has("doConsoleLog") || logNode.get("doConsoleLog").asBoolean();
-      boolean doFileLog = !logNode.has("doFileLog") || logNode.get("doFileLog").asBoolean();
+      boolean doConsoleLog =
+          !logNode.has("doConsoleLog") || logNode.get("doConsoleLog").asBoolean();
+      boolean doFileLog =
+          !logNode.has("doFileLog") || logNode.get("doFileLog").asBoolean();
 
       configBuilder = configBuilder
-              .author(author)
-              .domain(domain)
-              .description(description)
-              .events(events)
-              .logLevel(logLevel)
-              .doConsoleLog(doConsoleLog)
-              .doFileLog(doFileLog);
+          .author(author)
+          .domain(domain)
+          .description(description)
+          .events(events)
+          .logLevel(logLevel)
+          .doConsoleLog(doConsoleLog)
+          .doFileLog(doFileLog);
     } catch (Exception e) {
       throw new IllegalArgumentException(
           "The config file has missing/invalid fields or no config file was found");

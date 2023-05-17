@@ -53,7 +53,7 @@ public class PluginLogger {
    * @since 1.0.0
    */
   private static Level getLogLevel(String level) {
-    switch(level) {
+    switch (level) {
       case "ALL":
         return Level.ALL;
       case "DEBUG":
@@ -82,12 +82,7 @@ public class PluginLogger {
    * @author Pil Kyu Cho
    * @since 1.0.0
    */
-  public static void loadConfig(
-          String logLevel,
-          boolean doConsoleLog,
-          boolean doFileLog,
-          String logPath
-  ) {
+  public static void loadConfig(String logLevel, boolean doConsoleLog, boolean doFileLog, String logPath) {
     String pattern = "%d [%t] %p - %m%n";
     ConfigurationBuilder<BuiltConfiguration> configBuilder = ConfigurationBuilderFactory.newConfigurationBuilder();
     configBuilder.setStatusLevel(getLogLevel(logLevel));
@@ -95,25 +90,28 @@ public class PluginLogger {
     RootLoggerComponentBuilder rootLogger = configBuilder.newRootLogger(logLevel);
 
     if (doConsoleLog) {
-      AppenderComponentBuilder appenderBuilder = configBuilder.newAppender("Console", "CONSOLE")
-              .addAttribute("target", ConsoleAppender.Target.SYSTEM_OUT);
+      AppenderComponentBuilder appenderBuilder = configBuilder
+          .newAppender("Console", "CONSOLE")
+          .addAttribute("target", ConsoleAppender.Target.SYSTEM_OUT);
       appenderBuilder.add(configBuilder.newLayout("PatternLayout").addAttribute("pattern", pattern));
       rootLogger.add(configBuilder.newAppenderRef("Console"));
       configBuilder.add(appenderBuilder);
     }
 
     if (doFileLog) {
-      LayoutComponentBuilder layoutBuilder = configBuilder
-              .newLayout("PatternLayout")
-              .addAttribute("pattern", pattern);
+      LayoutComponentBuilder layoutBuilder =
+          configBuilder.newLayout("PatternLayout").addAttribute("pattern", pattern);
       ComponentBuilder triggeringPolicy = configBuilder
-              .newComponent("Policies")
-              .addComponent(configBuilder.newComponent("SizeBasedTriggeringPolicy").addAttribute("size", "10MB"));
-      AppenderComponentBuilder appenderBuilder = configBuilder.newAppender("Roller", "ROLLINGFILE")
-              .addAttribute("fileName", logPath)
-              .addAttribute("filePattern", logPath + "-%d{MM-dd-yy-HH-mm-ss}.log.")
-              .add(layoutBuilder)
-              .addComponent(triggeringPolicy);
+          .newComponent("Policies")
+          .addComponent(configBuilder
+              .newComponent("SizeBasedTriggeringPolicy")
+              .addAttribute("size", "10MB"));
+      AppenderComponentBuilder appenderBuilder = configBuilder
+          .newAppender("Roller", "ROLLINGFILE")
+          .addAttribute("fileName", logPath)
+          .addAttribute("filePattern", logPath + "-%d{MM-dd-yy-HH-mm-ss}.log.")
+          .add(layoutBuilder)
+          .addComponent(triggeringPolicy);
       configBuilder.add(appenderBuilder);
       rootLogger.add(configBuilder.newAppenderRef("Roller"));
     }
