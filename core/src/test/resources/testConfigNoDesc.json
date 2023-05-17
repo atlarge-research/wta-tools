@@ -13,7 +13,7 @@
   },
   "logSettings":
   {
-    "logLevel": "DEBUG",
+    "logLevel": "INFO",
     "doConsoleLog": "false",
     "doFileLog": "true"
   }
