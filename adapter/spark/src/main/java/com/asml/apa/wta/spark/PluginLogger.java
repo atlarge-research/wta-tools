@@ -22,7 +22,9 @@ public class PluginLogger {
    * @author Pil Kyu Cho
    * @since 1.0.0
    */
-  private PluginLogger() {}
+  private PluginLogger() {
+    throw new AssertionError();
+  }
 
   /**
    * Returns the instance of the Logger. If the instance is null, it will create a new one.
