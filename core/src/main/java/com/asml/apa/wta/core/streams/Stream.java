@@ -275,8 +275,8 @@ public class Stream<V extends Serializable> {
   }
 
   /**
-   * Maps the stream.
-   * Consumes the stream.
+   * Returns a stream that maps all elements in this stream using the given function. Consumes the
+   * stream.
    *
    * @param op the operation to perform over the {@link com.asml.apa.wta.core.streams.Stream}
    * @param <R> generic return type of the mapping operation
@@ -304,8 +304,8 @@ public class Stream<V extends Serializable> {
   }
 
   /**
-   * Filters the stream.
-   * Consumes the stream.
+   * Returns a stream that filters all elements in this stream using the given predicate. Consumes
+   * the stream.
    *
    * @param predicate the predicate used for filtering, elements that return false get filtered out
    * @return the filtered {@link com.asml.apa.wta.core.streams.Stream}
@@ -333,8 +333,8 @@ public class Stream<V extends Serializable> {
   }
 
   /**
-   * Fold over the stream.
-   * Consumes the stream.
+   * Returns a stream that aggregates all elements in this stream using the given function and initial value
+   * using a left fold. Consumes the stream.
    *
    * @param init the initial value
    * @param op the fold operation to perform over the {@link com.asml.apa.wta.core.streams.Stream}
