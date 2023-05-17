@@ -35,14 +35,26 @@ public class ParquetWriterUtils {
     return resources;
   }
 
+  /**getter for tasks, only for tests.
+   *
+   * @return the tasks
+   */
   public List<Task> getTasks() {
     return tasks;
   }
 
+  /**getter for workflows, only for tests.
+   *
+   * @return the workflows
+   */
   public List<Workflow> getWorkflows() {
     return workflows;
   }
 
+  /**getter for workloads, only for tests.
+   *
+   * @return the workloads
+   */
   public List<Workload> getWorkloads() {
     return workloads;
   }

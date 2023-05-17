@@ -69,7 +69,7 @@ public class AvroUtils implements AutoCloseable {
    * @param record record
    * @throws Exception possible io exception
    */
-  public void writeRecord(GenericRecord record) throws Exception {
+  private void writeRecord(GenericRecord record) throws Exception {
     writer.write(record);
   }
 
