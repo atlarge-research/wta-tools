@@ -73,6 +73,11 @@ public class AvroUtils implements AutoCloseable {
     }
   }
 
+  /**reader for test.
+   *
+   * @return the record in parquet file
+   * @throws IOException possible io exception
+   */
   public GenericRecord readRecord() throws IOException {
     return reader.read();
   }
