@@ -64,3 +64,6 @@ config.json
 
 benchmarking/src/main/resources/sql_files
 benchmarking/src/main/resources/tpcds_data
+
+#test output traces
+core/src/test/resources/WTA

@@ -29,7 +29,7 @@ class ParquetWriterUtilsTest {
         .procModel("test model");
     resource = resourceBuilder.build();
     resources = new ArrayList<>();
-    utils = new ParquetWriterUtils(new File("./WTA"), "schema-1.0");
+    utils = new ParquetWriterUtils(new File("./src/test/resources/WTA"), "schema-1.0");
   }
 
   @Test
