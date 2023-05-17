@@ -3,6 +3,9 @@ package com.asml.apa.wta.core.streams;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import com.asml.apa.wta.core.exceptions.FailedToDeserializeStreamException;
+import com.asml.apa.wta.core.exceptions.FailedToSerializeStreamException;
+import com.asml.apa.wta.core.exceptions.StreamSerializationException;
 import java.util.NoSuchElementException;
 import org.junit.jupiter.api.Test;
 
@@ -11,7 +14,7 @@ import org.junit.jupiter.api.Test;
  */
 class StreamTest {
 
-  Stream<Integer> createStreamOfNaturalNumbers(int size) {
+  Stream<Integer> createStreamOfNaturalNumbers(int size) throws FailedToSerializeStreamException {
     Stream<Integer> stream = new Stream<>();
     for (int i = 1; i <= size; i++) {
       stream.addToStream(i);
@@ -26,14 +29,14 @@ class StreamTest {
   }
 
   @Test
-  void setsUpStreamWithOneElement() {
+  void setsUpStreamWithOneElement() throws FailedToDeserializeStreamException {
     Stream<Integer> stream = new Stream<>(2);
     assertThat(stream.isEmpty()).isFalse();
     assertThat(stream.head()).isEqualTo(2);
   }
 
   @Test
-  void mapStream() {
+  void mapStream() throws StreamSerializationException {
     Stream<Integer> stream = createStreamOfNaturalNumbers(10);
     Stream<Integer> mappedStream = stream.map((i) -> {
       if (i < 3) {
@@ -49,7 +52,7 @@ class StreamTest {
   }
 
   @Test
-  void filterStream() {
+  void filterStream() throws StreamSerializationException {
     Stream<Integer> stream = createStreamOfNaturalNumbers(11);
     Stream<Integer> filteredStream = stream.filter((i) -> i > 9);
     assertThat(filteredStream.head()).isEqualTo(10);
@@ -58,7 +61,7 @@ class StreamTest {
   }
 
   @Test
-  void foldStream() {
+  void foldStream() throws FailedToDeserializeStreamException, FailedToSerializeStreamException {
     Stream<Integer> stream = createStreamOfNaturalNumbers(10);
     int sum = stream.foldLeft(0, Integer::sum);
     assertThat(sum).isEqualTo(55);
@@ -84,25 +87,25 @@ class StreamTest {
   }
 
   @Test
-  void mapUsingNullOperation() {
+  void mapUsingNullOperation() throws FailedToSerializeStreamException {
     Stream<Integer> stream = createStreamOfNaturalNumbers(1309);
     assertThatThrownBy(() -> stream.map(null)).isInstanceOf(NullPointerException.class);
   }
 
   @Test
-  void filterUsingNullOperation() {
+  void filterUsingNullOperation() throws FailedToSerializeStreamException {
     Stream<Integer> stream = createStreamOfNaturalNumbers(102);
     assertThatThrownBy(() -> stream.filter(null)).isInstanceOf(NullPointerException.class);
   }
 
   @Test
-  void foldUsingNullOperation() {
+  void foldUsingNullOperation() throws FailedToSerializeStreamException {
     Stream<Integer> stream = createStreamOfNaturalNumbers(457);
     assertThatThrownBy(() -> stream.foldLeft(0, null)).isInstanceOf(NullPointerException.class);
   }
 
   @Test
-  void simpleStreamWorkflow() {
+  void simpleStreamWorkflow() throws FailedToDeserializeStreamException, FailedToSerializeStreamException {
     Stream<Integer> stream = createStreamOfNaturalNumbers(10);
     int one = stream.head();
     stream.addToStream(1);
@@ -112,5 +115,26 @@ class StreamTest {
     assertThat(one).isEqualTo(1);
     assertThat(two).isEqualTo(2);
     assertThat(sum).isEqualTo(55);
+  }
+
+  @Test
+  void mapConsumesStream() throws StreamSerializationException {
+    Stream<Integer> stream = createStreamOfNaturalNumbers(10);
+    stream.map((i) -> 2);
+    assertThat(stream.isEmpty()).isTrue();
+  }
+
+  @Test
+  void filterConsumesStream() throws StreamSerializationException {
+    Stream<Integer> stream = createStreamOfNaturalNumbers(10);
+    stream.filter((i) -> i % 2 == 0);
+    assertThat(stream.isEmpty()).isTrue();
+  }
+
+  @Test
+  void foldLeftConsumesStream() throws StreamSerializationException {
+    Stream<Integer> stream = createStreamOfNaturalNumbers(10);
+    stream.foldLeft(0, Integer::sum);
+    assertThat(stream.isEmpty()).isTrue();
   }
 }

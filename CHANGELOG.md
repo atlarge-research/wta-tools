@@ -24,6 +24,7 @@ For the most part, since we are pre-release this will serve no real purpose, oth
 - Standardize schema version across all objects [@lyadalachanchu](https://gitlab.ewi.tudelft.nl/lyadalachanchu)
 - Updated TaskLevelLIstener to collect as much information from Spark for the Task object [@hpage](https://gitlab.ewi.tudelft.nl/hpage)
 - Improved PMD in the pipeline [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
+- Includes automatic serialization to the streaming package [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 
 ### Changed
 
