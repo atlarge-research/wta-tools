@@ -24,4 +24,13 @@ public class RuntimeConfig {
 
   @Builder.Default
   private Map<String, String> events = new HashMap<>();
+
+  @Builder.Default
+  private String logLevel = "INFO";
+
+  @Builder.Default
+  private boolean doConsoleLog = true;
+
+  @Builder.Default
+  private boolean doFileLog = true;
 }

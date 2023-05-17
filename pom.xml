@@ -30,7 +30,6 @@
     <spark.support.version>3.2.0</spark.support.version>
     <mockito.version>5.3.1</mockito.version>
     <jqwik.version>1.7.3</jqwik.version>
-    <log4j.version>2.20.0</log4j.version>
   </properties>
 
   <modules>
