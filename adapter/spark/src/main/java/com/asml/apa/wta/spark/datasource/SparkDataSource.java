@@ -4,6 +4,7 @@ import com.asml.apa.wta.core.model.Task;
 import com.asml.apa.wta.spark.listener.StageLevelListener;
 import com.asml.apa.wta.spark.listener.TaskLevelListener;
 import java.util.List;
+import lombok.Getter;
 import org.apache.spark.SparkContext;
 import org.apache.spark.scheduler.StageInfo;
 
@@ -15,8 +16,13 @@ import org.apache.spark.scheduler.StageInfo;
  */
 public class SparkDataSource {
 
+  @Getter
   private final SparkContext sparkContext;
+
+  @Getter
   private final TaskLevelListener taskLevelListener;
+
+  @Getter
   private final StageLevelListener stageLevelListener;
 
   /**

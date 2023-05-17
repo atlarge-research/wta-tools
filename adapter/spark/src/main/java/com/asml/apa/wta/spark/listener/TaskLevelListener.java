@@ -5,6 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.apache.spark.SparkContext;
 import org.apache.spark.executor.TaskMetrics;
@@ -22,8 +23,10 @@ public class TaskLevelListener extends SparkListener {
 
   private final SparkContext sparkContext;
 
+  @Getter
   private Map<Integer, Integer> stageIdstoJobs = new ConcurrentHashMap<>();
 
+  @Getter
   private final List<Task> processedTasks = new LinkedList<>();
 
   /**
@@ -41,7 +44,7 @@ public class TaskLevelListener extends SparkListener {
     final long submitTime = curTaskInfo.launchTime();
     final long runTime = curTaskMetrics.executorRunTime();
     final int userId = sparkContext.sparkUser().hashCode();
-    long workflowId = stageIdstoJobs.get(taskEnd.stageId());
+    final long workflowId = stageIdstoJobs.get(taskEnd.stageId());
 
     // unknown
     final int submissionSite = -1;
@@ -106,14 +109,5 @@ public class TaskLevelListener extends SparkListener {
   @Override
   public void onStageCompleted(SparkListenerStageCompleted stageCompleted) {
     stageIdstoJobs.remove(stageCompleted.stageInfo().stageId());
-  }
-
-  /**
-   * This method gets a list of task metrics.
-   *
-   * @return  List of task metrics
-   */
-  public List<Task> getProcessedTasks() {
-    return processedTasks;
   }
 }

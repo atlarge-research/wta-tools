@@ -6,4 +6,5 @@
 <suppressions>
   <!-- HideUtilityClassConstructor enforces the existence of an explicit constructor for Main, we consider this nonsense. -->
   <suppress files="Main.java" checks="HideUtilityClassConstructor" />
+  <suppress files="com/asml/apa/wta/spark/listener/TaskLevelListener.java" checks="AvoidStarImport" />
 </suppressions>
