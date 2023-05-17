@@ -12,7 +12,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import scala.Tuple2;
 
-public class SparkDataSourceTest {
+public class SparkDataSourceIntegrationTest {
 
   private SparkSession spark;
   private SparkDataSource sut;
