@@ -59,7 +59,7 @@ public class AvroUtils implements AutoCloseable {
         .withSchema(avroSchema)
         .build();
     reader = AvroParquetReader.<GenericRecord>builder(HadoopInputFile.fromPath(hadoopPath, configuration))
-            .build();
+        .build();
   }
 
   /**write batches into the disk.
