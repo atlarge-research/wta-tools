@@ -45,10 +45,58 @@ class PluginLoggerTest {
   }
 
   @Test
-  public void loggerHasCorrectLogLevel() {
+  public void loggerHasCorrectAllLogLevel() {
+    logger = PluginLogger.getInstance();
+    PluginLogger.loadConfig("ALL", false, false, "logging/app.log");
+    assertThat(logger.getLevel()).isEqualTo(Level.ALL);
+  }
+
+  @Test
+  public void loggerHasCorrectDebugLogLevel() {
+    logger = PluginLogger.getInstance();
+    PluginLogger.loadConfig("DEBUG", false, false, "logging/app.log");
+    assertThat(logger.getLevel()).isEqualTo(Level.DEBUG);
+  }
+
+  @Test
+  public void loggerHasCorrectErrorLogLevel() {
+    logger = PluginLogger.getInstance();
+    PluginLogger.loadConfig("ERROR", false, false, "logging/app.log");
+    assertThat(logger.getLevel()).isEqualTo(Level.ERROR);
+  }
+
+  @Test
+  public void loggerHasCorrectFatalLogLevel() {
+    logger = PluginLogger.getInstance();
+    PluginLogger.loadConfig("FATAL", false, false, "logging/app.log");
+    assertThat(logger.getLevel()).isEqualTo(Level.FATAL);
+  }
+
+  @Test
+  public void loggerHasCorrectOffLogLevel() {
+    logger = PluginLogger.getInstance();
+    PluginLogger.loadConfig("OFF", false, false, "logging/app.log");
+    assertThat(logger.getLevel()).isEqualTo(Level.OFF);
+  }
+
+  @Test
+  public void loggerHasCorrectTraceLogLevel() {
+    logger = PluginLogger.getInstance();
+    PluginLogger.loadConfig("TRACE", false, false, "logging/app.log");
+    assertThat(logger.getLevel()).isEqualTo(Level.TRACE);
+  }
+
+  @Test
+  public void loggerHasCorrectInfoLogLevel() {
     logger = PluginLogger.getInstance();
     PluginLogger.loadConfig("INFO", false, false, "logging/app.log");
-    assertThat(logger.getLevel()).isNotEqualTo(Level.ALL);
+    assertThat(logger.getLevel()).isEqualTo(Level.INFO);
+  }
+
+  @Test
+  public void loggerDefaultsToInfoLevel() {
+    logger = PluginLogger.getInstance();
+    PluginLogger.loadConfig("UNKNOWN", false, false, "logging/app.log");
     assertThat(logger.getLevel()).isEqualTo(Level.INFO);
   }
 

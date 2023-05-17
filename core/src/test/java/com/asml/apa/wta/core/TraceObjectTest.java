@@ -5,7 +5,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.asml.apa.wta.core.model.Resource;
 import org.junit.jupiter.api.Test;
 
-public class TraceObjectTest {
+class TraceObjectTest {
+
   @Test
   void getsCorrectSchemaVersion() {
     var traceObjectBuilder = Resource.builder();

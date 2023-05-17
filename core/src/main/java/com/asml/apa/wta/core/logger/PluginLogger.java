@@ -85,9 +85,10 @@ public class PluginLogger {
   public static void loadConfig(String logLevel, boolean doConsoleLog, boolean doFileLog, String logPath) {
     String pattern = "%d [%t] %p - %m%n";
     ConfigurationBuilder<BuiltConfiguration> configBuilder = ConfigurationBuilderFactory.newConfigurationBuilder();
-    configBuilder.setStatusLevel(getLogLevel(logLevel));
+    Level level = getLogLevel(logLevel);
+    configBuilder.setStatusLevel(level);
     configBuilder.setConfigurationName("DefaultLogger");
-    RootLoggerComponentBuilder rootLogger = configBuilder.newRootLogger(logLevel);
+    RootLoggerComponentBuilder rootLogger = configBuilder.newRootLogger(level);
 
     if (doConsoleLog) {
       AppenderComponentBuilder appenderBuilder = configBuilder
