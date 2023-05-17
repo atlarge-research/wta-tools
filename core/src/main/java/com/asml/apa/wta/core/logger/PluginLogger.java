@@ -3,13 +3,15 @@ package com.asml.apa.wta.core.logger;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.core.LoggerContext;
 import org.apache.logging.log4j.core.appender.ConsoleAppender;
-import org.apache.logging.log4j.core.appender.RollingFileAppender;
-import org.apache.logging.log4j.core.appender.rolling.SizeBasedTriggeringPolicy;
-import org.apache.logging.log4j.core.config.Configuration;
-import org.apache.logging.log4j.core.config.LoggerConfig;
-import org.apache.logging.log4j.core.layout.PatternLayout;
+import org.apache.logging.log4j.core.config.Configurator;
+import org.apache.logging.log4j.core.config.builder.api.AppenderComponentBuilder;
+import org.apache.logging.log4j.core.config.builder.api.ComponentBuilder;
+import org.apache.logging.log4j.core.config.builder.api.ConfigurationBuilder;
+import org.apache.logging.log4j.core.config.builder.api.ConfigurationBuilderFactory;
+import org.apache.logging.log4j.core.config.builder.api.LayoutComponentBuilder;
+import org.apache.logging.log4j.core.config.builder.api.RootLoggerComponentBuilder;
+import org.apache.logging.log4j.core.config.builder.impl.BuiltConfiguration;
 
 /**
  * Logger for the Spark plugin. Singleton design pattern so that one Logger is present
@@ -52,57 +54,70 @@ public class PluginLogger {
    */
   private static Level getLogLevel(String level) {
     switch(level) {
-      case "ALL": return Level.ALL;
-      case "DEBUG": return Level.DEBUG;
-      case "INFO": return Level.INFO;
-      case "ERROR": return Level.ERROR;
-      case "FATAL": return Level.FATAL;
-      case "OFF": return Level.OFF;
-      default: return Level.TRACE;
+      case "ALL":
+        return Level.ALL;
+      case "DEBUG":
+        return Level.DEBUG;
+      case "ERROR":
+        return Level.ERROR;
+      case "FATAL":
+        return Level.FATAL;
+      case "OFF":
+        return Level.OFF;
+      case "TRACE":
+        return Level.TRACE;
+      default:
+        return Level.INFO;
     }
   }
 
   /**
-   * Loads the configuration for the logger. This requires that the user defined config file
-   * is parsed before calling this method. Alternatively, if the user hasn't defined the log settings,
-   * it will be passed the default values in the RuntimeConfig class.
+   * Loads the logger configurations. It sets the log level and creates the defined Appender(s).
+   * User must have defined the values in the config file. Otherwise, it will receive the default, values
+   * in the RuntimeConfig class.
    * @param logLevel      String of the log level
    * @param doConsoleLog  Boolean to determine if console logging is enabled
    * @param doFileLog     Boolean to determine if file logging is enabled
+   * @param logPath       String of the path to write log files
    * @author Pil Kyu Cho
    * @since 1.0.0
    */
-  public static void loadConfig(String logLevel, boolean doConsoleLog, boolean doFileLog) {
-    Level level = getLogLevel(logLevel);
-    PatternLayout layout = PatternLayout.newBuilder().withPattern("%d{yyyy-MM-dd HH:mm:ss} [%t] %-5level %logger{36} - %msg%n").build();
-    LoggerContext context = (LoggerContext) LogManager.getContext(false);
-    Configuration configuration = context.getConfiguration();
-    LoggerConfig loggerConfig = configuration.getRootLogger();
+  public static void loadConfig(
+          String logLevel,
+          boolean doConsoleLog,
+          boolean doFileLog,
+          String logPath
+  ) {
+    String pattern = "%d [%t] %p - %m%n";
+    ConfigurationBuilder<BuiltConfiguration> configBuilder = ConfigurationBuilderFactory.newConfigurationBuilder();
+    configBuilder.setStatusLevel(getLogLevel(logLevel));
+    configBuilder.setConfigurationName("DefaultLogger");
+    RootLoggerComponentBuilder rootLogger = configBuilder.newRootLogger(logLevel);
+
     if (doConsoleLog) {
-      ConsoleAppender consoleAppender = ConsoleAppender.newBuilder()
-              .setName("stdout")
-              .setConfiguration(configuration)
-              .setLayout(layout)
-              .build();
-      consoleAppender.start();
-      loggerConfig.addAppender(consoleAppender, level, null);
-      context.updateLoggers();
+      AppenderComponentBuilder appenderBuilder = configBuilder.newAppender("Console", "CONSOLE")
+              .addAttribute("target", ConsoleAppender.Target.SYSTEM_OUT);
+      appenderBuilder.add(configBuilder.newLayout("PatternLayout").addAttribute("pattern", pattern));
+      rootLogger.add(configBuilder.newAppenderRef("Console"));
+      configBuilder.add(appenderBuilder);
     }
 
     if (doFileLog) {
-      RollingFileAppender rollingFileAppender = RollingFileAppender.newBuilder()
-              .setName("R")
-              .withFileName("logging/example.log")
-              .setIgnoreExceptions(false)
-              .withFilePattern("core/logging/app.%i.log.gz")
-              .withAppend(true)
-              .withLocking(false)
-              .withPolicy(SizeBasedTriggeringPolicy.createPolicy("1MB"))
-              .setLayout(layout)
-              .build();
-      rollingFileAppender.start();
-      loggerConfig.addAppender(rollingFileAppender, level, null);
-      context.updateLoggers();
+      LayoutComponentBuilder layoutBuilder = configBuilder
+              .newLayout("PatternLayout")
+              .addAttribute("pattern", pattern);
+      ComponentBuilder triggeringPolicy = configBuilder
+              .newComponent("Policies")
+              .addComponent(configBuilder.newComponent("SizeBasedTriggeringPolicy").addAttribute("size", "10MB"));
+      AppenderComponentBuilder appenderBuilder = configBuilder.newAppender("Roller", "ROLLINGFILE")
+              .addAttribute("fileName", logPath)
+              .addAttribute("filePattern", logPath + "-%d{MM-dd-yy-HH-mm-ss}.log.")
+              .add(layoutBuilder)
+              .addComponent(triggeringPolicy);
+      configBuilder.add(appenderBuilder);
+      rootLogger.add(configBuilder.newAppenderRef("Roller"));
     }
+    configBuilder.add(rootLogger);
+    Configurator.reconfigure(configBuilder.build());
   }
 }
