@@ -60,10 +60,19 @@ gemnasium-maven-plugin.json
 # pipeline reports (JaCoCo, pit)
 reports
 
+# application configuration
 config.json
 
+# big generated files for benchmarking
 benchmarking/src/main/resources/sql_files
 benchmarking/src/main/resources/tpcds_data
+
+# serialization files
+*.ser
+tmp
+
+# jqwik
+.jqwik-database
 
 #test output
 core/src/test/resources/WTA

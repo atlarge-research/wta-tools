@@ -56,7 +56,7 @@ integration-tests-core:
 
   script:
     - echo "Core integration tests started"
-    - "mvn -pl core jacoco:prepare-agent-integration failsafe:integration-test jacoco:report-integration"
+    - "mvn -pl core jacoco:prepare-agent-integration failsafe:integration-test failsafe:verify jacoco:report-integration"
     - "cat core/reports/jacoco/index.html | grep -Po 'Total.*?([0-9]{1,3})%' || echo '0%'"
 
   coverage: /([0-9]{1,3})%/
@@ -78,7 +78,7 @@ integration-tests-spark-adapter:
 
   script:
     - echo "Spark adapter integration tests started"
-    - "mvn -pl adapter/spark jacoco:prepare-agent-integration failsafe:integration-test jacoco:report-integration"
+    - "mvn -pl adapter/spark jacoco:prepare-agent-integration failsafe:integration-test failsafe:verify jacoco:report-integration"
     - "cat adapter/spark/reports/jacoco/index.html | grep -Po 'Total.*?([0-9]{1,3})%' || echo '0%'"
 
   coverage: /([0-9]{1,3})%/
@@ -93,7 +93,6 @@ integration-tests-spark-adapter:
 
 mutation-tests-core:
   stage: test
-  allow_failure: true
 
   needs: [build-core]
 
@@ -116,7 +115,6 @@ mutation-tests-core:
 
 mutation-tests-spark-adapter:
   stage: test
-  allow_failure: true
 
   needs: [build-adapters]
 

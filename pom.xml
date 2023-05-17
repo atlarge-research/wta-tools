@@ -29,6 +29,7 @@
     <assertj.version>3.24.2</assertj.version>
     <spark.support.version>3.2.0</spark.support.version>
     <mockito.version>5.3.1</mockito.version>
+    <jqwik.version>1.7.3</jqwik.version>
   </properties>
 
   <modules>
@@ -86,6 +87,13 @@
       <version>${mockito.version}</version>
       <scope>test</scope>
     </dependency>
+    <!-- https://mvnrepository.com/artifact/net.jqwik/jqwik -->
+    <dependency>
+      <groupId>net.jqwik</groupId>
+      <artifactId>jqwik</artifactId>
+      <version>${jqwik.version}</version>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
   <build>
@@ -95,6 +103,7 @@
         <artifactId>maven-failsafe-plugin</artifactId>
         <version>${failsafe.version}</version>
         <configuration>
+          <rerunFailingTestsCount>3</rerunFailingTestsCount>
           <includes>
             <include>**/*IntegrationTest.java</include>
           </includes>
@@ -105,6 +114,7 @@
         <artifactId>maven-surefire-plugin</artifactId>
         <version>${surefire.version}</version>
         <configuration>
+          <rerunFailingTestsCount>3</rerunFailingTestsCount>
           <argLine>${argLine}</argLine>
           <includes>
             <include>**/*Test.java</include>
@@ -202,6 +212,8 @@
         <artifactId>pitest-maven</artifactId>
         <version>${pitest.version}</version>
         <configuration>
+          <include>**/*Test.java</include>
+          <parseSurefireConfig>false</parseSurefireConfig>
           <reportsDirectory>reports/pitest</reportsDirectory>
           <timestampedReports>false</timestampedReports>
           <exportLineCoverage>true</exportLineCoverage>

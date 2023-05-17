@@ -23,6 +23,7 @@ For the most part, since we are pre-release this will serve no real purpose, oth
 - Standardize schema version across all objects [@lyadalachanchu](https://gitlab.ewi.tudelft.nl/lyadalachanchu)
 - Created utility class for writing WTA trace to parquet files [@sqak-sqak-izardrone](https://github.com/sqak-sqak-izardrone)
 - Improved PMD in the pipeline [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
+- Includes automatic serialization to the streaming package [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 
 ### Changed
 
