@@ -1,5 +1,8 @@
 package com.asml.apa.wta.core;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class Main {
 
   /**
@@ -8,6 +11,7 @@ public class Main {
    * @param args CLI args
    */
   public static void main(final String[] args) {
-    // System.out.println("Hello World!");
+    Logger logger = LoggerFactory.getLogger(Main.class);
+    logger.info("testing");
   }
 }

@@ -10,7 +10,6 @@ import org.apache.logging.log4j.core.appender.rolling.SizeBasedTriggeringPolicy;
 import org.apache.logging.log4j.core.config.Configuration;
 import org.apache.logging.log4j.core.config.LoggerConfig;
 import org.apache.logging.log4j.core.layout.PatternLayout;
-import org.slf4j.LoggerFactory;
 
 /**
  * Logger for the Spark plugin. Singleton design pattern so that one Logger is present
@@ -93,7 +92,7 @@ public class PluginLogger {
     if (doFileLog) {
       RollingFileAppender rollingFileAppender = RollingFileAppender.newBuilder()
               .setName("R")
-              .withFileName("core/logging/example.log")
+              .withFileName("logging/example.log")
               .setIgnoreExceptions(false)
               .withFilePattern("core/logging/app.%i.log.gz")
               .withAppend(true)

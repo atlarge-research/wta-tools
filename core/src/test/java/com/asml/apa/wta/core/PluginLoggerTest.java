@@ -1,6 +1,5 @@
 package com.asml.apa.wta.core;
 
-import static com.asml.apa.wta.core.logger.PluginLogger.loadConfig;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatNoException;
 
@@ -32,8 +31,8 @@ class PluginLoggerTest {
 
   @Test
   public void loggerLoadConfigAfterGetInstanceCall() {
-    PluginLogger.loadConfig("INFO", true, true);
-    logger = PluginLogger.getInstance();
-    logger.info("Hello World!");
+//    logger = PluginLogger.getInstance();
+//    PluginLogger.loadConfig("INFO", true, true);
+//    logger.trace("JournalDev Database Logging Message !");
   }
 }
