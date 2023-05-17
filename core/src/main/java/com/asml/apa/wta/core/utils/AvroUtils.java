@@ -18,13 +18,17 @@
 package com.asml.apa.wta.core.utils;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URI;
 import java.util.List;
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericRecord;
 import org.apache.hadoop.conf.Configuration;
+import org.apache.parquet.avro.AvroParquetReader;
 import org.apache.parquet.avro.AvroParquetWriter;
+import org.apache.parquet.hadoop.ParquetReader;
 import org.apache.parquet.hadoop.ParquetWriter;
+import org.apache.parquet.hadoop.util.HadoopInputFile;
 import org.apache.parquet.hadoop.util.HadoopOutputFile;
 
 /**
@@ -35,7 +39,9 @@ public class AvroUtils implements AutoCloseable {
   private final URI path;
   private final String uri;
   private final ParquetWriter<GenericRecord> writer;
+  private final ParquetReader<GenericRecord> reader;
   private final Schema avroSchema;
+  private Configuration configuration;
 
   public AvroUtils(Schema schema, File outputFolder) throws Exception {
     avroSchema = schema;
@@ -48,9 +54,12 @@ public class AvroUtils implements AutoCloseable {
     .withSchema(avroSchema)
     .build();
     */
-    writer = AvroParquetWriter.<GenericRecord>builder(HadoopOutputFile.fromPath(hadoopPath, new Configuration()))
+    configuration = new Configuration();
+    writer = AvroParquetWriter.<GenericRecord>builder(HadoopOutputFile.fromPath(hadoopPath, configuration))
         .withSchema(avroSchema)
         .build();
+    reader = AvroParquetReader.<GenericRecord>builder(HadoopInputFile.fromPath(hadoopPath, configuration))
+            .build();
   }
 
   /**write batches into the disk.
@@ -62,6 +71,10 @@ public class AvroUtils implements AutoCloseable {
     for (GenericRecord record : records) {
       writeRecord(record);
     }
+  }
+
+  public GenericRecord readRecord() throws IOException {
+    return reader.read();
   }
 
   /**write single record to disk.

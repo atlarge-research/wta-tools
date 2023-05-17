@@ -80,13 +80,11 @@ class ParquetWriterUtilsTest {
 
   @Test
   void writeToFileTest() {
-    resources.add(resource);
-    utils.readResource(resource);
-    tasks.add(task);
+    for (int i=1;i<1000;i++){
+      utils.readResource(resource);
+    }
     utils.readTask(task);
-    workflows.add(workflow);
     utils.readWorkflow(workflow);
-    workloads.add(workload);
     utils.readWorkload(workload);
     try {
       utils.writeToFile("test1", "test2", "test3", "test4");

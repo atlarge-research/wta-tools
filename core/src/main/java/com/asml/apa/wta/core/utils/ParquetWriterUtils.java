@@ -117,6 +117,7 @@ public class ParquetWriterUtils {
       resourceList.add(Resource.convertResourceToRecord(resource));
     }
     resourceWriter.writeRecords(resourceList);
+    resourceWriter.close();
   }
 
   private void writeTaskToFile(String taskFileName) throws Exception {
@@ -127,6 +128,7 @@ public class ParquetWriterUtils {
       taskList.add(Task.convertTaskToRecord(task));
     }
     taskWriter.writeRecords(taskList);
+    taskWriter.close();
   }
 
   private void writeWorkflowToFile(String workflowFileName) throws Exception {
@@ -138,6 +140,7 @@ public class ParquetWriterUtils {
       workflowList.add(Workflow.convertWorkflowToRecord(workflow));
     }
     workflowWriter.writeRecords(workflowList);
+    workflowWriter.close();
   }
 
   private void writeWorkloadToFile(String workloadFileName) throws Exception {
@@ -149,5 +152,6 @@ public class ParquetWriterUtils {
       workloadList.add(Workload.convertWorkloadToRecord(workload));
     }
     workloadWriter.writeRecords(workloadList);
+    workloadWriter.close();
   }
 }
