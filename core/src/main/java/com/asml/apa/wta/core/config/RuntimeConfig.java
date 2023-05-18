@@ -33,4 +33,7 @@ public class RuntimeConfig {
 
   @Builder.Default
   private boolean doFileLog = true;
+
+  @Builder.Default
+  private String logPath = "logging/app.log";
 }

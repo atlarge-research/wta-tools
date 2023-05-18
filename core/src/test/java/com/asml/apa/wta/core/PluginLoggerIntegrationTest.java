@@ -20,7 +20,7 @@ class PluginLoggerIntegrationTest {
   void readsConfigFileCorrectly() {
     RuntimeConfig cr = WtaUtils.readConfig("src/test/resources/testConfig.json");
     logger = PluginLogger.getInstance();
-    PluginLogger.loadConfig(cr.getLogLevel(), cr.isDoConsoleLog(), cr.isDoFileLog(), "logging/app.log");
+    PluginLogger.loadConfig(cr.getLogLevel(), cr.isDoConsoleLog(), cr.isDoFileLog(), cr.getLogPath());
     assertThat(logger.getLevel()).isEqualTo(Level.INFO);
     LoggerContext logContext = (LoggerContext) LogManager.getContext(false);
     assertThat(logContext.getConfiguration().getAppenders().size()).isEqualTo(1);
