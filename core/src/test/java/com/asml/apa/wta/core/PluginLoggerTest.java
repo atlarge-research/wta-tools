@@ -135,7 +135,7 @@ class PluginLoggerTest {
   @Test
   public void loggerHasBothAppenders() {
     logger = PluginLogger.getInstance();
-    PluginLogger.loadConfig("INFO", true, true, "logging/app.log");
+    PluginLogger.loadConfig("INFO", true, true, "logs/20230518_201232.log");
     LoggerContext logContext = (LoggerContext) LogManager.getContext(false);
     assertThat(logContext.getConfiguration().getAppenders().size()).isEqualTo(2);
     assertThat(logContext.getConfiguration().getAppenders().containsKey("Console"))

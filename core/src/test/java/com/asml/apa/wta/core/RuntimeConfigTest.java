@@ -18,5 +18,6 @@ class RuntimeConfigTest {
     assertThat(cr.getLogLevel()).isEqualTo("INFO");
     assertThat(cr.isDoConsoleLog()).isTrue();
     assertThat(cr.isDoFileLog()).isTrue();
+    assertThat(cr.getLogPath()).isNotNull();
   }
 }

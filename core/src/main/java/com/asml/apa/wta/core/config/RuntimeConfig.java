@@ -1,5 +1,7 @@
 package com.asml.apa.wta.core.config;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 import lombok.AllArgsConstructor;
@@ -35,5 +37,6 @@ public class RuntimeConfig {
   private boolean doFileLog = true;
 
   @Builder.Default
-  private String logPath = "logging/app.log";
+  private String logPath =
+      "logs/" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss")) + ".log";
 }
