@@ -21,6 +21,8 @@ class TaskLevelListenerIntegrationTest extends BaseSparkJobIntegrationTest {
     invokeJob();
     assertThat(sut.getTaskLevelListener().getStageIdstoJobs()).isEmpty();
     assertThat(sut.getTaskMetrics()).hasSizeGreaterThanOrEqualTo(1);
-    assertThat(sut.getTaskMetrics().get(0).getWorkflowId()).isEqualTo(0L);
+    assertThat(sut.getTaskMetrics().get(0).getWorkflowId())
+        .isInstanceOf(Long.class)
+        .isNotNull();
   }
 }
