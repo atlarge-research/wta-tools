@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-
+# This script (The DAS configuration script) is based on the work of Tim Hegeman, Chris Lemaire, and Laurens Versluis 
+# The github repo for the original script: https://github.com/lfdversluis/das-bigdata-deployment
 from __future__ import print_function
 from . import util
 import os
