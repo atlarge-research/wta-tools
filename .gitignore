@@ -75,6 +75,3 @@ tmp
 # jqwik
 .jqwik-database
 
-#test output
-core/src/test/resources/WTA
-core/src/test/resources/AvroOutput
