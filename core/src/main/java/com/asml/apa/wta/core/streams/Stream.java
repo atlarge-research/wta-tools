@@ -1,7 +1,6 @@
 package com.asml.apa.wta.core.streams;
 
 import com.asml.apa.wta.core.exceptions.FailedToDeserializeStreamException;
-import com.asml.apa.wta.core.exceptions.FailedToSerializeStreamException;
 import com.asml.apa.wta.core.exceptions.StreamSerializationException;
 import java.io.File;
 import java.io.FileInputStream;

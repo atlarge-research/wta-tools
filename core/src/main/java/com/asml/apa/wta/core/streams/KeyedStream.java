@@ -1,6 +1,5 @@
 package com.asml.apa.wta.core.streams;
 
-import com.asml.apa.wta.core.exceptions.FailedToSerializeStreamException;
 import java.io.Serializable;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
