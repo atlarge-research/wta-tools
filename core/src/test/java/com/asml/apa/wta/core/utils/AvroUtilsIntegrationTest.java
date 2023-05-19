@@ -15,7 +15,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-class AvroUtilsTest {
+class AvroUtilsIntegrationTest {
 
   private AvroUtils utils;
   private Schema schema;
