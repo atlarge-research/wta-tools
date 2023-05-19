@@ -131,11 +131,10 @@ public class Stream<V extends Serializable> {
   /**
    * Serializes the internals of the stream.
    *
-   * @throws FailedToSerializeStreamException if an {@link java.io.IOException} occurred when serializing internals
    * @author Atour Mousavi Gourabi
    * @since 1.0.0
    */
-  private synchronized void serializeInternals() throws FailedToSerializeStreamException {
+  private synchronized void serializeInternals() {
     StreamNode<V> current;
     if (head == deserializationEnd) {
       current = head.getNext();
@@ -145,20 +144,19 @@ public class Stream<V extends Serializable> {
     String filePath = "tmp\\" + id + "-" + System.currentTimeMillis() + "-"
         + Instant.now().getNano() + ".ser";
     List<StreamNode<V>> toSerialize = new ArrayList<>();
-    try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream(filePath))) {
-      while (current != tail && current != null) {
-        toSerialize.add(current);
-        current = current.getNext();
-      }
-      objectOutputStream.writeObject(toSerialize);
-      deserializationEnd.setNext(null);
-      diskLocations.add(filePath);
-      deserializationEnd = tail;
-    } catch (IOException e) {
-      throw new FailedToSerializeStreamException();
-    } finally {
-      additionsSinceLastWriteToDisk = 0;
+    while (current != tail && current != null) {
+      toSerialize.add(current);
+      current = current.getNext();
     }
+    try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream(filePath))) {
+      objectOutputStream.writeObject(toSerialize);
+    } catch (IOException e) {
+      return;
+    }
+    deserializationEnd.setNext(null);
+    deserializationEnd = tail;
+    diskLocations.add(filePath);
+    additionsSinceLastWriteToDisk = 0;
   }
 
   /**
@@ -254,12 +252,10 @@ public class Stream<V extends Serializable> {
    * Adds content to the stream.
    *
    * @param content the content to add to this {@link com.asml.apa.wta.core.streams.Stream}
-   * @throws FailedToSerializeStreamException when some error occurred during routine serialization of parts of
-   *                                          the {@link com.asml.apa.wta.core.streams.Stream}
    * @author Atour Mousavi Gourabi
    * @since 1.0.0
    */
-  public synchronized void addToStream(V content) throws FailedToSerializeStreamException {
+  public synchronized void addToStream(V content) {
     if (head == null) {
       head = new StreamNode<>(content);
       tail = head;

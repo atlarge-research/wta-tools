@@ -23,12 +23,10 @@ public class KeyedStream<K, V extends Serializable> {
    *
    * @param key the record key
    * @param record the record
-   * @throws FailedToSerializeStreamException when some error occurred during routine serialization of parts of the
-   *                                          underlying {@link com.asml.apa.wta.core.streams.Stream}
    * @author Atour Mousavi Gourabi
    * @since 1.0.0
    */
-  public void addToStream(K key, @NonNull V record) throws FailedToSerializeStreamException {
+  public void addToStream(K key, @NonNull V record) {
     if (streams.containsKey(key)) {
       streams.get(key).addToStream(record);
     } else {
