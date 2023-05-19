@@ -8,6 +8,7 @@
 *.class
 
 # Log file
+logging
 *.log
 
 # BlueJ files
