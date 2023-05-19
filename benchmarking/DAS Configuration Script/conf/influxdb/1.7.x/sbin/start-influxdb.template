@@ -1,0 +1,6 @@
+#!/bin/bash
+
+INFLUXDB_HOME="__HOME_DIR__"
+INFLUXDB_DATA="__DATA_DIR__"
+
+nohup "$INFLUXDB_HOME/usr/bin/influxd" -pidfile "$INFLUXDB_DATA/influxdb.pid" -config "$INFLUXDB_HOME/etc/influxdb/influxdb.conf" >"$INFLUXDB_DATA/stdout" 2>"$INFLUXDB_DATA/stderr" &
