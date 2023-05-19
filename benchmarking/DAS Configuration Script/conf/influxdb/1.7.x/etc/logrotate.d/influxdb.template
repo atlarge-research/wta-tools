@@ -1,8 +1,0 @@
-/local/__USER__/influxdb/influxd.log {
-    daily
-    rotate 7
-    missingok
-    dateext
-    copytruncate
-    compress
-}

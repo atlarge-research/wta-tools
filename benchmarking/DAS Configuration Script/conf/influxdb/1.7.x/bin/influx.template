@@ -1,8 +1,0 @@
-#!/bin/bash
-
-INFLUXDB_HOME="__HOME_DIR__"
-INFLUXDB_HOST="__HOST__"
-INFLUXDB_HTTP_PORT="__HTTP_PORT__"
-
-"$INFLUXDB_HOME/usr/bin/influx" -host "$INFLUXDB_HOST" -port "$INFLUXDB_HTTP_PORT" $@
-
