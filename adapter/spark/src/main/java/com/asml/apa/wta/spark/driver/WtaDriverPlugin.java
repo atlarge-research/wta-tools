@@ -2,6 +2,9 @@ package com.asml.apa.wta.spark.driver;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
+
+import com.asml.apa.wta.core.streams.KeyedStream;
 import org.apache.spark.SparkContext;
 import org.apache.spark.api.plugin.DriverPlugin;
 import org.apache.spark.api.plugin.PluginContext;
@@ -26,6 +29,7 @@ public class WtaDriverPlugin implements DriverPlugin {
    */
   @Override
   public Map<String, String> init(SparkContext sCtx, PluginContext pCtx) {
+    System.out.println("init");
     return new HashMap<>();
   }
 
@@ -34,4 +38,10 @@ public class WtaDriverPlugin implements DriverPlugin {
    */
   @Override
   public void shutdown() {}
+
+  @Override
+  public Object receive(Object message) throws Exception {
+    System.out.println(message.toString());
+    return message;
+  }
 }

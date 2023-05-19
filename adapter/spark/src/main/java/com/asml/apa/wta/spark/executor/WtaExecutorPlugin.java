@@ -1,12 +1,26 @@
 package com.asml.apa.wta.spark.executor;
 
 import com.asml.apa.wta.spark.WtaPlugin;
+import com.asml.apa.wta.spark.datasource.IostatDataSource;
 import com.asml.apa.wta.spark.driver.WtaDriverPlugin;
+
+import java.io.IOException;
 import java.util.Map;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
 import org.apache.spark.SparkContext;
+import org.apache.spark.TaskContext;
 import org.apache.spark.TaskFailedReason;
 import org.apache.spark.api.plugin.ExecutorPlugin;
 import org.apache.spark.api.plugin.PluginContext;
+import org.apache.spark.rpc.RpcEndpointRef;
+import org.apache.spark.SparkEnv;
+import org.apache.spark.scheduler.TaskSchedulerImpl;
+import java.util.concurrent.atomic.AtomicReference;
+
+
 
 /**
  * Executor component of the plugin.
@@ -15,6 +29,8 @@ import org.apache.spark.api.plugin.PluginContext;
  * @since 1.0.0
  */
 public class WtaExecutorPlugin implements ExecutorPlugin {
+
+  private PluginContext pluginContext;
 
   /**
    * This method is called when the plugin is initialized on the executor.
@@ -28,7 +44,10 @@ public class WtaExecutorPlugin implements ExecutorPlugin {
    * as it is loaded on to the executor.
    */
   @Override
-  public void init(PluginContext ctx, Map<String, String> extraConf) {}
+  public void init(PluginContext ctx, Map<String, String> extraConf) {
+    this.pluginContext = ctx;
+  }
+
 
   /**
    * Called before task is started.
@@ -37,7 +56,34 @@ public class WtaExecutorPlugin implements ExecutorPlugin {
    * <a href="https://spark.apache.org/docs/3.2.1/api/java/org/apache/spark/api/plugin/ExecutorPlugin.html#init-org.apache.spark.api.plugin.PluginContext-java.util.Map-">Refer to the docs</a> for more information.
    */
   @Override
-  public void onTaskStart() {}
+  public void onTaskStart() {//send the iostat metric dto to driver
+// Execute the bash command on the executor
+    AtomicReference<IostatDataSource> result = new AtomicReference<>(null);
+
+    try {
+      IostatDataSource iods = new IostatDataSource();
+      final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+      scheduler.scheduleAtFixedRate(() -> {
+        try {
+          IostatDataSource updatedResult = iods.getAllMetrics();
+          result.set(updatedResult);
+          // Send the result back to the driver
+          try {
+            this.pluginContext.send(result.get());
+          } catch (IOException e) {
+            throw new RuntimeException(e);
+          }
+        } catch (IOException | InterruptedException e) {
+          throw new RuntimeException(e);
+        }
+      }, 0, 5, TimeUnit.SECONDS);
+
+      // Initial result before scheduling
+      result.set(iods.getAllMetrics());
+    } catch (IOException | InterruptedException e) {
+      throw new RuntimeException(e);
+    }
+  }
 
   /**
    * Gets called when a task is successfully completed.

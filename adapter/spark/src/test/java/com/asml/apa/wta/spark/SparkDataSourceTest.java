@@ -2,15 +2,29 @@ package com.asml.apa.wta.spark;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.asml.apa.wta.spark.datasource.IostatDataSource;
 import com.asml.apa.wta.spark.datasource.SparkDataSource;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.Arrays;
+
+import com.asml.apa.wta.spark.executor.WtaExecutorPlugin;
+import org.apache.hadoop.yarn.webapp.hamlet2.Hamlet;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.api.plugin.PluginContext;
 import org.apache.spark.sql.SparkSession;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import scala.Tuple2;
+import static org.mockito.Mockito.*;
+import java.io.IOException;
+import java.util.List;
+
 
 public class SparkDataSourceTest {
 
@@ -24,8 +38,10 @@ public class SparkDataSourceTest {
     SparkConf conf = new SparkConf()
         .setAppName("SparkTestRunner")
         .setMaster("local[1]")
+        .set("spark.plugins", WtaPlugin.class.getName())
         .set("spark.executor.instances", "1") // 1 executor per instance of each worker
         .set("spark.executor.cores", "2"); // 2 cores on each executor
+
     spark = SparkSession.builder().config(conf).getOrCreate();
     spark.sparkContext().setLogLevel("ERROR");
 
@@ -44,6 +60,11 @@ public class SparkDataSourceTest {
   @Test
   public void taskListenerReturnsList() {
     assertThat(sut.getTaskMetrics()).isEmpty();
+  }
+  @Test
+  public void testtest() throws IOException, InterruptedException {
+    IostatDataSource a = new IostatDataSource();
+    a.getAllMetrics();
   }
 
   @Test
