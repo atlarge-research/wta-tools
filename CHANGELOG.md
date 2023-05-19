@@ -25,6 +25,7 @@ For the most part, since we are pre-release this will serve no real purpose, oth
 - Includes automatic serialization to the streaming package [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 - Update WtaUtils file to parse for user logging preferences [@pcho](https://gitlab.ewi.tudelft.nl/pcho)
 - Created a logging class to log on both console and to log file [@pcho](https://gitlab.ewi.tudelft.nl/pcho)
+- Updates the Spark dependency to 3.2.4 [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 
 ### Changed
 
