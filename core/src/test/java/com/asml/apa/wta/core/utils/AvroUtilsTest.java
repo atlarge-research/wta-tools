@@ -10,6 +10,8 @@ import org.apache.avro.Schema;
 import org.apache.avro.SchemaBuilder;
 import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.GenericRecord;
+import org.apache.commons.io.FileUtils;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -69,7 +71,7 @@ class AvroUtilsTest {
   }
 
   @Test
-  void writeRecordsTest() throws Exception {
+  void writeRecordsTest() {
     Resource resource = Resource.builder().build();
     GenericData.Record record = new GenericData.Record(schema);
     record.put("id", resource.getId());
@@ -83,8 +85,12 @@ class AvroUtilsTest {
     record.put("details", resource.getDetails());
     List<GenericRecord> recordList = new ArrayList<>();
     recordList.add(record);
-    utils = new AvroUtils(schema, new File(path, "/writeRecords"));
-    utils.writeRecords(recordList);
+    Assertions.assertDoesNotThrow(() -> {
+      utils = new AvroUtils(schema, new File(path, "/writeRecords"));
+      utils.writeRecords(recordList);
+      FileUtils.deleteDirectory(new File(path, "/writeRecords"));
+    });
+
   }
 
   @Test
@@ -92,11 +98,13 @@ class AvroUtilsTest {
     utils = new AvroUtils(schema, new File(path, "/outputUri"));
     assertThat(utils.getOutputUri())
         .isEqualTo(new File(path, "/outputUri").toURI().getPath());
+    FileUtils.deleteDirectory(new File(path, "/outputUri"));
   }
 
   @Test
   void getAvroSchemaTest() throws Exception {
     utils = new AvroUtils(schema, new File(path, "/schema"));
     assertThat(utils.getAvroSchema()).isEqualTo(schema);
+    FileUtils.deleteDirectory(new File(path, "/schema"));
   }
 }

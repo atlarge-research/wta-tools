@@ -21,7 +21,7 @@ For the most part, since we are pre-release this will serve no real purpose, oth
 - Added a build dependency to PMD [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 - Added events field for resource object to be configurable [@lyadalachanchu](https://gitlab.ewi.tudelft.nl/lyadalachanchu)
 - Standardize schema version across all objects [@lyadalachanchu](https://gitlab.ewi.tudelft.nl/lyadalachanchu)
-- Created utility class for writing WTA trace to parquet files [@sqak-sqak-izardrone](https://github.com/sqak-sqak-izardrone)
+- Created utility class for writing WTA trace to parquet files [@tqu](https://gitlab.ewi.tudelft.nl/tqu)
 - Improved PMD in the pipeline [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 - Includes automatic serialization to the streaming package [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 

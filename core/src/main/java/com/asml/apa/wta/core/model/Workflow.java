@@ -141,6 +141,13 @@ public class Workflow implements BaseTraceObject {
       .noDefault()
       .endRecord();
 
+  /**convert workflow to record.
+   *
+   * @param workflow workflow
+   * @return record
+   * @since 1.0.0
+   * @author Tianchen Qu
+   */
   public static GenericRecord convertWorkflowToRecord(Workflow workflow) {
     GenericData.Record record = new GenericData.Record(workflowSchema);
     record.put("id", workflow.id);

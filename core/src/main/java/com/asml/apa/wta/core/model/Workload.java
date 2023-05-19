@@ -357,6 +357,11 @@ public class Workload implements BaseTraceObject {
       .noDefault()
       .endRecord();
 
+  /**convert workload to record.
+   *
+   * @param workload workload
+   * @return record
+   */
   public static GenericRecord convertWorkloadToRecord(Workload workload) {
     GenericData.Record record = new GenericData.Record(workloadSchema);
     record.put("authors", workload.authors);

@@ -33,6 +33,9 @@ import org.apache.parquet.hadoop.util.HadoopOutputFile;
 
 /**
  * Utility class for writing Parquet files using Avro based tools.
+ * @since 1.0.0
+ * @author Tianchen Qu
+ *
  */
 public class AvroUtils implements AutoCloseable {
 
@@ -48,12 +51,6 @@ public class AvroUtils implements AutoCloseable {
     path = outputFolder.toURI();
     org.apache.hadoop.fs.Path hadoopPath = new org.apache.hadoop.fs.Path(path);
     uri = path.getPath();
-    /*
-    writer = AvroParquetWriter
-    .<GenericRecord>builder(new org.apache.hadoop.fs.Path(path))
-    .withSchema(avroSchema)
-    .build();
-    */
     configuration = new Configuration();
     writer = AvroParquetWriter.<GenericRecord>builder(HadoopOutputFile.fromPath(hadoopPath, configuration))
         .withSchema(avroSchema)
@@ -66,6 +63,8 @@ public class AvroUtils implements AutoCloseable {
    *
    * @param records list of records
    * @throws Exception possible io exception
+   * @since 1.0.0
+   * @author Tianchen Qu
    */
   public void writeRecords(List<GenericRecord> records) throws Exception {
     for (GenericRecord record : records) {
@@ -77,6 +76,8 @@ public class AvroUtils implements AutoCloseable {
    *
    * @return the record in parquet file
    * @throws IOException possible io exception
+   * @since 1.0.0
+   * @author Tianchen Qu
    */
   public GenericRecord readRecord() throws IOException {
     return reader.read();
@@ -85,15 +86,19 @@ public class AvroUtils implements AutoCloseable {
   /**write single record to disk.
    *
    * @param record record
-   * @throws Exception possible io exception
+   * @throws IOException possible io exception
+   * @since 1.0.0
+   * @author Tianchen Qu
    */
-  private void writeRecord(GenericRecord record) throws Exception {
+  private void writeRecord(GenericRecord record) throws IOException {
     writer.write(record);
   }
 
   /**getter.
    *
    * @return output uri
+   * @since 1.0.0
+   * @author Tianchen Qu
    */
   public String getOutputUri() {
     return uri;
@@ -102,6 +107,8 @@ public class AvroUtils implements AutoCloseable {
   /**getter.
    *
    * @return schema for the record to be written
+   * @since 1.0.0
+   * @author Tianchen Qu
    */
   public Schema getAvroSchema() {
     return avroSchema;
@@ -110,6 +117,8 @@ public class AvroUtils implements AutoCloseable {
   /**closes the writer.
    *
    * @throws Exception possible io exception
+   * @since 1.0.0
+   * @author Tianchen Qu
    */
   @Override
   public void close() throws Exception {

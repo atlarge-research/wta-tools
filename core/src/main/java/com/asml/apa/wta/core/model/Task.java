@@ -165,6 +165,13 @@ public class Task implements BaseTraceObject {
       .longDefault(0)
       .endRecord();
 
+  /**convert task to record.
+   *
+   * @param task task
+   * @return record
+   * @since 1.0.0
+   * @author Tianchen Qu
+   */
   public static GenericRecord convertTaskToRecord(Task task) {
     GenericData.Record record = new GenericData.Record(taskSchema);
     record.put("id", task.id);

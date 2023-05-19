@@ -87,6 +87,13 @@ public class Resource implements BaseTraceObject {
       .stringDefault("test")
       .endRecord();
 
+  /**convert resource object to record.
+   *
+   * @param resource resource
+   * @return record
+   * @since 1.0.0
+   * @author Tianchen Qu
+   */
   public static GenericRecord convertResourceToRecord(Resource resource) {
     GenericData.Record record = new GenericData.Record(resourceSchema);
     record.put("id", resource.getId());

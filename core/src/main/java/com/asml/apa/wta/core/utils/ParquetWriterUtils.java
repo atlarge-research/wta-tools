@@ -9,6 +9,11 @@ import java.util.ArrayList;
 import java.util.List;
 import org.apache.avro.generic.GenericRecord;
 
+/**
+ * Utility class for reading trace objects and writing them to the disk.
+ * @since 1.0.0
+ * @author Tianchen Qu
+ */
 public class ParquetWriterUtils {
 
   private String version;
@@ -30,6 +35,8 @@ public class ParquetWriterUtils {
   /**getter for resources, only for tests.
    *
    * @return the resources
+   * @since 1.0.0
+   * @author Tianchen Qu
    */
   public List<Resource> getResources() {
     return resources;
@@ -38,6 +45,8 @@ public class ParquetWriterUtils {
   /**getter for tasks, only for tests.
    *
    * @return the tasks
+   * @since 1.0.0
+   * @author Tianchen Qu
    */
   public List<Task> getTasks() {
     return tasks;
@@ -46,6 +55,8 @@ public class ParquetWriterUtils {
   /**getter for workflows, only for tests.
    *
    * @return the workflows
+   * @since 1.0.0
+   * @author Tianchen Qu
    */
   public List<Workflow> getWorkflows() {
     return workflows;
@@ -54,6 +65,8 @@ public class ParquetWriterUtils {
   /**getter for workloads, only for tests.
    *
    * @return the workloads
+   * @since 1.0.0
+   * @author Tianchen Qu
    */
   public List<Workload> getWorkloads() {
     return workloads;
@@ -62,6 +75,8 @@ public class ParquetWriterUtils {
   /**reads the resource object from kafka stream and feed into the writer.
    *
    * @param resource the resource
+   * @since 1.0.0
+   * @author Tianchen Qu
    */
   public void readResource(Resource resource) {
     resources.add(resource);
@@ -70,6 +85,8 @@ public class ParquetWriterUtils {
   /**reads the task object from kafka.
    *
    * @param task the task
+   * @since 1.0.0
+   * @author Tianchen Qu
    */
   public void readTask(Task task) {
     tasks.add(task);
@@ -78,6 +95,8 @@ public class ParquetWriterUtils {
   /**reads the workflow object from kafka.
    *
    * @param workflow the workflow
+   * @since 1.0.0
+   * @author Tianchen Qu
    */
   public void readWorkflow(Workflow workflow) {
     workflows.add(workflow);
@@ -86,6 +105,8 @@ public class ParquetWriterUtils {
   /**reads the workload object from kafka.
    *
    * @param workload the workload
+   * @since 1.0.0
+   * @author Tianchen Qu
    */
   public void readWorkload(Workload workload) {
     workloads.add(workload);
@@ -98,16 +119,27 @@ public class ParquetWriterUtils {
    * @param workflowFileName workflow file name
    * @param workloadFileName workload file name
    * @throws Exception possible exception due to io
+   * @since 1.0.0
+   * @author Tianchen Qu
    */
   public void writeToFile(
-      String resourceFileName, String taskFileName, String workflowFileName, String workloadFileName)
-      throws Exception {
+      String resourceFileName,
+      String taskFileName,
+      String workflowFileName,
+      String workloadFileName) throws Exception {
     writeResourceToFile(resourceFileName);
     writeTaskToFile(taskFileName);
     writeWorkflowToFile(workflowFileName);
     writeWorkloadToFile(workloadFileName);
   }
 
+  /**writer for resource object.
+   *
+   * @param resourceFileName name of the resource file
+   * @throws Exception possible io exception
+   * @since 1.0.0
+   * @author Tianchen Qu
+   */
   private void writeResourceToFile(String resourceFileName) throws Exception {
     AvroUtils resourceWriter = new AvroUtils(
         Resource.getResourceSchema(),
@@ -120,6 +152,13 @@ public class ParquetWriterUtils {
     resourceWriter.close();
   }
 
+  /**writer for the task object.
+   *
+   * @param taskFileName name of the task file
+   * @throws Exception possible io exception
+   * @since 1.0.0
+   * @author Tianchen Qu
+   */
   private void writeTaskToFile(String taskFileName) throws Exception {
     AvroUtils taskWriter = new AvroUtils(
         Task.getTaskSchema(), new File(path, "/tasks/" + version + "/" + taskFileName + ".parquet"));
@@ -131,6 +170,13 @@ public class ParquetWriterUtils {
     taskWriter.close();
   }
 
+  /**writer for the workflow object.
+   *
+   * @param workflowFileName name of the workflow file
+   * @throws Exception possible io exception
+   * @since 1.0.0
+   * @author Tianchen Qu
+   */
   private void writeWorkflowToFile(String workflowFileName) throws Exception {
     AvroUtils workflowWriter = new AvroUtils(
         Workflow.getWorkflowSchema(),
@@ -143,6 +189,13 @@ public class ParquetWriterUtils {
     workflowWriter.close();
   }
 
+  /**writer for the workload object.
+   *
+   * @param workloadFileName name of the workload file
+   * @throws Exception possible io exception
+   * @since 1.0.0
+   * @author Tianchen Qu
+   */
   private void writeWorkloadToFile(String workloadFileName) throws Exception {
     AvroUtils workloadWriter = new AvroUtils(
         Workload.getWorkloadSchema(),
