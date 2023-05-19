@@ -16,6 +16,7 @@
   <properties>
     <jackson.databind.version>2.15.0</jackson.databind.version>
     <slf4j.version>2.0.7</slf4j.version>
+    <log4j2.version>2.20.0</log4j2.version>
   </properties>
 
   <dependencies>
@@ -30,6 +31,21 @@
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
       <version>${slf4j.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-api</artifactId>
+      <version>${log4j2.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-core</artifactId>
+      <version>${log4j2.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-slf4j2-impl</artifactId>
+      <version>${log4j2.version}</version>
     </dependency>
   </dependencies>
 </project>
