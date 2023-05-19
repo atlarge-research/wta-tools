@@ -2,8 +2,6 @@ package com.asml.apa.wta.core.streams;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.asml.apa.wta.core.exceptions.FailedToSerializeStreamException;
-import com.asml.apa.wta.core.exceptions.StreamSerializationException;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -24,7 +22,7 @@ import org.junit.jupiter.api.Test;
  */
 public class StreamIntegrationTest {
 
-  Stream<Integer> createSerializingStreamOfNaturalNumbers(int size) throws FailedToSerializeStreamException {
+  Stream<Integer> createSerializingStreamOfNaturalNumbers(int size) {
     Stream<Integer> stream = new Stream<>(0, 10);
     for (int i = 1; i <= size; i++) {
       stream.addToStream(i);
@@ -35,25 +33,34 @@ public class StreamIntegrationTest {
   @Provide
   @SuppressWarnings("unused")
   Arbitrary<List<Integer>> largeListOfIntegers() {
-    return Arbitraries.integers().between(-65536, 65536).collect(list -> list.size() >= 1800);
+    return Arbitraries.integers()
+          .between(-65536, 65536)
+          .collect(list -> list.size() >= 1800);
   }
 
   @Provide
   @SuppressWarnings("unused")
   Arbitrary<List<Double>> largeListOfDoubles() {
-    return Arbitraries.doubles().collect(list -> list.size() >= 1800);
+    return Arbitraries.doubles()
+          .collect(list -> list.size() >= 1800);
   }
 
   @Provide
   @SuppressWarnings("unused")
   Arbitrary<List<String>> largeListOfLargeStrings() {
-    return Arbitraries.strings().ofMinLength(10).ofMaxLength(20).collect(list -> list.size() >= 1800);
+    return Arbitraries.strings()
+          .ofMinLength(10)
+          .ofMaxLength(20)
+          .collect(list -> list.size() >= 1800);
   }
 
   @Provide
   @SuppressWarnings("unused")
   Arbitrary<List<String>> largeListOfStrings() {
-    return Arbitraries.strings().ofMinLength(0).ofMaxLength(10).collect(list -> list.size() >= 1800);
+    return Arbitraries.strings()
+          .ofMinLength(0)
+          .ofMaxLength(10)
+          .collect(list -> list.size() >= 1800);
   }
 
   @BeforeAll
@@ -65,7 +72,7 @@ public class StreamIntegrationTest {
   }
 
   @Test
-  void streamSerializationWithMap() throws StreamSerializationException {
+  void streamSerializationWithMap() {
     Stream<Integer> stream = createSerializingStreamOfNaturalNumbers(10);
     for (int i = 1; i <= 10; i++) {
       stream.addToStream(i);
@@ -128,7 +135,7 @@ public class StreamIntegrationTest {
   }
 
   @Test
-  void streamSerializationWithFilter() throws StreamSerializationException {
+  void streamSerializationWithFilter() {
     Stream<Integer> stream = createSerializingStreamOfNaturalNumbers(10);
     for (int i = 1; i <= 10; i++) {
       stream.addToStream(i);
@@ -173,7 +180,7 @@ public class StreamIntegrationTest {
   }
 
   @Test
-  void streamSerializationWithFoldLeft() throws StreamSerializationException {
+  void streamSerializationWithFoldLeft() {
     Stream<Integer> stream = createSerializingStreamOfNaturalNumbers(11);
     for (int i = 1; i <= 9; i++) {
       stream.addToStream(i);
@@ -185,7 +192,7 @@ public class StreamIntegrationTest {
   }
 
   @Test
-  void streamSerializationWithHead() throws StreamSerializationException {
+  void streamSerializationWithHead() {
     Stream<Integer> stream = createSerializingStreamOfNaturalNumbers(10);
     for (int i = 1; i <= 9; i++) {
       stream.addToStream(i);
@@ -218,8 +225,7 @@ public class StreamIntegrationTest {
   }
 
   @Property
-  void propertyBasedFoldLeftOnStreams(@ForAll("largeListOfIntegers") @NonNull List<Integer> integers)
-      throws StreamSerializationException {
+  void propertyBasedFoldLeftOnStreams(@ForAll("largeListOfIntegers") @NonNull List<Integer> integers) {
     Stream<Integer> stream = new Stream<>();
     int expected = 0;
     for (int i : integers) {
@@ -230,8 +236,7 @@ public class StreamIntegrationTest {
   }
 
   @Property
-  void propertyBasedMapOnStreams(@ForAll("largeListOfDoubles") @NonNull List<Double> doubles)
-      throws StreamSerializationException {
+  void propertyBasedMapOnStreams(@ForAll("largeListOfDoubles") @NonNull List<Double> doubles) {
     Stream<Double> stream = new Stream<>();
     for (double d : doubles) {
       stream.addToStream(d);
@@ -241,8 +246,7 @@ public class StreamIntegrationTest {
   }
 
   @Property
-  void propertyBasedFilterOnStreams(@ForAll("largeListOfStrings") @NonNull List<String> strings)
-      throws StreamSerializationException {
+  void propertyBasedFilterOnStreams(@ForAll("largeListOfStrings") @NonNull List<String> strings) {
     Stream<String> stream = new Stream<>();
     int expectedLength = 0;
     for (String s : strings) {
@@ -262,8 +266,7 @@ public class StreamIntegrationTest {
 
   @Property
   void propertyBasedPeekObjectWillBeTheSameAsHead(
-      @ForAll("largeListOfLargeStrings") @UniqueElements @NonNull List<String> strings)
-      throws StreamSerializationException {
+      @ForAll("largeListOfLargeStrings") @UniqueElements @NonNull List<String> strings) {
     Stream<String> stream = new Stream<>();
     for (String s : strings) {
       stream.addToStream(s);
@@ -278,8 +281,7 @@ public class StreamIntegrationTest {
 
   @Property
   void propertyBasedHeadObjectWillNotBeTheSameAsPeekAfterwards(
-      @ForAll("largeListOfLargeStrings") @UniqueElements @NonNull List<String> strings)
-      throws StreamSerializationException {
+      @ForAll("largeListOfLargeStrings") @UniqueElements @NonNull List<String> strings) {
     Stream<String> stream = new Stream<>();
     for (String s : strings) {
       stream.addToStream(s);
@@ -298,8 +300,7 @@ public class StreamIntegrationTest {
   }
 
   @Property
-  void propertyBasedHead(@ForAll("largeListOfLargeStrings") @UniqueElements @NonNull List<String> strings)
-      throws StreamSerializationException {
+  void propertyBasedHead(@ForAll("largeListOfLargeStrings") @UniqueElements @NonNull List<String> strings) {
     Stream<String> stream = new Stream<>();
     for (String s : strings) {
       stream.addToStream(s);
