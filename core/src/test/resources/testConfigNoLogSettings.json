@@ -6,11 +6,12 @@
     "description": "Test Description"
   },
   "resourceSettings":
-  {},
-  "logSettings":
   {
-    "logLevel": "INFO",
-    "doConsoleLog": "false",
-    "doFileLog": "true"
-  }
+    "events": {
+      "f1": "v1",
+      "f2": "v2"
+    }
+  },
+  "logSettings":
+  {}
 }

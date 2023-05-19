@@ -35,6 +35,7 @@ public class WtaUtils {
 
       JsonNode workloadNode = rootNode.get("workloadSettings");
       JsonNode resourceNode = rootNode.get("resourceSettings");
+      JsonNode logNode = rootNode.get("logSettings");
 
       String author = workloadNode.get("author").asText();
       String domain = workloadNode.get("domain").asText();
@@ -44,12 +45,21 @@ public class WtaUtils {
       Map<String, String> events = resourceNode.has("events")
           ? mapper.convertValue(resourceNode.get("events"), new TypeReference<Map<String, String>>() {})
           : new HashMap<>();
+
+      String logLevel = logNode.has("logLevel") ? logNode.get("logLevel").asText() : "INFO";
+      boolean doConsoleLog =
+          !logNode.has("doConsoleLog") || logNode.get("doConsoleLog").asBoolean();
+      boolean doFileLog =
+          !logNode.has("doFileLog") || logNode.get("doFileLog").asBoolean();
+
       configBuilder = configBuilder
           .author(author)
           .domain(domain)
           .description(description)
-          .events(events);
-
+          .events(events)
+          .logLevel(logLevel)
+          .doConsoleLog(doConsoleLog)
+          .doFileLog(doFileLog);
     } catch (Exception e) {
       throw new IllegalArgumentException(
           "The config file has missing/invalid fields or no config file was found");
