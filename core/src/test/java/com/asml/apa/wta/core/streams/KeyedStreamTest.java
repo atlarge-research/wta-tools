@@ -59,14 +59,12 @@ class KeyedStreamTest {
   @Test
   void addToNullKeyStream() {
     KeyedStream<Boolean, String> keyedStream = new KeyedStream<>();
-    assertThatThrownBy(() -> keyedStream.addToStream(null, "some string"))
-          .isInstanceOf(NullPointerException.class);
+    assertThatThrownBy(() -> keyedStream.addToStream(null, "some string")).isInstanceOf(NullPointerException.class);
   }
 
   @Test
   void addNullRecordToStream() {
     KeyedStream<Boolean, String> keyedStream = new KeyedStream<>();
-    assertThatThrownBy(() -> keyedStream.addToStream(true, null))
-          .isInstanceOf(NullPointerException.class);
+    assertThatThrownBy(() -> keyedStream.addToStream(true, null)).isInstanceOf(NullPointerException.class);
   }
 }

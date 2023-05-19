@@ -86,22 +86,19 @@ class StreamTest {
   @Test
   void mapUsingNullOperation() {
     Stream<Integer> stream = createStreamOfNaturalNumbers(1309);
-    assertThatThrownBy(() -> stream.map(null))
-          .isInstanceOf(NullPointerException.class);
+    assertThatThrownBy(() -> stream.map(null)).isInstanceOf(NullPointerException.class);
   }
 
   @Test
   void filterUsingNullOperation() {
     Stream<Integer> stream = createStreamOfNaturalNumbers(102);
-    assertThatThrownBy(() -> stream.filter(null))
-          .isInstanceOf(NullPointerException.class);
+    assertThatThrownBy(() -> stream.filter(null)).isInstanceOf(NullPointerException.class);
   }
 
   @Test
   void foldUsingNullOperation() {
     Stream<Integer> stream = createStreamOfNaturalNumbers(457);
-    assertThatThrownBy(() -> stream.foldLeft(0, null))
-          .isInstanceOf(NullPointerException.class);
+    assertThatThrownBy(() -> stream.foldLeft(0, null)).isInstanceOf(NullPointerException.class);
   }
 
   @Test

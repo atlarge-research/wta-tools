@@ -33,34 +33,25 @@ public class StreamIntegrationTest {
   @Provide
   @SuppressWarnings("unused")
   Arbitrary<List<Integer>> largeListOfIntegers() {
-    return Arbitraries.integers()
-          .between(-65536, 65536)
-          .collect(list -> list.size() >= 1800);
+    return Arbitraries.integers().between(-65536, 65536).collect(list -> list.size() >= 1800);
   }
 
   @Provide
   @SuppressWarnings("unused")
   Arbitrary<List<Double>> largeListOfDoubles() {
-    return Arbitraries.doubles()
-          .collect(list -> list.size() >= 1800);
+    return Arbitraries.doubles().collect(list -> list.size() >= 1800);
   }
 
   @Provide
   @SuppressWarnings("unused")
   Arbitrary<List<String>> largeListOfLargeStrings() {
-    return Arbitraries.strings()
-          .ofMinLength(10)
-          .ofMaxLength(20)
-          .collect(list -> list.size() >= 1800);
+    return Arbitraries.strings().ofMinLength(10).ofMaxLength(20).collect(list -> list.size() >= 1800);
   }
 
   @Provide
   @SuppressWarnings("unused")
   Arbitrary<List<String>> largeListOfStrings() {
-    return Arbitraries.strings()
-          .ofMinLength(0)
-          .ofMaxLength(10)
-          .collect(list -> list.size() >= 1800);
+    return Arbitraries.strings().ofMinLength(0).ofMaxLength(10).collect(list -> list.size() >= 1800);
   }
 
   @BeforeAll
