@@ -1,3 +1,6 @@
+## This script (The DAS configuration script) is based on the work of Tim Hegeman, Chris Lemaire, and Laurens Versluis 
+## The github repo for the original script: https://github.com/lfdversluis/das-bigdata-deployment
+
 # Deployment scripts for big data frameworks on DAS-5
 
 These are the scripts I use to download, configure, and deploy several big data frameworks (YARN/MapReduce, Spark) and related systems (HDFS, ZooKeeper, InfluxDB).
