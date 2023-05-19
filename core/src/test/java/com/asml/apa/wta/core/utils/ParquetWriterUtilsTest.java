@@ -1,5 +1,8 @@
 package com.asml.apa.wta.core.utils;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.*;
+
 import com.asml.apa.wta.core.model.Resource;
 import com.asml.apa.wta.core.model.Task;
 import com.asml.apa.wta.core.model.Workflow;
@@ -7,11 +10,10 @@ import com.asml.apa.wta.core.model.Workload;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-class ParquetWriterUtilsIntegrationTest {
+class ParquetWriterUtilsTest {
 
   private Resource resource;
   private Task task;
@@ -50,19 +52,58 @@ class ParquetWriterUtilsIntegrationTest {
   }
 
   @Test
-  void writeToFileTest() {
-    for (int i = 1; i < 1000; i++) {
-      utils.readResource(resource);
-    }
+  void readResourceTest() {
+    resources.add(resource);
+    utils.readResource(resource);
+    assertThat(resources).isEqualTo(utils.getResources());
+  }
+
+  @Test
+  void readTaskTest() {
+    tasks.add(task);
     utils.readTask(task);
+    assertThat(tasks).isEqualTo(utils.getTasks());
+  }
+
+  @Test
+  void readWorkflow() {
+    workflows.add(workflow);
     utils.readWorkflow(workflow);
+    assertThat(workflows).isEqualTo(utils.getWorkflows());
+  }
+
+  @Test
+  void readWorkload() {
+    workloads.add(workload);
     utils.readWorkload(workload);
-    Assertions.assertDoesNotThrow(() -> {
-      utils.writeToFile("test1", "test2", "test3", "test4");
-      new File("./src/test/resources/WTA/resources/schema-1.0/test1.parquet").delete();
-      new File("./src/test/resources/WTA/tasks/schema-1.0/test2.parquet").delete();
-      new File("./src/test/resources/WTA/workflows/schema-1.0/test3.parquet").delete();
-      new File("./src/test/resources/WTA/workloads/schema-1.0/test4.parquet").delete();
-    });
+    assertThat(workloads).isEqualTo(utils.getWorkloads());
+  }
+
+  @Test
+  void getResources() {
+    resources.add(resource);
+    utils.readResource(resource);
+    assertThat(resources).isEqualTo(utils.getResources());
+  }
+
+  @Test
+  void getTasks() {
+    tasks.add(task);
+    utils.readTask(task);
+    assertThat(tasks).isEqualTo(utils.getTasks());
+  }
+
+  @Test
+  void getWorkflows() {
+    workflows.add(workflow);
+    utils.readWorkflow(workflow);
+    assertThat(workflows).isEqualTo(utils.getWorkflows());
+  }
+
+  @Test
+  void getWorkloads() {
+    workloads.add(workload);
+    utils.readWorkload(workload);
+    assertThat(workloads).isEqualTo(utils.getWorkloads());
   }
 }

@@ -21,7 +21,7 @@ public class ParquetWriterUtils {
   private File path;
 
   private List<Resource> resources;
-  
+
   private List<Task> tasks;
 
   private List<Workflow> workflows;
