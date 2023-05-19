@@ -84,8 +84,8 @@ public class Stream<V extends Serializable> {
    */
   public Stream(V content, int serializationTrigger) {
     head = new StreamNode<>(content);
-    diskLocations = new ArrayDeque<>();
     tail = head;
+    diskLocations = new ArrayDeque<>();
     deserializationStart = head;
     deserializationEnd = head;
     id = UUID.randomUUID();
@@ -102,8 +102,8 @@ public class Stream<V extends Serializable> {
    */
   public Stream(V content) {
     head = new StreamNode<>(content);
-    diskLocations = new ArrayDeque<>();
     tail = head;
+    diskLocations = new ArrayDeque<>();
     deserializationStart = head;
     deserializationEnd = head;
     id = UUID.randomUUID();
@@ -211,6 +211,7 @@ public class Stream<V extends Serializable> {
    * @return the head of the {@link com.asml.apa.wta.core.streams.Stream}
    * @throws FailedToDeserializeStreamException when some error occurred during routine deserialization of parts of
    *                                            the {@link com.asml.apa.wta.core.streams.Stream}
+   * @throws NoSuchElementException when head is called on an empty {@link com.asml.apa.wta.core.streams.Stream}
    * @author Atour Mousavi Gourabi
    * @since 1.0.0
    */
@@ -238,6 +239,7 @@ public class Stream<V extends Serializable> {
    * Peeks at the head of the stream.
    *
    * @return the head of the {@link com.asml.apa.wta.core.streams.Stream}
+   * @throws NoSuchElementException when peek is called on an empty {@link com.asml.apa.wta.core.streams.Stream}
    * @author Atour Mousavi Gourabi
    * @since 1.0.0
    */
