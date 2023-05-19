@@ -9,8 +9,6 @@ import com.asml.apa.wta.core.model.Workload;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -91,7 +89,10 @@ class ParquetWriterUtilsTest {
     utils.readWorkload(workload);
     Assertions.assertDoesNotThrow(() -> {
       utils.writeToFile("test1", "test2", "test3", "test4");
-      FileUtils.deleteDirectory(new File("./src/test/resources/WTA"));
+      new File("./src/test/resources/WTA/resources/schema-1.0/test1.parquet").delete();
+      new File("./src/test/resources/WTA/tasks/schema-1.0/test2.parquet").delete();
+      new File("./src/test/resources/WTA/workflows/schema-1.0/test3.parquet").delete();
+      new File("./src/test/resources/WTA/workloads/schema-1.0/test4.parquet").delete();
     });
   }
 

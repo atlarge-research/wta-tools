@@ -4,13 +4,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.asml.apa.wta.core.model.Resource;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.avro.Schema;
 import org.apache.avro.SchemaBuilder;
 import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.GenericRecord;
-import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -22,7 +22,7 @@ class AvroUtilsTest {
   private File path;
 
   @BeforeEach
-  void inits() {
+  void inits() throws IOException {
     schema = SchemaBuilder.record("resource")
         .namespace("com.asml.apa.wta.core.model")
         .fields()
@@ -68,6 +68,10 @@ class AvroUtilsTest {
         .stringDefault("test")
         .endRecord();
     path = new File("./src/test/resources/AvroOutput");
+    new File(path, "/writeRecords").delete();
+    new File(path, "/outputUri").delete();
+    new File(path, "/schema").delete();
+
   }
 
   @Test
@@ -88,7 +92,6 @@ class AvroUtilsTest {
     Assertions.assertDoesNotThrow(() -> {
       utils = new AvroUtils(schema, new File(path, "/writeRecords"));
       utils.writeRecords(recordList);
-      FileUtils.deleteDirectory(new File(path, "/writeRecords"));
     });
 
   }
@@ -98,13 +101,11 @@ class AvroUtilsTest {
     utils = new AvroUtils(schema, new File(path, "/outputUri"));
     assertThat(utils.getOutputUri())
         .isEqualTo(new File(path, "/outputUri").toURI().getPath());
-    FileUtils.deleteDirectory(new File(path, "/outputUri"));
   }
 
   @Test
   void getAvroSchemaTest() throws Exception {
     utils = new AvroUtils(schema, new File(path, "/schema"));
     assertThat(utils.getAvroSchema()).isEqualTo(schema);
-    FileUtils.deleteDirectory(new File(path, "/schema"));
   }
 }
