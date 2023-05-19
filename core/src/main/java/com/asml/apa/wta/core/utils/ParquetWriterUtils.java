@@ -123,10 +123,8 @@ public class ParquetWriterUtils {
    * @author Tianchen Qu
    */
   public void writeToFile(
-      String resourceFileName,
-      String taskFileName,
-      String workflowFileName,
-      String workloadFileName) throws Exception {
+      String resourceFileName, String taskFileName, String workflowFileName, String workloadFileName)
+      throws Exception {
     writeResourceToFile(resourceFileName);
     writeTaskToFile(taskFileName);
     writeWorkflowToFile(workflowFileName);

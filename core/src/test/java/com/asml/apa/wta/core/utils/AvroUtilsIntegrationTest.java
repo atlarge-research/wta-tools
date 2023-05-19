@@ -71,7 +71,6 @@ class AvroUtilsIntegrationTest {
     new File(path, "/writeRecords").delete();
     new File(path, "/outputUri").delete();
     new File(path, "/schema").delete();
-
   }
 
   @Test
@@ -93,7 +92,6 @@ class AvroUtilsIntegrationTest {
       utils = new AvroUtils(schema, new File(path, "/writeRecords"));
       utils.writeRecords(recordList);
     });
-
   }
 
   @Test
