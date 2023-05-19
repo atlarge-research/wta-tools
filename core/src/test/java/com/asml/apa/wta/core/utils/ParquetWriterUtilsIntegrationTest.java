@@ -25,7 +25,7 @@ class ParquetWriterUtilsIntegrationTest {
 
   @BeforeEach
   void init() {
-    var resourceBuilder = Resource.builder()
+    Resource.ResourceBuilder resourceBuilder = Resource.builder()
         .id(1)
         .type("test")
         .os("test os")
