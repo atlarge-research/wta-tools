@@ -40,10 +40,15 @@ import org.apache.parquet.hadoop.util.HadoopOutputFile;
 public class AvroUtils implements AutoCloseable {
 
   private final URI path;
+
   private final String uri;
+
   private final ParquetWriter<GenericRecord> writer;
+
   private final ParquetReader<GenericRecord> reader;
+
   private final Schema avroSchema;
+
   private Configuration configuration;
 
   public AvroUtils(Schema schema, File outputFolder) throws Exception {

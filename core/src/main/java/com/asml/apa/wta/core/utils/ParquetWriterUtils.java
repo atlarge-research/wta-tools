@@ -17,10 +17,15 @@ import org.apache.avro.generic.GenericRecord;
 public class ParquetWriterUtils {
 
   private String version;
+
   private File path;
+
   private List<Resource> resources;
+  
   private List<Task> tasks;
+
   private List<Workflow> workflows;
+
   private List<Workload> workloads;
 
   public ParquetWriterUtils(File path, String version) {
