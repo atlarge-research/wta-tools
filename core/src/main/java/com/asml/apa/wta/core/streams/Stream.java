@@ -190,8 +190,9 @@ public class Stream<V extends Serializable> {
       amountOfNodes = nodes.size();
     } catch (IOException | ClassNotFoundException | ClassCastException e) {
       throw new FailedToDeserializeStreamException();
+    } finally {
+      new File(filePath).delete();
     }
-    new File(filePath).delete();
     return amountOfNodes;
   }
 
