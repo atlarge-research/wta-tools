@@ -357,7 +357,8 @@ public class Workload implements BaseTraceObject {
       .noDefault()
       .endRecord();
 
-  /**convert workload to record.
+  /**
+   * convert workload to record.
    *
    * @param workload workload
    * @return record

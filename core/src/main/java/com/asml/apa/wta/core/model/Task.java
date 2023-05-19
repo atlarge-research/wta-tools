@@ -165,7 +165,8 @@ public class Task implements BaseTraceObject {
       .longDefault(0)
       .endRecord();
 
-  /**convert task to record.
+  /**
+   * convert task to record.
    *
    * @param task task
    * @return record

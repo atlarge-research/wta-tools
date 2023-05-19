@@ -87,7 +87,8 @@ public class Resource implements BaseTraceObject {
       .stringDefault("test")
       .endRecord();
 
-  /**convert resource object to record.
+  /**
+   * convert resource object to record.
    *
    * @param resource resource
    * @return record

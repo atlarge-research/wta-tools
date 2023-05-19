@@ -39,13 +39,13 @@ class ParquetWriterUtilsTest {
         .procModel("test model");
     resource = resourceBuilder.build();
     resources = new ArrayList<>();
-    var taskBuilder = Task.builder();
+    Task.TaskBuilder taskBuilder = Task.builder();
     task = taskBuilder.build();
     tasks = new ArrayList<>();
-    var workflowBuilder = Workflow.builder();
+    Workflow.WorkflowBuilder workflowBuilder = Workflow.builder();
     workflow = workflowBuilder.build();
     workflows = new ArrayList<>();
-    var workloadBuilder = Workload.builder();
+    Workload.WorkloadBuilder workloadBuilder = Workload.builder();
     workload = workloadBuilder.build();
     workloads = new ArrayList<>();
     utils = new ParquetWriterUtils(new File("./src/test/resources/WTA"), "schema-1.0");

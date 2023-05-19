@@ -64,7 +64,8 @@ public class AvroUtils implements AutoCloseable {
         .build();
   }
 
-  /**write batches into the disk.
+  /**
+   * write batches into the disk.
    *
    * @param records list of records
    * @throws Exception possible io exception
@@ -77,7 +78,8 @@ public class AvroUtils implements AutoCloseable {
     }
   }
 
-  /**reader for test.
+  /**
+   * reader for test.
    *
    * @return the record in parquet file
    * @throws IOException possible io exception
@@ -88,7 +90,8 @@ public class AvroUtils implements AutoCloseable {
     return reader.read();
   }
 
-  /**write single record to disk.
+  /**
+   * write single record to disk.
    *
    * @param record record
    * @throws IOException possible io exception
@@ -99,7 +102,8 @@ public class AvroUtils implements AutoCloseable {
     writer.write(record);
   }
 
-  /**getter.
+  /**
+   * getter.
    *
    * @return output uri
    * @since 1.0.0
@@ -109,7 +113,8 @@ public class AvroUtils implements AutoCloseable {
     return uri;
   }
 
-  /**getter.
+  /**
+   * getter.
    *
    * @return schema for the record to be written
    * @since 1.0.0
@@ -119,7 +124,8 @@ public class AvroUtils implements AutoCloseable {
     return avroSchema;
   }
 
-  /**closes the writer.
+  /**
+   * closes the writer.
    *
    * @throws Exception possible io exception
    * @since 1.0.0

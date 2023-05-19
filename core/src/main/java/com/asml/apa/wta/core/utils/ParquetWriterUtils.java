@@ -37,7 +37,8 @@ public class ParquetWriterUtils {
     this.version = version;
   }
 
-  /**getter for resources, only for tests.
+  /**
+   * getter for resources, only for tests.
    *
    * @return the resources
    * @since 1.0.0
@@ -47,7 +48,8 @@ public class ParquetWriterUtils {
     return resources;
   }
 
-  /**getter for tasks, only for tests.
+  /**
+   * getter for tasks, only for tests.
    *
    * @return the tasks
    * @since 1.0.0
@@ -57,7 +59,8 @@ public class ParquetWriterUtils {
     return tasks;
   }
 
-  /**getter for workflows, only for tests.
+  /**
+   * getter for workflows, only for tests.
    *
    * @return the workflows
    * @since 1.0.0
@@ -67,7 +70,8 @@ public class ParquetWriterUtils {
     return workflows;
   }
 
-  /**getter for workloads, only for tests.
+  /**
+   * getter for workloads, only for tests.
    *
    * @return the workloads
    * @since 1.0.0
@@ -77,7 +81,8 @@ public class ParquetWriterUtils {
     return workloads;
   }
 
-  /**reads the resource object from kafka stream and feed into the writer.
+  /**
+   * reads the resource object from kafka stream and feed into the writer.
    *
    * @param resource the resource
    * @since 1.0.0
@@ -87,7 +92,8 @@ public class ParquetWriterUtils {
     resources.add(resource);
   }
 
-  /**reads the task object from kafka.
+  /**
+   * reads the task object from kafka.
    *
    * @param task the task
    * @since 1.0.0
@@ -97,7 +103,8 @@ public class ParquetWriterUtils {
     tasks.add(task);
   }
 
-  /**reads the workflow object from kafka.
+  /**
+   * reads the workflow object from kafka.
    *
    * @param workflow the workflow
    * @since 1.0.0
@@ -107,7 +114,8 @@ public class ParquetWriterUtils {
     workflows.add(workflow);
   }
 
-  /**reads the workload object from kafka.
+  /**
+   * reads the workload object from kafka.
    *
    * @param workload the workload
    * @since 1.0.0
@@ -117,7 +125,8 @@ public class ParquetWriterUtils {
     workloads.add(workload);
   }
 
-  /**given the output name, output the trace.
+  /**
+   * given the output name, output the trace.
    *
    * @param resourceFileName resource file name
    * @param taskFileName task file name
@@ -136,7 +145,8 @@ public class ParquetWriterUtils {
     writeWorkloadToFile(workloadFileName);
   }
 
-  /**writer for resource object.
+  /**
+   * writer for resource object.
    *
    * @param resourceFileName name of the resource file
    * @throws Exception possible io exception
@@ -155,7 +165,8 @@ public class ParquetWriterUtils {
     resourceWriter.close();
   }
 
-  /**writer for the task object.
+  /**
+   * writer for the task object.
    *
    * @param taskFileName name of the task file
    * @throws Exception possible io exception
@@ -173,7 +184,8 @@ public class ParquetWriterUtils {
     taskWriter.close();
   }
 
-  /**writer for the workflow object.
+  /**
+   * writer for the workflow object.
    *
    * @param workflowFileName name of the workflow file
    * @throws Exception possible io exception
@@ -192,7 +204,8 @@ public class ParquetWriterUtils {
     workflowWriter.close();
   }
 
-  /**writer for the workload object.
+  /**
+   * writer for the workload object.
    *
    * @param workloadFileName name of the workload file
    * @throws Exception possible io exception

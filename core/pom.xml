@@ -61,11 +61,6 @@
       <version>3.2.2</version>
       <scope>compile</scope>
     </dependency>
-
-
-
-
-
     <!-- https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-core -->
     <dependency>
       <groupId>org.apache.logging.log4j</groupId>

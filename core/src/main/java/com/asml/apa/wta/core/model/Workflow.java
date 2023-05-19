@@ -141,7 +141,8 @@ public class Workflow implements BaseTraceObject {
       .noDefault()
       .endRecord();
 
-  /**convert workflow to record.
+  /**
+   * convert workflow to record.
    *
    * @param workflow workflow
    * @return record
