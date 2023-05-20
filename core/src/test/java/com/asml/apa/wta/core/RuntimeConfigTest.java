@@ -16,7 +16,5 @@ class RuntimeConfigTest {
     assertThat(cr.getDescription()).isEqualTo("");
     assertThat(cr.getEvents()).isEqualTo(new HashMap<String, String>());
     assertThat(cr.getLogLevel()).isEqualTo("ERROR");
-    assertThat(cr.isDoConsoleLog()).isTrue();
-    assertThat(cr.isDoFileLog()).isTrue();
   }
 }

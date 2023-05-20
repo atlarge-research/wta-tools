@@ -27,10 +27,4 @@ public class RuntimeConfig {
 
   @Builder.Default
   private String logLevel = "ERROR";
-
-  @Builder.Default
-  private boolean doConsoleLog = true;
-
-  @Builder.Default
-  private boolean doFileLog = true;
 }
