@@ -65,7 +65,7 @@ class ConfigReaderIntegrationTest {
   void readsConfigFileWhereLogSettingIsNotThere() {
     RuntimeConfig cr = WtaUtils.readConfig("src/test/resources/testConfigNoLogSettings.json");
     assertThat(cr.getAuthors()).isEqualTo("Test Name");
-    assertThat(cr.getDomain()).isEqualTo("Test Domain");
+    assertThat(cr.getDomain()).isEqualTo(Domain.INDUSTRIAL);
     assertThat(cr.getDescription()).isEqualTo("Test Description");
     assertThat(cr.getEvents()).isEqualTo(new HashMap<String, String>() {
       {
