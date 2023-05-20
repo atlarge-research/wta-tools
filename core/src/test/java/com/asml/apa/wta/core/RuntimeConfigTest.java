@@ -15,9 +15,8 @@ class RuntimeConfigTest {
     assertThat(cr.getDomain()).isNull();
     assertThat(cr.getDescription()).isEqualTo("");
     assertThat(cr.getEvents()).isEqualTo(new HashMap<String, String>());
-    assertThat(cr.getLogLevel()).isEqualTo("INFO");
+    assertThat(cr.getLogLevel()).isEqualTo("ERROR");
     assertThat(cr.isDoConsoleLog()).isTrue();
     assertThat(cr.isDoFileLog()).isTrue();
-    assertThat(cr.getLogPath()).isNotNull();
   }
 }

@@ -1,7 +1,5 @@
 package com.asml.apa.wta.core.config;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 import lombok.AllArgsConstructor;
@@ -28,15 +26,11 @@ public class RuntimeConfig {
   private Map<String, String> events = new HashMap<>();
 
   @Builder.Default
-  private String logLevel = "INFO";
+  private String logLevel = "ERROR";
 
   @Builder.Default
   private boolean doConsoleLog = true;
 
   @Builder.Default
   private boolean doFileLog = true;
-
-  @Builder.Default
-  private String logPath =
-      "logs/" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss")) + ".log";
 }

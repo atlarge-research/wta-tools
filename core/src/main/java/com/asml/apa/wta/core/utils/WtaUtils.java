@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -43,10 +44,10 @@ public class WtaUtils {
           ? workloadNode.get("description").asText()
           : "";
       Map<String, String> events = resourceNode.has("events")
-          ? mapper.convertValue(resourceNode.get("events"), new TypeReference<Map<String, String>>() {})
+          ? mapper.convertValue(resourceNode.get("events"), new TypeReference<>() {})
           : new HashMap<>();
 
-      String logLevel = logNode.has("logLevel") ? logNode.get("logLevel").asText() : "INFO";
+      String logLevel = logNode.has("logLevel") ? logNode.get("logLevel").asText() : "ERROR";
       boolean doConsoleLog =
           !logNode.has("doConsoleLog") || logNode.get("doConsoleLog").asBoolean();
       boolean doFileLog =
@@ -60,7 +61,7 @@ public class WtaUtils {
           .logLevel(logLevel)
           .doConsoleLog(doConsoleLog)
           .doFileLog(doFileLog);
-    } catch (Exception e) {
+    } catch (IOException e) {
       throw new IllegalArgumentException(
           "The config file has missing/invalid fields or no config file was found");
     }
