@@ -77,6 +77,11 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
         .endDate(endDate)
         .authors(authors)
         .workloadDescription(workloadDescription)
+        .numSites(numSites)
+        .numResources(numResources)
+        .numUsers(numUsers)
+        .numGroups(numGroups)
+        .totalResourceSeconds(totalResourceSeconds)
         .build());
   }
 }
