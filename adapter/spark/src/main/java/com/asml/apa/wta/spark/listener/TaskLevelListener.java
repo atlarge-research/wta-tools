@@ -9,7 +9,11 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.apache.spark.SparkContext;
 import org.apache.spark.executor.TaskMetrics;
-import org.apache.spark.scheduler.*;
+import org.apache.spark.scheduler.SparkListener;
+import org.apache.spark.scheduler.SparkListenerJobStart;
+import org.apache.spark.scheduler.SparkListenerStageCompleted;
+import org.apache.spark.scheduler.SparkListenerTaskEnd;
+import org.apache.spark.scheduler.TaskInfo;
 
 /**
  * This class is a task-level listener for the Spark data source.
@@ -24,7 +28,7 @@ public class TaskLevelListener extends SparkListener {
   private final SparkContext sparkContext;
 
   @Getter
-  private Map<Integer, Integer> stageIdstoJobs = new ConcurrentHashMap<>();
+  private Map<Integer, Integer> stageIdsToJobs = new ConcurrentHashMap<>();
 
   @Getter
   private final List<Task> processedTasks = new LinkedList<>();
@@ -44,7 +48,7 @@ public class TaskLevelListener extends SparkListener {
     final long submitTime = curTaskInfo.launchTime();
     final long runTime = curTaskMetrics.executorRunTime();
     final int userId = sparkContext.sparkUser().hashCode();
-    final long workflowId = stageIdstoJobs.get(taskEnd.stageId());
+    final long workflowId = stageIdsToJobs.get(taskEnd.stageId());
 
     // unknown
     final int submissionSite = -1;
@@ -98,7 +102,7 @@ public class TaskLevelListener extends SparkListener {
    */
   @Override
   public void onJobStart(SparkListenerJobStart jobStart) {
-    jobStart.stageInfos().foreach(stageInfo -> stageIdstoJobs.put(stageInfo.stageId(), jobStart.jobId()));
+    jobStart.stageInfos().foreach(stageInfo -> stageIdsToJobs.put(stageInfo.stageId(), jobStart.jobId()));
   }
 
   /**
@@ -108,6 +112,6 @@ public class TaskLevelListener extends SparkListener {
    */
   @Override
   public void onStageCompleted(SparkListenerStageCompleted stageCompleted) {
-    stageIdstoJobs.remove(stageCompleted.stageInfo().stageId());
+    stageIdsToJobs.remove(stageCompleted.stageInfo().stageId());
   }
 }
