@@ -44,85 +44,125 @@ public class Workload implements BaseTraceObject {
 
   private final String[] authors;
 
-  private final double minResourceTask;
+  @Builder.Default
+  private final double minResourceTask = -1.0;
 
-  private final double maxResourceTask;
+  @Builder.Default
+  private final double maxResourceTask = -1.0;
 
-  private final double stdResourceTask;
+  @Builder.Default
+  private final double stdResourceTask = -1.0;
 
-  private final double meanResourceTask;
+  @Builder.Default
+  private final double meanResourceTask = -1.0;
 
-  private final double medianResourceTask;
+  @Builder.Default
+  private final double medianResourceTask = -1.0;
 
-  private final double firstQuartileResourceTask;
+  @Builder.Default
+  private final double firstQuartileResourceTask = -1.0;
 
-  private final double thirdQuartileResourceTask;
+  @Builder.Default
+  private final double thirdQuartileResourceTask = -1.0;
 
-  private final double covResourceTask;
+  @Builder.Default
+  private final double covResourceTask = -1.0;
 
-  private final double minMemory;
+  @Builder.Default
+  private final double minMemory = -1.0;
 
-  private final double maxMemory;
+  @Builder.Default
+  private final double maxMemory = -1.0;
 
-  private final double stdMemory;
+  @Builder.Default
+  private final double stdMemory = -1.0;
 
-  private final double meanMemory;
+  @Builder.Default
+  private final double meanMemory = -1.0;
 
-  private final double medianMemory;
+  @Builder.Default
+  private final double medianMemory = -1.0;
 
-  private final long firstQuartileMemory;
+  @Builder.Default
+  private final long firstQuartileMemory = -1L;
 
-  private final long thirdQuartileMemory;
+  @Builder.Default
+  private final long thirdQuartileMemory = -1L;
 
-  private final double covMemory;
+  @Builder.Default
+  private final double covMemory = -1.0;
 
-  private final long minNetworkUsage;
+  @Builder.Default
+  private final long minNetworkUsage = -1L;
 
-  private final long maxNetworkUsage;
+  @Builder.Default
+  private final long maxNetworkUsage = -1L;
 
-  private final double stdNetworkUsage;
+  @Builder.Default
+  private final double stdNetworkUsage = -1.0;
 
-  private final double meanNetworkUsage;
+  @Builder.Default
+  private final double meanNetworkUsage = -1.0;
 
-  private final double medianNetworkUsage;
+  @Builder.Default
+  private final double medianNetworkUsage = -1.0;
 
-  private final long firstQuartileNetworkUsage;
+  @Builder.Default
+  private final long firstQuartileNetworkUsage = -1L;
 
-  private final long thirdQuartileNetworkUsage;
+  @Builder.Default
+  private final long thirdQuartileNetworkUsage = -1L;
 
-  private final double covNetworkUsage;
+  @Builder.Default
+  private final double covNetworkUsage = -1.0;
 
-  private final double minDiskSpaceUsage;
+  @Builder.Default
+  private final double minDiskSpaceUsage = -1.0;
 
-  private final double maxDiskSpaceUsage;
+  @Builder.Default
+  private final double maxDiskSpaceUsage = -1.0;
 
-  private final double stdDiskSpaceUsage;
+  @Builder.Default
+  private final double stdDiskSpaceUsage = -1.0;
 
-  private final double meanDiskSpaceUsage;
+  @Builder.Default
+  private final double meanDiskSpaceUsage = -1.0;
 
-  private final long medianDiskSpaceUsage;
+  @Builder.Default
+  private final long medianDiskSpaceUsage = -1L;
 
-  private final long firstQuartileDiskSpaceUsage;
+  @Builder.Default
+  private final long firstQuartileDiskSpaceUsage = -1L;
 
-  private final long thirdQuartileDiskSpaceUsage;
+  @Builder.Default
+  private final long thirdQuartileDiskSpaceUsage = -1L;
 
-  private final double covDiskSpaceUsage;
+  @Builder.Default
+  private final double covDiskSpaceUsage = -1.0;
 
-  private final int minEnergy;
+  @Builder.Default
+  private final int minEnergy = -1;
 
-  private final int maxEnergy;
+  @Builder.Default
+  private final int maxEnergy = -1;
 
-  private final double stdEnergy;
+  @Builder.Default
+  private final double stdEnergy = -1.0;
 
-  private final double meanEnergy;
+  @Builder.Default
+  private final double meanEnergy = -1.0;
 
-  private final int medianEnergy;
+  @Builder.Default
+  private final int medianEnergy = -1;
 
-  private final int firstQuartileEnergy;
+  @Builder.Default
+  private final int firstQuartileEnergy = -1;
 
-  private final int thirdQuartileEnergy;
+  @Builder.Default
+  private final int thirdQuartileEnergy = -1;
 
-  private final double covEnergy;
+  @Builder.Default
+  private final double covEnergy = -1.0;
 
   private final String workloadDescription;
 }

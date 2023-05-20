@@ -45,32 +45,4 @@ public class SparkDataSourceIntegrationTest extends BaseSparkJobIntegrationTest 
     invokeJob();
     assertThat(sut.getTaskMetrics()).isEmpty();
   }
-
-  @Test
-  public void stageListenerReturnsList() {
-    assertThat(sut.getStageInfo()).isEmpty();
-  }
-
-  @Test
-  public void registeredStageListenerCollectsInfo() {
-    sut.registerStageListener();
-    assertThat(sut.getStageInfo()).isEmpty();
-    invokeJob();
-    assertThat(sut.getStageInfo()).isNotEmpty();
-  }
-
-  @Test
-  public void unregisteredStageListenerDoesNotCollect() {
-    assertThat(sut.getStageInfo()).isEmpty();
-    invokeJob();
-    assertThat(sut.getStageInfo()).isEmpty();
-  }
-
-  @Test
-  public void removedStageListenerDoesNotCollect() {
-    sut.registerStageListener();
-    sut.removeStageListener();
-    invokeJob();
-    assertThat(sut.getStageInfo()).isEmpty();
-  }
 }

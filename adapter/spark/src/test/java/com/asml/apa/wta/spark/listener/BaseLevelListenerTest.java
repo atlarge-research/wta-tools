@@ -1,0 +1,35 @@
+package com.asml.apa.wta.spark.listener;
+
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+import com.asml.apa.wta.core.config.RuntimeConfig;
+import com.asml.apa.wta.core.model.enums.Domain;
+import java.util.Map;
+import org.apache.spark.SparkConf;
+import org.apache.spark.SparkContext;
+import org.junit.jupiter.api.BeforeEach;
+
+public class BaseLevelListenerTest {
+
+  protected SparkContext mockedSparkContext;
+
+  protected RuntimeConfig fakeConfig;
+
+  @BeforeEach
+  void setUpCommonBehaviour() {
+    // setup mock spark context
+    mockedSparkContext = mock(SparkContext.class);
+    when(mockedSparkContext.sparkUser()).thenReturn("testUser");
+    when(mockedSparkContext.getConf()).thenReturn(new SparkConf().set("spark.app.name", "testApp"));
+    when(mockedSparkContext.appName()).thenReturn("testApp");
+
+    // setup fake config
+    fakeConfig = RuntimeConfig.builder()
+        .authors("Harry Potter")
+        .domain(Domain.SCIENTIFIC)
+        .description("Yer a wizard harry")
+        .events(Map.of("event1", "Desc of event1", "event2", "Desc of event2"))
+        .build();
+  }
+}

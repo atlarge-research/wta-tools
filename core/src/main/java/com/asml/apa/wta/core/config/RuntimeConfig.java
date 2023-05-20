@@ -1,5 +1,6 @@
 package com.asml.apa.wta.core.config;
 
+import com.asml.apa.wta.core.model.enums.Domain;
 import java.util.HashMap;
 import java.util.Map;
 import lombok.AllArgsConstructor;
@@ -15,9 +16,9 @@ import lombok.Setter;
 @NoArgsConstructor
 public class RuntimeConfig {
 
-  private String author;
+  private String authors;
 
-  private String domain;
+  private Domain domain;
 
   @Builder.Default
   private String description = "";

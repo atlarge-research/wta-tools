@@ -25,9 +25,10 @@ For the most part, since we are pre-release this will serve no real purpose, oth
 - Updated TaskLevelLIstener to collect as much information from Spark for the Task object [@hpage](https://gitlab.ewi.tudelft.nl/hpage)
 - Improved PMD in the pipeline [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 - Includes automatic serialization to the streaming package [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
+- Utilise spark API to collect information about workflow and workload [@hpage](https://gitlab.ewi.tudelft.nl/hpage)
 
 ### Changed
-
+- Refactored listeners into a generic interface to reduce code duplication and increase cc [@hpage](https://gitlab.ewi.tudelft.nl/hpage)
 ### Fixed
 
 ### Deprecated

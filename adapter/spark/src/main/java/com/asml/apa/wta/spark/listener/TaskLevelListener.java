@@ -1,12 +1,10 @@
 package com.asml.apa.wta.spark.listener;
 
+import com.asml.apa.wta.core.config.RuntimeConfig;
 import com.asml.apa.wta.core.model.Task;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import org.apache.spark.SparkContext;
 import org.apache.spark.executor.TaskMetrics;
 import org.apache.spark.scheduler.*;
@@ -18,21 +16,29 @@ import org.apache.spark.scheduler.*;
  * @author Henry Page
  * @since 1.0.0
  */
-@RequiredArgsConstructor
-public class TaskLevelListener extends SparkListener {
-
-  private final SparkContext sparkContext;
+public class TaskLevelListener extends AbstractListener<Task> {
 
   @Getter
   private Map<Integer, Integer> stageIdstoJobs = new ConcurrentHashMap<>();
 
-  @Getter
-  private final List<Task> processedTasks = new LinkedList<>();
+  /**
+   * Constructor for the task-level listener.
+   *
+   * @param sparkContext The current spark context
+   * @param config Additional config specified by the user for the plugin
+   * @author Henry Page
+   * @since 1.0.0
+   */
+  public TaskLevelListener(SparkContext sparkContext, RuntimeConfig config) {
+    super(sparkContext, config);
+  }
 
   /**
    * This method is called every time a task ends, task-level metrics should be collected here, and added.
    *
-   * @param taskEnd   SparkListenerTaskEnd
+   * @param taskEnd   SparkListenerTaskEnd The object corresponding to information on task end
+   * @author Henry Page
+   * @since 1.0.0
    */
   @Override
   public void onTaskEnd(SparkListenerTaskEnd taskEnd) {
@@ -65,7 +71,7 @@ public class TaskLevelListener extends SparkListener {
 
     // TODO(#61): CALL EXTERNAL DEPENDENCIES
 
-    processedTasks.add(Task.builder()
+    processedObjects.add(Task.builder()
         .id(taskId)
         .type(type)
         .submissionSite(submissionSite)
@@ -95,9 +101,12 @@ public class TaskLevelListener extends SparkListener {
    * In the context of the WTA, this is a workflow.
    *
    * @param jobStart The object corresponding to information on job start.
+   * @author Henry Page
+   * @since 1.0.0
    */
   @Override
   public void onJobStart(SparkListenerJobStart jobStart) {
+    // stage ids are always unique
     jobStart.stageInfos().foreach(stageInfo -> stageIdstoJobs.put(stageInfo.stageId(), jobStart.jobId()));
   }
 
@@ -105,9 +114,12 @@ public class TaskLevelListener extends SparkListener {
    * Callback for when a stage ends.
    *
    * @param stageCompleted The stage completion event
+   * @author Henry Page
+   * @since 1.0.0
    */
   @Override
   public void onStageCompleted(SparkListenerStageCompleted stageCompleted) {
+    // all tasks are guaranteed to be completed, so we can remove the stage id to reduce memory usage.
     stageIdstoJobs.remove(stageCompleted.stageInfo().stageId());
   }
 }

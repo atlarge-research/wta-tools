@@ -1,42 +1,58 @@
 package com.asml.apa.wta.spark.datasource;
 
+import com.asml.apa.wta.core.config.RuntimeConfig;
 import com.asml.apa.wta.core.model.Task;
-import com.asml.apa.wta.spark.listener.StageLevelListener;
-import com.asml.apa.wta.spark.listener.TaskLevelListener;
+import com.asml.apa.wta.core.model.Workflow;
+import com.asml.apa.wta.core.model.Workload;
+import com.asml.apa.wta.core.utils.CollectorInterface;
+import com.asml.apa.wta.core.utils.WtaUtils;
+import com.asml.apa.wta.spark.listener.*;
 import java.util.List;
 import lombok.Getter;
 import org.apache.spark.SparkContext;
-import org.apache.spark.scheduler.StageInfo;
 
 /**
  * This class is a Stage data source.
  *
  * @author Pil Kyu Cho
+ * @author Henry Page
  * @since 1.0.0
  */
-public class SparkDataSource {
+@Getter
+public class SparkDataSource implements CollectorInterface {
 
-  @Getter
-  private final SparkContext sparkContext;
+  private final AbstractListener<Task> taskLevelListener;
 
-  @Getter
-  private final TaskLevelListener taskLevelListener;
+  private final AbstractListener<Workflow> jobLevelListener;
 
-  @Getter
-  private final StageLevelListener stageLevelListener;
+  private final AbstractListener<Workload> applicationLevelListener;
 
   /**
    * Constructor for the Spark data source. This requires a Spark context to ensure a Spark session
    * is available before the data source is initialized.
    *
    * @param sparkContext  SparkContext of the running Spark session
+   * @param config Additional config specified by the user for the plugin
    * @author Pil Kyu Cho
+   * @author Henry Page
+   * @since 1.0.0
+   */
+  public SparkDataSource(SparkContext sparkContext, RuntimeConfig config) {
+    taskLevelListener = new TaskLevelListener(sparkContext, config);
+    jobLevelListener = new JobLevelListener(sparkContext, config, taskLevelListener);
+    applicationLevelListener = new ApplicationLevelListener(sparkContext, config, jobLevelListener);
+  }
+
+  /**
+   * Alternate constructor which requires the context and gets the config from
+   * the default directory.
+   *
+   * @param sparkContext The current spark context
+   * @author Henry Page
    * @since 1.0.0
    */
   public SparkDataSource(SparkContext sparkContext) {
-    this.sparkContext = sparkContext;
-    taskLevelListener = new TaskLevelListener(sparkContext);
-    stageLevelListener = new StageLevelListener();
+    this(sparkContext, WtaUtils.readConfig());
   }
 
   /**
@@ -46,7 +62,7 @@ public class SparkDataSource {
    * @since 1.0.0
    */
   public void registerTaskListener() {
-    sparkContext.addSparkListener(taskLevelListener);
+    taskLevelListener.register();
   }
 
   /**
@@ -56,46 +72,60 @@ public class SparkDataSource {
    * @since 1.0.0
    */
   public void removeTaskListener() {
-    sparkContext.removeSparkListener(taskLevelListener);
+    taskLevelListener.remove();
   }
 
   /**
-   * This method registers a stage listener to the Spark context.
+   * Registers a job listener to the Spark context.
    *
-   * @author Pil Kyu Cho
+   * @author Henry Page
    * @since 1.0.0
    */
-  public void registerStageListener() {
-    sparkContext.addSparkListener(stageLevelListener);
+  public void registerJobListener() {
+    jobLevelListener.register();
   }
 
   /**
-   * This method removes a stage listener from the Spark context.
+   * Removes a job listener from the Spark context.
    *
-   * @author Pil Kyu Cho
+   * @author Henry Page
    * @since 1.0.0
    */
-  public void removeStageListener() {
-    sparkContext.removeSparkListener(stageLevelListener);
+  public void removeJobListener() {
+    jobLevelListener.remove();
+  }
+
+  /**
+   * Registers an application listener to the Spark context.
+   *
+   * @author Henry Page
+   * @since 1.0.0
+   */
+  public void registerApplicationListener() {
+    applicationLevelListener.register();
+  }
+
+  /**
+   * Removes an application listener from the Spark context.
+   *
+   * @author Henry Page
+   * @since 1.0.0
+   */
+  public void removeApplicationListener() {
+    applicationLevelListener.remove();
   }
 
   /**
    * This method gets a list of TaskMetrics from the registered task listener.
+   *
    * @return List of task metrics
    * @author Pil Kyu Cho
    * @since 1.0.0
+   * @deprecated We don't want to expose tasks to the end user.
+   * If really needed, use taskLevelListener.getProcessedObjects()
    */
+  @Deprecated
   public List<Task> getTaskMetrics() {
-    return taskLevelListener.getProcessedTasks();
-  }
-
-  /**
-   * This method gets a list of StageInfo from the registered stage listener.
-   * @return List of StageInfo
-   * @author Pil Kyu Cho
-   * @since 1.0.0
-   */
-  public List<StageInfo> getStageInfo() {
-    return stageLevelListener.getStageInfoList();
+    return taskLevelListener.getProcessedObjects();
   }
 }
