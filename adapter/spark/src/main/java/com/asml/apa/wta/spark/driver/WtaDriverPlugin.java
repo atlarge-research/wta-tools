@@ -42,7 +42,6 @@ public class WtaDriverPlugin implements DriverPlugin {
    */
   @Override
   public void shutdown() {
-    // PMD bypass
-    this.sparkContext = null;
+    this.sparkContext.stop();
   }
 }
