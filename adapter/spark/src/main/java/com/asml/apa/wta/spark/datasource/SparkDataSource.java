@@ -14,15 +14,13 @@ import org.apache.spark.scheduler.StageInfo;
  * @author Pil Kyu Cho
  * @since 1.0.0
  */
+@Getter
 public class SparkDataSource {
 
-  @Getter
   private final SparkContext sparkContext;
 
-  @Getter
   private final TaskLevelListener taskLevelListener;
 
-  @Getter
   private final StageLevelListener stageLevelListener;
 
   /**

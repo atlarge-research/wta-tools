@@ -17,7 +17,7 @@ public class BaseSparkJobIntegrationTest {
   protected JavaRDD<String> testFile;
 
   @BeforeEach
-  void setup() {
+  void setupBaseIntegrationTest() {
     SparkConf conf = new SparkConf()
         .setAppName("SparkTestRunner")
         .setMaster("local[1]")
