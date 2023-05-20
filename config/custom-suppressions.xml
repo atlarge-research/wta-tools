@@ -10,4 +10,6 @@
   <suppress files="com/asml/apa/wta/spark/listener/AbstractListener.java" checks="VisibilityModifier" />
   <suppress files="com/asml/apa/wta/spark/datasource/SparkDataSource.java" checks="AvoidStarImport" />
   <suppress files="com/asml/apa/wta/spark/listener/JobLevelListener.java" checks="AvoidStarImport" />
+  <!-- BanLoggingImplementations forbids import of log4j framework but SLF4J makes use of it anyways  -->
+  <suppress files="PluginLogger.java" id="BanLoggingImplementations"/>
 </suppressions>

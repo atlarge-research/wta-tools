@@ -23,7 +23,7 @@ public class BaseSparkJobIntegrationTest {
   RuntimeConfig fakeConfig;
 
   @BeforeEach
-  void setup() {
+  void setupBaseIntegrationTest() {
     fakeConfig = RuntimeConfig.builder()
         .authors("Harry Potter")
         .domain(Domain.SCIENTIFIC)

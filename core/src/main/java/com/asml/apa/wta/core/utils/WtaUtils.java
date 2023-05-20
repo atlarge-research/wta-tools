@@ -14,6 +14,7 @@ import java.util.Map;
  *
  * @author Henry Page
  * @author Lohithsai Yadala Chanchu
+ * @author Atour Mousavi Gourabi
  * @since 1.0.0
  */
 public class WtaUtils {
@@ -43,6 +44,7 @@ public class WtaUtils {
 
       JsonNode workloadNode = rootNode.get("workloadSettings");
       JsonNode resourceNode = rootNode.get("resourceSettings");
+      JsonNode logNode = rootNode.get("logSettings");
 
       String author = workloadNode.get("author").asText();
 
@@ -54,11 +56,21 @@ public class WtaUtils {
       Map<String, String> events = resourceNode.has("events")
           ? mapper.convertValue(resourceNode.get("events"), new TypeReference<>() {})
           : new HashMap<>();
+
+      String logLevel = logNode.has("logLevel") ? logNode.get("logLevel").asText() : "INFO";
+      boolean doConsoleLog =
+          !logNode.has("doConsoleLog") || logNode.get("doConsoleLog").asBoolean();
+      boolean doFileLog =
+          !logNode.has("doFileLog") || logNode.get("doFileLog").asBoolean();
+
       configBuilder = configBuilder
           .authors(author)
           .domain(domain)
           .description(description)
-          .events(events);
+          .events(events)
+          .logLevel(logLevel)
+          .doConsoleLog(doConsoleLog)
+          .doFileLog(doFileLog);
     } catch (EnumConstantNotPresentException e) {
       throw new IllegalArgumentException(e.constantName()
           + " is not a valid domain. It must be one of BIOMEDICAL, ENGINEERING, INDUSTRIAL, SCIENTIFIC.");

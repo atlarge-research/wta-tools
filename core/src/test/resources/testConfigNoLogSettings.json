@@ -2,7 +2,7 @@
   "workloadSettings":
   {
     "author": "Test Name",
-    "domain": "SCIENTIFIC",
+    "domain": "Test Domain",
     "description": "Test Description"
   },
   "resourceSettings":
@@ -13,9 +13,5 @@
     }
   },
   "logSettings":
-  {
-    "logLevel": "INFO",
-    "doConsoleLog": "false",
-    "doFileLog": "true"
-  }
+  {}
 }
