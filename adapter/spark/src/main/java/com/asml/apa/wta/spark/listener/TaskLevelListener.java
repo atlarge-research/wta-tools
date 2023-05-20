@@ -5,7 +5,6 @@ import com.asml.apa.wta.core.model.Task;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.Getter;
-import lombok.NonNull;
 import org.apache.spark.SparkContext;
 import org.apache.spark.executor.TaskMetrics;
 import org.apache.spark.scheduler.SparkListenerJobStart;
@@ -122,7 +121,7 @@ public class TaskLevelListener extends AbstractListener<Task> {
    * @since 1.0.0
    */
   @Override
-  public void onStageCompleted(@NonNull SparkListenerStageCompleted stageCompleted) {
+  public void onStageCompleted(SparkListenerStageCompleted stageCompleted) {
     // all tasks are guaranteed to be completed, so we can remove the stage id to reduce memory usage.
     stageIdsToJobs.remove(stageCompleted.stageInfo().stageId());
   }
