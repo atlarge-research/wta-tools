@@ -12,7 +12,6 @@ import java.util.Map;
 public class WtaUtils {
 
   private static final String CONFIG_DIR = "config.json";
-  private static RuntimeConfig config = null;
 
   /**
    * Utility classes should not have a public or default constructor.
@@ -28,10 +27,6 @@ public class WtaUtils {
    * @return The associated config object
    */
   public static RuntimeConfig readConfig(String configDir) {
-    if (config != null) {
-      return config;
-    }
-
     var configBuilder = RuntimeConfig.builder();
 
     try (FileInputStream fis = new FileInputStream(configDir)) {
@@ -60,12 +55,11 @@ public class WtaUtils {
           .description(description)
           .events(events)
           .logLevel(logLevel);
-    } catch (IOException e) {
+    } catch (Exception e) {
       throw new IllegalArgumentException(
           "The config file has missing/invalid fields or no config file was found");
     }
-    config = configBuilder.build();
-    return config;
+    return configBuilder.build();
   }
 
   /**

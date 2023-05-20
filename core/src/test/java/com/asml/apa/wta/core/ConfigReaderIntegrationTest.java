@@ -10,6 +10,7 @@ import java.util.Map;
 import org.junit.jupiter.api.Test;
 
 class ConfigReaderIntegrationTest {
+
   @Test
   void readsConfigFileCorrectly() {
     RuntimeConfig cr = WtaUtils.readConfig("src/test/resources/testConfig.json");
@@ -61,6 +62,6 @@ class ConfigReaderIntegrationTest {
     map.put("f1", "v1");
     map.put("f2", "v2");
     assertThat(cr.getEvents()).isEqualTo(map);
-    assertThat(cr.getLogLevel()).isEqualTo("INFO");
+    assertThat(cr.getLogLevel()).isEqualTo("ERROR");
   }
 }
