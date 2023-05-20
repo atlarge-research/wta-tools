@@ -3,7 +3,7 @@
 
 # Deployment scripts for big data frameworks on DAS-5
 
-These are the scripts I use to download, configure, and deploy several big data frameworks (YARN/MapReduce, Spark) and related systems (HDFS, ZooKeeper, InfluxDB).
+These are the scripts I use to download, configure, and deploy several big data frameworks (YARN/MapReduce, Spark) and related systems (HDFS, ZooKeeper).
 
 Warning: I have not extensively tested these scripts for different users. The scripts assume ownership of the `/local/$USER/` directory on every node used in a deployment. In particular, the scripts will wipe the `/local/$USER/{hadoop,spark,zookeeper,influxdb}` directory before the respective application is deployed.
 
