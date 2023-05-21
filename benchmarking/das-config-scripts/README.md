@@ -3,19 +3,25 @@
 
 # Deployment scripts for big data frameworks on DAS-5
 
-These are the scripts I use to download, configure, and deploy several big data frameworks (YARN/MapReduce, Spark) and related systems (HDFS, ZooKeeper).
+Scripts to download configure, and deploy several big data frameworks (YARN/MapReduce, Spark) and related systems (HDFS, ZooKeeper).
 
-Warning: I have not extensively tested these scripts for different users. The scripts assume ownership of the `/local/$USER/` directory on every node used in a deployment. In particular, the scripts will wipe the `/local/$USER/{hadoop,spark,zookeeper,influxdb}` directory before the respective application is deployed.
+Warning: The scripts assume ownership of the `/local/$USER/` directory on every node used in a deployment. In particular, the scripts will wipe the `/local/$USER/{hadoop,spark,zookeeper,influxdb}` directory before the respective application is deployed.
 
 ## Installation
 
 1. Git clone this repository to your home directory on DAS-5. The resulting directory will be referred to as `$DEPLOYER_HOME` throughout this manual.
 
+2. Set the environment path variable to the `$DEPLOYER_HOME`
+
+```bash
+export PATH=$PATH:`<path_to_$DEPLOYER_HOME>`
+```
+
 Optional if space in your home directory is limited (deployments are likely to generate gigabytes of logs over time):
 
-2. Create a directory in your scratch folder for the big data frameworks and configuration files, e.g., `/var/scratch/$USER/big-data-frameworks`.
+3. Create a directory in your scratch folder for the big data frameworks and configuration files, e.g., `/var/scratch/$USER/big-data-frameworks`.
 
-3. Create a symlink in `$DEPLOYER_HOME` called `frameworks` pointing at the directory you created at point 2.
+4. Create a symlink in `$DEPLOYER_HOME` called `frameworks` pointing at the directory you created at point 2.
 
 The deployment scripts can now be used to deploy any of the included frameworks.
 

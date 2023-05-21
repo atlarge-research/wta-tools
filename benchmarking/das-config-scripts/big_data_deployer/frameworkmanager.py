@@ -202,10 +202,14 @@ class FrameworkManager:
         except Exception as e:
             raise InstallFailedError("Failed to create temporary directory to extract %s with unknown error: %s." % (framework.name, e))
         try:
+            extract_dir = os.path.join(extract_tmp_dir, framework_version.archive_root_dir)
             with tarfile.open(self.__archive_file(framework, framework_version)) as archive_tar:
-                archive_tar.extractall(extract_tmp_dir)
+                archive_tar.extractall(extract_dir)
             log_fn(2, "Extraction to temporary directory complete. Moving to framework directory...")
-            shutil.move(os.path.join(extract_tmp_dir, framework_version.archive_root_dir), target_dir)
+            shutil.move(
+                extract_dir,
+                target_dir,
+            )
             log_fn(3, "Move complete.")
         except Exception as e:
             raise InstallFailedError("Failed to extract %s archive \"%s\" with unknown error: %s." % (framework.name, self.__archive_file(framework, framework_version), e))

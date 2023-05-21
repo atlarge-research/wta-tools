@@ -107,8 +107,4 @@ class SparkFramework(Framework):
         log_fn(1, "Spark cluster deployed.")
 
 get_framework_registry().register_framework(SparkFramework())
-get_framework_registry().framework("spark").add_version(SparkFrameworkVersion("2.4.0", "https://archive.apache.org/dist/spark/spark-2.4.0/spark-2.4.0-bin-hadoop2.6.tgz", "tgz", "spark-2.4.0-bin-hadoop2.6", "2.4.x"))
-get_framework_registry().framework("spark").add_version(SparkFrameworkVersion("3.0.0", "https://archive.apache.org/dist/spark/spark-3.0.0/spark-3.0.0-bin-hadoop2.7.tgz", "tgz", "spark-3.0.0-bin-hadoop2.7", "2.4.x"))
-get_framework_registry().framework("spark").add_version(SparkFrameworkVersion("3.0.2", "https://archive.apache.org/dist/spark/spark-3.0.2/spark-3.0.2-bin-hadoop2.7.tgz", "tgz", "spark-3.0.2-bin-hadoop2.7", "2.4.x"))
-get_framework_registry().framework("spark").add_version(SparkFrameworkVersion("3.1.1", "https://apache.mirror.wearetriple.com/spark/spark-3.1.1/spark-3.1.1-bin-hadoop3.2.tgz", "tgz", "spark-3.1.1-bin-hadoop3.2", "2.4.x"))
-get_framework_registry().framework("spark").add_version(SparkFrameworkVersion("3.2.4", "https://archive.apache.org/dist/spark/spark-3.2.4/spark-3.2.4-bin-hadoop3.2.tgz", "tgz", "spark-3.2.4-bin-hadoop3.2", "3.2.x"))
+get_framework_registry().framework("spark").add_version(SparkFrameworkVersion("3.2.4", "https://dlcdn.apache.org/spark/spark-3.2.4/spark-3.2.4-bin-hadoop3.2.tgz", "tgz", "spark-3.2.4-bin-hadoop3.2", "3.2.x"))

@@ -72,4 +72,4 @@ class ZookeeperFramework(Framework):
         return []
 
 get_framework_registry().register_framework(ZookeeperFramework())
-get_framework_registry().framework("zookeeper").add_version(ZookeeperFrameworkVersion("3.7.1", "https://archive.apache.org/dist/zookeeper/zookeeper-3.7.1/zookeeper-3.7.1.tar.gz", "tar.gz", "zookeeper-3.7.1", "3.7.x"))
+get_framework_registry().framework("zookeeper").add_version(ZookeeperFrameworkVersion("3.7.1", "https://archive.apache.org/dist/zookeeper/zookeeper-3.7.1/apache-zookeeper-3.7.1.tar.gz", "tar.gz", "zookeeper-3.7.1", "3.7.x"))
