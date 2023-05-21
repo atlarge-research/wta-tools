@@ -1,6 +1,5 @@
 package com.asml.apa.wta.spark.streams;
 
-import com.asml.apa.wta.core.exceptions.FailedToSerializeStreamException;
 import com.asml.apa.wta.core.streams.KeyedStream;
 
 /**
@@ -30,13 +29,10 @@ public class MetricStreamingEngine {
    *
    * @param resource the {@link com.asml.apa.wta.spark.streams.ResourceKey} of the resource
    * @param record the {@link ResourceMetricsRecord} containing the metrics
-   * @throws FailedToSerializeStreamException when some error occurred during routine serialization of parts of
-   *                                          the {@link com.asml.apa.wta.core.streams.KeyedStream}
    * @author Atour Mousavi Gourabi
    * @since 1.0.0
    */
-  public void addToResourceStream(ResourceKey resource, ResourceMetricsRecord record)
-      throws FailedToSerializeStreamException {
+  public void addToResourceStream(ResourceKey resource, ResourceMetricsRecord record) {
     resourceStream.addToStream(resource, record);
   }
 
@@ -45,12 +41,10 @@ public class MetricStreamingEngine {
    *
    * @param task the {@link com.asml.apa.wta.spark.streams.TaskKey} of the task
    * @param record the {@link TaskMetricsRecord} containing the metrics
-   * @throws FailedToSerializeStreamException when some error occurred during routine serialization of parts of
-   *                                          the {@link com.asml.apa.wta.core.streams.KeyedStream}
    * @author Atour Mousavi Gourabi
    * @since 1.0.0
    */
-  public void addToTaskStream(TaskKey task, TaskMetricsRecord record) throws FailedToSerializeStreamException {
+  public void addToTaskStream(TaskKey task, TaskMetricsRecord record) {
     taskStream.addToStream(task, record);
   }
 }
