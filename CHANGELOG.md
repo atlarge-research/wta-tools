@@ -26,6 +26,7 @@ For the most part, since we are pre-release this will serve no real purpose, oth
 - Update WtaUtils file to parse for user logging preferences [@pcho](https://gitlab.ewi.tudelft.nl/pcho)
 - Created a logging class to log on both console and to log file [@pcho](https://gitlab.ewi.tudelft.nl/pcho)
 - Updates the Spark dependency to 3.2.4 [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
+- Moves to using slf4j as logging facade over directly using log4j2 [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 
 ### Changed
 
