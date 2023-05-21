@@ -20,6 +20,7 @@ import java.util.function.Function;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Message stream, used for processing incoming metrics.
@@ -28,6 +29,7 @@ import lombok.Setter;
  * @author Atour Mousavi Gourabi
  * @since 1.0.0
  */
+@Slf4j
 public class Stream<V extends Serializable> {
 
   /**
@@ -149,6 +151,7 @@ public class Stream<V extends Serializable> {
     try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream(filePath))) {
       objectOutputStream.writeObject(toSerialize);
     } catch (IOException e) {
+      log.error("Failed to serialize stream internals to {}", filePath);
       return;
     }
     deserializationEnd.setNext(null);
@@ -185,6 +188,7 @@ public class Stream<V extends Serializable> {
       }
       amountOfNodes = nodes.size();
     } catch (IOException | ClassNotFoundException | ClassCastException e) {
+      log.error("Failed to deserialize stream internals from {}", filePath);
       throw new FailedToDeserializeStreamException();
     } finally {
       new File(filePath).delete();
@@ -215,6 +219,7 @@ public class Stream<V extends Serializable> {
    */
   public synchronized V head() {
     if (head == null) {
+      log.error("Stream#head() was called on an empty stream");
       throw new NoSuchElementException();
     }
     additionsSinceLastWriteToDisk--;
@@ -243,6 +248,7 @@ public class Stream<V extends Serializable> {
    */
   public synchronized V peek() {
     if (head == null) {
+      log.error("Stream#peek() was called on an empty stream");
       throw new NoSuchElementException();
     }
     return head.getContent();
@@ -267,6 +273,9 @@ public class Stream<V extends Serializable> {
     }
     additionsSinceLastWriteToDisk++;
     if (additionsSinceLastWriteToDisk > serializationTrigger) {
+      log.trace(
+          "Serializing stream internals after {} additions since last write to disk",
+          additionsSinceLastWriteToDisk);
       serializeInternals();
     }
   }
