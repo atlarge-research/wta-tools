@@ -1,6 +1,7 @@
 package com.asml.apa.wta.spark.streams;
 
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
 /**
@@ -10,5 +11,6 @@ import lombok.Getter;
  * @since 1.0.0
  */
 @Getter
+@EqualsAndHashCode
 @AllArgsConstructor
 public class ResourceKey {}

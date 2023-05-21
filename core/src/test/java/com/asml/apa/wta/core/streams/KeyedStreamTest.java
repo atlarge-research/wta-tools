@@ -3,8 +3,6 @@ package com.asml.apa.wta.core.streams;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import com.asml.apa.wta.core.exceptions.FailedToDeserializeStreamException;
-import com.asml.apa.wta.core.exceptions.FailedToSerializeStreamException;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -13,7 +11,7 @@ import org.junit.jupiter.api.Test;
 class KeyedStreamTest {
 
   @Test
-  void integerKeyedInteractions() throws FailedToDeserializeStreamException, FailedToSerializeStreamException {
+  void integerKeyedInteractions() {
     KeyedStream<Integer, String> keyedStream = new KeyedStream<>();
     keyedStream.addToStream(2, "Hello");
     keyedStream.addToStream(-3, "World!");
@@ -31,7 +29,7 @@ class KeyedStreamTest {
   }
 
   @Test
-  void onKeyThatDoesNotExist() throws FailedToSerializeStreamException {
+  void onKeyThatDoesNotExist() {
     KeyedStream<Integer, String> keyedStream = new KeyedStream<>();
     keyedStream.addToStream(-2, "Hello");
     keyedStream.addToStream(3, "World!");
@@ -40,8 +38,7 @@ class KeyedStreamTest {
   }
 
   @Test
-  void keyedStreamToCollectionTwoStrings()
-      throws FailedToDeserializeStreamException, FailedToSerializeStreamException {
+  void keyedStreamToCollectionTwoStrings() {
     KeyedStream<Boolean, String> keyedStream = new KeyedStream<>();
     keyedStream.addToStream(true, "Hello");
     keyedStream.addToStream(false, "Lorem");
