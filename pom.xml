@@ -152,6 +152,11 @@
             <palantirJavaFormat />
             <endWithNewline />
             <formatAnnotations />
+            <replaceRegex>
+              <name>Remove wildcard imports</name>
+              <searchRegex>import\s+[^\*\s]+\*;(\r\n|\r|\n)</searchRegex>
+              <replacement>$1</replacement>
+            </replaceRegex>
             <indent>
               <tabs>true</tabs>
               <spacesPerTab>4</spacesPerTab>

@@ -30,7 +30,6 @@ public class WtaPlugin implements SparkPlugin {
    * Returns the executor-side component of the plugin.
    *
    * @return The executor-side component initialised at startup
-   *
    */
   @Override
   public ExecutorPlugin executorPlugin() {

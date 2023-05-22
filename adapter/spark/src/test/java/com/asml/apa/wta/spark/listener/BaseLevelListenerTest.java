@@ -34,7 +34,7 @@ public class BaseLevelListenerTest {
 
     // setup fake config
     fakeConfig = RuntimeConfig.builder()
-        .authors("Harry Potter")
+        .authors(new String[] {"Harry Potter"})
         .domain(Domain.SCIENTIFIC)
         .description("Yer a wizard harry")
         .events(Map.of("event1", "Desc of event1", "event2", "Desc of event2"))

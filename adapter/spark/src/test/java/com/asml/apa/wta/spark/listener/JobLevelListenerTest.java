@@ -5,7 +5,10 @@ import static org.mockito.Mockito.*;
 
 import com.asml.apa.wta.core.model.Workflow;
 import java.util.Properties;
-import org.apache.spark.scheduler.*;
+import org.apache.spark.scheduler.JobFailed;
+import org.apache.spark.scheduler.SparkListenerJobEnd;
+import org.apache.spark.scheduler.SparkListenerJobStart;
+import org.apache.spark.scheduler.StageInfo;
 import org.junit.jupiter.api.Test;
 import scala.collection.mutable.ListBuffer;
 

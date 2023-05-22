@@ -46,7 +46,7 @@ public class WtaUtils {
       JsonNode resourceNode = rootNode.get("resourceSettings");
       JsonNode logNode = rootNode.get("logSettings");
 
-      String author = workloadNode.get("author").asText();
+      String[] authors = workloadNode.get("author").asText().split("\\s*,\\s*");
 
       Domain domain = Domain.extractAsEnum(workloadNode.get("domain").asText());
 
@@ -57,23 +57,17 @@ public class WtaUtils {
           ? mapper.convertValue(resourceNode.get("events"), new TypeReference<>() {})
           : new HashMap<>();
 
-      String logLevel = logNode.has("logLevel") ? logNode.get("logLevel").asText() : "INFO";
-      boolean doConsoleLog =
-          !logNode.has("doConsoleLog") || logNode.get("doConsoleLog").asBoolean();
-      boolean doFileLog =
-          !logNode.has("doFileLog") || logNode.get("doFileLog").asBoolean();
+      String logLevel = logNode.has("logLevel") ? logNode.get("logLevel").asText() : "ERROR";
 
       configBuilder = configBuilder
-          .authors(author)
+          .authors(authors)
           .domain(domain)
           .description(description)
           .events(events)
-          .logLevel(logLevel)
-          .doConsoleLog(doConsoleLog)
-          .doFileLog(doFileLog);
+          .logLevel(logLevel);
     } catch (EnumConstantNotPresentException e) {
       throw new IllegalArgumentException(e.constantName()
-          + " is not a valid domain. It must be one of BIOMEDICAL, ENGINEERING, INDUSTRIAL, SCIENTIFIC.");
+          + " is not a valid domain. It must be BIOMEDICAL, ENGINEERING, INDUSTRIAL, or SCIENTIFIC.");
     } catch (Exception e) {
       throw new IllegalArgumentException(
           "The config file has missing/invalid fields or no config file was found");

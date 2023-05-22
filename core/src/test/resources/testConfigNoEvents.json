@@ -9,8 +9,6 @@
   {},
   "logSettings":
   {
-    "logLevel": "INFO",
-    "doConsoleLog": "false",
-    "doFileLog": "true"
+    "logLevel": "INFO"
   }
 }

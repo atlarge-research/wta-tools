@@ -1,7 +1,6 @@
 package com.asml.apa.wta.spark.listener;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 import com.asml.apa.wta.spark.BaseSparkJobIntegrationTest;
 import org.junit.jupiter.api.Test;
@@ -19,7 +18,7 @@ class TaskLevelListenerIntegrationTest extends BaseSparkJobIntegrationTest {
   void runningAJobShouldClearTheMapOfEntriesAfterStageIsDoneWorkflowIdShouldBeInitialised() {
     sut.registerTaskListener();
     invokeJob();
-    assertThat(((TaskLevelListener) sut.getTaskLevelListener()).getStageIdstoJobs())
+    assertThat(((TaskLevelListener) sut.getTaskLevelListener()).getStageIdsToJobs())
         .isEmpty();
     assertThat(sut.getTaskMetrics()).hasSizeGreaterThanOrEqualTo(1);
     assertThat(sut.getTaskMetrics().get(0).getWorkflowId())

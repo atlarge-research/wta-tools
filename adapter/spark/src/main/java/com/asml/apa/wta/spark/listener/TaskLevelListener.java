@@ -2,12 +2,15 @@ package com.asml.apa.wta.spark.listener;
 
 import com.asml.apa.wta.core.config.RuntimeConfig;
 import com.asml.apa.wta.core.model.Task;
-import java.util.*;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.Getter;
 import org.apache.spark.SparkContext;
 import org.apache.spark.executor.TaskMetrics;
-import org.apache.spark.scheduler.*;
+import org.apache.spark.scheduler.SparkListenerJobStart;
+import org.apache.spark.scheduler.SparkListenerStageCompleted;
+import org.apache.spark.scheduler.SparkListenerTaskEnd;
+import org.apache.spark.scheduler.TaskInfo;
 
 /**
  * This class is a task-level listener for the Spark data source.
@@ -19,7 +22,7 @@ import org.apache.spark.scheduler.*;
 public class TaskLevelListener extends AbstractListener<Task> {
 
   @Getter
-  private Map<Integer, Integer> stageIdstoJobs = new ConcurrentHashMap<>();
+  private Map<Integer, Integer> stageIdsToJobs = new ConcurrentHashMap<>();
 
   /**
    * Constructor for the task-level listener.
@@ -50,7 +53,7 @@ public class TaskLevelListener extends AbstractListener<Task> {
     final long submitTime = curTaskInfo.launchTime();
     final long runTime = curTaskMetrics.executorRunTime();
     final int userId = sparkContext.sparkUser().hashCode();
-    final long workflowId = stageIdstoJobs.get(taskEnd.stageId());
+    final long workflowId = stageIdsToJobs.get(taskEnd.stageId());
 
     // unknown
     final int submissionSite = -1;
@@ -107,7 +110,7 @@ public class TaskLevelListener extends AbstractListener<Task> {
   @Override
   public void onJobStart(SparkListenerJobStart jobStart) {
     // stage ids are always unique
-    jobStart.stageInfos().foreach(stageInfo -> stageIdstoJobs.put(stageInfo.stageId(), jobStart.jobId()));
+    jobStart.stageInfos().foreach(stageInfo -> stageIdsToJobs.put(stageInfo.stageId(), jobStart.jobId()));
   }
 
   /**
@@ -120,6 +123,6 @@ public class TaskLevelListener extends AbstractListener<Task> {
   @Override
   public void onStageCompleted(SparkListenerStageCompleted stageCompleted) {
     // all tasks are guaranteed to be completed, so we can remove the stage id to reduce memory usage.
-    stageIdstoJobs.remove(stageCompleted.stageInfo().stageId());
+    stageIdsToJobs.remove(stageCompleted.stageInfo().stageId());
   }
 }

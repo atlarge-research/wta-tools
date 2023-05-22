@@ -6,8 +6,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import org.junit.jupiter.api.Test;
 
 class DomainTest {
-  final String expectedErrorMessage =
-      "Invalid domain value. It must be one of BIOMEDICAL, ENGINEERING, INDUSTRIAL, SCIENTIFIC.";
 
   @Test
   void extractNullDomainFails() {

@@ -60,7 +60,7 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
     final Domain domain = config.getDomain();
     final long startDate = sparkContext.startTime();
     final long endDate = applicationEnd.time();
-    final String[] authors = config.getAuthors().split(",");
+    final String[] authors = config.getAuthors();
     final String workloadDescription = config.getDescription();
 
     // unknown

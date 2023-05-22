@@ -6,10 +6,7 @@
 <suppressions>
   <!-- HideUtilityClassConstructor enforces the existence of an explicit constructor for Main, we consider this nonsense. -->
   <suppress files="Main.java" checks="HideUtilityClassConstructor" />
-  <suppress files="com/asml/apa/wta/spark/listener/TaskLevelListener.java" checks="AvoidStarImport" />
   <suppress files="com/asml/apa/wta/spark/listener/AbstractListener.java" checks="VisibilityModifier" />
-  <suppress files="com/asml/apa/wta/spark/datasource/SparkDataSource.java" checks="AvoidStarImport" />
-  <suppress files="com/asml/apa/wta/spark/listener/JobLevelListener.java" checks="AvoidStarImport" />
   <!-- BanLoggingImplementations forbids import of log4j framework but SLF4J makes use of it anyways  -->
-  <suppress files="PluginLogger.java" id="BanLoggingImplementations"/>
+  <suppress files="Log4j2Configuration.java" id="BanLoggingImplementations"/>
 </suppressions>
