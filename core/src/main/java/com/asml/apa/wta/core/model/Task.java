@@ -1,12 +1,10 @@
 package com.asml.apa.wta.core.model;
 
-import java.util.ArrayList;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
 import org.apache.avro.Schema;
-import org.apache.avro.SchemaBuilder;
 import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.GenericRecord;
 
@@ -66,105 +64,6 @@ public class Task implements BaseTraceObject {
 
   private final long resourceUsed;
 
-  private static Schema taskSchema = SchemaBuilder.record("task")
-      .namespace("com.asml.apa.wta.core.model")
-      .fields()
-      .name("id")
-      .type()
-      .longType()
-      .noDefault()
-      .name("type")
-      .type()
-      .nullable()
-      .stringType()
-      .stringDefault("test")
-      .name("submitType")
-      .type()
-      .longType()
-      .longDefault(0)
-      .name("submissionSite")
-      .type()
-      .intType()
-      .intDefault(0)
-      .name("runtime")
-      .type()
-      .longType()
-      .longDefault(0)
-      .name("resourceType")
-      .type()
-      .nullable()
-      .stringType()
-      .stringDefault("test")
-      .name("resourceAmountRequested")
-      .type()
-      .doubleType()
-      .doubleDefault(0.0)
-      .name("parents")
-      .type()
-      .nullable()
-      .array()
-      .items()
-      .longType()
-      .arrayDefault(new ArrayList<Long>())
-      .name("children")
-      .type()
-      .nullable()
-      .array()
-      .items()
-      .longType()
-      .arrayDefault(new ArrayList<Long>())
-      .name("userId")
-      .type()
-      .intType()
-      .intDefault(0)
-      .name("groupId")
-      .type()
-      .intType()
-      .intDefault(0)
-      .name("nfrs")
-      .type()
-      .nullable()
-      .stringType()
-      .stringDefault("test")
-      .name("workflowId")
-      .type()
-      .longType()
-      .longDefault(0)
-      .name("waitTime")
-      .type()
-      .longType()
-      .longDefault(0)
-      .name("params")
-      .type()
-      .nullable()
-      .stringType()
-      .stringDefault("test")
-      .name("memoryRequested")
-      .type()
-      .doubleType()
-      .doubleDefault(0.0)
-      .name("networkIoTime")
-      .type()
-      .longType()
-      .longDefault(0)
-      .name("diskIoTime")
-      .type()
-      .longType()
-      .longDefault(0)
-      .name("diskSpaceRequested")
-      .type()
-      .doubleType()
-      .doubleDefault(0.0)
-      .name("energyConsumption")
-      .type()
-      .longType()
-      .longDefault(0)
-      .name("resourceUsed")
-      .type()
-      .longType()
-      .longDefault(0)
-      .endRecord();
-
   /**
    * convert task to record.
    *
@@ -173,33 +72,71 @@ public class Task implements BaseTraceObject {
    * @since 1.0.0
    * @author Tianchen Qu
    */
-  public static GenericRecord convertTaskToRecord(Task task) {
-    GenericData.Record record = new GenericData.Record(taskSchema);
-    record.put("id", task.id);
-    record.put("type", task.type);
-    record.put("submitType", task.submitType);
-    record.put("submissionSite", task.submissionSite);
-    record.put("runtime", task.runtime);
-    record.put("resourceType", task.resourceType);
-    record.put("resourceAmountRequested", task.resourceAmountRequested);
-    record.put("parents", task.parents);
-    record.put("children", task.children);
-    record.put("userId", task.userId);
-    record.put("groupId", task.groupId);
-    record.put("nfrs", task.nfrs);
-    record.put("workflowId", task.workflowId);
-    record.put("waitTime", task.waitTime);
-    record.put("params", task.params);
-    record.put("memoryRequested", task.memoryRequested);
-    record.put("networkIoTime", task.networkIoTime);
-    record.put("diskIoTime", task.diskIoTime);
-    record.put("diskSpaceRequested", task.diskSpaceRequested);
-    record.put("energyConsumption", task.energyConsumption);
-    record.put("resourceUsed", task.resourceUsed);
+  public static GenericRecord convertTaskToRecord(Task task, Boolean[] checker, Schema schema) {
+    GenericData.Record record = new GenericData.Record(schema);
+    if (checker[0] == true) {
+      record.put("id", task.id);
+    }
+    if (checker[1] == true) {
+      record.put("type", task.type);
+    }
+    if (checker[2] == true) {
+      record.put("submitType", task.submitType);
+    }
+    if (checker[3] == true) {
+      record.put("submissionSite", task.submissionSite);
+    }
+    if (checker[4] == true) {
+      record.put("runtime", task.runtime);
+    }
+    if (checker[5] == true) {
+      record.put("resourceType", task.resourceType);
+    }
+    if (checker[6] == true) {
+      record.put("resourceAmountRequested", task.resourceAmountRequested);
+    }
+    if (checker[7] == true) {
+      record.put("parents", task.parents);
+    }
+    if (checker[8] == true) {
+      record.put("children", task.children);
+    }
+    if (checker[9] == true) {
+      record.put("userId", task.userId);
+    }
+    if (checker[10] == true) {
+      record.put("groupId", task.groupId);
+    }
+    if (checker[11] == true) {
+      record.put("nfrs", task.nfrs);
+    }
+    if (checker[12] == true) {
+      record.put("workflowId", task.workflowId);
+    }
+    if (checker[13] == true) {
+      record.put("waitTime", task.waitTime);
+    }
+    if (checker[14] == true) {
+      record.put("params", task.params);
+    }
+    if (checker[15] == true) {
+      record.put("memoryRequested", task.memoryRequested);
+    }
+    if (checker[16] == true) {
+      record.put("networkIoTime", task.networkIoTime);
+    }
+    if (checker[17] == true) {
+      record.put("diskIoTime", task.diskIoTime);
+    }
+    if (checker[18] == true) {
+      record.put("diskSpaceRequested", task.diskSpaceRequested);
+    }
+    if (checker[19] == true) {
+      record.put("energyConsumption", task.energyConsumption);
+    }
+    if (checker[20] == true) {
+      record.put("resourceUsed", task.resourceUsed);
+    }
     return record;
-  }
-
-  public static Schema getTaskSchema() {
-    return taskSchema;
   }
 }

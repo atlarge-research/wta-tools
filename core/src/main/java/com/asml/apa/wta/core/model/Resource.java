@@ -5,7 +5,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
 import org.apache.avro.Schema;
-import org.apache.avro.SchemaBuilder;
 import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.GenericRecord;
 
@@ -42,51 +41,6 @@ public class Resource implements BaseTraceObject {
 
   private final String details;
 
-  private static Schema resourceSchema = SchemaBuilder.record("resource")
-      .namespace("com.asml.apa.wta.core.model")
-      .fields()
-      .name("id")
-      .type()
-      .longType()
-      .noDefault()
-      .name("type")
-      .type()
-      .nullable()
-      .stringType()
-      .stringDefault("test")
-      .name("numResources")
-      .type()
-      .doubleType()
-      .doubleDefault(0.0)
-      .name("procModel")
-      .type()
-      .nullable()
-      .stringType()
-      .stringDefault("test")
-      .name("memory")
-      .type()
-      .longType()
-      .longDefault(0)
-      .name("diskSpace")
-      .type()
-      .longType()
-      .longDefault(0)
-      .name("networkSpeed")
-      .type()
-      .longType()
-      .longDefault(0)
-      .name("os")
-      .type()
-      .nullable()
-      .stringType()
-      .stringDefault("test")
-      .name("details")
-      .type()
-      .nullable()
-      .stringType()
-      .stringDefault("test")
-      .endRecord();
-
   /**
    * convert resource object to record.
    *
@@ -95,21 +49,35 @@ public class Resource implements BaseTraceObject {
    * @since 1.0.0
    * @author Tianchen Qu
    */
-  public static GenericRecord convertResourceToRecord(Resource resource) {
-    GenericData.Record record = new GenericData.Record(resourceSchema);
-    record.put("id", resource.getId());
-    record.put("type", resource.getType());
-    record.put("numResources", resource.getNumResources());
-    record.put("procModel", resource.getProcModel());
-    record.put("memory", resource.getMemory());
-    record.put("diskSpace", resource.getDiskSpace());
-    record.put("networkSpeed", resource.getNetworkSpeed());
-    record.put("os", resource.getOs());
-    record.put("details", resource.getDetails());
+  public static GenericRecord convertResourceToRecord(Resource resource, Boolean[] checker, Schema schema) {
+    GenericData.Record record = new GenericData.Record(schema);
+    if (checker[0] == true) {
+      record.put("id", resource.getId());
+    }
+    if (checker[1] == true) {
+      record.put("type", resource.getType());
+    }
+    if (checker[2] == true) {
+      record.put("numResources", resource.getNumResources());
+    }
+    if (checker[3] == true) {
+      record.put("procModel", resource.getProcModel());
+    }
+    if (checker[4] == true) {
+      record.put("memory", resource.getMemory());
+    }
+    if (checker[5] == true) {
+      record.put("diskSpace", resource.getDiskSpace());
+    }
+    if (checker[6] == true) {
+      record.put("networkSpeed", resource.getNetworkSpeed());
+    }
+    if (checker[7] == true) {
+      record.put("os", resource.getOs());
+    }
+    if (checker[8] == true) {
+      record.put("details", resource.getDetails());
+    }
     return record;
-  }
-
-  public static Schema getResourceSchema() {
-    return resourceSchema;
   }
 }

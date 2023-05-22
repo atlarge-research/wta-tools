@@ -14,7 +14,6 @@ import org.apache.parquet.hadoop.ParquetWriter;
 import org.apache.parquet.hadoop.util.HadoopInputFile;
 import org.apache.parquet.hadoop.util.HadoopOutputFile;
 
-
 /**
  * Utility class for writing Parquet files using Avro based tools.
  * @since 1.0.0

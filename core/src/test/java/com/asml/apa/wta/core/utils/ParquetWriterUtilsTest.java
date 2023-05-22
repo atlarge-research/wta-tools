@@ -23,7 +23,6 @@ class ParquetWriterUtilsTest {
   List<Resource> resources;
   List<Task> tasks;
   List<Workflow> workflows;
-  List<Workload> workloads;
 
   @BeforeEach
   void init() {
@@ -47,7 +46,6 @@ class ParquetWriterUtilsTest {
     workflows = new ArrayList<>();
     Workload.WorkloadBuilder workloadBuilder = Workload.builder();
     workload = workloadBuilder.build();
-    workloads = new ArrayList<>();
     utils = new ParquetWriterUtils(new File("./src/test/resources/WTA"), "schema-1.0");
   }
 
@@ -74,9 +72,8 @@ class ParquetWriterUtilsTest {
 
   @Test
   void readWorkload() {
-    workloads.add(workload);
     utils.readWorkload(workload);
-    assertThat(workloads).isEqualTo(utils.getWorkloads());
+    assertThat(workload).isEqualTo(utils.getWorkload());
   }
 
   @Test
@@ -102,8 +99,7 @@ class ParquetWriterUtilsTest {
 
   @Test
   void getWorkloads() {
-    workloads.add(workload);
     utils.readWorkload(workload);
-    assertThat(workloads).isEqualTo(utils.getWorkloads());
+    assertThat(workload).isEqualTo(utils.getWorkload());
   }
 }

@@ -21,7 +21,6 @@ class ParquetWriterUtilsIntegrationTest {
   List<Resource> resources;
   List<Task> tasks;
   List<Workflow> workflows;
-  List<Workload> workloads;
 
   @BeforeEach
   void init() {
@@ -45,7 +44,6 @@ class ParquetWriterUtilsIntegrationTest {
     workflows = new ArrayList<>();
     Workload.WorkloadBuilder workloadBuilder = Workload.builder();
     workload = workloadBuilder.build();
-    workloads = new ArrayList<>();
     utils = new ParquetWriterUtils(new File("./src/test/resources/WTA"), "schema-1.0");
   }
 
