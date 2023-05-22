@@ -21,6 +21,7 @@ For the most part, since we are pre-release this will serve no real purpose, oth
 - Added a build dependency to PMD [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 - Added events field for resource object to be configurable [@lyadalachanchu](https://gitlab.ewi.tudelft.nl/lyadalachanchu)
 - Standardize schema version across all objects [@lyadalachanchu](https://gitlab.ewi.tudelft.nl/lyadalachanchu)
+- Updated TaskLevelLIstener to collect as much information from Spark for the Task object [@hpage](https://gitlab.ewi.tudelft.nl/hpage)
 - Improved PMD in the pipeline [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 - Includes automatic serialization to the streaming package [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 - Update WtaUtils file to parse for user logging preferences [@pcho](https://gitlab.ewi.tudelft.nl/pcho)

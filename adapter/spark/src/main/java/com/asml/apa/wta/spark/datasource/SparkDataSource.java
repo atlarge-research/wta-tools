@@ -1,10 +1,11 @@
 package com.asml.apa.wta.spark.datasource;
 
+import com.asml.apa.wta.core.model.Task;
 import com.asml.apa.wta.spark.listener.StageLevelListener;
 import com.asml.apa.wta.spark.listener.TaskLevelListener;
 import java.util.List;
+import lombok.Getter;
 import org.apache.spark.SparkContext;
-import org.apache.spark.executor.TaskMetrics;
 import org.apache.spark.scheduler.StageInfo;
 
 /**
@@ -13,10 +14,13 @@ import org.apache.spark.scheduler.StageInfo;
  * @author Pil Kyu Cho
  * @since 1.0.0
  */
+@Getter
 public class SparkDataSource {
 
   private final SparkContext sparkContext;
+
   private final TaskLevelListener taskLevelListener;
+
   private final StageLevelListener stageLevelListener;
 
   /**
@@ -29,7 +33,7 @@ public class SparkDataSource {
    */
   public SparkDataSource(SparkContext sparkContext) {
     this.sparkContext = sparkContext;
-    taskLevelListener = new TaskLevelListener();
+    taskLevelListener = new TaskLevelListener(sparkContext);
     stageLevelListener = new StageLevelListener();
   }
 
@@ -54,7 +58,7 @@ public class SparkDataSource {
   }
 
   /**
-   * This method registers a stage listener to the Spark context.
+   * This method registers stage listener to the Spark context.
    *
    * @author Pil Kyu Cho
    * @since 1.0.0
@@ -64,7 +68,7 @@ public class SparkDataSource {
   }
 
   /**
-   * This method removes a stage listener from the Spark context.
+   * This method removes the current stage listener from the Spark context.
    *
    * @author Pil Kyu Cho
    * @since 1.0.0
@@ -79,8 +83,8 @@ public class SparkDataSource {
    * @author Pil Kyu Cho
    * @since 1.0.0
    */
-  public List<TaskMetrics> getTaskMetrics() {
-    return taskLevelListener.getTaskMetricsList();
+  public List<Task> getTaskMetrics() {
+    return taskLevelListener.getProcessedTasks();
   }
 
   /**

@@ -2,44 +2,9 @@ package com.asml.apa.wta.spark;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.asml.apa.wta.spark.datasource.SparkDataSource;
-import java.util.Arrays;
-import org.apache.spark.SparkConf;
-import org.apache.spark.api.java.JavaRDD;
-import org.apache.spark.api.java.JavaSparkContext;
-import org.apache.spark.sql.SparkSession;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import scala.Tuple2;
 
-public class SparkDataSourceIntegrationTest {
-
-  private SparkSession spark;
-  private SparkDataSource sut;
-
-  private JavaRDD<String> testFile;
-
-  @BeforeEach
-  public void setup() {
-    SparkConf conf = new SparkConf()
-        .setAppName("SparkTestRunner")
-        .setMaster("local[1]")
-        .set("spark.executor.instances", "1") // 1 executor per instance of each worker
-        .set("spark.executor.cores", "2"); // 2 cores on each executor
-    spark = SparkSession.builder().config(conf).getOrCreate();
-    spark.sparkContext().setLogLevel("ERROR");
-
-    sut = new SparkDataSource(spark.sparkContext());
-    String resourcePath = "src/test/resources/wordcount.txt";
-    testFile = JavaSparkContext.fromSparkContext(spark.sparkContext()).textFile(resourcePath);
-  }
-
-  private void invokeJob() {
-    testFile.flatMap(s -> Arrays.asList(s.split(" ")).iterator())
-        .mapToPair(word -> new Tuple2<>(word, 1))
-        .reduceByKey((a, b) -> a + b)
-        .collect(); // important to collect to store the metrics
-  }
+public class SparkDataSourceIntegrationTest extends BaseSparkJobIntegrationTest {
 
   @Test
   public void taskListenerReturnsList() {
