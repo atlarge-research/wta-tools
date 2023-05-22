@@ -14,6 +14,7 @@ import org.apache.parquet.hadoop.ParquetWriter;
 import org.apache.parquet.hadoop.util.HadoopInputFile;
 import org.apache.parquet.hadoop.util.HadoopOutputFile;
 
+
 /**
  * Utility class for writing Parquet files using Avro based tools.
  * @since 1.0.0
@@ -48,7 +49,7 @@ public class AvroUtils implements AutoCloseable {
   }
 
   /**
-   * write batches into the disk.
+   * Write batches into the disk.
    *
    * @param records list of records
    * @throws Exception possible io exception
@@ -62,7 +63,7 @@ public class AvroUtils implements AutoCloseable {
   }
 
   /**
-   * reader for test.
+   * Reader for test.
    *
    * @return the record in parquet file
    * @throws IOException possible io exception
@@ -74,7 +75,7 @@ public class AvroUtils implements AutoCloseable {
   }
 
   /**
-   * write single record to disk.
+   * Write single record to disk.
    *
    * @param record record
    * @throws IOException possible io exception
@@ -86,7 +87,7 @@ public class AvroUtils implements AutoCloseable {
   }
 
   /**
-   * getter.
+   * Getter.
    *
    * @return output uri
    * @since 1.0.0
@@ -97,7 +98,7 @@ public class AvroUtils implements AutoCloseable {
   }
 
   /**
-   * getter.
+   * Getter.
    *
    * @return schema for the record to be written
    * @since 1.0.0
@@ -108,7 +109,7 @@ public class AvroUtils implements AutoCloseable {
   }
 
   /**
-   * closes the writer.
+   * Closes the writer.
    *
    * @throws Exception possible io exception
    * @since 1.0.0
