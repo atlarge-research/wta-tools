@@ -1,8 +1,6 @@
 package com.asml.apa.wta.core.streams;
 
 import com.asml.apa.wta.core.exceptions.FailedToDeserializeStreamException;
-import com.asml.apa.wta.core.exceptions.FailedToSerializeStreamException;
-import com.asml.apa.wta.core.exceptions.StreamSerializationException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -22,6 +20,7 @@ import java.util.function.Function;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Message stream, used for processing incoming metrics.
@@ -30,6 +29,7 @@ import lombok.Setter;
  * @author Atour Mousavi Gourabi
  * @since 1.0.0
  */
+@Slf4j
 public class Stream<V extends Serializable> {
 
   /**
@@ -84,8 +84,8 @@ public class Stream<V extends Serializable> {
    */
   public Stream(V content, int serializationTrigger) {
     head = new StreamNode<>(content);
-    diskLocations = new ArrayDeque<>();
     tail = head;
+    diskLocations = new ArrayDeque<>();
     deserializationStart = head;
     deserializationEnd = head;
     id = UUID.randomUUID();
@@ -102,8 +102,8 @@ public class Stream<V extends Serializable> {
    */
   public Stream(V content) {
     head = new StreamNode<>(content);
-    diskLocations = new ArrayDeque<>();
     tail = head;
+    diskLocations = new ArrayDeque<>();
     deserializationStart = head;
     deserializationEnd = head;
     id = UUID.randomUUID();
@@ -131,11 +131,10 @@ public class Stream<V extends Serializable> {
   /**
    * Serializes the internals of the stream.
    *
-   * @throws FailedToSerializeStreamException if an {@link java.io.IOException} occurred when serializing internals
    * @author Atour Mousavi Gourabi
    * @since 1.0.0
    */
-  private synchronized void serializeInternals() throws FailedToSerializeStreamException {
+  private synchronized void serializeInternals() {
     StreamNode<V> current;
     if (head == deserializationEnd) {
       current = head.getNext();
@@ -145,20 +144,20 @@ public class Stream<V extends Serializable> {
     String filePath = "tmp\\" + id + "-" + System.currentTimeMillis() + "-"
         + Instant.now().getNano() + ".ser";
     List<StreamNode<V>> toSerialize = new ArrayList<>();
-    try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream(filePath))) {
-      while (current != tail && current != null) {
-        toSerialize.add(current);
-        current = current.getNext();
-      }
-      objectOutputStream.writeObject(toSerialize);
-      deserializationEnd.setNext(null);
-      diskLocations.add(filePath);
-      deserializationEnd = tail;
-    } catch (IOException e) {
-      throw new FailedToSerializeStreamException();
-    } finally {
-      additionsSinceLastWriteToDisk = 0;
+    while (current != tail && current != null) {
+      toSerialize.add(current);
+      current = current.getNext();
     }
+    try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream(filePath))) {
+      objectOutputStream.writeObject(toSerialize);
+    } catch (IOException e) {
+      log.error("Failed to serialize stream internals to {}", filePath);
+      return;
+    }
+    deserializationEnd.setNext(null);
+    deserializationEnd = tail;
+    diskLocations.add(filePath);
+    additionsSinceLastWriteToDisk = 0;
   }
 
   /**
@@ -170,7 +169,7 @@ public class Stream<V extends Serializable> {
    * @author Atour Mousavi Gourabi
    * @since 1.0.0
    */
-  private synchronized int deserializeInternals(@NonNull String filePath) throws FailedToDeserializeStreamException {
+  private synchronized int deserializeInternals(@NonNull String filePath) {
     int amountOfNodes;
     try (ObjectInputStream objectInputStream = new ObjectInputStream(new FileInputStream(filePath))) {
       List<StreamNode<V>> nodes = (ArrayList<StreamNode<V>>) objectInputStream.readObject();
@@ -189,9 +188,11 @@ public class Stream<V extends Serializable> {
       }
       amountOfNodes = nodes.size();
     } catch (IOException | ClassNotFoundException | ClassCastException e) {
+      log.error("Failed to deserialize stream internals from {}", filePath);
       throw new FailedToDeserializeStreamException();
+    } finally {
+      new File(filePath).delete();
     }
-    new File(filePath).delete();
     return amountOfNodes;
   }
 
@@ -212,11 +213,13 @@ public class Stream<V extends Serializable> {
    * @return the head of the {@link com.asml.apa.wta.core.streams.Stream}
    * @throws FailedToDeserializeStreamException when some error occurred during routine deserialization of parts of
    *                                            the {@link com.asml.apa.wta.core.streams.Stream}
+   * @throws NoSuchElementException when head is called on an empty {@link com.asml.apa.wta.core.streams.Stream}
    * @author Atour Mousavi Gourabi
    * @since 1.0.0
    */
-  public synchronized V head() throws FailedToDeserializeStreamException {
+  public synchronized V head() {
     if (head == null) {
+      log.error("Stream#head() was called on an empty stream");
       throw new NoSuchElementException();
     }
     additionsSinceLastWriteToDisk--;
@@ -239,11 +242,13 @@ public class Stream<V extends Serializable> {
    * Peeks at the head of the stream.
    *
    * @return the head of the {@link com.asml.apa.wta.core.streams.Stream}
+   * @throws NoSuchElementException when peek is called on an empty {@link com.asml.apa.wta.core.streams.Stream}
    * @author Atour Mousavi Gourabi
    * @since 1.0.0
    */
   public synchronized V peek() {
     if (head == null) {
+      log.error("Stream#peek() was called on an empty stream");
       throw new NoSuchElementException();
     }
     return head.getContent();
@@ -253,12 +258,10 @@ public class Stream<V extends Serializable> {
    * Adds content to the stream.
    *
    * @param content the content to add to this {@link com.asml.apa.wta.core.streams.Stream}
-   * @throws FailedToSerializeStreamException when some error occurred during routine serialization of parts of
-   *                                          the {@link com.asml.apa.wta.core.streams.Stream}
    * @author Atour Mousavi Gourabi
    * @since 1.0.0
    */
-  public synchronized void addToStream(V content) throws FailedToSerializeStreamException {
+  public synchronized void addToStream(V content) {
     if (head == null) {
       head = new StreamNode<>(content);
       tail = head;
@@ -270,6 +273,9 @@ public class Stream<V extends Serializable> {
     }
     additionsSinceLastWriteToDisk++;
     if (additionsSinceLastWriteToDisk > serializationTrigger) {
+      log.trace(
+          "Serializing stream internals after {} additions since last write to disk",
+          additionsSinceLastWriteToDisk);
       serializeInternals();
     }
   }
@@ -281,13 +287,12 @@ public class Stream<V extends Serializable> {
    * @param op the operation to perform over the {@link com.asml.apa.wta.core.streams.Stream}
    * @param <R> generic return type of the mapping operation
    * @return the mapped stream
-   * @throws StreamSerializationException when some error occurred during routine (de)serialization of parts of
-   *                                      the {@link com.asml.apa.wta.core.streams.Stream}
+   * @throws FailedToDeserializeStreamException when some error occurred during routine deserialization of parts
+   *                                            of the {@link com.asml.apa.wta.core.streams.Stream}
    * @author Atour Mousavi Gourabi
    * @since 1.0.0
    */
-  public synchronized <R extends Serializable> Stream<R> map(@NonNull Function<V, R> op)
-      throws StreamSerializationException {
+  public synchronized <R extends Serializable> Stream<R> map(@NonNull Function<V, R> op) {
     StreamNode<V> next = head;
     Stream<R> ret = new Stream<>();
     while (next != null) {
@@ -309,12 +314,12 @@ public class Stream<V extends Serializable> {
    *
    * @param predicate the predicate used for filtering, elements that return false get filtered out
    * @return the filtered {@link com.asml.apa.wta.core.streams.Stream}
-   * @throws StreamSerializationException when some error occurred during routine (de)serialization of parts of
-   *                                      the {@link com.asml.apa.wta.core.streams.Stream}
+   * @throws FailedToDeserializeStreamException when some error occurred during routine deserialization of parts
+   *                                            of the {@link com.asml.apa.wta.core.streams.Stream}
    * @author Atour Mousavi Gourabi
    * @since 1.0.0
    */
-  public synchronized Stream<V> filter(@NonNull Function<V, Boolean> predicate) throws StreamSerializationException {
+  public synchronized Stream<V> filter(@NonNull Function<V, Boolean> predicate) {
     StreamNode<V> next = head;
     Stream<V> ret = new Stream<>();
     while (next != null) {
@@ -345,8 +350,7 @@ public class Stream<V extends Serializable> {
    * @author Atour Mousavi Gourabi
    * @since 1.0.0
    */
-  public synchronized <R> R foldLeft(R init, @NonNull BiFunction<R, V, R> op)
-      throws FailedToDeserializeStreamException {
+  public synchronized <R> R foldLeft(R init, @NonNull BiFunction<R, V, R> op) {
     R acc = init;
     StreamNode<V> next = head;
     while (next != null) {

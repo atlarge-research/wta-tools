@@ -2,7 +2,6 @@ package com.asml.apa.wta.core.streams;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.asml.apa.wta.core.exceptions.FailedToSerializeStreamException;
 import java.util.List;
 import lombok.NonNull;
 import net.jqwik.api.Arbitraries;
@@ -29,8 +28,7 @@ class KeyedStreamIntegrationTest {
   void simpleOnKeyRetrieval(
       @ForAll("listOfStrings") @NonNull List<String> strings,
       @ForAll @IntRange(min = -10, max = 10) int key,
-      @ForAll @Size(100) @UniqueElements List<Integer> list)
-      throws FailedToSerializeStreamException {
+      @ForAll @Size(100) @UniqueElements List<Integer> list) {
     KeyedStream<Integer, String> keyedStream = new KeyedStream<>();
     for (String s : strings) {
       keyedStream.addToStream(key, s);
