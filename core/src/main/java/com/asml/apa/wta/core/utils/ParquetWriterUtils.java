@@ -5,7 +5,10 @@ import com.asml.apa.wta.core.model.Task;
 import com.asml.apa.wta.core.model.Workflow;
 import com.asml.apa.wta.core.model.Workload;
 import com.google.gson.Gson;
-import java.io.*;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.avro.Schema;
@@ -119,12 +122,12 @@ public class ParquetWriterUtils {
   /**
    * Reads the workload object from kafka.
    *
-   * @param workload the workload
+   * @param workLoad the workload
    * @since 1.0.0
    * @author Tianchen Qu
    */
-  public void readWorkload(Workload workload) {
-    this.workload = workload;
+  public void readWorkload(Workload workLoad) {
+    workload = workLoad;
   }
 
   /**
@@ -160,33 +163,33 @@ public class ParquetWriterUtils {
     SchemaBuilder.FieldAssembler<Schema> fieldSchema = SchemaBuilder.record("resource")
         .namespace("com.asml.apa.wta.core.model")
         .fields();
-    if (checker[0] == true) {
+    if (checker[0]) {
       fieldSchema = fieldSchema.name("id").type().longType().noDefault();
     }
-    if (checker[1] == true) {
+    if (checker[1]) {
       fieldSchema =
           fieldSchema.name("type").type().nullable().stringType().stringDefault("test");
     }
-    if (checker[2] == true) {
+    if (checker[2]) {
       fieldSchema = fieldSchema.name("numResources").type().doubleType().doubleDefault(0.0);
     }
-    if (checker[3] == true) {
+    if (checker[3]) {
       fieldSchema =
           fieldSchema.name("procModel").type().nullable().stringType().stringDefault("test");
     }
-    if (checker[4] == true) {
+    if (checker[4]) {
       fieldSchema = fieldSchema.name("memory").type().longType().longDefault(0);
     }
-    if (checker[5] == true) {
+    if (checker[5]) {
       fieldSchema = fieldSchema.name("diskSpace").type().longType().longDefault(0);
     }
-    if (checker[6] == true) {
+    if (checker[6]) {
       fieldSchema = fieldSchema.name("networkSpeed").type().longType().longDefault(0);
     }
-    if (checker[7] == true) {
+    if (checker[7]) {
       fieldSchema = fieldSchema.name("os").type().nullable().stringType().stringDefault("test");
     }
-    if (checker[8] == true) {
+    if (checker[8]) {
       fieldSchema =
           fieldSchema.name("details").type().nullable().stringType().stringDefault("test");
     }
@@ -214,23 +217,23 @@ public class ParquetWriterUtils {
     SchemaBuilder.FieldAssembler<Schema> fieldSchema = SchemaBuilder.record("resource")
         .namespace("com.asml.apa.wta.core.model")
         .fields();
-    if (checker[0] == true) {
+    if (checker[0]) {
       fieldSchema = fieldSchema.name("id").type().longType().noDefault();
     }
-    if (checker[1] == true) {
+    if (checker[1]) {
       fieldSchema =
           fieldSchema.name("type").type().nullable().stringType().stringDefault("test");
     }
-    if (checker[2] == true) {
+    if (checker[2]) {
       fieldSchema = fieldSchema.name("submitType").type().longType().longDefault(0);
     }
-    if (checker[3] == true) {
+    if (checker[3]) {
       fieldSchema = fieldSchema.name("submissionSite").type().intType().intDefault(0);
     }
-    if (checker[4] == true) {
+    if (checker[4]) {
       fieldSchema = fieldSchema.name("runtime").type().longType().longDefault(0);
     }
-    if (checker[5] == true) {
+    if (checker[5]) {
       fieldSchema = fieldSchema
           .name("resourceType")
           .type()
@@ -238,14 +241,14 @@ public class ParquetWriterUtils {
           .stringType()
           .stringDefault("test");
     }
-    if (checker[6] == true) {
+    if (checker[6]) {
       fieldSchema = fieldSchema
           .name("resourceAmountRequested")
           .type()
           .doubleType()
           .doubleDefault(0.0);
     }
-    if (checker[7] == true) {
+    if (checker[7]) {
       fieldSchema = fieldSchema
           .name("parents")
           .type()
@@ -255,7 +258,7 @@ public class ParquetWriterUtils {
           .longType()
           .arrayDefault(new ArrayList<Long>());
     }
-    if (checker[8] == true) {
+    if (checker[8]) {
       fieldSchema = fieldSchema
           .name("children")
           .type()
@@ -265,45 +268,45 @@ public class ParquetWriterUtils {
           .longType()
           .arrayDefault(new ArrayList<Long>());
     }
-    if (checker[9] == true) {
+    if (checker[9]) {
       fieldSchema = fieldSchema.name("userId").type().intType().intDefault(0);
     }
-    if (checker[10] == true) {
+    if (checker[10]) {
       fieldSchema = fieldSchema.name("groupId").type().intType().intDefault(0);
     }
-    if (checker[11] == true) {
+    if (checker[11]) {
       fieldSchema =
           fieldSchema.name("nfrs").type().nullable().stringType().stringDefault("test");
     }
-    if (checker[12] == true) {
+    if (checker[12]) {
       fieldSchema = fieldSchema.name("workflowId").type().longType().longDefault(0);
     }
-    if (checker[13] == true) {
+    if (checker[13]) {
       fieldSchema = fieldSchema.name("waitTime").type().longType().longDefault(0);
     }
-    if (checker[14] == true) {
+    if (checker[14]) {
       fieldSchema =
           fieldSchema.name("params").type().nullable().stringType().stringDefault("test");
     }
-    if (checker[15] == true) {
+    if (checker[15]) {
       fieldSchema =
           fieldSchema.name("memoryRequested").type().doubleType().doubleDefault(0.0);
     }
-    if (checker[16] == true) {
+    if (checker[16]) {
       fieldSchema = fieldSchema.name("networkIoTime").type().longType().longDefault(0);
     }
-    if (checker[17] == true) {
+    if (checker[17]) {
       fieldSchema = fieldSchema.name("diskIoTime").type().longType().longDefault(0);
     }
-    if (checker[18] == true) {
+    if (checker[18]) {
       fieldSchema =
           fieldSchema.name("diskSpaceRequested").type().doubleType().doubleDefault(0.0);
     }
-    if (checker[19] == true) {
+    if (checker[19]) {
       fieldSchema =
           fieldSchema.name("energyConsumption").type().longType().longDefault(0);
     }
-    if (checker[20] == true) {
+    if (checker[20]) {
       fieldSchema = fieldSchema.name("resourceUsed").type().longType().longDefault(0);
     }
     Schema schema = fieldSchema.endRecord();
@@ -330,13 +333,13 @@ public class ParquetWriterUtils {
     SchemaBuilder.FieldAssembler<Schema> fieldSchema = SchemaBuilder.record("resource")
         .namespace("com.asml.apa.wta.core.model")
         .fields();
-    if (checker[0] == true) {
+    if (checker[0]) {
       fieldSchema = fieldSchema.name("id").type().longType().noDefault();
     }
-    if (checker[1] == true) {
+    if (checker[1]) {
       fieldSchema = fieldSchema.name("submitTime").type().longType().noDefault();
     }
-    if (checker[2] == true) {
+    if (checker[2]) {
       fieldSchema = fieldSchema
           .name("tasks")
           .type()
@@ -346,37 +349,37 @@ public class ParquetWriterUtils {
           .longType()
           .noDefault();
     }
-    if (checker[3] == true) {
+    if (checker[3]) {
       fieldSchema = fieldSchema.name("numberOfTasks").type().intType().noDefault();
     }
-    if (checker[4] == true) {
+    if (checker[4]) {
       fieldSchema =
           fieldSchema.name("criticalPathLength").type().intType().noDefault();
     }
-    if (checker[5] == true) {
+    if (checker[5]) {
       fieldSchema =
           fieldSchema.name("criticalPathTaskCount").type().intType().noDefault();
     }
-    if (checker[6] == true) {
+    if (checker[6]) {
       fieldSchema = fieldSchema
           .name("maxNumberOfConcurrentTasks")
           .type()
           .intType()
           .noDefault();
     }
-    if (checker[7] == true) {
+    if (checker[7]) {
       fieldSchema =
           fieldSchema.name("nfrs").type().nullable().stringType().noDefault();
     }
-    if (checker[8] == true) {
+    if (checker[8]) {
       fieldSchema =
           fieldSchema.name("scheduler").type().nullable().stringType().noDefault();
     }
-    if (checker[9] == true) {
+    if (checker[9]) {
       fieldSchema =
           fieldSchema.name("domain").type().nullable().stringType().noDefault();
     }
-    if (checker[10] == true) {
+    if (checker[10]) {
       fieldSchema = fieldSchema
           .name("applicationName")
           .type()
@@ -384,7 +387,7 @@ public class ParquetWriterUtils {
           .stringType()
           .noDefault();
     }
-    if (checker[11] == true) {
+    if (checker[11]) {
       fieldSchema = fieldSchema
           .name("applicationField")
           .type()
@@ -392,22 +395,22 @@ public class ParquetWriterUtils {
           .stringType()
           .noDefault();
     }
-    if (checker[12] == true) {
+    if (checker[12]) {
       fieldSchema = fieldSchema.name("totalResources").type().doubleType().noDefault();
     }
-    if (checker[13] == true) {
+    if (checker[13]) {
       fieldSchema =
           fieldSchema.name("totalMemoryUsage").type().doubleType().noDefault();
     }
-    if (checker[14] == true) {
+    if (checker[14]) {
       fieldSchema =
           fieldSchema.name("totalNetworkUsage").type().longType().noDefault();
     }
-    if (checker[15] == true) {
+    if (checker[15]) {
       fieldSchema =
           fieldSchema.name("totalDiskSpaceUsage").type().longType().noDefault();
     }
-    if (checker[16] == true) {
+    if (checker[16]) {
       fieldSchema =
           fieldSchema.name("totalEnergyConsumption").type().longType().noDefault();
     }
@@ -433,10 +436,10 @@ public class ParquetWriterUtils {
   private void writeWorkloadToFile(String workloadFileName) throws Exception {
     Gson gson = new Gson();
     String workloadJson = gson.toJson(workload);
-    File path = new File(this.path, "/workloads/" + version);
+    File file = new File(this.path, "/workloads/" + version);
     path.mkdirs();
     ByteArrayOutputStream writer = new ByteArrayOutputStream();
-    OutputStream dir = new FileOutputStream(new File(path, workloadFileName + ".json"));
+    OutputStream dir = new FileOutputStream(new File(file, workloadFileName + ".json"));
     writer.write(workloadJson.getBytes());
     writer.writeTo(dir);
     writer.flush();
@@ -564,15 +567,15 @@ public class ParquetWriterUtils {
 
   /**
    * Checks whether there are objects with uninitialized field, we will skip these columns in the output parquet file.
-   * @param workflows workflows
+   * @param workFlows workflows
    * @return a boolean array indicating what column to skip
    */
-  private Boolean[] checkWorkflowDomain(List<Workflow> workflows) {
+  private Boolean[] checkWorkflowDomain(List<Workflow> workFlows) {
     Boolean[] flg = new Boolean[17];
     for (int i = 0; i < 17; i++) {
       flg[i] = true;
     }
-    for (Workflow workflow : workflows) {
+    for (Workflow workflow : workFlows) {
       if (workflow.getId() == -1) {
         flg[0] = false;
       }

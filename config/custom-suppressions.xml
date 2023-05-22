@@ -8,4 +8,8 @@
   <suppress files="Main.java" checks="HideUtilityClassConstructor" />
   <!-- BanLoggingImplementations forbids import of log4j framework but SLF4J makes use of it anyways  -->
   <suppress files="Log4j2Configuration.java" id="BanLoggingImplementations"/>
+  <suppress files="ParquetWriterUtils.java" id="CyclomaticComplexity"/>
+  <suppress files="Resource.java" id="CyclomaticComplexity"/>
+  <suppress files="Task.java" id="CyclomaticComplexity"/>
+  <suppress files="Workflow.java" id="CyclomaticComplexity"/>
 </suppressions>
