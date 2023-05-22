@@ -27,16 +27,16 @@ public class WtaDriverPlugin implements DriverPlugin {
    *
    * Expensive calls should be postponed or delegated to another thread.
    *
-   * @param sCtx The current SparkContext.
-   * @param pCtx Additional plugin-specific about the Spark application where the plugin is running.
+   * @param sparkCtx The current SparkContext.
+   * @param pluginCtx Additional plugin-specific about the Spark application where the plugin is running.
    * @return Extra information provided to the executor
    * @author Henry Page
    * @since 1.0.0
    */
   @Override
-  public Map<String, String> init(SparkContext sCtx, PluginContext pCtx) {
-    this.sparkContext = sCtx;
-    this.sparkDataSource = new SparkDataSource(sparkContext);
+  public Map<String, String> init(SparkContext sparkCtx, PluginContext pluginCtx) {
+    this.sparkContext = sparkCtx;
+    this.sparkDataSource = new SparkDataSource(sparkCtx);
     return new HashMap<>();
   }
 

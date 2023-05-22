@@ -10,7 +10,6 @@ import com.asml.apa.wta.spark.listener.AbstractListener;
 import com.asml.apa.wta.spark.listener.ApplicationLevelListener;
 import com.asml.apa.wta.spark.listener.JobLevelListener;
 import com.asml.apa.wta.spark.listener.TaskLevelListener;
-import java.util.List;
 import lombok.Getter;
 import org.apache.spark.SparkContext;
 
@@ -116,19 +115,5 @@ public class SparkDataSource implements CollectorInterface {
    */
   public void removeApplicationListener() {
     applicationLevelListener.remove();
-  }
-
-  /**
-   * This method gets a list of TaskMetrics from the registered task listener.
-   *
-   * @return List of task metrics
-   * @author Pil Kyu Cho
-   * @since 1.0.0
-   * @deprecated We don't want to expose tasks to the end user.
-   * If really needed, use taskLevelListener.getProcessedObjects()
-   */
-  @Deprecated
-  public List<Task> getTaskMetrics() {
-    return taskLevelListener.getProcessedObjects();
   }
 }
