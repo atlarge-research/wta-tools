@@ -1,4 +1,3 @@
-
 # CHANGELOG
 For the most part, since we are pre-release this will serve no real purpose, other than accountability. Initial Release will correspond to minimum viable product.
 
