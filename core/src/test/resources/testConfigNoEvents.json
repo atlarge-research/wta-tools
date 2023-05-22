@@ -6,5 +6,9 @@
     "description": "Test Description"
   },
   "resourceSettings":
-  {}
+  {},
+  "logSettings":
+  {
+    "logLevel": "INFO"
+  }
 }

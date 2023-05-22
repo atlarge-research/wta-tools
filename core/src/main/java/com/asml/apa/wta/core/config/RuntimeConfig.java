@@ -24,4 +24,7 @@ public class RuntimeConfig {
 
   @Builder.Default
   private Map<String, String> events = new HashMap<>();
+
+  @Builder.Default
+  private String logLevel = "ERROR";
 }

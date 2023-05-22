@@ -23,6 +23,11 @@ For the most part, since we are pre-release this will serve no real purpose, oth
 - Standardize schema version across all objects [@lyadalachanchu](https://gitlab.ewi.tudelft.nl/lyadalachanchu)
 - Improved PMD in the pipeline [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 - Includes automatic serialization to the streaming package [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
+- Update WtaUtils file to parse for user logging preferences [@pcho](https://gitlab.ewi.tudelft.nl/pcho)
+- Created a logging class to log on both console and to log file [@pcho](https://gitlab.ewi.tudelft.nl/pcho)
+- Updates the Spark dependency to 3.2.4 [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
+- Moves to using slf4j as logging facade over directly using log4j2 [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
+- Simplified the use of the streaming packages [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 
 ### Changed
 

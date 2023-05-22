@@ -26,7 +26,7 @@ import java.io.IOException;
 import java.util.List;
 
 
-public class SparkDataSourceTest {
+public class SparkDataSourceIntegrationTest {
 
   private SparkSession spark;
   private SparkDataSource sut;

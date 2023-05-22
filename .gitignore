@@ -8,6 +8,7 @@
 *.class
 
 # Log file
+logging
 *.log
 
 # BlueJ files
@@ -73,3 +74,6 @@ tmp
 
 # jqwik
 .jqwik-database
+
+# logs
+logs

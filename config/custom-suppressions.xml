@@ -6,4 +6,6 @@
 <suppressions>
   <!-- HideUtilityClassConstructor enforces the existence of an explicit constructor for Main, we consider this nonsense. -->
   <suppress files="Main.java" checks="HideUtilityClassConstructor" />
+  <!-- BanLoggingImplementations forbids import of log4j framework but SLF4J makes use of it anyways  -->
+  <suppress files="Log4j2Configuration.java" id="BanLoggingImplementations"/>
 </suppressions>
