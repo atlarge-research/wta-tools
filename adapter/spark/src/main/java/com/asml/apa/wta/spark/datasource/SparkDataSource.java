@@ -58,7 +58,7 @@ public class SparkDataSource {
   }
 
   /**
-   * This method registers a stage listener to the Spark context.
+   * This method registers stage listener to the Spark context.
    *
    * @author Pil Kyu Cho
    * @since 1.0.0
@@ -68,7 +68,7 @@ public class SparkDataSource {
   }
 
   /**
-   * This method removes a stage listener from the Spark context.
+   * This method removes the current stage listener from the Spark context.
    *
    * @author Pil Kyu Cho
    * @since 1.0.0
