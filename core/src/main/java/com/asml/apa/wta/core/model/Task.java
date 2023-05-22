@@ -68,73 +68,75 @@ public class Task implements BaseTraceObject {
    * Convert task to record.
    *
    * @param task task
+   * @param checker checker for which column to skip
+   * @param schema schema
    * @return record
    * @since 1.0.0
    * @author Tianchen Qu
    */
   public static GenericRecord convertTaskToRecord(Task task, Boolean[] checker, Schema schema) {
     GenericData.Record record = new GenericData.Record(schema);
-    if (checker[0] == true) {
+    if (checker[0]) {
       record.put("id", task.id);
     }
-    if (checker[1] == true) {
+    if (checker[1]) {
       record.put("type", task.type);
     }
-    if (checker[2] == true) {
+    if (checker[2]) {
       record.put("submitType", task.submitType);
     }
-    if (checker[3] == true) {
+    if (checker[3]) {
       record.put("submissionSite", task.submissionSite);
     }
-    if (checker[4] == true) {
+    if (checker[4]) {
       record.put("runtime", task.runtime);
     }
-    if (checker[5] == true) {
+    if (checker[5]) {
       record.put("resourceType", task.resourceType);
     }
-    if (checker[6] == true) {
+    if (checker[6]) {
       record.put("resourceAmountRequested", task.resourceAmountRequested);
     }
-    if (checker[7] == true) {
+    if (checker[7]) {
       record.put("parents", task.parents);
     }
-    if (checker[8] == true) {
+    if (checker[8]) {
       record.put("children", task.children);
     }
-    if (checker[9] == true) {
+    if (checker[9]) {
       record.put("userId", task.userId);
     }
-    if (checker[10] == true) {
+    if (checker[10]) {
       record.put("groupId", task.groupId);
     }
-    if (checker[11] == true) {
+    if (checker[11]) {
       record.put("nfrs", task.nfrs);
     }
-    if (checker[12] == true) {
+    if (checker[12]) {
       record.put("workflowId", task.workflowId);
     }
-    if (checker[13] == true) {
+    if (checker[13]) {
       record.put("waitTime", task.waitTime);
     }
-    if (checker[14] == true) {
+    if (checker[14]) {
       record.put("params", task.params);
     }
-    if (checker[15] == true) {
+    if (checker[15]) {
       record.put("memoryRequested", task.memoryRequested);
     }
-    if (checker[16] == true) {
+    if (checker[16]) {
       record.put("networkIoTime", task.networkIoTime);
     }
-    if (checker[17] == true) {
+    if (checker[17]) {
       record.put("diskIoTime", task.diskIoTime);
     }
-    if (checker[18] == true) {
+    if (checker[18]) {
       record.put("diskSpaceRequested", task.diskSpaceRequested);
     }
-    if (checker[19] == true) {
+    if (checker[19]) {
       record.put("energyConsumption", task.energyConsumption);
     }
-    if (checker[20] == true) {
+    if (checker[20]) {
       record.put("resourceUsed", task.resourceUsed);
     }
     return record;
