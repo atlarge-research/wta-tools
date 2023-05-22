@@ -65,7 +65,7 @@ public class Task implements BaseTraceObject {
   private final long resourceUsed;
 
   /**
-   * convert task to record.
+   * Convert task to record.
    *
    * @param task task
    * @return record

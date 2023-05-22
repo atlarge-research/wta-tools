@@ -42,7 +42,7 @@ public class Resource implements BaseTraceObject {
   private final String details;
 
   /**
-   * convert resource object to record.
+   * Convert resource object to record.
    *
    * @param resource resource
    * @return record

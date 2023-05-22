@@ -7,8 +7,6 @@ import com.asml.apa.wta.core.model.Workload;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-
-import net.jqwik.api.domains.Domain;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -43,32 +41,32 @@ class ParquetWriterUtilsIntegrationTest {
   @Test
   void writeToFileTest() {
     Resource.ResourceBuilder resourceBuilder = Resource.builder()
-            .id(1)
-            .type("test")
-            .os("test os")
-            .details("None")
-            .diskSpace(2)
-            .numResources(4.0)
-            .memory(8)
-            .networkSpeed(16)
-            .procModel("test model");
+        .id(1)
+        .type("test")
+        .os("test os")
+        .details("None")
+        .diskSpace(2)
+        .numResources(4.0)
+        .memory(8)
+        .networkSpeed(16)
+        .procModel("test model");
     resource = resourceBuilder.build();
     Task.TaskBuilder taskBuilder = Task.builder()
-            .nfrs("test")
-            .children(new long[1])
-            .parents(new long[1])
-            .type("test")
-            .params("test")
-            .resourceType("test");
+        .nfrs("test")
+        .children(new long[1])
+        .parents(new long[1])
+        .type("test")
+        .params("test")
+        .resourceType("test");
     task = taskBuilder.build();
     Task[] tArray = new Task[1];
     tArray[0] = task;
     Workflow.WorkflowBuilder workflowBuilder = Workflow.builder()
-            .applicationField("test")
-            .applicationName("test")
-            .scheduler("test")
-            .nfrs("test")
-            .tasks(tArray);
+        .applicationField("test")
+        .applicationName("test")
+        .scheduler("test")
+        .nfrs("test")
+        .tasks(tArray);
     workflow = workflowBuilder.build();
     System.out.println(workflow);
     Workload.WorkloadBuilder workloadBuilder = Workload.builder();
@@ -89,40 +87,37 @@ class ParquetWriterUtilsIntegrationTest {
   }
 
   @Test
-  void writeToFileAltTest(){
-    Resource.ResourceBuilder resourceBuilderAlt = Resource.builder()
-            .diskSpace(-1)
-            .numResources(-1.0)
-            .memory(-1)
-            .networkSpeed(-1);
+  void writeToFileAltTest() {
+    Resource.ResourceBuilder resourceBuilderAlt =
+        Resource.builder().diskSpace(-1).numResources(-1.0).memory(-1).networkSpeed(-1);
     resourceAlt = resourceBuilderAlt.build();
     Task.TaskBuilder taskBuilderAlt = Task.builder()
-            .groupId(-1)
-            .diskIoTime(-1)
-            .energyConsumption(-1)
-            .diskSpaceRequested(-1.0)
-            .memoryRequested(-1.0)
-            .networkIoTime(-1)
-            .resourceAmountRequested(-1.0)
-            .runtime(-1)
-            .resourceUsed(-1)
-            .submissionSite(-1)
-            .submitType(-1)
-            .userId(-1)
-            .waitTime(-1)
-            .workflowId(-1);
+        .groupId(-1)
+        .diskIoTime(-1)
+        .energyConsumption(-1)
+        .diskSpaceRequested(-1.0)
+        .memoryRequested(-1.0)
+        .networkIoTime(-1)
+        .resourceAmountRequested(-1.0)
+        .runtime(-1)
+        .resourceUsed(-1)
+        .submissionSite(-1)
+        .submitType(-1)
+        .userId(-1)
+        .waitTime(-1)
+        .workflowId(-1);
     taskAlt = taskBuilderAlt.build();
     Workflow.WorkflowBuilder workflowBuilderAlt = Workflow.builder()
-            .criticalPathLength(-1)
-            .criticalPathTaskCount(-1)
-            .numberOfTasks(-1)
-            .submitTime(-1)
-            .maxNumberOfConcurrentTasks(-1)
-            .totalDiskSpaceUsage(-1)
-            .totalEnergyConsumption(-1)
-            .totalMemoryUsage(-1.0)
-            .totalNetworkUsage(-1)
-            .totalResources(-1.0);
+        .criticalPathLength(-1)
+        .criticalPathTaskCount(-1)
+        .numberOfTasks(-1)
+        .submitTime(-1)
+        .maxNumberOfConcurrentTasks(-1)
+        .totalDiskSpaceUsage(-1)
+        .totalEnergyConsumption(-1)
+        .totalMemoryUsage(-1.0)
+        .totalNetworkUsage(-1)
+        .totalResources(-1.0);
     workflowAlt = workflowBuilderAlt.build();
     Workload.WorkloadBuilder workloadBuilder = Workload.builder();
     workload = workloadBuilder.build();

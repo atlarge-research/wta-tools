@@ -442,6 +442,11 @@ public class ParquetWriterUtils {
     writer.flush();
   }
 
+  /**
+   * Checks whether there are objects with uninitialized field, we will skip these columns in the output parquet file.
+   * @param resources resources
+   * @return a boolean array indicating what column to skip
+   */
   private Boolean[] checkResourceDomain(List<Resource> resources) {
     Boolean[] flg = new Boolean[9];
     for (int i = 0; i < 9; i++) {
@@ -479,6 +484,11 @@ public class ParquetWriterUtils {
     return flg;
   }
 
+  /**
+   * Checks whether there are objects with uninitialized field, we will skip these columns in the output parquet file.
+   * @param tasks tasks
+   * @return a boolean array indicating what column to skip
+   */
   private Boolean[] checkTaskDomain(List<Task> tasks) {
     Boolean[] flg = new Boolean[21];
     for (int i = 0; i < 21; i++) {
@@ -552,6 +562,11 @@ public class ParquetWriterUtils {
     return flg;
   }
 
+  /**
+   * Checks whether there are objects with uninitialized field, we will skip these columns in the output parquet file.
+   * @param workflows workflows
+   * @return a boolean array indicating what column to skip
+   */
   private Boolean[] checkWorkflowDomain(List<Workflow> workflows) {
     Boolean[] flg = new Boolean[17];
     for (int i = 0; i < 17; i++) {

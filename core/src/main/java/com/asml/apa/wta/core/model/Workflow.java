@@ -7,7 +7,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
 import org.apache.avro.Schema;
-import org.apache.avro.SchemaBuilder;
 import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.GenericRecord;
 
@@ -60,9 +59,8 @@ public class Workflow implements BaseTraceObject {
 
   private final long totalEnergyConsumption;
 
-
   /**
-   * convert workflow to record.
+   * Convert workflow to record.
    *
    * @param workflow workflow
    * @return record
@@ -78,7 +76,8 @@ public class Workflow implements BaseTraceObject {
       record.put("submitTime", workflow.submitTime);
     }
     if (checker[2] == true) {
-      record.put("tasks", Arrays.stream(workflow.tasks).map(x -> x.getId()).toArray());
+      record.put(
+          "tasks", Arrays.stream(workflow.tasks).map(x -> x.getId()).toArray());
     }
     if (checker[3] == true) {
       record.put("numberOfTasks", workflow.numberOfTasks);
