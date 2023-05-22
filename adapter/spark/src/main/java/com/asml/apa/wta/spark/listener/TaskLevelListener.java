@@ -28,7 +28,7 @@ public class TaskLevelListener extends SparkListener {
   private final SparkContext sparkContext;
 
   @Getter
-  private Map<Integer, Integer> stageIdsToJobs = new ConcurrentHashMap<>();
+  private final Map<Integer, Integer> stageIdsToJobs = new ConcurrentHashMap<>();
 
   @Getter
   private final List<Task> processedTasks = new LinkedList<>();
