@@ -46,6 +46,9 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
    * @param applicationEnd The event corresponding to the end of the application
    */
   public void onApplicationEnd(SparkListenerApplicationEnd applicationEnd) {
+
+    // we should enver enter this branch, this is a guard since an application
+    // only terminates once.
     if (!processedObjects.isEmpty()) {
       return;
     }

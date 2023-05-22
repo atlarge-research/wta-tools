@@ -17,8 +17,6 @@ import scala.collection.mutable.ListBuffer;
 
 class TaskLevelListenerTest extends BaseLevelListenerTest {
 
-  TaskLevelListener sut;
-
   TaskInfo testTaskInfo;
 
   StageInfo testStageInfo;
@@ -27,7 +25,6 @@ class TaskLevelListenerTest extends BaseLevelListenerTest {
 
   @BeforeEach
   void setup() {
-    sut = new TaskLevelListener(mockedSparkContext, fakeConfig);
 
     testTaskInfo = new TaskInfo(1, 0, 1, 50L, "testExecutor", "local", TaskLocality.NODE_LOCAL(), false);
 
@@ -55,10 +52,10 @@ class TaskLevelListenerTest extends BaseLevelListenerTest {
     ListBuffer<StageInfo> stageBuffer = new ListBuffer<>();
     stageBuffer.addOne(testStageInfo);
 
-    sut.onJobStart(new SparkListenerJobStart(1, 2L, stageBuffer.toList(), new Properties()));
-    sut.onTaskEnd(taskEndEvent);
-    assertEquals(1, sut.getProcessedObjects().size());
-    Task curTask = sut.getProcessedObjects().get(0);
+    fakeTaskListener.onJobStart(new SparkListenerJobStart(1, 2L, stageBuffer.toList(), new Properties()));
+    fakeTaskListener.onTaskEnd(taskEndEvent);
+    assertEquals(1, fakeTaskListener.getProcessedObjects().size());
+    Task curTask = fakeTaskListener.getProcessedObjects().get(0);
     assertEquals(1, curTask.getId());
     assertEquals("testtaskType", curTask.getType());
     assertEquals(50L, curTask.getSubmitTime());

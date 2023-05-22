@@ -1,7 +1,9 @@
 package com.asml.apa.wta.spark.driver;
 
+import com.asml.apa.wta.spark.datasource.SparkDataSource;
 import java.util.HashMap;
 import java.util.Map;
+import lombok.Getter;
 import org.apache.spark.SparkContext;
 import org.apache.spark.api.plugin.DriverPlugin;
 import org.apache.spark.api.plugin.PluginContext;
@@ -15,6 +17,9 @@ import org.apache.spark.api.plugin.PluginContext;
 public class WtaDriverPlugin implements DriverPlugin {
 
   private SparkContext sparkContext;
+
+  @Getter
+  private SparkDataSource sparkDataSource;
 
   /**
    * This method is called early in the initialization of the Spark driver.
@@ -31,6 +36,7 @@ public class WtaDriverPlugin implements DriverPlugin {
   @Override
   public Map<String, String> init(SparkContext sCtx, PluginContext pCtx) {
     this.sparkContext = sCtx;
+    this.sparkDataSource = new SparkDataSource(sparkContext);
     return new HashMap<>();
   }
 
@@ -42,6 +48,6 @@ public class WtaDriverPlugin implements DriverPlugin {
    */
   @Override
   public void shutdown() {
-    this.sparkContext.stop();
+    // clean up
   }
 }
