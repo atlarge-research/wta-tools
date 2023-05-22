@@ -29,6 +29,7 @@ For the most part, since we are pre-release this will serve no real purpose, oth
 - Updates the Spark dependency to 3.2.4 [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 - Utilise spark API to collect information about workflow and workload [@hpage](https://gitlab.ewi.tudelft.nl/hpage)
 - Moves to using slf4j as logging facade over directly using log4j2 [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
+- Add DAS configuration script to benchmark [@tqu](https://gitlab.ewi.tudelft.nl/tqu)[@pcho](https://gitlab.ewi.tudelft.nl/pcho)
 - Simplified the use of the streaming packages [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 
 ### Changed

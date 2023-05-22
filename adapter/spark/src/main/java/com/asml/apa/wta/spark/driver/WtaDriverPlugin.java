@@ -36,7 +36,7 @@ public class WtaDriverPlugin implements DriverPlugin {
   @Override
   public Map<String, String> init(SparkContext sparkCtx, PluginContext pluginCtx) {
     this.sparkContext = sparkCtx;
-    this.sparkDataSource = new SparkDataSource(sparkCtx);
+    this.sparkDataSource = new SparkDataSource(this.sparkContext);
     return new HashMap<>();
   }
 
