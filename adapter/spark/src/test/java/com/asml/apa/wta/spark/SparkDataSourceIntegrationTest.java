@@ -8,34 +8,34 @@ public class SparkDataSourceIntegrationTest extends BaseSparkJobIntegrationTest 
 
   @Test
   public void taskListenerReturnsList() {
-    assertThat(sut.getTaskMetrics()).isEmpty();
+    assertThat(sut.getTaskLevelListener().getProcessedObjects()).isEmpty();
   }
 
   @Test
   public void registeredTaskListenerCollectsMetrics() {
     sut.registerTaskListener();
-    assertThat(sut.getTaskMetrics()).isEmpty();
+    assertThat(sut.getTaskLevelListener().getProcessedObjects()).isEmpty();
     invokeJob();
-    assertThat(sut.getTaskMetrics()).isNotEmpty();
+    assertThat(sut.getTaskLevelListener().getProcessedObjects()).isNotEmpty();
   }
 
   @Test
   public void registeredTaskListenerKeepsCollectingMetrics() {
     sut.registerTaskListener();
-    assertThat(sut.getTaskMetrics()).isEmpty();
+    assertThat(sut.getTaskLevelListener().getProcessedObjects()).isEmpty();
     invokeJob();
-    int size1 = sut.getTaskMetrics().size();
-    assertThat(sut.getTaskMetrics()).isNotEmpty();
+    int size1 = sut.getTaskLevelListener().getProcessedObjects().size();
+    assertThat(sut.getTaskLevelListener().getProcessedObjects()).isNotEmpty();
     invokeJob();
-    int size2 = sut.getTaskMetrics().size();
+    int size2 = sut.getTaskLevelListener().getProcessedObjects().size();
     assertThat(size2).isGreaterThan(size1);
   }
 
   @Test
   public void unregisteredTaskListenerDoesNotCollect() {
-    assertThat(sut.getTaskMetrics()).isEmpty();
+    assertThat(sut.getTaskLevelListener().getProcessedObjects()).isEmpty();
     invokeJob();
-    assertThat(sut.getTaskMetrics()).isEmpty();
+    assertThat(sut.getTaskLevelListener().getProcessedObjects()).isEmpty();
   }
 
   @Test
@@ -43,34 +43,6 @@ public class SparkDataSourceIntegrationTest extends BaseSparkJobIntegrationTest 
     sut.registerTaskListener();
     sut.removeTaskListener();
     invokeJob();
-    assertThat(sut.getTaskMetrics()).isEmpty();
-  }
-
-  @Test
-  public void stageListenerReturnsList() {
-    assertThat(sut.getStageInfo()).isEmpty();
-  }
-
-  @Test
-  public void registeredStageListenerCollectsInfo() {
-    sut.registerStageListener();
-    assertThat(sut.getStageInfo()).isEmpty();
-    invokeJob();
-    assertThat(sut.getStageInfo()).isNotEmpty();
-  }
-
-  @Test
-  public void unregisteredStageListenerDoesNotCollect() {
-    assertThat(sut.getStageInfo()).isEmpty();
-    invokeJob();
-    assertThat(sut.getStageInfo()).isEmpty();
-  }
-
-  @Test
-  public void removedStageListenerDoesNotCollect() {
-    sut.registerStageListener();
-    sut.removeStageListener();
-    invokeJob();
-    assertThat(sut.getStageInfo()).isEmpty();
+    assertThat(sut.getTaskLevelListener().getProcessedObjects()).isEmpty();
   }
 }

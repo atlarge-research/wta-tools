@@ -6,7 +6,6 @@ import static org.mockito.Mockito.when;
 
 import com.asml.apa.wta.core.model.Task;
 import java.util.Properties;
-import org.apache.spark.SparkContext;
 import org.apache.spark.executor.ExecutorMetrics;
 import org.apache.spark.executor.TaskMetrics;
 import org.apache.spark.scheduler.SparkListenerJobStart;
@@ -21,10 +20,7 @@ import org.junit.jupiter.api.Test;
 import scala.collection.immutable.Seq;
 import scala.collection.mutable.ListBuffer;
 
-class TaskLevelListenerTest {
-
-  SparkContext mockedSparkContext;
-  TaskLevelListener sut;
+class TaskLevelListenerTest extends BaseLevelListenerTest {
 
   TaskInfo testTaskInfo;
 
@@ -34,9 +30,6 @@ class TaskLevelListenerTest {
 
   @BeforeEach
   void setup() {
-    mockedSparkContext = mock(SparkContext.class);
-    when(mockedSparkContext.sparkUser()).thenReturn("testUser");
-    sut = new TaskLevelListener(mockedSparkContext);
 
     testTaskInfo = new TaskInfo(1, 0, 1, 50L, "testExecutor", "local", TaskLocality.NODE_LOCAL(), false);
 
@@ -64,10 +57,10 @@ class TaskLevelListenerTest {
     ListBuffer<StageInfo> stageBuffer = new ListBuffer<>();
     stageBuffer.addOne(testStageInfo);
 
-    sut.onJobStart(new SparkListenerJobStart(1, 2L, stageBuffer.toList(), new Properties()));
-    sut.onTaskEnd(taskEndEvent);
-    assertEquals(1, sut.getProcessedTasks().size());
-    Task curTask = sut.getProcessedTasks().get(0);
+    fakeTaskListener.onJobStart(new SparkListenerJobStart(1, 2L, stageBuffer.toList(), new Properties()));
+    fakeTaskListener.onTaskEnd(taskEndEvent);
+    assertEquals(1, fakeTaskListener.getProcessedObjects().size());
+    Task curTask = fakeTaskListener.getProcessedObjects().get(0);
     assertEquals(1, curTask.getId());
     assertEquals("testtaskType", curTask.getType());
     assertEquals(50L, curTask.getSubmitTime());

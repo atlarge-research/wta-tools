@@ -11,7 +11,7 @@ class RuntimeConfigTest {
   @Test
   void createsRuntimeConfigWithDefaultValues() {
     RuntimeConfig cr = RuntimeConfig.builder().build();
-    assertThat(cr.getAuthor()).isNull();
+    assertThat(cr.getAuthors()).isNull();
     assertThat(cr.getDomain()).isNull();
     assertThat(cr.getDescription()).isEqualTo("");
     assertThat(cr.getEvents()).isEqualTo(new HashMap<String, String>());
