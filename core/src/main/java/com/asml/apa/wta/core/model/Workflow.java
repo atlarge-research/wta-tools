@@ -78,8 +78,7 @@ public class Workflow implements BaseTraceObject {
       record.put("submitTime", workflow.submitTime);
     }
     if (checker[2] == true) {
-      record.put("tasks", (Long[])
-          Arrays.stream(workflow.tasks).map(x -> x.getId()).toArray());
+      record.put("tasks", Arrays.stream(workflow.tasks).map(x -> x.getId()).toArray());
     }
     if (checker[3] == true) {
       record.put("numberOfTasks", workflow.numberOfTasks);
