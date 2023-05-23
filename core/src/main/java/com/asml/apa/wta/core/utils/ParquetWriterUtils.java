@@ -226,7 +226,7 @@ public class ParquetWriterUtils {
           fieldSchema.name("type").type().nullable().stringType().stringDefault("test");
     }
     if (checker[2]) {
-      fieldSchema = fieldSchema.name("submitType").type().longType().longDefault(0);
+      fieldSchema = fieldSchema.name("submitTime").type().longType().longDefault(0);
     }
     if (checker[3]) {
       fieldSchema = fieldSchema.name("submissionSite").type().intType().intDefault(0);
