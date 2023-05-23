@@ -408,6 +408,7 @@ public class ParquetWriterUtils {
 
   /**
    * Checks whether there are objects with uninitialized field, we will skip these columns in the output parquet file.
+   * If there exists object in the list that doesn't contain a certain field, the whole column will be dropped.
    * @param resources resources
    * @return a boolean array indicating what column to skip
    */
@@ -448,15 +449,13 @@ public class ParquetWriterUtils {
 
   /**
    * Checks whether there are objects with uninitialized field, we will skip these columns in the output parquet file.
+   * If there exists object in the list that doesn't contain a certain field, the whole column will be dropped.
    * @param tasks tasks
    * @return a boolean array indicating what column to skip
    */
   private Boolean[] checkTaskDomain(List<Task> tasks) {
     Boolean[] flg = new Boolean[21];
     Arrays.fill(flg, true);
-    for (int i = 0; i < 21; i++) {
-      flg[i] = true;
-    }
     for (Task task : tasks) {
       if (task.getId() == -1) {
         flg[0] = false;
@@ -527,15 +526,13 @@ public class ParquetWriterUtils {
 
   /**
    * Checks whether there are objects with uninitialized field, we will skip these columns in the output parquet file.
+   * If there exists object in the list that doesn't contain a certain field, the whole column will be dropped.
    * @param workFlows workflows
    * @return a boolean array indicating what column to skip
    */
   private Boolean[] checkWorkflowDomain(List<Workflow> workFlows) {
     Boolean[] flg = new Boolean[17];
     Arrays.fill(flg, true);
-    for (int i = 0; i < 17; i++) {
-      flg[i] = true;
-    }
     for (Workflow workflow : workFlows) {
       if (workflow.getId() == -1) {
         flg[0] = false;
