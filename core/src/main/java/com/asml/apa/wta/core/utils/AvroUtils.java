@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.util.List;
+
+import lombok.Getter;
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericRecord;
 import org.apache.hadoop.conf.Configuration;
@@ -25,12 +27,14 @@ public class AvroUtils implements AutoCloseable {
 
   private final URI path;
 
+  @Getter
   private final String uri;
 
   private final ParquetWriter<GenericRecord> writer;
 
   private final ParquetReader<GenericRecord> reader;
 
+  @Getter
   private final Schema avroSchema;
 
   private Configuration configuration;
@@ -72,28 +76,6 @@ public class AvroUtils implements AutoCloseable {
    */
   public GenericRecord readRecord() throws IOException {
     return reader.read();
-  }
-
-  /**
-   * Getter.
-   *
-   * @return output uri
-   * @since 1.0.0
-   * @author Tianchen Qu
-   */
-  public String getOutputUri() {
-    return uri;
-  }
-
-  /**
-   * Getter.
-   *
-   * @return schema for the record to be written
-   * @since 1.0.0
-   * @author Tianchen Qu
-   */
-  public Schema getAvroSchema() {
-    return avroSchema;
   }
 
   /**

@@ -97,7 +97,7 @@ class AvroUtilsIntegrationTest {
   @Test
   void getOutputUriTest() throws Exception {
     utils = new AvroUtils(schema, new File(path, "/outputUri"));
-    assertThat(utils.getOutputUri())
+    assertThat(utils.getUri())
         .isEqualTo(new File(path, "/outputUri").toURI().getPath());
   }
 
