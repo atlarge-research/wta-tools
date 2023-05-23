@@ -60,7 +60,7 @@ public class Workflow implements BaseTraceObject {
   private final long totalEnergyConsumption;
 
   /**
-   * Convert workflow to record.
+   * Converts the POJO object into record object, enabling it to be written by Avro.
    *
    * @param workflow workflow
    * @param checker checker for which column to skip
@@ -69,6 +69,7 @@ public class Workflow implements BaseTraceObject {
    * @since 1.0.0
    * @author Tianchen Qu
    */
+  @SuppressWarnings("CyclomaticComplexity")
   public static GenericRecord convertWorkflowToRecord(Workflow workflow, Boolean[] checker, Schema schema) {
     GenericData.Record record = new GenericData.Record(schema);
     if (checker[0]) {

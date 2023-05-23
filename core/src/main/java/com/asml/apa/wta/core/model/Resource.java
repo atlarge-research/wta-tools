@@ -42,7 +42,7 @@ public class Resource implements BaseTraceObject {
   private final String details;
 
   /**
-   * Convert resource object to record.
+   * Converts the POJO object into record object, enabling it to be written by Avro.
    *
    * @param resource resource
    * @param checker checker for which column to skip
@@ -51,6 +51,7 @@ public class Resource implements BaseTraceObject {
    * @since 1.0.0
    * @author Tianchen Qu
    */
+  @SuppressWarnings("CyclomaticComplexity")
   public static GenericRecord convertResourceToRecord(Resource resource, Boolean[] checker, Schema schema) {
     GenericData.Record record = new GenericData.Record(schema);
     if (checker[0]) {

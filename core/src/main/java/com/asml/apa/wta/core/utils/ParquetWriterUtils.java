@@ -20,6 +20,7 @@ import org.apache.avro.generic.GenericRecord;
  * @since 1.0.0
  * @author Tianchen Qu
  */
+@SuppressWarnings({"CyclomaticComplexity", "HiddenField"})
 public class ParquetWriterUtils {
 
   private String version;
@@ -122,12 +123,12 @@ public class ParquetWriterUtils {
   /**
    * Reads the workload object from kafka.
    *
-   * @param workLoad the workload
+   * @param workload the workload
    * @since 1.0.0
    * @author Tianchen Qu
    */
-  public void readWorkload(Workload workLoad) {
-    workload = workLoad;
+  public void readWorkload(Workload workload) {
+    this.workload = workload;
   }
 
   /**
@@ -436,8 +437,8 @@ public class ParquetWriterUtils {
   private void writeWorkloadToFile(String workloadFileName) throws Exception {
     Gson gson = new Gson();
     String workloadJson = gson.toJson(workload);
-    File file = new File(this.path, "/workloads/" + version);
-    path.mkdirs();
+    File file = new File(this.path, "/workload/" + version);
+    file.mkdirs();
     ByteArrayOutputStream writer = new ByteArrayOutputStream();
     OutputStream dir = new FileOutputStream(new File(file, workloadFileName + ".json"));
     writer.write(workloadJson.getBytes());

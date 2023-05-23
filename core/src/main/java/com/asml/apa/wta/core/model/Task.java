@@ -65,7 +65,7 @@ public class Task implements BaseTraceObject {
   private final long resourceUsed;
 
   /**
-   * Convert task to record.
+   * Converts the POJO object into record object, enabling it to be written by Avro.
    *
    * @param task task
    * @param checker checker for which column to skip
@@ -74,6 +74,7 @@ public class Task implements BaseTraceObject {
    * @since 1.0.0
    * @author Tianchen Qu
    */
+  @SuppressWarnings("CyclomaticComplexity")
   public static GenericRecord convertTaskToRecord(Task task, Boolean[] checker, Schema schema) {
     GenericData.Record record = new GenericData.Record(schema);
     if (checker[0]) {

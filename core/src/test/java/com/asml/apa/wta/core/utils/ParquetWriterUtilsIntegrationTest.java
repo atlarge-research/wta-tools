@@ -82,7 +82,7 @@ class ParquetWriterUtilsIntegrationTest {
       new File("./src/test/resources/WTA/resources/schema-1.0/test1.parquet").delete();
       new File("./src/test/resources/WTA/tasks/schema-1.0/test2.parquet").delete();
       new File("./src/test/resources/WTA/workflows/schema-1.0/test3.parquet").delete();
-      new File("./src/test/resources/WTA/workloads/schema-1.0/test4.json").delete();
+      new File("./src/test/resources/WTA/workload/schema-1.0/test4.json").delete();
     });
   }
 
@@ -132,7 +132,7 @@ class ParquetWriterUtilsIntegrationTest {
       new File("./src/test/resources/WTA/resources/schema-1.0/test1.parquet").delete();
       new File("./src/test/resources/WTA/tasks/schema-1.0/test2.parquet").delete();
       new File("./src/test/resources/WTA/workflows/schema-1.0/test3.parquet").delete();
-      new File("./src/test/resources/WTA/workloads/schema-1.0/test4.json").delete();
+      new File("./src/test/resources/WTA/workload/schema-1.0/test4.json").delete();
     });
   }
 }
