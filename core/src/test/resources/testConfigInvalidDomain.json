@@ -2,7 +2,7 @@
   "workloadSettings":
   {
     "author": "Test Name",
-    "domain": "SCIENTIFIC",
+    "domain": "Let's gooo",
     "description": "Test Description"
   },
   "resourceSettings":
@@ -11,9 +11,5 @@
       "f1": "v1",
       "f2": "v2"
     }
-  },
-  "logSettings":
-  {
-    "logLevel": "INFO"
   }
 }
