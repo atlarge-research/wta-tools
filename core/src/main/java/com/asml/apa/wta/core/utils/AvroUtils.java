@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.util.List;
-
 import lombok.Getter;
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericRecord;
