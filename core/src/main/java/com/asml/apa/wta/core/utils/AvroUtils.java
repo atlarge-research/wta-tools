@@ -7,6 +7,7 @@ import java.util.List;
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericRecord;
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.Path;
 import org.apache.parquet.avro.AvroParquetReader;
 import org.apache.parquet.avro.AvroParquetWriter;
 import org.apache.parquet.hadoop.ParquetReader;
@@ -16,9 +17,9 @@ import org.apache.parquet.hadoop.util.HadoopOutputFile;
 
 /**
  * Utility class for writing Parquet files using Avro based tools.
+ *
  * @since 1.0.0
  * @author Tianchen Qu
- *
  */
 public class AvroUtils implements AutoCloseable {
 
@@ -37,7 +38,7 @@ public class AvroUtils implements AutoCloseable {
   public AvroUtils(Schema schema, File outputFolder) throws Exception {
     avroSchema = schema;
     path = outputFolder.toURI();
-    org.apache.hadoop.fs.Path hadoopPath = new org.apache.hadoop.fs.Path(path);
+    Path hadoopPath = new Path(path);
     uri = path.getPath();
     configuration = new Configuration();
     writer = AvroParquetWriter.<GenericRecord>builder(HadoopOutputFile.fromPath(hadoopPath, configuration))
@@ -57,7 +58,7 @@ public class AvroUtils implements AutoCloseable {
    */
   public void writeRecords(List<GenericRecord> records) throws Exception {
     for (GenericRecord record : records) {
-      writeRecord(record);
+      writer.write(record);
     }
   }
 
@@ -71,18 +72,6 @@ public class AvroUtils implements AutoCloseable {
    */
   public GenericRecord readRecord() throws IOException {
     return reader.read();
-  }
-
-  /**
-   * Write single record to disk.
-   *
-   * @param record record
-   * @throws IOException possible io exception
-   * @since 1.0.0
-   * @author Tianchen Qu
-   */
-  private void writeRecord(GenericRecord record) throws IOException {
-    writer.write(record);
   }
 
   /**

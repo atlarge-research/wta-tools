@@ -4,34 +4,38 @@ import com.asml.apa.wta.core.model.Resource;
 import com.asml.apa.wta.core.model.Task;
 import com.asml.apa.wta.core.model.Workflow;
 import com.asml.apa.wta.core.model.Workload;
-import com.google.gson.Gson;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import lombok.Getter;
 import org.apache.avro.Schema;
 import org.apache.avro.SchemaBuilder;
 import org.apache.avro.generic.GenericRecord;
 
 /**
  * Utility class for reading trace objects and writing them to the disk.
+ *
  * @since 1.0.0
  * @author Tianchen Qu
  */
 @SuppressWarnings({"CyclomaticComplexity", "HiddenField"})
+@Getter
 public class ParquetWriterUtils {
 
-  private String version;
+  private final String version;
 
-  private File path;
+  private final File path;
 
-  private List<Resource> resources;
+  private final List<Resource> resources;
 
-  private List<Task> tasks;
+  private final List<Task> tasks;
 
-  private List<Workflow> workflows;
+  private final List<Workflow> workflows;
 
   private Workload workload = null;
 
@@ -41,50 +45,6 @@ public class ParquetWriterUtils {
     workflows = new ArrayList<>();
     this.path = path;
     this.version = version;
-  }
-
-  /**
-   * Getter for resources, only for tests.
-   *
-   * @return the resources
-   * @since 1.0.0
-   * @author Tianchen Qu
-   */
-  public List<Resource> getResources() {
-    return resources;
-  }
-
-  /**
-   * Getter for tasks, only for tests.
-   *
-   * @return the tasks
-   * @since 1.0.0
-   * @author Tianchen Qu
-   */
-  public List<Task> getTasks() {
-    return tasks;
-  }
-
-  /**
-   * Getter for workflows, only for tests.
-   *
-   * @return the workflows
-   * @since 1.0.0
-   * @author Tianchen Qu
-   */
-  public List<Workflow> getWorkflows() {
-    return workflows;
-  }
-
-  /**
-   * Getter for workloads, only for tests.
-   *
-   * @return the workloads
-   * @since 1.0.0
-   * @author Tianchen Qu
-   */
-  public Workload getWorkload() {
-    return workload;
   }
 
   /**
@@ -435,8 +395,8 @@ public class ParquetWriterUtils {
    * @author Tianchen Qu
    */
   private void writeWorkloadToFile(String workloadFileName) throws Exception {
-    Gson gson = new Gson();
-    String workloadJson = gson.toJson(workload);
+    ObjectMapper mapper = new ObjectMapper();
+    String workloadJson = mapper.writeValueAsString(workload);
     File file = new File(this.path, "/workload/" + version);
     file.mkdirs();
     ByteArrayOutputStream writer = new ByteArrayOutputStream();
@@ -453,9 +413,7 @@ public class ParquetWriterUtils {
    */
   private Boolean[] checkResourceDomain(List<Resource> resources) {
     Boolean[] flg = new Boolean[9];
-    for (int i = 0; i < 9; i++) {
-      flg[i] = true;
-    }
+    Arrays.fill(flg, true);
     for (Resource resource : resources) {
       if (resource.getId() == -1) {
         flg[0] = false;
@@ -495,6 +453,7 @@ public class ParquetWriterUtils {
    */
   private Boolean[] checkTaskDomain(List<Task> tasks) {
     Boolean[] flg = new Boolean[21];
+    Arrays.fill(flg, true);
     for (int i = 0; i < 21; i++) {
       flg[i] = true;
     }
@@ -573,6 +532,7 @@ public class ParquetWriterUtils {
    */
   private Boolean[] checkWorkflowDomain(List<Workflow> workFlows) {
     Boolean[] flg = new Boolean[17];
+    Arrays.fill(flg, true);
     for (int i = 0; i < 17; i++) {
       flg[i] = true;
     }
