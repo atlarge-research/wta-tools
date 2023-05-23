@@ -102,7 +102,7 @@ class ParquetWriterUtilsIntegrationTest {
         .runtime(-1)
         .resourceUsed(-1)
         .submissionSite(-1)
-        .submitType(-1)
+        .submitTime(-1)
         .userId(-1)
         .waitTime(-1)
         .workflowId(-1);

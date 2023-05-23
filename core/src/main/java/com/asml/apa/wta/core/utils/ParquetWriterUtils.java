@@ -505,7 +505,7 @@ public class ParquetWriterUtils {
       if (task.getType() == null) {
         flg[1] = false;
       }
-      if (task.getSubmitType() == -1) {
+      if (task.getSubmitTime() == -1) {
         flg[2] = false;
       }
       if (task.getSubmissionSite() == -1) {

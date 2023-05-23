@@ -84,7 +84,7 @@ public class Task implements BaseTraceObject {
       record.put("type", task.type);
     }
     if (checker[2]) {
-      record.put("submitType", task.submitType);
+      record.put("submitTime", task.submitTime);
     }
     if (checker[3]) {
       record.put("submissionSite", task.submissionSite);
