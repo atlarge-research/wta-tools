@@ -38,6 +38,7 @@ For the most part, since we are pre-release this will serve no real purpose, oth
 - Refactored listeners into a generic interface to reduce code duplication and increase cc [@hpage](https://gitlab.ewi.tudelft.nl/hpage)
 
 ### Fixed
+- Fixes the slf4j logging module to allow use in testing and `adapter/spark` [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 
 ### Deprecated
 
