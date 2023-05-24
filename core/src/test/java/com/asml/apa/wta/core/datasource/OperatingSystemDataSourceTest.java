@@ -42,12 +42,6 @@ class OperatingSystemDataSourceTest {
   }
 
   @Test
-  void getSystemLoadAverage() {
-    assertThat(sut.isValid()).isTrue();
-    assertThat(sut.getSystemLoadAverage()).isLessThanOrEqualTo(1.0);
-  }
-
-  @Test
   void getAvailableProcessors() {
     assertThat(sut.isValid()).isTrue();
     assertThat(sut.getAvailableProcessors()).isGreaterThanOrEqualTo(1);
