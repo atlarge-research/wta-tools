@@ -32,9 +32,11 @@ For the most part, since we are pre-release this will serve no real purpose, oth
 - Add DAS configuration script to benchmark [@tqu](https://gitlab.ewi.tudelft.nl/tqu)[@pcho](https://gitlab.ewi.tudelft.nl/pcho)
 - Simplified the use of the streaming packages [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 - Created utility class for writing WTA trace to parquet files [@tqu](https://gitlab.ewi.tudelft.nl/tqu)
+- Added Java MX Bean data source for resource metrics [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 
 ### Changed
 - Refactored listeners into a generic interface to reduce code duplication and increase cc [@hpage](https://gitlab.ewi.tudelft.nl/hpage)
+
 ### Fixed
 
 ### Deprecated
