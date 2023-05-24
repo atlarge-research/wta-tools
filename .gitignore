@@ -77,3 +77,10 @@ tmp
 
 # logs
 logs
+
+# DAS config files
+*.pyc
+benchmarking/das-config-scripts/frameworks
+#test output
+core/src/test/resources/WTA
+core/src/test/resources/AvroOutput
