@@ -23,11 +23,11 @@ import org.apache.spark.SparkContext;
 @Getter
 public class SparkDataSource implements CollectorInterface {
 
-  private final AbstractListener<Task> taskLevelListener;
+  private final TaskLevelListener taskLevelListener;
 
-  private final AbstractListener<Workflow> jobLevelListener;
+  private final JobLevelListener jobLevelListener;
 
-  private final AbstractListener<Workload> applicationLevelListener;
+  private final ApplicationLevelListener applicationLevelListener;
 
   /**
    * Constructor for the Spark data source. This requires a Spark context to ensure a Spark session

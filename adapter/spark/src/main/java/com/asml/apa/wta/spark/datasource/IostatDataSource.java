@@ -25,14 +25,9 @@ public class IostatDataSource {
     private double KBRead;
     private double KBWrtn;
     private double KBDscd;
-    @Getter
-    @Setter
-    private Long taskId;
-
-    //should only be in DTO
     @Setter
     @Getter
-    private long taskAttemptId = TaskContext.get().taskAttemptId();
+    private String executorId;
 
 
     public IostatDataSource() throws IOException, InterruptedException {
@@ -92,8 +87,7 @@ public class IostatDataSource {
                 ", KBRead=" + KBRead +
                 ", KBWrtn=" + KBWrtn +
                 ", KBDscd=" + KBDscd +
-                ", taskAttemptId=" + taskAttemptId +
-                ", taskId=" + taskId +
+                ", executorId=" + executorId +
                 '}';
     }
 }

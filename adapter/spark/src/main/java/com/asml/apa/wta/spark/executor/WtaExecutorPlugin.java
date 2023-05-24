@@ -45,8 +45,8 @@ public class WtaExecutorPlugin implements ExecutorPlugin {
    * as it is loaded on to the executor.
    */
   @Override
-  public void init(PluginContext ctx, Map<String, String> extraConf) {
-    this.pluginContext = ctx;
+  public void init(PluginContext pluginContext, Map<String, String> extraConf) {
+    this.pluginContext = pluginContext;
   }
 
 
@@ -60,9 +60,9 @@ public class WtaExecutorPlugin implements ExecutorPlugin {
   public void onTaskStart() {//send the iostat metric dto to driver
 // Execute the bash command on the executor
     AtomicReference<IostatDataSource> result = new AtomicReference<>(null);
-
     try {
       IostatDataSource iods = new IostatDataSource();
+      iods.setExecutorId(pluginContext.executorID());
       final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
       scheduler.scheduleAtFixedRate(() -> {
         try {
@@ -71,9 +71,6 @@ public class WtaExecutorPlugin implements ExecutorPlugin {
           // Send the result back to the driver
           try {
             Long taskId = (Long) this.pluginContext.ask(result.get());
-            if(iods.getTaskId() == null) {
-              iods.setTaskId(taskId);
-            }
 
           } catch (IOException e) {
             throw new RuntimeException(e);

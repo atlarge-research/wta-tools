@@ -42,8 +42,8 @@ public class WtaDriverPlugin implements DriverPlugin {
    *
    * Expensive calls should be postponed or delegated to another thread.
    *
-   * @param sCtx The current SparkContext.
-   * @param pCtx Additional plugin-specific about the Spark application where the plugin is running.
+   * @param sparkCtx The current SparkContext.
+   * @param pluginCtx Additional plugin-specific about the Spark application where the plugin is running.
    * @return Extra information provided to the executor
    * @author Henry Page
    * @since 1.0.0
@@ -65,20 +65,14 @@ public class WtaDriverPlugin implements DriverPlugin {
   @Override
   public void shutdown() {}
 
-  private Map<Long, Long> taskAttemptIdToTaskIds = new ConcurrentHashMap<>();
-  public static SparkListenerTaskStart taskStart;
   @Override
-  public Object receive(Object message) throws Exception {
+  public Object receive(Object message) {
     System.out.println(message.toString());
-    TaskLevelListener a  = (TaskLevelListener) sparkDataSource.getTaskLevelListener();
     IostatDataSource k = (IostatDataSource) message;
-    Long taskId = taskStart.taskInfo().taskId();
-    taskAttemptIdToTaskIds.put(k.getTaskAttemptId(), taskId);
 
     MetricStreamingEngine mse = new MetricStreamingEngine();
 
-    mse.addToResourceStream(new ResourceKey(taskId), new ResourceMetricsRecord(k));
-
-    return taskId;
+    mse.addToResourceStream(new ResourceKey(k.getExecutorId()), new ResourceMetricsRecord(k));
+    return message;
   }
 }
