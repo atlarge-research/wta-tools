@@ -23,7 +23,6 @@ import org.apache.spark.SparkContext;
 @Getter
 public class SparkDataSource implements CollectorInterface {
 
-  @Getter
   private final AbstractListener<Task> taskLevelListener;
 
   private final AbstractListener<Workflow> jobLevelListener;

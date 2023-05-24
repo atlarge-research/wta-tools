@@ -31,6 +31,7 @@ For the most part, since we are pre-release this will serve no real purpose, oth
 - Moves to using slf4j as logging facade over directly using log4j2 [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 - Add DAS configuration script to benchmark [@tqu](https://gitlab.ewi.tudelft.nl/tqu)[@pcho](https://gitlab.ewi.tudelft.nl/pcho)
 - Simplified the use of the streaming packages [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
+- Created utility class for writing WTA trace to parquet files [@tqu](https://gitlab.ewi.tudelft.nl/tqu)
 
 ### Changed
 - Refactored listeners into a generic interface to reduce code duplication and increase cc [@hpage](https://gitlab.ewi.tudelft.nl/hpage)

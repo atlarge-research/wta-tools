@@ -1,10 +1,12 @@
 package com.asml.apa.wta.spark.driver;
 
+import com.asml.apa.wta.spark.datasource.SparkDataSource;
 import com.asml.apa.wta.core.model.Task;
 import com.asml.apa.wta.spark.datasource.IostatDataSource;
 import com.asml.apa.wta.spark.datasource.SparkDataSource;
 import java.util.HashMap;
 import java.util.Map;
+import lombok.Getter;
 import java.util.UUID;
 import java.util.concurrent.*;
 
@@ -40,8 +42,8 @@ public class WtaDriverPlugin implements DriverPlugin {
    *
    * Expensive calls should be postponed or delegated to another thread.
    *
-   * @param sparkCtx The current SparkContext.
-   * @param pluginCtx Additional plugin-specific about the Spark application where the plugin is running.
+   * @param sCtx The current SparkContext.
+   * @param pCtx Additional plugin-specific about the Spark application where the plugin is running.
    * @return Extra information provided to the executor
    * @author Henry Page
    * @since 1.0.0
@@ -61,9 +63,8 @@ public class WtaDriverPlugin implements DriverPlugin {
    * @since 1.0.0
    */
   @Override
-  public void shutdown() {
+  public void shutdown() {}
 
-  }
   private Map<Long, Long> taskAttemptIdToTaskIds = new ConcurrentHashMap<>();
   public static SparkListenerTaskStart taskStart;
   @Override

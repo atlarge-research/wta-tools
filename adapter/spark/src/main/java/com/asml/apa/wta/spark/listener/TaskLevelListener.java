@@ -9,8 +9,18 @@ import com.asml.apa.wta.spark.driver.WtaDriverPlugin;
 import lombok.Getter;
 import org.apache.spark.SparkContext;
 import org.apache.spark.TaskContext;
+import com.asml.apa.wta.core.config.RuntimeConfig;
+import com.asml.apa.wta.core.model.Task;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import lombok.Getter;
+import org.apache.spark.SparkContext;
 import org.apache.spark.executor.TaskMetrics;
 import org.apache.spark.scheduler.*;
+import org.apache.spark.scheduler.SparkListenerJobStart;
+import org.apache.spark.scheduler.SparkListenerStageCompleted;
+import org.apache.spark.scheduler.SparkListenerTaskEnd;
+import org.apache.spark.scheduler.TaskInfo;
 
 /**
  * This class is a task-level listener for the Spark data source.
@@ -97,6 +107,72 @@ public class TaskLevelListener extends AbstractListener<Task> {
         .energyConsumption(energyConsumption)
         .resourceUsed(resourceUsed)
         .build());
+    final TaskInfo curTaskInfo = taskEnd.taskInfo();
+    final TaskMetrics curTaskMetrics = taskEnd.taskMetrics();
+
+    final long taskId = curTaskInfo.taskId();
+    final String type = taskEnd.taskType();
+    final long submitTime = curTaskInfo.launchTime();
+    final long runTime = curTaskMetrics.executorRunTime();
+    final int userId = sparkContext.sparkUser().hashCode();
+    final long workflowId = stageIdsToJobs.get(taskEnd.stageId());
+
+    // unknown
+    final int submissionSite = -1;
+    final String resourceType = "N/A";
+    final double resourceAmountRequested = -1.0;
+    final long[] parents = new long[0];
+    final long[] children = new long[0];
+    final int groupId = -1;
+    final String nfrs = "";
+    final String params = "";
+    final double memoryRequested = -1.0;
+    final long networkIoTime = -1L;
+    final long diskIoTime = -1L;
+    final double diskSpaceRequested = -1.0;
+    final long energyConsumption = -1L;
+    final long waitTime = -1L;
+    final long resourceUsed = -1L;
+
+    // TODO(#61): CALL EXTERNAL DEPENDENCIES
+
+    processedObjects.add(Task.builder()
+        .id(taskId)
+        .type(type)
+        .submissionSite(submissionSite)
+        .submitTime(submitTime)
+        .runtime(runTime)
+        .resourceType(resourceType)
+        .resourceAmountRequested(resourceAmountRequested)
+        .parents(parents)
+        .children(children)
+        .userId(userId)
+        .groupId(groupId)
+        .nfrs(nfrs)
+        .workflowId(workflowId)
+        .waitTime(waitTime)
+        .params(params)
+        .memoryRequested(memoryRequested)
+        .networkIoTime(networkIoTime)
+        .diskIoTime(diskIoTime)
+        .diskSpaceRequested(diskSpaceRequested)
+        .energyConsumption(energyConsumption)
+        .resourceUsed(resourceUsed)
+        .build());
+  }
+
+  /**
+   * This method is called every time a job starts.
+   * In the context of the WTA, this is a workflow.
+   *
+   * @param jobStart The object corresponding to information on job start.
+   * @author Henry Page
+   * @since 1.0.0
+   */
+  @Override
+  public void onJobStart(SparkListenerJobStart jobStart) {
+    // stage ids are always unique
+    jobStart.stageInfos().foreach(stageInfo -> stageIdsToJobs.put(stageInfo.stageId(), jobStart.jobId()));
   }
 
   /**
@@ -124,11 +200,9 @@ public class TaskLevelListener extends AbstractListener<Task> {
   public void onStageCompleted(SparkListenerStageCompleted stageCompleted) {
     // all tasks are guaranteed to be completed, so we can remove the stage id to reduce memory usage.
     stageIdsToJobs.remove(stageCompleted.stageInfo().stageId());
-  }
 
   @Override
   public void onTaskStart(SparkListenerTaskStart taskStart) {
     WtaDriverPlugin.taskStart = taskStart;
   }
-
-  }
+}
