@@ -15,4 +15,6 @@ import lombok.Getter;
 public class ResourceMetricsRecord implements Serializable {
 
   private static final long serialVersionUID = -3101218638564306099L;
+
+  private Object obj;
 }

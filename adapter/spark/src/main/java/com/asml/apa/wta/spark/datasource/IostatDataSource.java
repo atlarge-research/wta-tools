@@ -1,8 +1,10 @@
 package com.asml.apa.wta.spark.datasource;
 
+import lombok.Getter;
 import lombok.Setter;
 import org.apache.spark.SparkConf;
 import org.apache.spark.SparkContext;
+import org.apache.spark.TaskContext;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.sparkproject.jetty.util.IO;
@@ -23,6 +25,14 @@ public class IostatDataSource {
     private double KBRead;
     private double KBWrtn;
     private double KBDscd;
+    @Getter
+    @Setter
+    private Long taskId;
+
+    //should only be in DTO
+    @Setter
+    @Getter
+    private long taskAttemptId = TaskContext.get().taskAttemptId();
 
 
     public IostatDataSource() throws IOException, InterruptedException {
@@ -82,6 +92,8 @@ public class IostatDataSource {
                 ", KBRead=" + KBRead +
                 ", KBWrtn=" + KBWrtn +
                 ", KBDscd=" + KBDscd +
+                ", taskAttemptId=" + taskAttemptId +
+                ", taskId=" + taskId +
                 '}';
     }
 }

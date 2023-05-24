@@ -13,4 +13,6 @@ import lombok.Getter;
 @Getter
 @EqualsAndHashCode
 @AllArgsConstructor
-public class ResourceKey {}
+public class ResourceKey {
+    private long id;
+}

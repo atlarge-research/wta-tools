@@ -17,6 +17,7 @@ import org.apache.spark.api.plugin.ExecutorPlugin;
 import org.apache.spark.api.plugin.PluginContext;
 import org.apache.spark.rpc.RpcEndpointRef;
 import org.apache.spark.SparkEnv;
+import org.apache.spark.scheduler.Task;
 import org.apache.spark.scheduler.TaskSchedulerImpl;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -37,7 +38,7 @@ public class WtaExecutorPlugin implements ExecutorPlugin {
    * Developers are urged not to put inefficient code here as it blocks executor initialization until
    * it is completed.
    *
-   * @param ctx The PluginContext object that represents the context of the plugin.
+   * @param pluginContext The PluginContext object that represents the context of the plugin.
    * @param extraConf A map object that contains any extra configuration information. This map
    *                  is directly returned from {@link WtaDriverPlugin#init(SparkContext, PluginContext)}
    * @see WtaPlugin#executorPlugin() where a new instance of the plugin is created. This gets called as soon
@@ -69,8 +70,14 @@ public class WtaExecutorPlugin implements ExecutorPlugin {
           result.set(updatedResult);
           // Send the result back to the driver
           try {
-            this.pluginContext.send(result.get());
+            Long taskId = (Long) this.pluginContext.ask(result.get());
+            if(iods.getTaskId() == null) {
+              iods.setTaskId(taskId);
+            }
+
           } catch (IOException e) {
+            throw new RuntimeException(e);
+          } catch (Exception e) {
             throw new RuntimeException(e);
           }
         } catch (IOException | InterruptedException e) {
