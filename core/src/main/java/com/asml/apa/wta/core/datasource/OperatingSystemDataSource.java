@@ -26,7 +26,7 @@ public abstract class OperatingSystemDataSource {
   /**
    * Verifies the validity of the data source.
    *
-   * @return a {@code boolean} indicating the validity of this data source.
+   * @return a {@code boolean} indicating the validity of this data source
    * @author Atour Mousavi Gourabi
    * @since 1.0.0
    */

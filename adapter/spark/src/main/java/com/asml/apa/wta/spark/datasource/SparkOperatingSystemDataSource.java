@@ -9,8 +9,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.spark.api.plugin.PluginContext;
 
 /**
- * Data source that uses Java's operating system MBean to gain access to mainly resource information.
- * Integrated into the Apache Spark adapter.
+ * Data source that uses Java's operating system MBean to gain access to resource information.
+ * Adapted for the Apache Spark adapter.
  *
  * @author Atour Mousavi Gourabi
  * @since 1.0.0
@@ -42,7 +42,9 @@ public class SparkOperatingSystemDataSource extends OperatingSystemDataSource {
 
     private final int availableProcessors;
 
-    private final double getSystemLoadAverage;
+    private final double systemLoadAverage;
+
+    private final String executorId;
   }
 
   private final PluginContext pluginContext;
@@ -62,7 +64,9 @@ public class SparkOperatingSystemDataSource extends OperatingSystemDataSource {
     long totalMemSize = getTotalPhysicalMemorySize();
     int availableProc = getAvailableProcessors();
     double systemLoadAverage = getSystemLoadAverage();
-    Dto dto = new Dto(vMemSize, freeMemSize, cpuLoad, cpuTime, totalMemSize, availableProc, systemLoadAverage);
+    String executorId = pluginContext.executorID();
+    Dto dto = new Dto(
+        vMemSize, freeMemSize, cpuLoad, cpuTime, totalMemSize, availableProc, systemLoadAverage, executorId);
     try {
       pluginContext.send(dto);
     } catch (IOException e) {
