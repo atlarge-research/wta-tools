@@ -110,7 +110,7 @@ public abstract class OperatingSystemDataSource {
    * @since 1.0.0
    */
   public double getSystemLoadAverage() {
-    return bean.getSystemLoadAverage();
+    return bean.getSystemLoadAverage() / bean.getAvailableProcessors();
   }
 
   /**
