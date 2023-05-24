@@ -14,7 +14,6 @@ import scala.Tuple2;
 
 public class BaseSparkJobIntegrationTest {
 
-  public static final String RESOURCE_PATH = "src/test/resources/wordcount.txt";
   protected SparkSession spark;
   protected SparkDataSource sut;
 
