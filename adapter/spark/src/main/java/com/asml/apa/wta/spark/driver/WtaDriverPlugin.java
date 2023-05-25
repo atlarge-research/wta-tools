@@ -1,9 +1,11 @@
 package com.asml.apa.wta.spark.driver;
 
 import com.asml.apa.wta.spark.datasource.SparkDataSource;
+import com.asml.apa.wta.spark.datasource.SparkOperatingSystemDataSource;
 import com.asml.apa.wta.spark.datasource.dto.IostatDataSourceDto;
 import com.asml.apa.wta.spark.streams.MetricStreamingEngine;
 import com.asml.apa.wta.spark.streams.ResourceKey;
+import com.asml.apa.wta.spark.streams.ResourceMetricsRecord;
 import java.util.HashMap;
 import java.util.Map;
 import lombok.Getter;
@@ -14,7 +16,9 @@ import org.apache.spark.api.plugin.PluginContext;
 /**
  * Driver component of the plugin.
  *
- * @author Henry Page and Lohithsai Yadala Chanchu
+ * @author Lohithsai Yadala Chanchu
+ * @author Atour Mousavi Gourabi
+ * @author Henry Page
  * @since 1.0.0
  */
 public class WtaDriverPlugin implements DriverPlugin {
@@ -35,7 +39,7 @@ public class WtaDriverPlugin implements DriverPlugin {
    * @param sparkCtx The current SparkContext.
    * @param pluginCtx Additional plugin-specific about the Spark application where the plugin is running.
    * @return Extra information provided to the executor
-   * @author Henry Page and Lohithsai Yadala Chanchu
+   * @author Henry Page
    * @since 1.0.0
    */
   @Override
@@ -48,28 +52,45 @@ public class WtaDriverPlugin implements DriverPlugin {
   }
 
   /**
+   * Receives messages from the executors.
+   *
+   * @param message the message that was sent by the executors, to be serializable
+   * @return a response to the executor, if no response is expected the result is ignored
+   * @author Atour Mousavi Gourabi
+   * @author Lohithsai Yadala Chanchu
+   */
+  @Override
+  public Object receive(Object message) {
+    if (message instanceof SparkOperatingSystemDataSource.Dto) {
+      SparkOperatingSystemDataSource.Dto dto = (SparkOperatingSystemDataSource.Dto) message;
+      ResourceKey resourceKey = new ResourceKey(dto.getExecutorId());
+      ResourceMetricsRecord resourceRecord = new ResourceMetricsRecord(
+          dto.getCommittedVirtualMemorySize(),
+          dto.getFreePhysicalMemorySize(),
+          dto.getProcessCpuLoad(),
+          dto.getProcessCpuTime(),
+          dto.getTotalPhysicalMemorySize(),
+          dto.getAvailableProcessors(),
+          dto.getSystemLoadAverage());
+      mse.addToResourceStream(resourceKey, resourceRecord);
+    }
+    if (message instanceof IostatDataSourceDto) {
+      mse.addToResourceStream(
+          new ResourceKey(((IostatDataSourceDto) message).getExecutorId()), (IostatDataSourceDto) message);
+    }
+    return null;
+  }
+
+  /**
    * Gets called just before shutdown. Recommended that no spark functions are used here.
    *
-   * @author Henry Page and Lohithsai Yadala Chanchu
+   * @author Henry Page
+   * @author Lohithsai Yadala Chanchu
    * @since 1.0.0
    */
   @Override
   public void shutdown() {
     mse.clearResourceStream();
-  }
-
-  /**
-   * Gets called whenever a message is received from one of the executors.
-   *
-   * @author Lohithsai Yadala Chanchu
-   * @since 1.0.0
-   */
-  @Override
-  public Object receive(Object message) {
-    if (message instanceof IostatDataSourceDto) {
-      mse.addToResourceStream(new ResourceKey(((IostatDataSourceDto)message).getExecutorId()), (IostatDataSourceDto)message);
-    }
-    return message;
   }
 
   /**
