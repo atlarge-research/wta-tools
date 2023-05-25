@@ -1,30 +1,15 @@
 # Core Module
 
-This module contains part of the plugin that we consider indispensable for the plugin.
-That is to say, it is the part of plugin that will not change even someone extends the plugin.
+This module contains all classes and auxillary data structures that are common in between all data sources such as Spark and Flink.
 
 This module consists of:
- - configuration on the Spark-unrelated infos (authors,descriptions,etc)
- - general datasource from the OS
- - definition of the internal WTA objects (e.g. Resource,Task,Workflow,Workload)
- - stream infrastructure for the serialization/deserialization of metrics
- - utility class providing read for configs and output to parquet files
+ - Configuration that the user must specify that is required for the WTA format (authors,descriptions,etc).
+ - Model objects (e.g. Resource,Task,Workflow,Workload)
+ - Stream Infrastructure for the smart serialization/deserialization of objects such that memory is not a bottleneck.
+ - Functionality for serializing into parquet
 
-### RuntimeConfiguration
-The runtime config stores information that is not included in the Spark job.
-These information needs to be input by the user inside the config file
-
-This includes the authors, domain(scientific/engineering/company purpose), description, events and the log level
-(How detailed does the user want the logging to be).
-
-### OS datasource
-The datasource from OS is made abstract in the core module as we consider it useful for
-different future plugins(e.g. Flink plugin).
-
-### Internal WTA objects
-These are the data objects of the corresponding WTA objects.
-These objects are the aggregation results from the spark metrics.
-These objects implement BaseTraceObject interface for the benefit of future extendability.
+### WTA Model
+Model objects which are representative of the final Parquet output.
 
 ### Stream infrastructure
 This sets up the stream infrastructure for storing (intermediate) metrics from the spark.
@@ -33,30 +18,24 @@ The Stream is a single linked list storing streams of metric data. It will seria
 automatically after receiving certain amount of metrics(by default 1800), and will automatically deserialize the data
 once the data is required(e.g. poll() method for the stream).
 
-the (de)serialization is synchronized
-In addition, there is KeyedStream which allows each node content in the stream to carry a key for different aggregation
-with respect to the key.
 
 ### IO Utilities
-For reading the config json file, we use ObjectMapper in the Jackson library to read it into RuntimeConfig
-objects inside the application. For the final output, it will write Resource, Task and Workflow into parquet file and
-Workload into json file. We use Jackson as well as Apache Avro and Apache Hadoop.
-The Utility class will go through the list of WTA objects first, checking whether there exists list member with fields
-has uninitialized values (set to -1/-1.0 for basic types and null for object types). As long as one object in the list
-has these uninitialized values, the whole column will be dropped in the following schema building and the final output.
-The object will thus be converted into Record for the writer with respect to the schema built. and finally fed to the
-AvroUtils writer.
+To read the config JSON file, we utilize the ObjectMapper from the Jackson library to parse it and create RuntimeConfig objects within the application. The resulting data will be written into a Parquet file for the Resource, Task, and Workflow information, while the Workload information will be written into a JSON file. Our approach involves the use of Jackson, Apache Avro, and Apache Hadoop.
 
-#### Important regarding Hadoop dependency
-Since Avro essentially uses Hadoop, if you want to run the plugin(thus running the parquet writer) in Windows, you need
+The Utility class performs a preliminary check on the list of WTA (Workload, Task, and Activity) objects. It verifies whether any member of the list contains uninitialized values, indicated by -1 or -1.0 for basic types and null for object types. If any object in the list has such uninitialized values, the entire column associated with that object will be excluded during the schema creation process and in the final output.
+
+Consequently, the object will be transformed into a Record format specific to the schema that has been constructed. Finally, the AvroUtils writer will handle the task of feeding the data to be written using the schema and AvroUtils.
+
+#### Hadoop Dependency in Windows
+Since Avro uses Hadoop, if you want to run the plugin in Windows, you need
 to manually configure the environmental variable for the hadoop file system.
 If you want to use a different hadoop version, you need to download the corresponding Winutils.exe for the
 corresponding version of hadoop, put it in directory
 
-<Something>/hadoop/bin/Winutils.exe
+path_to_hadoop_binary/bin/Winutils.exe
 
 and add the environmental variable
 
-HADOOP_HOME=<Something>/hadoop
+HADOOP_HOME=path_to_hadoop_bin/hadoop
 
-In the hadoop we offered the Winutils.exe in path: <project_directory>/core/resources/hadoop
+If you want to use a different executable, replace the Winutils.exe at <project_directory>/core/resources/hadoop
