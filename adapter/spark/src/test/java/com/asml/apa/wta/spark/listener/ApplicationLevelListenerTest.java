@@ -17,7 +17,7 @@ class ApplicationLevelListenerTest extends BaseLevelListenerTest {
   }
 
   @Test
-  void applicationCollectsDesiredInformationEvenIfINotcomplete() {
+  void applicationListenerCollectsDesiredInformation() {
     fakeApplicationListener.onApplicationEnd(applicationEndObj);
     assertThat(fakeApplicationListener.getProcessedObjects()).hasSize(1);
 

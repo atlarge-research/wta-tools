@@ -1,6 +1,6 @@
 # Core Module
 
-This module contains all classes and auxillary data structures that are common in between all data sources such as Spark and Flink.
+This module contains all classes and auxillary data structures that are common in between all adapters.
 
 This module consists of:
  - Configuration that the user must specify that is required for the WTA format (authors,descriptions,etc).
@@ -15,8 +15,8 @@ Model objects which are representative of the final Parquet output.
 This sets up the stream infrastructure for storing (intermediate) metrics from the spark.
 The Stream is a single linked list storing streams of metric data. It will serialize the data into the disk
 (using ObjectOutputStream in native Java to .ser extension files labeled by the current time in the system)
-automatically after receiving certain amount of metrics(by default 1800), and will automatically deserialize the data
-once the data is required(e.g. poll() method for the stream).
+automatically after receiving certain amount of metrics (by default this is set to 1800), and will automatically deserialize the data
+once the data is required(e.g. `poll()` method for the stream).
 
 
 ### IO Utilities
