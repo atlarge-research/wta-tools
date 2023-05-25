@@ -7,6 +7,7 @@ import com.asml.apa.wta.spark.driver.WtaDriverPlugin;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -43,6 +44,8 @@ public class WtaExecutorPlugin implements ExecutorPlugin {
    */
   @Override
   public void init(PluginContext pluginContext, Map<String, String> extraConf) {
+
+  //TODO: put in seperate thread
     this.pluginContext = pluginContext;
 
     AtomicReference<IostatDataSourceDto> result = new AtomicReference<>(new IostatDataSourceDto());
