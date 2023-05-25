@@ -135,9 +135,4 @@ public class TaskLevelListener extends AbstractListener<Task> {
     // all tasks are guaranteed to be completed, so we can remove the stage id to reduce memory usage.
     stageIdsToJobs.remove(stageCompleted.stageInfo().stageId());
   }
-
-//  @Override
-//  public void onTaskStart(SparkListenerTaskStart taskStart) {
-//    WtaDriverPlugin.taskStart = taskStart;
-//  }
 }

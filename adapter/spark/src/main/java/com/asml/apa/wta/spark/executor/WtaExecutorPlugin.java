@@ -6,6 +6,8 @@ import com.asml.apa.wta.spark.datasource.dto.IostatDataSourceDto;
 import com.asml.apa.wta.spark.driver.WtaDriverPlugin;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
@@ -31,6 +33,9 @@ public class WtaExecutorPlugin implements ExecutorPlugin {
 
   private PluginContext pluginContext;
 
+  private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+
+
   /**
    * This method is called when the plugin is initialized on the executor.
    * Developers are urged not to put inefficient code here as it blocks executor initialization until
@@ -48,33 +53,27 @@ public class WtaExecutorPlugin implements ExecutorPlugin {
   //TODO: put in seperate thread
     this.pluginContext = pluginContext;
 
-    AtomicReference<IostatDataSourceDto> result = new AtomicReference<>(new IostatDataSourceDto());
-    try {
-      IostatDataSource iods = new IostatDataSource();
+    IostatDataSource iods = new IostatDataSource();
 
-      final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
-      scheduler.scheduleAtFixedRate(() -> {
+    List<IostatDataSourceDto> listOfIostatDtos = new ArrayList<>();
+
+    scheduler.scheduleAtFixedRate(() -> {
+      try {
+
+        IostatDataSourceDto iodsDto = iods.getAllMetrics(pluginContext.executorID());
+        //this list is to be used when batch sending is implemented. For now I'm sending the object itself.
+        listOfIostatDtos.add(iodsDto);
+        // Send the result back to the driver
         try {
-          iods.getAllMetrics();
-          result.set(iods.getIostatDto(pluginContext.executorID()));
-          // Send the result back to the driver
-          try {
-            this.pluginContext.send(result.get());
+          this.pluginContext.send(iodsDto);
 
-          } catch (Exception e) {
-            throw new RuntimeException(e);
-          }
-        } catch (IOException | InterruptedException e) {
+        } catch (Exception e) {
           throw new RuntimeException(e);
         }
-      }, 0, 5, TimeUnit.SECONDS);
-
-      // Initial result before scheduling
-      iods.getAllMetrics();
-      result.set(iods.getIostatDto(pluginContext.executorID()));
-    } catch (IOException | InterruptedException e) {
-      throw new RuntimeException(e);
-    }
+      } catch (IOException | InterruptedException e) {
+        throw new RuntimeException(e);
+      }
+    }, 0, 5, TimeUnit.SECONDS);
   }
 
 

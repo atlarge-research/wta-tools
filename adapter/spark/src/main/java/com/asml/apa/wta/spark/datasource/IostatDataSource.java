@@ -16,16 +16,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class IostatDataSource {
 
-    private double tps;
-    private double KBReadPerSec;
-    private double KBWrtnPerSec;
-    private double KBDscdPerSec;
-    private double KBRead;
-    private double KBWrtn;
-    private double KBDscd;
-    private String executorId;
-
-    public void getAllMetrics() throws IOException, InterruptedException {
+    public IostatDataSourceDto getAllMetrics(String executorId) throws IOException, InterruptedException {
         CompletableFuture<Double> tpsFuture = executeCommand("iostat -d | awk '$1 == \"sdc\"' | awk '{print $2}'");
         CompletableFuture<Double> KBReadPerSecFuture = executeCommand("iostat -d | awk '$1 == \"sdc\"' | awk '{print $3}'");
         CompletableFuture<Double> KBWrtnPerSecFuture = executeCommand("iostat -d | awk '$1 == \"sdc\"' | awk '{print $4}'");
@@ -34,17 +25,14 @@ public class IostatDataSource {
         CompletableFuture<Double> KBWrtnFuture = executeCommand("iostat -d | awk '$1 == \"sdc\"' | awk '{print $7}'");
         CompletableFuture<Double> KBDscdFuture = executeCommand("iostat -d | awk '$1 == \"sdc\"' | awk '{print $8}'");
         try {
-            tps = tpsFuture.get();
-            KBReadPerSec = KBReadPerSecFuture.get();
-            KBWrtnPerSec = KBWrtnPerSecFuture.get();
-            KBDscdPerSec = KBDscdPerSecFuture.get();
-            KBRead = KBReadFuture.get();
-            KBWrtn = KBWrtnFuture.get();
-            KBDscd = KBDscdFuture.get();
+            return IostatDataSourceDto.builder().tps(tpsFuture.get()).KBReadPerSec(KBReadPerSecFuture.get())
+                    .KBWrtnPerSec(KBWrtnPerSecFuture.get()).KBDscdPerSec(KBDscdPerSecFuture.get()).KBRead(KBReadFuture.get())
+                    .KBWrtn(KBWrtnFuture.get()).KBDscd(KBDscdFuture.get()).executorId((executorId)).build();
         } catch (Exception e) {
             //TODO: Log this as an error
             Throwable cause =  e.getCause();
         }
+        return null;
     }
 
     public CompletableFuture<Double> executeCommand(String command) throws InterruptedException, IOException {
@@ -69,10 +57,5 @@ public class IostatDataSource {
                 return -1.0;
             }
         });
-    }
-    public IostatDataSourceDto getIostatDto(String executorId) {
-        return IostatDataSourceDto.builder().tps(getTps()).KBReadPerSec(getKBReadPerSec())
-                .KBWrtnPerSec(getKBWrtnPerSec()).KBDscdPerSec(getKBDscdPerSec()).KBRead(getKBRead())
-                .KBWrtn(getKBWrtn()).KBDscd(getKBDscd()).executorId((executorId)).build();
     }
 }
