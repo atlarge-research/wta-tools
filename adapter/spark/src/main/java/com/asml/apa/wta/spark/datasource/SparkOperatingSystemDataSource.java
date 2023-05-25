@@ -3,6 +3,8 @@ package com.asml.apa.wta.spark.datasource;
 import com.asml.apa.wta.core.datasource.OperatingSystemDataSource;
 import java.io.IOException;
 import java.io.Serializable;
+
+import com.asml.apa.wta.spark.streams.ResourceMetricsRecord;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -26,7 +28,7 @@ public class SparkOperatingSystemDataSource extends OperatingSystemDataSource {
    * @since 1.0.0
    */
   @Data
-  public static class Dto implements Serializable {
+  public static class Dto extends ResourceMetricsRecord {
 
     private static final long serialVersionUID = 4386177879327585527L;
 

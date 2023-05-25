@@ -64,17 +64,10 @@ public class WtaDriverPlugin implements DriverPlugin {
     if (message instanceof SparkOperatingSystemDataSource.Dto) {
       SparkOperatingSystemDataSource.Dto dto = (SparkOperatingSystemDataSource.Dto) message;
       ResourceKey resourceKey = new ResourceKey(dto.getExecutorId());
-      ResourceMetricsRecord resourceRecord = new ResourceMetricsRecord(
-          dto.getCommittedVirtualMemorySize(),
-          dto.getFreePhysicalMemorySize(),
-          dto.getProcessCpuLoad(),
-          dto.getProcessCpuTime(),
-          dto.getTotalPhysicalMemorySize(),
-          dto.getAvailableProcessors(),
-          dto.getSystemLoadAverage());
-      mse.addToResourceStream(resourceKey, resourceRecord);
+      mse.addToResourceStream(resourceKey, dto);
     }
     if (message instanceof IostatDataSourceDto) {
+      System.out.println(message.toString());
       mse.addToResourceStream(
           new ResourceKey(((IostatDataSourceDto) message).getExecutorId()), (IostatDataSourceDto) message);
     }
