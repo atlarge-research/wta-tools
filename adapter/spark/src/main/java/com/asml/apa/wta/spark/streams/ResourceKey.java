@@ -14,5 +14,5 @@ import lombok.Getter;
 @EqualsAndHashCode
 @AllArgsConstructor
 public class ResourceKey {
-    private String id;
+  private String id;
 }

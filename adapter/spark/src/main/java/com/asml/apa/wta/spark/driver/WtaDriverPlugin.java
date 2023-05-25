@@ -1,29 +1,16 @@
 package com.asml.apa.wta.spark.driver;
 
 import com.asml.apa.wta.spark.datasource.SparkDataSource;
-import com.asml.apa.wta.core.model.Task;
-import com.asml.apa.wta.spark.datasource.IostatDataSource;
-import com.asml.apa.wta.spark.datasource.SparkDataSource;
-import java.util.HashMap;
-import java.util.Map;
-
 import com.asml.apa.wta.spark.datasource.dto.IostatDataSourceDto;
-import lombok.Getter;
-import java.util.UUID;
-import java.util.concurrent.*;
-
-import com.asml.apa.wta.core.streams.KeyedStream;
-import com.asml.apa.wta.spark.listener.AbstractListener;
-import com.asml.apa.wta.spark.listener.TaskLevelListener;
 import com.asml.apa.wta.spark.streams.MetricStreamingEngine;
 import com.asml.apa.wta.spark.streams.ResourceKey;
 import com.asml.apa.wta.spark.streams.ResourceMetricsRecord;
+import java.util.HashMap;
+import java.util.Map;
 import lombok.Getter;
 import org.apache.spark.SparkContext;
 import org.apache.spark.api.plugin.DriverPlugin;
 import org.apache.spark.api.plugin.PluginContext;
-import org.apache.spark.scheduler.SparkListenerTaskStart;
-import org.sparkproject.jetty.util.IO;
 
 /**
  * Driver component of the plugin.
@@ -72,7 +59,7 @@ public class WtaDriverPlugin implements DriverPlugin {
 
   @Override
   public Object receive(Object message) {
-    if(message instanceof IostatDataSourceDto) {
+    if (message instanceof IostatDataSourceDto) {
       onIostatRecieve((IostatDataSourceDto) message);
     }
     return message;
@@ -80,11 +67,12 @@ public class WtaDriverPlugin implements DriverPlugin {
 
   private void initListeners() {
     this.sparkDataSource.registerTaskListener();
-    //register more listeners as needed
+    // register more listeners as needed
   }
 
   private void onIostatRecieve(IostatDataSourceDto iodsDto) {
-    //TODO: Remove print at end (kept now for debugging)
+    // TODO: Remove print at end (kept now for debugging)
     System.out.println(iodsDto.toString());
-    mse.addToResourceStream(new ResourceKey(iodsDto.getExecutorId()), new ResourceMetricsRecord(iodsDto));}
+    mse.addToResourceStream(new ResourceKey(iodsDto.getExecutorId()), new ResourceMetricsRecord(iodsDto));
+  }
 }
