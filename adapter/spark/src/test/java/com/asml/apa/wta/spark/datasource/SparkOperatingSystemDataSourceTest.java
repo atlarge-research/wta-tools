@@ -5,6 +5,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 import java.io.IOException;
 import org.apache.spark.api.plugin.PluginContext;
@@ -42,5 +43,6 @@ class SparkOperatingSystemDataSourceTest {
     sut.gatherMetrics();
 
     verify(log).error(anyString());
+    verifyNoMoreInteractions(log);
   }
 }
