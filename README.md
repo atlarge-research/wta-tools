@@ -2,7 +2,7 @@
 
 ## Installation and Usage
 - Clone the repository
-- Run `mvn clean install` in the source root. 
+- Run `mvn clean install` in the source root.
 - Copy the resulting jar file from `adapter/spark/target`.
 - Run the following command in the directory where the jar file is located:
 ```bash
