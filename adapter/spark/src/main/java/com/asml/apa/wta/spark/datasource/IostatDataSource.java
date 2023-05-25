@@ -32,7 +32,7 @@ public class IostatDataSource {
         CompletableFuture<Double> KBDscdPerSecFuture = executeCommand("iostat -d | awk '$1 == \"sdc\"' | awk '{print $5}'");
         CompletableFuture<Double> KBReadFuture = executeCommand("iostat -d | awk '$1 == \"sdc\"' | awk '{print $6}'");
         CompletableFuture<Double> KBWrtnFuture = executeCommand("iostat -d | awk '$1 == \"sdc\"' | awk '{print $7}'");
-        CompletableFuture<Double> KBDscdFuture = executeCommand("iostat -d | awk '$1 == \"sdc\"' | awk '{print $8}'");=
+        CompletableFuture<Double> KBDscdFuture = executeCommand("iostat -d | awk '$1 == \"sdc\"' | awk '{print $8}'");
         try {
             tps = tpsFuture.get();
             KBReadPerSec = KBReadPerSecFuture.get();
@@ -54,9 +54,13 @@ public class IostatDataSource {
                 Process process = new ProcessBuilder(commands).start();
                 process.waitFor();
 
-                BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-                String line = reader.readLine();
-                reader.close();
+                String line = "";
+                try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+                    line = reader.readLine();
+                } catch (IOException e) {
+                    //TODO: Log this as an error
+                    Throwable cause =  e.getCause();
+                }
 
                 return Double.parseDouble(line);
             } catch (Exception e) {
