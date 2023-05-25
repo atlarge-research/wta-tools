@@ -67,7 +67,7 @@ public class WtaDriverPlugin implements DriverPlugin {
   @Override
   public Object receive(Object message) {
     if (message instanceof IostatDataSourceDto) {
-      onIostatRecieve((IostatDataSourceDto) message);
+      mse.addToResourceStream(new ResourceKey(((IostatDataSourceDto)message).getExecutorId()), (IostatDataSourceDto)message);
     }
     return message;
   }
@@ -81,17 +81,5 @@ public class WtaDriverPlugin implements DriverPlugin {
   private void initListeners() {
     this.sparkDataSource.registerTaskListener();
     // register more listeners as needed
-  }
-
-  /**
-   * Gets called when recieved object is of type IostatDataSourceDto .
-   *
-   * @author Lohithsai Yadala Chanchu
-   * @since 1.0.0
-   */
-  private void onIostatRecieve(IostatDataSourceDto iodsDto) {
-    // TODO: Remove print at end (kept now for debugging)
-    System.out.println(iodsDto.toString());
-    mse.addToResourceStream(new ResourceKey(iodsDto.getExecutorId()), iodsDto);
   }
 }
