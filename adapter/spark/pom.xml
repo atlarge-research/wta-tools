@@ -14,7 +14,7 @@
   <artifactId>spark</artifactId>
 
   <properties>
-    <scala.version>2.13.8</scala.version>
+    <scala.version>2.13.5</scala.version>
   </properties>
 
   <dependencies>
@@ -49,5 +49,24 @@
       <artifactId>scala-library</artifactId>
       <version>${scala.version}</version>
     </dependency>
+
   </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <!-- https://mvnrepository.com/artifact/net.alchim31.maven/scala-maven-plugin -->
+        <groupId>net.alchim31.maven</groupId>
+        <artifactId>scala-maven-plugin</artifactId>
+        <version>4.8.1</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>compile</goal>
+              <goal>testCompile</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
 </project>
