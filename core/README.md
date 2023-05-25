@@ -5,6 +5,7 @@ That is to say, it is the part of plugin that will not change even someone exten
 
 This module consists of:
  - configuration on the Spark-unrelated infos (authors,descriptions,etc)
+ - general datasource from the OS
  - definition of the internal WTA objects (e.g. Resource,Task,Workflow,Workload)
  - stream infrastructure for the serialization/deserialization of metrics
  - utility class providing read for configs and output to parquet files
@@ -15,6 +16,10 @@ These information needs to be input by the user inside the config file
 
 This includes the authors, domain(scientific/engineering/company purpose), description, events and the log level
 (How detailed does the user want the logging to be).
+
+### OS datasource
+The datasource from OS is made abstract in the core module as we consider it useful for
+different future plugins(e.g. Flink plugin).
 
 ### Internal WTA objects
 These are the data objects of the corresponding WTA objects.
