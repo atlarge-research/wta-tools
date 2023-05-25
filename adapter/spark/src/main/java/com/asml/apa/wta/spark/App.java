@@ -14,13 +14,18 @@ import org.apache.spark.SparkContext;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.sql.SparkSession;
+import org.apache.spark.sql.streaming.StreamingQueryException;
 import scala.Tuple2;
 
+/**
+ * Entry point for the Spark plugin. Used as part of the live demo along with spark-submit
+ */
 public class App {
 
   private static JavaRDD<String> testFile;
 
-  private static void invokeJob() {
+  private static void invokeJob() throws StreamingQueryException {
+    System.out.println("Invoking job");
     testFile.flatMap(s -> Arrays.asList(s.split(" ")).iterator())
             .mapToPair(word -> new Tuple2<>(word, 1))
             .reduceByKey((a, b) -> a + b)
@@ -41,14 +46,19 @@ public class App {
     }
 
     // 2. create spark session and load config object
-    JavaSparkContext sparkContext = new JavaSparkContext("local", "Main");
-    sparkContext.setLogLevel("OFF");
-    testFile = sparkContext.textFile(testTextPath);
+    SparkConf conf = new SparkConf()
+            .setAppName("App")
+            .setMaster("local");
+    SparkSession spark = SparkSession.builder().config(conf).getOrCreate();
+    SparkContext sc = spark.sparkContext();
+    testFile = JavaSparkContext.fromSparkContext(spark.sparkContext()).textFile(testTextPath);
 
-
-    // Part 2: out code
+    // Part 2: our code
     // 3. Register listeners
-    SparkDataSource sut = new SparkDataSource(sparkContext.sc(), WtaUtils.readConfig(configPath));
+    SparkDataSource sut = new SparkDataSource(sc, WtaUtils.readConfig(configPath));
+
+    // TODO: solve in taskListener java.lang.NoSuchMethodError:
+    //  'scala.collection.immutable.Seq org.apache.spark.scheduler.SparkListenerJobStart.stageInfos()'
     sut.registerTaskListener();
     sut.registerJobListener();
     sut.registerApplicationListener();
@@ -57,7 +67,7 @@ public class App {
     for (int i = 0; i < 100; i++) {
       invokeJob();
     }
-    sparkContext.stop();
+    sc.stop();
 
     // 5. Use parquet utils to write to parquet
     String schemaVersion = "schema-1.0";

@@ -34,8 +34,11 @@ For the most part, since we are pre-release this will serve no real purpose, oth
 - Created utility class for writing WTA trace to parquet files [@tqu](https://gitlab.ewi.tudelft.nl/tqu)
 - Create entry point for the Spark plugin for live demo [@pcho](https://gitlab.ewi.tudelft.nl/pcho)
 
+
 ### Changed
 - Refactored listeners into a generic interface to reduce code duplication and increase cc [@hpage](https://gitlab.ewi.tudelft.nl/hpage)
+- Add maven-assembly plugin to create fat jar  [@pcho](https://gitlab.ewi.tudelft.nl/pcho) [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
+
 ### Fixed
 
 ### Deprecated

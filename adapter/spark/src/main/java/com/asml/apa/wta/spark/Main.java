@@ -82,6 +82,7 @@ public class Main {
     for (int i = 0; i < 100; i++) {
       invokeJob();
     }
+//    spark.streams().awaitAnyTermination();
     spark.stop();
 
     // 5. Use parquet utils to write to parquet
