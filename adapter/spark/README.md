@@ -6,11 +6,11 @@ The Spark Adapter consists of two main parts that allows the application to coll
 
 ## SparkListenerInterface
 
-The SparkListenerInterface is responsible for listening to the spark events and collect the metrics. As part of the
+The SparkListenerInterface is responsible for listening to the Spark events and collect the metrics. As part of the
 standard instrumentation of Spark, metrics are sent from the executor to the driver as part of a heartbeat. The listener interface
 intercepts these events. Examples of how we use it, and what metrics we collect for the different WTA objects can be seen [here](/src/main/java/com/asml/apa/wta/spark/listener).
 
-It also allows us to define custom behaviour when certain events are intercepted, such as tracking the various stage ids for a spark job.
+It also allows us to define custom behaviour when certain events are intercepted, such as tracking the various stage ids for a Spark job.
 
 ```java
 @Override
@@ -29,7 +29,7 @@ utilization metrics on the executor side. These metrics are then passed to the d
 
 Aggregation of all the resource utilization metrics are done on the driver side.
 
-This module listens to the spark job that is carrying out, retrieves metric from it and
+This module listens to the Spark job that is carrying out, retrieves metric from it and
 aggregate to the WTA objects. This module consists of:
 
 

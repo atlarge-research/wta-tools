@@ -3,7 +3,7 @@
 This module contains all classes and auxillary data structures that are common in between all adapters.
 
 This module consists of:
- - Configuration that the user must specify that is required for the WTA format (authors, descriptions, etc).
+ - Configuration that the user must specify that is required for the WTA format (authors, descriptions, etc.)
  - Model objects (e.g. Resource,Task,Workflow,Workload)
  - Stream Infrastructure for the smart serialization/deserialization of objects such that memory is not a bottleneck.
  - Functionality for serializing into parquet
