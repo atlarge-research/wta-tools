@@ -47,4 +47,12 @@ public class MetricStreamingEngine {
   public void addToTaskStream(TaskKey task, TaskMetricsRecord record) {
     taskStream.addToStream(task, record);
   }
+
+  public void clearTaskStream() {
+    taskStream.clearStream();
+  }
+
+  public void clearResourceStream() {
+    resourceStream.clearStream();
+  }
 }

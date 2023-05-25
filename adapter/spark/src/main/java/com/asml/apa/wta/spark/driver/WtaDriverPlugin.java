@@ -25,7 +25,7 @@ public class WtaDriverPlugin implements DriverPlugin {
   @Getter
   private SparkDataSource sparkDataSource;
 
-  private MetricStreamingEngine mse = new MetricStreamingEngine();
+  private MetricStreamingEngine mse;
 
   /**
    * This method is called early in the initialization of the Spark driver.
@@ -55,7 +55,9 @@ public class WtaDriverPlugin implements DriverPlugin {
    * @since 1.0.0
    */
   @Override
-  public void shutdown() {}
+  public void shutdown() {
+    mse.clearResourceStream();
+  }
 
   @Override
   public Object receive(Object message) {

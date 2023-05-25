@@ -45,4 +45,8 @@ public class KeyedStream<K, V extends Serializable> {
     streams.putIfAbsent(key, new Stream<>());
     return streams.get(key);
   }
+
+  public void clearStream() {
+    streams.clear();
+  }
 }
