@@ -15,6 +15,7 @@ import org.apache.spark.api.plugin.PluginContext;
 /**
  * Driver component of the plugin.
  *
+ * @author Atour Mousavi Gourabi
  * @author Henry Page
  * @since 1.0.0
  */
@@ -51,6 +52,7 @@ public class WtaDriverPlugin implements DriverPlugin {
    *
    * @param message the message that was sent by the executors, to be serializable
    * @return a response to the executor, if no response is expected the result is ignored
+   * @author Atour Mousavi Gourabi
    */
   @Override
   public Object receive(Object message) {
