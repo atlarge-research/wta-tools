@@ -1,0 +1,15 @@
+{
+  "workloadSettings":
+  {
+    "author": "Test Name",
+    "domain": "Let's gooo",
+    "description": "Test Description"
+  },
+  "resourceSettings":
+  {
+    "events": {
+      "f1": "v1",
+      "f2": "v2"
+    }
+  }
+}

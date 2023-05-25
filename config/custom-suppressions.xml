@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<!DOCTYPE suppressions PUBLIC
+        "-//Checkstyle//DTD SuppressionFilter Configuration 1.2//EN"
+        "https://checkstyle.org/dtds/suppressions_1_2.dtd">
+
+<suppressions>
+  <!-- HideUtilityClassConstructor enforces the existence of an explicit constructor for Main, we consider this nonsense. -->
+  <suppress files="Main.java" checks="HideUtilityClassConstructor" />
+  <suppress files="com/asml/apa/wta/spark/listener/AbstractListener.java" checks="VisibilityModifier" />
+  <!-- BanLoggingImplementations forbids import of log4j framework but SLF4J makes use of it anyways  -->
+  <suppress files="Log4j2Configuration.java" id="BanLoggingImplementations"/>
+</suppressions>

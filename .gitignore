@@ -8,6 +8,7 @@
 *.class
 
 # Log file
+logging
 *.log
 
 # BlueJ files
@@ -53,3 +54,33 @@ buildNumber.properties
 .project
 # JDT-specific (Eclipse Java Development Tools)
 .classpath
+
+# Gemnasium
+gemnasium-maven-plugin.json
+
+# pipeline reports (JaCoCo, pit)
+reports
+
+# application configuration
+config.json
+
+# big generated files for benchmarking
+benchmarking/src/main/resources/sql_files
+benchmarking/src/main/resources/tpcds_data
+
+# serialization files
+*.ser
+tmp
+
+# jqwik
+.jqwik-database
+
+# logs
+logs
+
+# DAS config files
+*.pyc
+benchmarking/das-config-scripts/frameworks
+#test output
+core/src/test/resources/WTA
+core/src/test/resources/AvroOutput
