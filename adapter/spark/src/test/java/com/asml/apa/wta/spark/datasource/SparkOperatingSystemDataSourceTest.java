@@ -6,11 +6,8 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 
-import com.asml.apa.wta.core.logger.Log4j2Configuration;
 import java.io.IOException;
-import org.apache.logging.log4j.Level;
 import org.apache.spark.api.plugin.PluginContext;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -29,11 +26,6 @@ class SparkOperatingSystemDataSourceTest {
 
   @InjectMocks
   SparkOperatingSystemDataSource sut;
-
-  @BeforeAll
-  static void setUpLogging() {
-    Log4j2Configuration.setUpLoggingConfig(Level.ERROR);
-  }
 
   @Test
   void gatherMetrics() throws IOException {
