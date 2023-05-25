@@ -6,6 +6,8 @@ import com.asml.apa.wta.spark.datasource.IostatDataSource;
 import com.asml.apa.wta.spark.datasource.SparkDataSource;
 import java.util.HashMap;
 import java.util.Map;
+
+import com.asml.apa.wta.spark.datasource.dto.IostatDataSourceDto;
 import lombok.Getter;
 import java.util.UUID;
 import java.util.concurrent.*;
@@ -36,6 +38,8 @@ public class WtaDriverPlugin implements DriverPlugin {
   @Getter
   private SparkDataSource sparkDataSource;
 
+  private MetricStreamingEngine mse = new MetricStreamingEngine();
+
   /**
    * This method is called early in the initialization of the Spark driver.
    * Explicitly, it is called before the Spark driver's task scheduler is initialized. It is blocking.
@@ -52,7 +56,8 @@ public class WtaDriverPlugin implements DriverPlugin {
   public Map<String, String> init(SparkContext sparkCtx, PluginContext pluginCtx) {
     this.sparkContext = sparkCtx;
     this.sparkDataSource = new SparkDataSource(this.sparkContext);
-    this.sparkDataSource.registerTaskListener();
+    initListeners();
+    this.mse = new MetricStreamingEngine();
     return new HashMap<>();
   }
 
@@ -67,12 +72,19 @@ public class WtaDriverPlugin implements DriverPlugin {
 
   @Override
   public Object receive(Object message) {
-    System.out.println(message.toString());
-    IostatDataSource k = (IostatDataSource) message;
-
-    MetricStreamingEngine mse = new MetricStreamingEngine();
-
-    mse.addToResourceStream(new ResourceKey(k.getExecutorId()), new ResourceMetricsRecord(k));
+    if(message instanceof IostatDataSourceDto) {
+      onIostatRecieve((IostatDataSourceDto) message);
+    }
     return message;
   }
+
+  private void initListeners() {
+    this.sparkDataSource.registerTaskListener();
+    //register more listeners as needed
+  }
+
+  private void onIostatRecieve(IostatDataSourceDto iodsDto) {
+    //TODO: Remove print at end (kept now for debugging)
+    System.out.println(iodsDto.toString());
+    mse.addToResourceStream(new ResourceKey(iodsDto.getExecutorId()), new ResourceMetricsRecord(iodsDto));}
 }
