@@ -5,7 +5,7 @@ anyone who wants to utilize this plugin as a way to evaluate its performance. Cu
 
 ### DAS scripts
 
-We used the Distributed ASCI Supercomputer (DAS) system to benchmark our plugin. Information can be found [here](https://asci.tudelft.nl/project-das/).
+We used the Distributed ASCI Supercomputer (DAS) system to benchmark our plugin. Supplementary information can be found [here](https://asci.tudelft.nl/project-das/).
 
 The DAS scripts are Python scripts that submit a slot allocation request on the DAS, whilst configuring the spark environment.
 
