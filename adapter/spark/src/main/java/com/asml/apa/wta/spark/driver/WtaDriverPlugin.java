@@ -1,6 +1,10 @@
 package com.asml.apa.wta.spark.driver;
 
 import com.asml.apa.wta.spark.datasource.SparkDataSource;
+import com.asml.apa.wta.spark.datasource.SparkOperatingSystemDataSource;
+import com.asml.apa.wta.spark.streams.MetricStreamingEngine;
+import com.asml.apa.wta.spark.streams.ResourceKey;
+import com.asml.apa.wta.spark.streams.ResourceMetricsRecord;
 import java.util.HashMap;
 import java.util.Map;
 import lombok.Getter;
@@ -14,6 +18,7 @@ import org.apache.spark.api.plugin.PluginContext;
 /**
  * Driver component of the plugin.
  *
+ * @author Atour Mousavi Gourabi
  * @author Henry Page
  * @since 1.0.0
  */
@@ -23,6 +28,8 @@ public class WtaDriverPlugin implements DriverPlugin {
 
   @Getter
   private SparkDataSource sparkDataSource;
+
+  private MetricStreamingEngine streamingEngine;
 
   /**
    * This method is called early in the initialization of the Spark driver.
@@ -38,10 +45,35 @@ public class WtaDriverPlugin implements DriverPlugin {
    */
   @Override
   public Map<String, String> init(SparkContext sparkCtx, PluginContext pluginCtx) {
-    System.out.println("init");
-    this.sparkContext = sparkCtx;
-    this.sparkDataSource = new SparkDataSource(this.sparkContext);
+    sparkContext = sparkCtx;
+    sparkDataSource = new SparkDataSource(sparkContext);
+    streamingEngine = new MetricStreamingEngine();
     return new HashMap<>();
+  }
+
+  /**
+   * Receives messages from the executors.
+   *
+   * @param message the message that was sent by the executors, to be serializable
+   * @return a response to the executor, if no response is expected the result is ignored
+   * @author Atour Mousavi Gourabi
+   */
+  @Override
+  public Object receive(Object message) {
+    if (message instanceof SparkOperatingSystemDataSource.Dto) {
+      SparkOperatingSystemDataSource.Dto dto = (SparkOperatingSystemDataSource.Dto) message;
+      ResourceKey resourceKey = new ResourceKey(dto.getExecutorId());
+      ResourceMetricsRecord resourceRecord = new ResourceMetricsRecord(
+          dto.getCommittedVirtualMemorySize(),
+          dto.getFreePhysicalMemorySize(),
+          dto.getProcessCpuLoad(),
+          dto.getProcessCpuTime(),
+          dto.getTotalPhysicalMemorySize(),
+          dto.getAvailableProcessors(),
+          dto.getSystemLoadAverage());
+      streamingEngine.addToResourceStream(resourceKey, resourceRecord);
+    }
+    return null;
   }
 
   /**
@@ -50,11 +82,8 @@ public class WtaDriverPlugin implements DriverPlugin {
    * @author Henry Page
    * @since 1.0.0
    */
-  public void shutdown() {}
-
   @Override
-  public Object receive(Object message) throws Exception {
-    System.out.println(message.toString());
-    return message;
+  public void shutdown() {
+    // clean up
   }
 }
