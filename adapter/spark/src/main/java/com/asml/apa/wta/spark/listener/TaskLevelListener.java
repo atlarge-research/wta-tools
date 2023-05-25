@@ -53,7 +53,7 @@ public class TaskLevelListener extends AbstractListener<Task> {
     final long submitTime = curTaskInfo.launchTime();
     final long runTime = curTaskMetrics.executorRunTime();
     final int userId = sparkContext.sparkUser().hashCode();
-//    final long workflowId = stageIdsToJobs.get(taskEnd.stageId());
+    final long workflowId = stageIdsToJobs.get(taskEnd.stageId());
 
     // unknown
     final int submissionSite = -1;
@@ -87,7 +87,7 @@ public class TaskLevelListener extends AbstractListener<Task> {
         .userId(userId)
         .groupId(groupId)
         .nfrs(nfrs)
-//        .workflowId(workflowId)
+        .workflowId(workflowId)
         .waitTime(waitTime)
         .params(params)
         .memoryRequested(memoryRequested)
@@ -99,19 +99,19 @@ public class TaskLevelListener extends AbstractListener<Task> {
         .build());
   }
 
-//  /**
-//   * This method is called every time a job starts.
-//   * In the context of the WTA, this is a workflow.
-//   *
-//   * @param jobStart The object corresponding to information on job start.
-//   * @author Henry Page
-//   * @since 1.0.0
-//   */
-//  @Override
-//  public void onJobStart(SparkListenerJobStart jobStart) {
-//    // stage ids are always unique
-//    jobStart.stageInfos().foreach(stageInfo -> stageIdsToJobs.put(stageInfo.stageId(), jobStart.jobId()));
-//  }
+  /**
+   * This method is called every time a job starts.
+   * In the context of the WTA, this is a workflow.
+   *
+   * @param jobStart The object corresponding to information on job start.
+   * @author Henry Page
+   * @since 1.0.0
+   */
+  @Override
+  public void onJobStart(SparkListenerJobStart jobStart) {
+    // stage ids are always unique
+    jobStart.stageInfos().foreach(stageInfo -> stageIdsToJobs.put(stageInfo.stageId(), jobStart.jobId()));
+  }
 
   /**
    * Callback for when a stage ends.

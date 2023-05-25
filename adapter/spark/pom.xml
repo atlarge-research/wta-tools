@@ -13,6 +13,10 @@
 
   <artifactId>spark</artifactId>
 
+  <properties>
+    <scala.version>2.13.8</scala.version>
+  </properties>
+
   <dependencies>
     <!-- https://mvnrepository.com/artifact/org.apache.spark/spark-core -->
     <dependency>
@@ -32,6 +36,18 @@
       <artifactId>core</artifactId>
       <version>${project.version}</version>
       <scope>compile</scope>
+    </dependency>
+    <!-- https://mvnrepository.com/artifact/org.scala-lang/scala-reflect -->
+    <dependency>
+      <groupId>org.scala-lang</groupId>
+      <artifactId>scala-reflect</artifactId>
+      <version>${scala.version}</version>
+    </dependency>
+    <!-- https://mvnrepository.com/artifact/org.scala-lang/scala-reflect -->
+    <dependency>
+      <groupId>org.scala-lang</groupId>
+      <artifactId>scala-library</artifactId>
+      <version>${scala.version}</version>
     </dependency>
   </dependencies>
 </project>
