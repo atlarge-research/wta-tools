@@ -1,10 +1,9 @@
 package com.asml.apa.wta.spark.datasource;
 
 import com.asml.apa.wta.core.datasource.OperatingSystemDataSource;
+import com.asml.apa.wta.spark.dto.SparkOperatingSystemDataSourceDto;
 import java.io.IOException;
-import java.io.Serializable;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.spark.api.plugin.PluginContext;
 
@@ -18,34 +17,6 @@ import org.apache.spark.api.plugin.PluginContext;
 @Slf4j
 @AllArgsConstructor
 public class SparkOperatingSystemDataSource extends OperatingSystemDataSource {
-
-  /**
-   * Data transfer object used for communicating with the driver.
-   *
-   * @author Atour Mousavi Gourabi
-   * @since 1.0.0
-   */
-  @Data
-  public static class Dto implements Serializable {
-
-    private static final long serialVersionUID = 4386177879327585527L;
-
-    private final long committedVirtualMemorySize;
-
-    private final long freePhysicalMemorySize;
-
-    private final double processCpuLoad;
-
-    private final long processCpuTime;
-
-    private final long totalPhysicalMemorySize;
-
-    private final int availableProcessors;
-
-    private final double systemLoadAverage;
-
-    private final String executorId;
-  }
 
   private final PluginContext pluginContext;
 
@@ -65,7 +36,7 @@ public class SparkOperatingSystemDataSource extends OperatingSystemDataSource {
     int availableProc = getAvailableProcessors();
     double systemLoadAverage = getSystemLoadAverage();
     String executorId = pluginContext.executorID();
-    Dto dto = new Dto(
+    SparkOperatingSystemDataSourceDto dto = new SparkOperatingSystemDataSourceDto(
         vMemSize, freeMemSize, cpuLoad, cpuTime, totalMemSize, availableProc, systemLoadAverage, executorId);
     try {
       pluginContext.send(dto);
