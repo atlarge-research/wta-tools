@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -49,28 +50,30 @@ public class WtaExecutorPlugin implements ExecutorPlugin {
 
     List<IostatDataSourceDto> listOfIostatDtos = new LinkedList<>();
 
-    scheduler.scheduleAtFixedRate(
-        () -> {
-          try {
-
-            IostatDataSourceDto iodsDto = iods.getAllMetrics(pluginContext.executorID());
-            // this list is to be used when batch sending is implemented. For now I'm sending the object
-            // itself.
-            listOfIostatDtos.add(iodsDto);
-            // Send the result back to the driver
+    ExecutorService executor = Executors.newSingleThreadExecutor();
+    executor.submit(() -> {
+      scheduler.scheduleAtFixedRate(
+          () -> {
             try {
-              this.pluginContext.send(iodsDto);
+              IostatDataSourceDto iodsDto = iods.getAllMetrics(pluginContext.executorID());
+              // this list is to be used when batch sending is implemented. For now I'm sending the object
+              // itself.
+              listOfIostatDtos.add(iodsDto);
+              // Send the result back to the driver
+              try {
+                this.pluginContext.send(iodsDto);
 
-            } catch (Exception e) {
+              } catch (Exception e) {
+                throw new RuntimeException(e);
+              }
+            } catch (IOException | InterruptedException e) {
               throw new RuntimeException(e);
             }
-          } catch (IOException | InterruptedException e) {
-            throw new RuntimeException(e);
-          }
-        },
-        0,
-        5,
-        TimeUnit.SECONDS);
+          },
+          0,
+          5,
+          TimeUnit.SECONDS);
+    });
   }
 
   /**
