@@ -7,6 +7,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 
+import com.asml.apa.wta.spark.dto.SparkOperatingSystemDataSourceDto;
 import java.io.IOException;
 import org.apache.spark.api.plugin.PluginContext;
 import org.junit.jupiter.api.Test;
@@ -32,7 +33,7 @@ class SparkOperatingSystemDataSourceTest {
   void gatherMetrics() throws IOException {
     sut.gatherMetrics();
 
-    verify(pluginContext).send(any(SparkOperatingSystemDataSource.Dto.class));
+    verify(pluginContext).send(any(SparkOperatingSystemDataSourceDto.class));
     verifyNoInteractions(log);
   }
 
