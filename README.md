@@ -1,4 +1,4 @@
-# asml-dev
+# WTA Spark Plugin
 
 ## Installation and Usage
 - Clone the repository
@@ -8,8 +8,8 @@
 ```bash
 spark-submit --class com.asml.apa.wta.spark.App
 --master local[1] <plugin_jar_location> <config.json_location> <directory_for_outputted_parquet> <file_to_be_processed>
-- The parquet files should now be in the directory_for_outputted_parquet.
 ```
+- The parquet files should now be in the <directory_for_outputted_parquet>.
 
 ### Logging
 It is important that when using the `core` module to build adapter layers, `Log4j2Configuration#setUpLoggingConfig`
