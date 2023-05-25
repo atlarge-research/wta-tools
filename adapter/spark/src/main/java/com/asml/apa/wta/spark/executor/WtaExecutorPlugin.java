@@ -12,6 +12,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.spark.SparkContext;
 import org.apache.spark.TaskFailedReason;
 import org.apache.spark.api.plugin.ExecutorPlugin;
@@ -20,9 +21,10 @@ import org.apache.spark.api.plugin.PluginContext;
 /**
  * Executor component of the plugin.
  *
- * @author Henry Page
+ * @author Henry Page and Lohithsai Yadala Chanchu
  * @since 1.0.0
  */
+@Slf4j
 public class WtaExecutorPlugin implements ExecutorPlugin {
 
   private PluginContext pluginContext;
@@ -36,16 +38,18 @@ public class WtaExecutorPlugin implements ExecutorPlugin {
    * Developers are urged not to put inefficient code here as it blocks executor initialization until
    * it is completed.
    *
-   * @param pluginContext The PluginContext object that represents the context of the plugin.
+   * @param pCtx The PluginContext object that represents the context of the plugin.
    * @param extraConf A map object that contains any extra configuration information. This map
    *                  is directly returned from {@link WtaDriverPlugin#init(SparkContext, PluginContext)}
    * @see WtaPlugin#executorPlugin() where a new instance of the plugin is created. This gets called as soon
    * as it is loaded on to the executor.
+   *
+   * @author Lohithsai Yadala Chanchu
+   * @since 1.0.0
    */
   @Override
-  public void init(PluginContext pluginContext, Map<String, String> extraConf) {
+  public void init(PluginContext pCtx, Map<String, String> extraConf) {
 
-    // TODO: put in seperate thread
     this.pluginContext = pluginContext;
 
     List<IostatDataSourceDto> listOfIostatDtos = new LinkedList<>();
@@ -56,7 +60,8 @@ public class WtaExecutorPlugin implements ExecutorPlugin {
           () -> {
             try {
               IostatDataSourceDto iodsDto = iods.getAllMetrics(pluginContext.executorID());
-              // this list is to be used when batch sending is implemented. For now I'm sending the object
+              // this list is to be used when batch sending is implemented. For now we're sending the
+              // object
               // itself.
               listOfIostatDtos.add(iodsDto);
               // Send the result back to the driver
@@ -64,10 +69,14 @@ public class WtaExecutorPlugin implements ExecutorPlugin {
                 this.pluginContext.send(iodsDto);
 
               } catch (Exception e) {
-                throw new RuntimeException(e);
+                log.error(
+                    "Something went wrong while sending iostat metrics. The cause is: {}",
+                    e.getCause().toString());
               }
             } catch (IOException | InterruptedException e) {
-              throw new RuntimeException(e);
+              log.error(
+                  "Something went wrong while sending iostat metrics. The cause is: {}",
+                  e.getCause().toString());
             }
           },
           0,

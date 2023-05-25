@@ -14,7 +14,7 @@ import org.apache.spark.api.plugin.PluginContext;
 /**
  * Driver component of the plugin.
  *
- * @author Henry Page
+ * @author Henry Page and Lohithsai Yadala Chanchu
  * @since 1.0.0
  */
 public class WtaDriverPlugin implements DriverPlugin {
@@ -35,7 +35,7 @@ public class WtaDriverPlugin implements DriverPlugin {
    * @param sparkCtx The current SparkContext.
    * @param pluginCtx Additional plugin-specific about the Spark application where the plugin is running.
    * @return Extra information provided to the executor
-   * @author Henry Page
+   * @author Henry Page and Lohithsai Yadala Chanchu
    * @since 1.0.0
    */
   @Override
@@ -50,7 +50,7 @@ public class WtaDriverPlugin implements DriverPlugin {
   /**
    * Gets called just before shutdown. Recommended that no spark functions are used here.
    *
-   * @author Henry Page
+   * @author Henry Page and Lohithsai Yadala Chanchu
    * @since 1.0.0
    */
   @Override
