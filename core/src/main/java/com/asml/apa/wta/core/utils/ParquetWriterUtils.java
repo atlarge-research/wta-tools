@@ -135,8 +135,12 @@ public class ParquetWriterUtils {
       fieldSchema = fieldSchema.name("num_resources").type().doubleType().doubleDefault(0.0);
     }
     if (checker[3]) {
-      fieldSchema =
-          fieldSchema.name("proc_model").type().nullable().stringType().stringDefault("test");
+      fieldSchema = fieldSchema
+          .name("proc_model")
+          .type()
+          .nullable()
+          .stringType()
+          .stringDefault("test");
     }
     if (checker[4]) {
       fieldSchema = fieldSchema.name("memory").type().longType().longDefault(0);
@@ -318,15 +322,15 @@ public class ParquetWriterUtils {
           fieldSchema.name("critical_path_length").type().intType().noDefault();
     }
     if (checker[5]) {
-      fieldSchema =
-          fieldSchema.name("critical_path_task_count").type().intType().noDefault();
-    }
-    if (checker[6]) {
       fieldSchema = fieldSchema
-          .name("max_concurrent_tasks")
+          .name("critical_path_task_count")
           .type()
           .intType()
           .noDefault();
+    }
+    if (checker[6]) {
+      fieldSchema =
+          fieldSchema.name("max_concurrent_tasks").type().intType().noDefault();
     }
     if (checker[7]) {
       fieldSchema =
@@ -357,7 +361,8 @@ public class ParquetWriterUtils {
           .noDefault();
     }
     if (checker[12]) {
-      fieldSchema = fieldSchema.name("total_resources").type().doubleType().noDefault();
+      fieldSchema =
+          fieldSchema.name("total_resources").type().doubleType().noDefault();
     }
     if (checker[13]) {
       fieldSchema =
@@ -372,8 +377,11 @@ public class ParquetWriterUtils {
           fieldSchema.name("total_disk_space_usage").type().longType().noDefault();
     }
     if (checker[16]) {
-      fieldSchema =
-          fieldSchema.name("total_energy_consumption").type().longType().noDefault();
+      fieldSchema = fieldSchema
+          .name("total_energy_consumption")
+          .type()
+          .longType()
+          .noDefault();
     }
     Schema schema = fieldSchema.endRecord();
     AvroUtils workflowWriter =

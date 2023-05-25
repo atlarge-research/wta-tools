@@ -15,6 +15,7 @@ import lombok.Getter;
  */
 @Data
 @Builder
+@SuppressWarnings("MemberName")
 public class Workload implements BaseTraceObject {
   private static final long serialVersionUID = -4547341610378381743L;
 

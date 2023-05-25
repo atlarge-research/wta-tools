@@ -73,18 +73,18 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
 
     processedObjects.add(Workload.builder()
         .workflows(workflows)
-        .totalWorkflows(numWorkflows)
-        .totalTasks(totalTasks)
+        .total_workflows(numWorkflows)
+        .total_tasks(totalTasks)
         .domain(domain)
-        .startDate(startDate)
-        .endDate(endDate)
+        .date_start(startDate)
+        .date_end(endDate)
         .authors(authors)
-        .workloadDescription(workloadDescription)
-        .numSites(numSites)
-        .numResources(numResources)
-        .numUsers(numUsers)
-        .numGroups(numGroups)
-        .totalResourceSeconds(totalResourceSeconds)
+        .workload_description(workloadDescription)
+        .num_sites(numSites)
+        .num_resources(numResources)
+        .num_users(numUsers)
+        .num_groups(numGroups)
+        .total_resource_seconds(totalResourceSeconds)
         .build());
   }
 }
