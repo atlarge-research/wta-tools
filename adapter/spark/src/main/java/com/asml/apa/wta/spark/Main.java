@@ -6,92 +6,101 @@ import com.asml.apa.wta.core.model.Workload;
 import com.asml.apa.wta.core.utils.ParquetWriterUtils;
 import com.asml.apa.wta.core.utils.WtaUtils;
 import com.asml.apa.wta.spark.datasource.SparkDataSource;
+import java.io.File;
+import java.util.Arrays;
+import java.util.List;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.sql.SparkSession;
 import scala.Tuple2;
 
-import java.io.File;
-import java.util.Arrays;
-import java.util.List;
-
 /**
- * Entry point for the Spark plugin.
+ * Entry point for the Spark plugin. Current main method is used for full system
+ * testing purposes.
+ * @author Pil Kyu Cho
+ * @since 1.0.0
  */
 public class Main {
 
-  private static SparkSession spark;
-
-  private static SparkDataSource sut;
-
   private static JavaRDD<String> testFile;
 
-  private static ParquetWriterUtils parquetUtil;
+  private static final String resourceDir = "./adapter/spark/src/main/resources/";
 
-  private static String resourceDir = "adapter/spark/src/main/resources/";
+  private static final String testTextPath = resourceDir + "wordcount.txt";
 
-  private static String testTextPath = resourceDir + "wordcount.txt";
-
-  private static String configPath = resourceDir + "config.json";
-
-  private static String outputPath = resourceDir + "WTA";
-
-  private static String schemaVersion = "schema-1.0";
-
+  /**
+   * Private method to run a very basic spark job.
+   * @author Pil Kyu Cho
+   * @since 1.0.0
+   */
   private static void invokeJob() {
     testFile.flatMap(s -> Arrays.asList(s.split(" ")).iterator())
-            .mapToPair(word -> new Tuple2<>(word, 1))
-            .reduceByKey((a, b) -> a + b)
-            .collect(); // important to collect to store the metrics
+        .mapToPair(word -> new Tuple2<>(word, 1))
+        .reduceByKey((a, b) -> a + b)
+        .collect();
   }
 
+  /**
+   * Full plugin system testing. Sets the filepath and reads the user config file along
+   * with output dir for generated parquet files. Then runs a simple spark job to
+   * colelct metrics and uses the parquet utils to write to parquet.
+   * @param args        Command line args. Expecting two arguments
+   * @throws Exception  Possible Exception thrown from Parquet utils
+   * @author Pil Kyu Cho
+   * @since 1.0.0
+   */
   public static void main(String[] args) throws Exception {
-    // 1. Set paths
+    // 1. Set custom paths
+    String configPath;
+    String outputPath;
     try {
       configPath = args[0];
       outputPath = args[1];
     } catch (ArrayIndexOutOfBoundsException e) {
-      System.out.println("No config path or output path specified, using default values");
+      configPath = resourceDir + "config.json";
+      outputPath = resourceDir + "WTA";
     }
 
     // 2. create spark session and load config object
     SparkConf conf = new SparkConf()
             .setAppName("SparkRunner")
             .setMaster("local[1]")
-            .set("spark.executor.instances", "2") // 1 executor per instance of each worker
-            .set("spark.executor.cores", "2"); // 2 cores on each executor
-    spark = SparkSession.builder().config(conf).getOrCreate();
+            .set("spark.executor.instances", "2")
+            .set("spark.executor.cores", "2");
+    SparkSession spark = SparkSession.builder().config(conf).getOrCreate();
     spark.sparkContext().setLogLevel("OFF");
-    sut = new SparkDataSource(spark.sparkContext(), WtaUtils.readConfig(configPath));
     testFile = JavaSparkContext.fromSparkContext(spark.sparkContext()).textFile(testTextPath);
 
     // 3. Register listeners
+    SparkDataSource sut = new SparkDataSource(spark.sparkContext(), WtaUtils.readConfig(configPath));
     sut.registerTaskListener();
     sut.registerJobListener();
     sut.registerApplicationListener();
 
-    // 4. Invoke a job multiple times and stop spark session when finished
-    for (int i = 0; i < 1000; i++) {
+    // 4. invoke Spark job multiple times to generate metrics
+    for (int i = 0; i < 100; i++) {
       invokeJob();
     }
     spark.stop();
 
     // 5. Use parquet utils to write to parquet
-    parquetUtil = new ParquetWriterUtils(new File(outputPath), schemaVersion);
+    String schemaVersion = "schema-1.0";
+    ParquetWriterUtils parquetUtil = new ParquetWriterUtils(new File(outputPath), schemaVersion);
 
     // no resource object yet
     List<Task> tasks = sut.getTaskLevelListener().getProcessedObjects();
     List<Workflow> workFlow = sut.getJobLevelListener().getProcessedObjects();
-    Workload workLoad = sut.getApplicationLevelListener().getProcessedObjects().get(0);
+    Workload workLoad =
+        sut.getApplicationLevelListener().getProcessedObjects().get(0);
 
-    // first delete any existing parquet files
+    // delete any potential existing parquet files
     new File(resourceDir + "WTA/resources/schema-1.0/resource.parquet").delete();
     new File(resourceDir + "WTA/tasks/schema-1.0/task.parquet").delete();
     new File(resourceDir + "WTA/workflows/schema-1.0/workflow.parquet").delete();
     new File(resourceDir + "WTA/workload/schema-1.0/workload.json").delete();
 
-    // write
+    // generate files
     parquetUtil.getTasks().addAll(tasks);
     parquetUtil.getWorkflows().addAll(workFlow);
     parquetUtil.readWorkload(workLoad);
