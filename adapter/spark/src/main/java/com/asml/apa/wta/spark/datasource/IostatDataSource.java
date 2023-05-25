@@ -8,26 +8,37 @@ import java.util.concurrent.CompletableFuture;
 
 public class IostatDataSource {
 
+  /**
+   * Uses the Iostat dependency to get io metrics .
+   *
+   * @param executorId The executorId string that represents the executorId the io information is being received from.
+   * @return IostatDataSourceDto object that will be sent to the driver (with the necessary information filled out)
+   * @author Lohithsai Yadala Chanchu
+   * @since 1.0.0
+   */
   public IostatDataSourceDto getAllMetrics(String executorId) throws IOException, InterruptedException {
     CompletableFuture<Double> tpsFuture = executeCommand("iostat -d | awk '$1 == \"sdc\"' | awk '{print $2}'");
-    CompletableFuture<Double> KBReadPerSecFuture =
+    CompletableFuture<Double> kiloByteReadPerSecFuture =
         executeCommand("iostat -d | awk '$1 == \"sdc\"' | awk '{print $3}'");
-    CompletableFuture<Double> KBWrtnPerSecFuture =
+    CompletableFuture<Double> kiloByteWrtnPerSecFuture =
         executeCommand("iostat -d | awk '$1 == \"sdc\"' | awk '{print $4}'");
-    CompletableFuture<Double> KBDscdPerSecFuture =
+    CompletableFuture<Double> kiloByteDscdPerSecFuture =
         executeCommand("iostat -d | awk '$1 == \"sdc\"' | awk '{print $5}'");
-    CompletableFuture<Double> KBReadFuture = executeCommand("iostat -d | awk '$1 == \"sdc\"' | awk '{print $6}'");
-    CompletableFuture<Double> KBWrtnFuture = executeCommand("iostat -d | awk '$1 == \"sdc\"' | awk '{print $7}'");
-    CompletableFuture<Double> KBDscdFuture = executeCommand("iostat -d | awk '$1 == \"sdc\"' | awk '{print $8}'");
+    CompletableFuture<Double> kiloByteReadFuture =
+        executeCommand("iostat -d | awk '$1 == \"sdc\"' | awk '{print $6}'");
+    CompletableFuture<Double> kiloByteWrtnFuture =
+        executeCommand("iostat -d | awk '$1 == \"sdc\"' | awk '{print $7}'");
+    CompletableFuture<Double> kiloByteDscdFuture =
+        executeCommand("iostat -d | awk '$1 == \"sdc\"' | awk '{print $8}'");
     try {
       return IostatDataSourceDto.builder()
           .tps(tpsFuture.get())
-          .KBReadPerSec(KBReadPerSecFuture.get())
-          .KBWrtnPerSec(KBWrtnPerSecFuture.get())
-          .KBDscdPerSec(KBDscdPerSecFuture.get())
-          .KBRead(KBReadFuture.get())
-          .KBWrtn(KBWrtnFuture.get())
-          .KBDscd(KBDscdFuture.get())
+          .kiloByteReadPerSec(kiloByteReadPerSecFuture.get())
+          .kiloByteWrtnPerSec(kiloByteWrtnPerSecFuture.get())
+          .kiloByteDscdPerSec(kiloByteDscdPerSecFuture.get())
+          .kiloByteRead(kiloByteReadFuture.get())
+          .kiloByteWrtn(kiloByteWrtnFuture.get())
+          .kiloByteDscd(kiloByteDscdFuture.get())
           .executorId((executorId))
           .build();
     } catch (Exception e) {

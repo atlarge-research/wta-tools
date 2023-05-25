@@ -48,10 +48,22 @@ public class MetricStreamingEngine {
     taskStream.addToStream(task, record);
   }
 
+  /**
+   * Clear task metrics stream.
+   *
+   * @author Lohithsai Yadala Chanchu
+   * @since 1.0.0
+   */
   public void clearTaskStream() {
     taskStream.clearStream();
   }
 
+  /**
+   * Clear resource metrics stream.
+   *
+   * @author Lohithsai Yadala Chanchu
+   * @since 1.0.0
+   */
   public void clearResourceStream() {
     resourceStream.clearStream();
   }

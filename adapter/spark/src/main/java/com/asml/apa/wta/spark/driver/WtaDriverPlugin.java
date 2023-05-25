@@ -4,7 +4,6 @@ import com.asml.apa.wta.spark.datasource.SparkDataSource;
 import com.asml.apa.wta.spark.datasource.dto.IostatDataSourceDto;
 import com.asml.apa.wta.spark.streams.MetricStreamingEngine;
 import com.asml.apa.wta.spark.streams.ResourceKey;
-import com.asml.apa.wta.spark.streams.ResourceMetricsRecord;
 import java.util.HashMap;
 import java.util.Map;
 import lombok.Getter;
@@ -59,6 +58,12 @@ public class WtaDriverPlugin implements DriverPlugin {
     mse.clearResourceStream();
   }
 
+  /**
+   * Gets called whenever a message is received from one of the executors.
+   *
+   * @author Lohithsai Yadala Chanchu
+   * @since 1.0.0
+   */
   @Override
   public Object receive(Object message) {
     if (message instanceof IostatDataSourceDto) {
@@ -67,14 +72,26 @@ public class WtaDriverPlugin implements DriverPlugin {
     return message;
   }
 
+  /**
+   * Initializes the listeners.
+   *
+   * @author Lohithsai Yadala Chanchu
+   * @since 1.0.0
+   */
   private void initListeners() {
     this.sparkDataSource.registerTaskListener();
     // register more listeners as needed
   }
 
+  /**
+   * Gets called when recieved object is of type IostatDataSourceDto .
+   *
+   * @author Lohithsai Yadala Chanchu
+   * @since 1.0.0
+   */
   private void onIostatRecieve(IostatDataSourceDto iodsDto) {
     // TODO: Remove print at end (kept now for debugging)
     System.out.println(iodsDto.toString());
-    mse.addToResourceStream(new ResourceKey(iodsDto.getExecutorId()), new ResourceMetricsRecord(iodsDto));
+    mse.addToResourceStream(new ResourceKey(iodsDto.getExecutorId()), iodsDto);
   }
 }

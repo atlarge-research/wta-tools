@@ -5,7 +5,7 @@ import com.asml.apa.wta.spark.datasource.IostatDataSource;
 import com.asml.apa.wta.spark.datasource.dto.IostatDataSourceDto;
 import com.asml.apa.wta.spark.driver.WtaDriverPlugin;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executors;
@@ -28,6 +28,8 @@ public class WtaExecutorPlugin implements ExecutorPlugin {
 
   private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
+  private IostatDataSource iods = new IostatDataSource();
+
   /**
    * This method is called when the plugin is initialized on the executor.
    * Developers are urged not to put inefficient code here as it blocks executor initialization until
@@ -45,9 +47,7 @@ public class WtaExecutorPlugin implements ExecutorPlugin {
     // TODO: put in seperate thread
     this.pluginContext = pluginContext;
 
-    IostatDataSource iods = new IostatDataSource();
-
-    List<IostatDataSourceDto> listOfIostatDtos = new ArrayList<>();
+    List<IostatDataSourceDto> listOfIostatDtos = new LinkedList<>();
 
     scheduler.scheduleAtFixedRate(
         () -> {
