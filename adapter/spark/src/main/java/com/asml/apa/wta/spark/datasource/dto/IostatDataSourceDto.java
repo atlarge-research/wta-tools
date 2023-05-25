@@ -1,5 +1,6 @@
 package com.asml.apa.wta.spark.datasource.dto;
 
+import java.time.Instant;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -18,4 +19,7 @@ public class IostatDataSourceDto {
   private double KBWrtn;
   private double KBDscd;
   private String executorId;
+
+  @Builder.Default
+  private long timestamp = Instant.now().toEpochMilli();
 }

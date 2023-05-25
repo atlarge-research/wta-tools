@@ -5,11 +5,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.concurrent.CompletableFuture;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
-@Data
-@NoArgsConstructor
 public class IostatDataSource {
 
   public IostatDataSourceDto getAllMetrics(String executorId) throws IOException, InterruptedException {
