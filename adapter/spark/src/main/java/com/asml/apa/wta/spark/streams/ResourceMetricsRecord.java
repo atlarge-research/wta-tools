@@ -1,6 +1,6 @@
 package com.asml.apa.wta.spark.streams;
 
-import com.asml.apa.wta.spark.dto.SparkOperatingSystemDataSourceDto;
+import com.asml.apa.wta.core.dto.OperatingSystemDataSourceDto;
 import java.io.Serializable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -17,5 +17,7 @@ public class ResourceMetricsRecord implements Serializable {
 
   private static final long serialVersionUID = -3101218638564306099L;
 
-  private SparkOperatingSystemDataSourceDto sparkOperatingSystemDataSourceDto;
+  private OperatingSystemDataSourceDto operatingSystemDataSourceDto;
+
+  private String executorId;
 }

@@ -1,10 +1,7 @@
 package com.asml.apa.wta.spark.driver;
 
 import com.asml.apa.wta.spark.datasource.SparkDataSource;
-import com.asml.apa.wta.spark.dto.SparkOperatingSystemDataSourceDto;
 import com.asml.apa.wta.spark.streams.MetricStreamingEngine;
-import com.asml.apa.wta.spark.streams.ResourceKey;
-import com.asml.apa.wta.spark.streams.ResourceMetricsRecord;
 import java.util.HashMap;
 import java.util.Map;
 import lombok.Getter;
@@ -56,12 +53,6 @@ public class WtaDriverPlugin implements DriverPlugin {
    */
   @Override
   public Object receive(Object message) {
-    if (message instanceof SparkOperatingSystemDataSourceDto) {
-      SparkOperatingSystemDataSourceDto dto = (SparkOperatingSystemDataSourceDto) message;
-      ResourceKey resourceKey = new ResourceKey(dto.getExecutorId());
-      ResourceMetricsRecord resourceRecord = new ResourceMetricsRecord(dto);
-      streamingEngine.addToResourceStream(resourceKey, resourceRecord);
-    }
     return null;
   }
 
