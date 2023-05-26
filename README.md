@@ -1,15 +1,7 @@
-# WTA Spark Plugin
+# WTA Conversion Tool
 
 ## Installation and Usage
-- Clone the repository
-- Run `mvn clean install` in the source root.
-- Copy the resulting jar file from `adapter/spark/target`.
-- Run the following command in the directory where the jar file is located:
-```bash
-spark-submit --class com.asml.apa.wta.spark.App
---master local[1] <plugin_jar_location> <config.json_location> <directory_for_outputted_parquet> <file_to_be_processed>
-```
-- The parquet files should now be in the <directory_for_outputted_parquet>.
+- [Spark Plugin](/adapter/spark/README.md#installation-and-usage)
 
 
 ## Authors and Acknowledgement
