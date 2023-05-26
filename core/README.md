@@ -12,7 +12,7 @@ This module consists of:
 Model objects which are representative of the final Parquet output.
 
 ## Stream infrastructure
-This sets up the stream infrastructure for storing (intermediate) metrics from the spark.
+The Streaming for storing (intermediate) metrics from the spark.
 The Stream is a single linked list storing streams of metric data. It will serialize the data into the disk
 (using ObjectOutputStream in native Java to .ser extension files labeled by the current time in the system)
 automatically after receiving certain amount of metrics (by default this is set to 1800), and will automatically deserialize the data

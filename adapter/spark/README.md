@@ -34,5 +34,5 @@ aggregate to the WTA objects. This module consists of:
 
 
 ## Notes for Developers
-- If a new data source has to be added be sure to use the existing streaming infrastructure that handles MetricRecords in a smart way. This helps the driver in terms of memory use out of memory.
+- If a new data source is added in the future, be sure to use the existing streaming infrastructure that handles `MetricsRecord`. This helps the driver in terms of memory usage.
 - When a resource is not needed anymore, release it in `shutdown()`, within the respective `PluginContext`.
