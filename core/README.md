@@ -11,9 +11,7 @@ This module consists of:
 ## Streaming infrastructure
 The general streaming infrastructure that is used to store intermediate metrics before aggregation.
 
-The Stream is a singly linked list storing streams of metric data. It will serialize the data to disk (using the `.ser` format)
-automatically after receiving certain number of metrics (by default this is set to 1800). It will automatically deserialize the data
-once the data is required (e.g., when `poll()` is called).
+The Stream is a singly linked list storing streams of metric data. It will serialize the data to disk (using the `.ser` format) automatically after receiving certain number of metrics (by default this is set to 1800). It will automatically deserialize the data once the data is required (e.g., when `poll()` is called).
 
 ## I/O Utilities
 To read the config JSON file, we use the ObjectMapper from the Jackson library to parse it and create RuntimeConfig objects within the application. The resulting data will be written into a Parquet file for the Resource, Task, and Workflow information, while the Workload information will be written into a JSON file. Our approach involves the use of Jackson, Apache Avro, and Apache Hadoop.
