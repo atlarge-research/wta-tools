@@ -49,7 +49,7 @@ unit-tests-spark-adapter:
 integration-tests-core:
   stage: test
 
-  needs: [build-linux-tooling-image, build-adapters]
+  needs: [build-linux-tooling-image, build-core]
 
   dependencies:
     - build-core
