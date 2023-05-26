@@ -4,9 +4,9 @@ This module contains all classes and auxiliary data structures that are common b
 
 This module consists of:
  - Essential configuration details for the WTA format, such as authors, descriptions, and other relevant information.
- - Model objects (e.g. Resource, Task, Workflow, Workload)
- - Stream Infrastructure for the smart serialization/deserialization of objects to prevent the driver from running out of memory.
- - Functionality for serializing into Parquet
+ - Model objects (e.g., Resource, Task, Workflow, Workload)
+ - Stream Infrastructure for the smart serialisation/deserialisation of objects to prevent the driver from running out of memory.
+ - Functionality for serialising into Parquet
 
 ## Streaming infrastructure
 The general streaming infrastructure is used to store intermediate metrics before aggregation.

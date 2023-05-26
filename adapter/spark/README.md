@@ -41,9 +41,9 @@ An instance of the `DriverPlugin` is created for the driver, it's lifecycle is e
 for each executor, and it's lifecycle is equivalent to that of an executor. This can possibly span multiple tasks.
 
 Our main use case for the plugin API is to pass messages between the executor and the driver. We use different libraries such as `iostat` to collect resource
-utilization metrics on the executor side. These metrics are then passed to the driver using the plugin API. Namely, we use `ask()`,`send(Object message)` and `receive(Object message)`.
+utilisation metrics on the executor side. These metrics are then passed to the driver using the plugin API. Namely, we use `ask()`,`send(Object message)` and `receive(Object message)`.
 
-Aggregation of all the resource utilization metrics are done at the driver's end.
+Aggregation of all the resource utilisation metrics are done at the driver's end.
 
 ## Guidelines for Developers
 - If a new data source is added in the future, be sure to use the existing streaming infrastructure that handles `MetricsRecord`. This helps the driver in terms of memory usage.
