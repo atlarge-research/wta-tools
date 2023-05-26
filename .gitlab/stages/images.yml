@@ -23,6 +23,7 @@ build-spark-adapter-image:
     - docker:20.10.16-dind
   script:
     - docker load < linux-tooling-setup-image.tar
+    - docker images
     - docker build -t spark-setup-image infra/docker/spark-adapter
     - docker save spark-setup-image > spark-setup-image.tar
   artifacts:
