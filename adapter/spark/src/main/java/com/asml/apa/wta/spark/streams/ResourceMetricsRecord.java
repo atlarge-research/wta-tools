@@ -1,5 +1,6 @@
 package com.asml.apa.wta.spark.streams;
 
+import com.asml.apa.wta.core.dto.OperatingSystemDataSourceDto;
 import java.io.Serializable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -16,17 +17,7 @@ public class ResourceMetricsRecord implements Serializable {
 
   private static final long serialVersionUID = -3101218638564306099L;
 
-  private final long committedVirtualMemorySize;
+  private OperatingSystemDataSourceDto operatingSystemDataSourceDto;
 
-  private final long freePhysicalMemorySize;
-
-  private final double processCpuLoad;
-
-  private final long processCpuTime;
-
-  private final long totalPhysicalMemorySize;
-
-  private final int availableProcessors;
-
-  private final double systemLoadAverage;
+  private String executorId;
 }
