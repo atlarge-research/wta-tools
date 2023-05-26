@@ -1,7 +1,6 @@
 package com.asml.apa.wta.spark.driver;
 
 import com.asml.apa.wta.spark.datasource.SparkDataSource;
-import com.asml.apa.wta.spark.streams.MetricStreamingEngine;
 import java.util.HashMap;
 import java.util.Map;
 import lombok.Getter;
@@ -23,8 +22,6 @@ public class WtaDriverPlugin implements DriverPlugin {
   @Getter
   private SparkDataSource sparkDataSource;
 
-  private MetricStreamingEngine streamingEngine;
-
   /**
    * This method is called early in the initialization of the Spark driver.
    * Explicitly, it is called before the Spark driver's task scheduler is initialized. It is blocking.
@@ -40,7 +37,6 @@ public class WtaDriverPlugin implements DriverPlugin {
   public Map<String, String> init(SparkContext sparkCtx, PluginContext pluginCtx) {
     sparkContext = sparkCtx;
     sparkDataSource = new SparkDataSource(sparkContext);
-    streamingEngine = new MetricStreamingEngine();
     return new HashMap<>();
   }
 
