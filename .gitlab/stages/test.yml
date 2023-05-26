@@ -49,7 +49,7 @@ unit-tests-spark-adapter:
 integration-tests-core:
   stage: test
 
-  needs: [build-core]
+  needs: [build-linux-tooling-image, build-adapters]
 
   dependencies:
     - build-core
@@ -135,7 +135,7 @@ mutation-tests-spark-adapter:
     paths:
       - adapter/spark/reports/pitest/
 
-end-to-end-test-spark-adapter:
+system-tests-spark-adapter:
   stage: test
 
   needs: [build-adapters, build-spark-adapter-image]
@@ -146,4 +146,5 @@ end-to-end-test-spark-adapter:
 
   script:
     - echo "Spark adapter end-to-end test started"
-    - echo "This job is empty now, but will be used to spot issues with the application"
+    - echo "This job does not provide coverage metrics, it just verifies the system as a whole functions to some degree"
+    - echo "This job is empty now, but will be used to spot some pressing issues with the application"
