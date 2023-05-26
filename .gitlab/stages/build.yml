@@ -20,6 +20,9 @@ build-adapters:
     - build-core
 
   script:
+    - echo "install sysstat dependency for iostat"
+    - "sudo apt-get update"
+    - "sudo apt-get install sysstat"
     - echo "Build Spark adapter started"
     - "mvn -pl adapter/spark process-test-classes"
 
