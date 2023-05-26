@@ -1,18 +1,18 @@
 build-linux-tooling-image:
   stage: images
-  image: docker:24.0.2
+  image: docker:20.10.16
   services:
-    - docker:dind
+    - docker:20.10.16-dind
   script:
     - docker build -t linux-tooling-setup-image:1.0.0 infra/docker/spark-adapter
 
 build-spark-adapter-image:
   stage: images
-  image: docker:24.0.2
+  image: docker:20.10.16
   needs: [build-linux-tooling-image]
   dependencies:
     - build-linux-tooling-image
   services:
-    - docker:dind
+    - docker:20.10.16-dind
   script:
     - docker build -t spark-setup-image:1.0.0 infra/docker/spark-adapter
