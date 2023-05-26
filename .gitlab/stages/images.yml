@@ -4,7 +4,7 @@ build-linux-tooling-image:
   services:
     - docker:20.10.16-dind
   script:
-    - docker build -t linux-tooling-setup-image:1.0.0 infra/docker/spark-adapter
+    - docker build -t linux-tooling-setup-image:1.0.0 infra/docker/linux-tooling
 
 build-spark-adapter-image:
   stage: images
