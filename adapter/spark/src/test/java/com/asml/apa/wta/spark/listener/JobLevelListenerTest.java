@@ -1,7 +1,6 @@
 package com.asml.apa.wta.spark.listener;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.*;
 
 import com.asml.apa.wta.core.model.Workflow;
 import java.util.Properties;
