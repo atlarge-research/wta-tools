@@ -1,5 +1,7 @@
 build-core:
   stage: build
+  dependencies: []
+  needs: []
 
   script:
     - echo "Build core started"
