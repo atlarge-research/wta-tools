@@ -10,11 +10,13 @@ workflow:
     - if: $CI_COMMIT_REF_NAME == 'main'
 
 stages:
+  - images
   - build
   - test
   - check
 
 include:
+  - local: '.gitlab/stages/images.yml'
   - local: '.gitlab/stages/build.yml'
   - local: '.gitlab/stages/test.yml'
   - local: '.gitlab/stages/check.yml'

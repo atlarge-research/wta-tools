@@ -134,3 +134,16 @@ mutation-tests-spark-adapter:
     when: always
     paths:
       - adapter/spark/reports/pitest/
+
+end-to-end-test-spark-adapter:
+  stage: test
+
+  needs: [build-adapters, build-spark-adapter-image]
+
+  dependencies:
+    - build-adapters
+    - build-spark-adapter-image
+
+  script:
+    - echo "Spark adapter end-to-end test started"
+    - echo "This job is empty now, but will be used to spot issues with the application"
