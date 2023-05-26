@@ -4,7 +4,14 @@ build-linux-tooling-image:
   services:
     - docker:20.10.16-dind
   script:
-    - docker build -t linux-tooling-setup-image:1.0.0 infra/docker/linux-tooling
+    - docker build -t linux-tooling-setup-image infra/docker/linux-tooling
+    - docker save linux-tooling-setup-image > linux-tooling-setup-image.tar
+  artifacts:
+    name: linux-tooling-image
+    expire_in: 3 days
+    when: always
+    paths:
+      - linux-tooling-setup-image.tar
 
 build-spark-adapter-image:
   stage: images
@@ -15,4 +22,12 @@ build-spark-adapter-image:
   services:
     - docker:20.10.16-dind
   script:
-    - docker build -t spark-setup-image:1.0.0 infra/docker/spark-adapter
+    - docker load < linux-tooling-setup-image.tar
+    - docker build -t spark-setup-image infra/docker/spark-adapter
+    - docker save spark-setup-image > spark-setup-image.tar
+  artifacts:
+    name: spark-image
+    expire_in: 3 days
+    when: always
+    paths:
+      - spark-setup-image.tar
