@@ -61,19 +61,19 @@ public class Resource implements BaseTraceObject {
       record.put("type", resource.getType());
     }
     if (checker[2]) {
-      record.put("numResources", resource.getNumResources());
+      record.put("num_resources", resource.getNumResources());
     }
     if (checker[3]) {
-      record.put("procModel", resource.getProcModel());
+      record.put("proc_model", resource.getProcModel());
     }
     if (checker[4]) {
       record.put("memory", resource.getMemory());
     }
     if (checker[5]) {
-      record.put("diskSpace", resource.getDiskSpace());
+      record.put("disk_space", resource.getDiskSpace());
     }
     if (checker[6]) {
-      record.put("networkSpeed", resource.getNetworkSpeed());
+      record.put("network", resource.getNetworkSpeed());
     }
     if (checker[7]) {
       record.put("os", resource.getOs());

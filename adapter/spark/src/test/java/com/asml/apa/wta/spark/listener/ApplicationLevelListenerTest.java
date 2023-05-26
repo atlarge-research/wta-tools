@@ -27,7 +27,7 @@ class ApplicationLevelListenerTest extends BaseLevelListenerTest {
     assertThat(workload.getTotalTasks()).isEqualTo(0);
     assertThat(workload.getDomain()).isEqualTo(fakeConfig.getDomain());
     long sutStartTime = mockedSparkContext.startTime();
-    assertThat(workload.getStartDate()).isEqualTo(sutStartTime);
-    assertThat(workload.getEndDate()).isEqualTo(sutStartTime + 1000L);
+    assertThat(workload.getDateStart()).isEqualTo(sutStartTime);
+    assertThat(workload.getDateEnd()).isEqualTo(sutStartTime + 1000L);
   }
 }

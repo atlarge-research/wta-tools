@@ -27,8 +27,8 @@ public class BaseLevelListenerTest {
   void setupCommonListenerDependencies() {
     // setup mock spark context
     mockedSparkContext = mock(SparkContext.class);
-    when(mockedSparkContext.sparkUser()).thenReturn("testUser");
     SparkConf conf = new SparkConf().set("spark.app.name", "testApp");
+    when(mockedSparkContext.sparkUser()).thenReturn("testUser");
     when(mockedSparkContext.getConf()).thenReturn(conf);
     when(mockedSparkContext.appName()).thenReturn("testApp");
     when(mockedSparkContext.startTime()).thenReturn(5000L);
