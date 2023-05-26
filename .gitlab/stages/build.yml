@@ -2,9 +2,6 @@ build-core:
   stage: build
 
   script:
-    - echo "install sysstat dependency for iostat"
-    - "sudo apt-get update"
-    - "sudo apt-get install sysstat"
     - echo "Build core started"
     - "mvn -pl core install -DskipTests"
 
