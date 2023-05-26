@@ -1,8 +1,6 @@
 build-linux-tooling-image:
   stage: images
   image: docker:20.10.16
-  services:
-    - docker:20.10.16-dind
   script:
     - docker build -t linux-tooling-setup-image infra/docker/linux-tooling
     - docker save linux-tooling-setup-image > linux-tooling-setup-image.tar
@@ -19,8 +17,6 @@ build-spark-adapter-image:
   needs: [build-linux-tooling-image]
   dependencies:
     - build-linux-tooling-image
-  services:
-    - docker:20.10.16-dind
   script:
     - docker load < linux-tooling-setup-image.tar
     - docker images
