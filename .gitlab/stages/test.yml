@@ -71,7 +71,7 @@ integration-tests-core:
 integration-tests-spark-adapter:
   stage: test
 
-  needs: [build-adapters]
+  needs: [build-linux-tooling-image, build-adapters]
 
   dependencies:
     - build-adapters
