@@ -1,10 +1,8 @@
 package com.asml.apa.wta.spark.datasource;
 
 import com.asml.apa.wta.core.datasource.OperatingSystemDataSource;
-import java.io.IOException;
-import java.io.Serializable;
-
 import com.asml.apa.wta.spark.streams.ResourceMetricsRecord;
+import java.io.IOException;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;

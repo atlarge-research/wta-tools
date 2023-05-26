@@ -5,7 +5,6 @@ import com.asml.apa.wta.spark.datasource.SparkOperatingSystemDataSource;
 import com.asml.apa.wta.spark.datasource.dto.IostatDataSourceDto;
 import com.asml.apa.wta.spark.streams.MetricStreamingEngine;
 import com.asml.apa.wta.spark.streams.ResourceKey;
-import com.asml.apa.wta.spark.streams.ResourceMetricsRecord;
 import java.util.HashMap;
 import java.util.Map;
 import lombok.Getter;
@@ -67,7 +66,6 @@ public class WtaDriverPlugin implements DriverPlugin {
       mse.addToResourceStream(resourceKey, dto);
     }
     if (message instanceof IostatDataSourceDto) {
-      System.out.println(message.toString());
       mse.addToResourceStream(
           new ResourceKey(((IostatDataSourceDto) message).getExecutorId()), (IostatDataSourceDto) message);
     }
