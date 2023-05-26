@@ -47,7 +47,7 @@ public class IostatDataSource {
           .kiloByteRead(kiloByteReadFuture.get())
           .kiloByteWrtn(kiloByteWrtnFuture.get())
           .kiloByteDscd(kiloByteDscdFuture.get())
-          .executorId((executorId))
+          .executorId(executorId)
           .build();
     } catch (Exception e) {
       log.error(
