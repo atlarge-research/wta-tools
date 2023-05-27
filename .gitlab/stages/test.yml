@@ -49,7 +49,7 @@ unit-tests-spark-adapter:
 integration-tests-core:
   stage: test
 
-  needs: [build-linux-tooling-image, build-core]
+  needs: [build-core]
 
   dependencies:
     - build-core
@@ -71,7 +71,7 @@ integration-tests-core:
 integration-tests-spark-adapter:
   stage: test
 
-  needs: [build-linux-tooling-image, build-adapters]
+  needs: [build-adapters]
 
   dependencies:
     - build-adapters
@@ -85,6 +85,51 @@ integration-tests-spark-adapter:
 
   artifacts:
     name: integration-tests-spark-adapter
+    expire_in: 3 days
+    when: always
+    paths:
+      - adapter/spark/reports/jacoco/
+
+
+environment-integration-tests-core:
+  stage: test
+
+  needs: [build-linux-tooling-image, build-core]
+
+  dependencies:
+    - build-core
+
+  script:
+    - echo "Core environment integration tests started"
+    - "mvn -pl core jacoco:prepare-agent-integration failsafe:integration-test failsafe:verify jacoco:report-integration"
+    - "cat core/reports/jacoco/index.html | grep -Po 'Total.*?([0-9]{1,3})%' || echo '0%'"
+
+  coverage: /([0-9]{1,3})%/
+
+  artifacts:
+    name: environment-integration-tests-core
+    expire_in: 3 days
+    when: always
+    paths:
+      - core/reports/jacoco/
+
+environment-integration-tests-spark-adapter:
+  stage: test
+
+  needs: [build-linux-tooling-image, build-adapters]
+
+  dependencies:
+    - build-adapters
+
+  script:
+    - echo "Spark adapter environment integration tests started"
+    - "mvn -pl adapter/spark jacoco:prepare-agent-integration failsafe:integration-test failsafe:verify jacoco:report-integration"
+    - "cat adapter/spark/reports/jacoco/index.html | grep -Po 'Total.*?([0-9]{1,3})%' || echo '0%'"
+
+  coverage: /([0-9]{1,3})%/
+
+  artifacts:
+    name: environment-integration-tests-spark-adapter
     expire_in: 3 days
     when: always
     paths:
@@ -135,7 +180,8 @@ mutation-tests-spark-adapter:
     paths:
       - adapter/spark/reports/pitest/
 
-system-tests-spark-adapter:
+
+end-to-end-run-spark-adapter:
   stage: test
 
   needs: [build-adapters, build-spark-adapter-image]
@@ -145,6 +191,6 @@ system-tests-spark-adapter:
     - build-spark-adapter-image
 
   script:
-    - echo "Spark adapter end-to-end test started"
+    - echo "Spark adapter end-to-end run started"
     - echo "This job does not provide coverage metrics, it just verifies the system as a whole functions to some degree"
     - echo "This job is empty now, but will be used to spot some pressing issues with the application"
