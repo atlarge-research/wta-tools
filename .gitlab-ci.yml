@@ -1,5 +1,6 @@
 variables:
   MAVEN_OPTS: "-Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository"
+  PITEST_OPTS: "-DwithHistory"
 
 image: maven:3-openjdk-11
 
@@ -13,17 +14,17 @@ stages:
   - images
   - build
   - package
-  - test
-  - coverage
-  - end-to-end
+  - test-core
+  - test-spark-adapter
+  - end-to-end-spark-adapter
   - check
 
 include:
   - local: '.gitlab/stages/images.yml'
   - local: '.gitlab/stages/build.yml'
   - local: '.gitlab/stages/package.yml'
-  - local: '.gitlab/stages/test.yml'
-  - local: '.gitlab/stages/coverage.yml'
+  - local: '.gitlab/stages/test-core.yml'
+  - local: '.gitlab/stages/test-spark-adapter.yml'
   - local: '.gitlab/stages/end-to-end.yml'
   - local: '.gitlab/stages/check.yml'
 

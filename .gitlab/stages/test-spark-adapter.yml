@@ -1,0 +1,97 @@
+unit-tests-spark-adapter:
+  stage: test-spark-adapter
+
+  needs: [build-spark-adapter]
+
+  dependencies:
+    - build-spark-adapter
+
+  script:
+    - echo "Spark adapter unit tests started"
+    - "mvn -pl adapter/spark jacoco:prepare-agent surefire:test jacoco:report"
+    - "[ -f adapter/spark/target/jacoco.exec ] && mv -f adapter/spark/target/jacoco.exec adapter/spark/target/jacoco-unit-tests.exec"
+    - echo "0"
+
+  artifacts:
+    name: unit-tests-spark-adapter
+    expire_in: 3 days
+    when: always
+    paths:
+      - adapter/spark/reports/jacoco/
+      - adapter/spark/target/jacoco-unit-tests.exec
+
+integration-tests-spark-adapter:
+  stage: test-spark-adapter
+
+  needs: [build-linux-tooling-image, build-spark-adapter]
+
+  dependencies:
+    - build-spark-adapter
+
+  script:
+    - echo "Spark adapter integration tests started"
+    - "mvn -pl adapter/spark jacoco:prepare-agent-integration failsafe:integration-test failsafe:verify jacoco:report-integration"
+    - "[ -f adapter/spark/target/jacoco-it.exec ] && mv -f adapter/spark/target/jacoco-it.exec adapter/spark/target/jacoco-integration-tests.exec"
+    - echo "0"
+
+  artifacts:
+    name: integration-tests-spark-adapter
+    expire_in: 3 days
+    when: always
+    paths:
+      - adapter/spark/reports/jacoco/
+      - adapter/spark/target/jacoco-integration-tests.exec
+
+mutation-tests-spark-adapter:
+  stage: test-spark-adapter
+
+  needs: [build-spark-adapter]
+
+  dependencies:
+    - build-spark-adapter
+
+  script:
+    - echo "Spark adapter mutation tests started"
+    - "mvn -pl adapter/spark $PITEST_OPTS pitest:mutationCoverage"
+    - "cat adapter/spark/reports/pitest/index.html | awk -F '</?td>' 'FNR == 25 { print $2 }' || echo '0%'"
+
+  coverage: /([0-9]{1,3})%/
+
+  artifacts:
+    name: mutation-tests-spark-adapter
+    expire_in: 3 days
+    when: always
+    paths:
+      - adapter/spark/reports/pitest/
+
+
+line-coverage-spark-adapter:
+  stage: test-spark-adapter
+  needs: [integration-tests-spark-adapter, unit-tests-spark-adapter, build-spark-adapter]
+  dependencies:
+    - integration-tests-spark-adapter
+    - unit-tests-spark-adapter
+    - build-spark-adapter
+  script:
+    - echo "Started creating Spark adapter line coverage"
+    - "rm -rf adapter/spark/reports/jacoco"
+    - "mvn -pl adapter/spark jacoco:merge jacoco:report"
+    - "cat adapter/spark/reports/jacoco/index.html | grep -Po 'Total.*?([0-9]{1,3})%' || echo '0%'"
+  coverage: /([0-9]{1,3})%/
+  artifacts:
+    name: line-coverage-spark-adapter
+    expire_in: 3 days
+    when: always
+    paths:
+      - adapter/spark/reports/jacoco/
+      - adapter/spark/target/jacoco.exec
+
+branch-coverage-spark-adapter:
+  stage: test-spark-adapter
+  needs: [line-coverage-spark-adapter]
+  dependencies:
+    - line-coverage-spark-adapter
+  script:
+    - echo "Started generating Spark adapter branch coverage"
+    - "cat adapter/spark/reports/jacoco/index.html | grep -Po '%.*?of.*?([0-9]{1,3})%' || echo '0%'"
+  coverage: /([0-9]{1,3})%/
