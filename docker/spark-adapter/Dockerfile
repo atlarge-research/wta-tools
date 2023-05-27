@@ -1,5 +1,5 @@
 ARG base_image
-FROM ${base-image}
+FROM ${base_image}
 
 RUN apt-get update
 RUN wget https://dlcdn.apache.org/spark/spark-3.2.4/spark-3.2.4-bin-hadoop3.2.tgz
