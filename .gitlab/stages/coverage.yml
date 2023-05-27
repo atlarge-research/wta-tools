@@ -50,6 +50,8 @@ branch-coverage-core:
     - line-coverage-core
   script:
     - echo "Started generating core branch coverage"
+    - "cat core/reports/jacoco/index.html | grep -Po '%.*?of.*?([0-9]{1,3})%' || echo '0%'"
+  coverage: /([0-9]{1,3})%/
 
 branch-coverage-spark-adapter:
   stage: coverage
@@ -58,3 +60,5 @@ branch-coverage-spark-adapter:
     - line-coverage-spark-adapter
   script:
     - echo "Started generating Spark adapter branch coverage"
+    - "cat adapter/spark/reports/jacoco/index.html | grep -Po '%.*?of.*?([0-9]{1,3})%' || echo '0%'"
+  coverage: /([0-9]{1,3})%/
