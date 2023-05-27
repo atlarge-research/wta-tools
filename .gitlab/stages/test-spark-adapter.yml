@@ -18,6 +18,7 @@ unit-tests-spark-adapter:
 
 integration-tests-spark-adapter:
   stage: test-spark-adapter
+  image: $LINUX_TOOLING_IMAGE
   needs: [build-linux-tooling-image, build-spark-adapter]
   dependencies:
     - build-spark-adapter
@@ -36,7 +37,8 @@ integration-tests-spark-adapter:
 
 mutation-tests-spark-adapter:
   stage: test-spark-adapter
-  needs: [build-spark-adapter]
+  image: $LINUX_TOOLING_IMAGE
+  needs: [build-linux-tooling-image, build-spark-adapter]
   dependencies:
     - build-spark-adapter
   script:

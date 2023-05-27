@@ -1,5 +1,6 @@
 end-to-end-spark-adapter:
   stage: e2e-spark-adapter
+  image: $SPARK_IMAGE
   needs: [package-spark-adapter, build-spark-adapter-image]
   dependencies:
     - package-spark-adapter
@@ -11,6 +12,7 @@ end-to-end-spark-adapter:
 
 end-to-end-barebones-spark-adapter:
   stage: e2e-spark-adapter
+  image: $SPARK_BAREBONES_IMAGE
   needs: [package-spark-adapter, build-barebones-spark-adapter-image]
   dependencies:
     - package-spark-adapter
