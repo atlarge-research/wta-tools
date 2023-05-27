@@ -49,14 +49,14 @@ unit-tests-spark-adapter:
 integration-tests-core:
   stage: test
 
-  needs: [build-core]
+  needs: [build-linux-tooling-image, build-core]
 
   dependencies:
     - build-core
 
   script:
     - echo "Core integration tests started"
-    - "mvn -pl core jacoco:prepare-agent-integration failsafe:integration-test@all-tests failsafe:verify jacoco:report-integration"
+    - "mvn -pl core jacoco:prepare-agent-integration failsafe:integration-test failsafe:verify jacoco:report-integration"
     - "[ -f core/target/jacoco-it.exec ] && mv -f core/target/jacoco-it.exec core/target/jacoco-integration-tests.exec"
     - echo "0"
 
@@ -71,14 +71,14 @@ integration-tests-core:
 integration-tests-spark-adapter:
   stage: test
 
-  needs: [build-spark-adapter]
+  needs: [build-linux-tooling-image, build-spark-adapter]
 
   dependencies:
     - build-spark-adapter
 
   script:
     - echo "Spark adapter integration tests started"
-    - "mvn -pl adapter/spark jacoco:prepare-agent-integration failsafe:integration-test@all-tests failsafe:verify jacoco:report-integration"
+    - "mvn -pl adapter/spark jacoco:prepare-agent-integration failsafe:integration-test failsafe:verify jacoco:report-integration"
     - "[ -f adapter/spark/target/jacoco-it.exec ] && mv -f adapter/spark/target/jacoco-it.exec adapter/spark/target/jacoco-integration-tests.exec"
     - echo "0"
 
@@ -89,51 +89,6 @@ integration-tests-spark-adapter:
     paths:
       - adapter/spark/reports/jacoco/
       - adapter/spark/target/jacoco-integration-tests.exec
-
-
-environment-integration-tests-core:
-  stage: test
-
-  needs: [build-linux-tooling-image, build-core]
-
-  dependencies:
-    - build-core
-
-  script:
-    - echo "Core environment integration tests started"
-    - "mvn -pl core jacoco:prepare-agent-integration failsafe:integration-test@env-tests failsafe:verify jacoco:report-integration"
-    - "[ -f core/target/jacoco-it.exec ] && mv -f core/target/jacoco-it.exec core/target/jacoco-environment-integration-tests.exec"
-    - echo "0"
-
-  artifacts:
-    name: environment-integration-tests-core
-    expire_in: 3 days
-    when: always
-    paths:
-      - core/reports/jacoco/
-      - core/target/jacoco-environment-integration-tests.exec
-
-environment-integration-tests-spark-adapter:
-  stage: test
-
-  needs: [build-linux-tooling-image, build-spark-adapter]
-
-  dependencies:
-    - build-spark-adapter
-
-  script:
-    - echo "Spark adapter environment integration tests started"
-    - "mvn -pl adapter/spark jacoco:prepare-agent-integration failsafe:integration-test@env-tests failsafe:verify jacoco:report-integration"
-    - "[ -f adapter/spark/target/jacoco-it.exec ] && mv -f adapter/spark/target/jacoco-it.exec adapter/spark/target/jacoco-environment-integration-tests.exec"
-    - echo "0"
-
-  artifacts:
-    name: environment-integration-tests-spark-adapter
-    expire_in: 3 days
-    when: always
-    paths:
-      - adapter/spark/reports/jacoco/
-      - adapter/spark/target/jacoco-environment-integration-tests.exec
 
 
 mutation-tests-core:

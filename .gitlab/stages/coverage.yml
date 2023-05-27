@@ -1,8 +1,7 @@
 line-coverage-core:
   stage: coverage
-  needs: [environment-integration-tests-core, integration-tests-core, unit-tests-core, build-core]
+  needs: [integration-tests-core, unit-tests-core, build-core]
   dependencies:
-    - environment-integration-tests-core
     - integration-tests-core
     - unit-tests-core
     - build-core
@@ -22,9 +21,8 @@ line-coverage-core:
 
 line-coverage-spark-adapter:
   stage: coverage
-  needs: [environment-integration-tests-spark-adapter, integration-tests-spark-adapter, unit-tests-spark-adapter, build-spark-adapter]
+  needs: [integration-tests-spark-adapter, unit-tests-spark-adapter, build-spark-adapter]
   dependencies:
-    - environment-integration-tests-spark-adapter
     - integration-tests-spark-adapter
     - unit-tests-spark-adapter
     - build-spark-adapter
