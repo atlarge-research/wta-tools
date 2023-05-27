@@ -202,7 +202,8 @@ line-coverage-core:
     - unit-tests-core
   script:
     - echo "Started creating core line coverage report"
-    - "mvn jacoco:merge jacoco:report"
+    - "rm -rf core/reports/jacoco"
+    - "mvn -pl core jacoco:merge jacoco:report"
     - "cat core/reports/jacoco/index.html | grep -Po 'Total.*?([0-9]{1,3})%' || echo '0%'"
   coverage: /([0-9]{1,3})%/
   artifacts:
@@ -222,7 +223,8 @@ line-coverage-spark-adapter:
     - unit-tests-spark-adapter
   script:
     - echo "Started creating Spark adapter line coverage report"
-    - "mvn jacoco:merge jacoco:report"
+    - "rm -rf adapter/spark/reports/jacoco"
+    - "mvn -pl adapter/spark jacoco:merge jacoco:report"
     - "cat adapter/spark/reports/jacoco/index.html | grep -Po 'Total.*?([0-9]{1,3})%' || echo '0%'"
   coverage: /([0-9]{1,3})%/
   artifacts:
