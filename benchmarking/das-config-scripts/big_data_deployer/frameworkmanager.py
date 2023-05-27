@@ -177,6 +177,7 @@ class FrameworkManager:
         # If so, either remove for a forced reinstall, or return
         log_fn(1, "Checking if previous installation of %s version %s is present..." % (framework.name, version))
         target_dir = self.__install_dir(framework, framework_version)
+        print(target_dir)
         if os.path.exists(target_dir):
             if force_reinstall:
                 log_fn(2, "Found previous installation of %s. Removing to do a forced reinstall." % framework.name)
@@ -232,4 +233,3 @@ class FrameworkManager:
         framework = self.framework_registry.framework(framework_identifier)
         framework_version = framework.version(version)
         return framework.get_supported_deployment_settings(framework_version)
-
