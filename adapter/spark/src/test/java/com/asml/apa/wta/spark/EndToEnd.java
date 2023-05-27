@@ -20,7 +20,7 @@ import scala.Tuple2;
  * Used for full system testing the plugin. This class will be the entry point for the
  * JAR file when running with spark-submit.
  *
- * @author Pil Kyu Cho & Atour Mousavi Gourabi
+ * @author Pil Kyu Cho
  * @since 1.0.0
  */
 public class EndToEnd {
@@ -30,7 +30,7 @@ public class EndToEnd {
   /**
    * Private method to invoke a simple Spark job.
    *
-   * @author Pil Kyu Cho & Atour Mousavi Gourabi
+   * @author Pil Kyu Cho
    * @since 1.0.0
    */
   private static void invokeJob() {
