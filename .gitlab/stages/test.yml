@@ -101,7 +101,7 @@ environment-integration-tests-core:
 
   script:
     - echo "Core environment integration tests started"
-    - "mvn -pl core jacoco:prepare-agent-integration failsafe:integration-test -Penv-test failsafe:verify jacoco:report-integration"
+    - "mvn -pl core jacoco:prepare-agent-integration failsafe:integration-test@env-tests failsafe:verify jacoco:report-integration"
     - "cat core/reports/jacoco/index.html | grep -Po 'Total.*?([0-9]{1,3})%' || echo '0%'"
 
   coverage: /([0-9]{1,3})%/
@@ -123,7 +123,7 @@ environment-integration-tests-spark-adapter:
 
   script:
     - echo "Spark adapter environment integration tests started"
-    - "mvn -pl adapter/spark jacoco:prepare-agent-integration failsafe:integration-test -Penv-test failsafe:verify jacoco:report-integration"
+    - "mvn -pl adapter/spark jacoco:prepare-agent-integration failsafe:integration-test@env-tests failsafe:verify jacoco:report-integration"
     - "cat adapter/spark/reports/jacoco/index.html | grep -Po 'Total.*?([0-9]{1,3})%' || echo '0%'"
 
   coverage: /([0-9]{1,3})%/
