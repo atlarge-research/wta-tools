@@ -1,106 +1,239 @@
 package com.asml.apa.wta.benchmarking.spark;
 
-import com.asml.apa.wta.core.model.Task;
-import com.asml.apa.wta.core.model.Workflow;
-import com.asml.apa.wta.core.model.Workload;
-import com.asml.apa.wta.core.utils.ParquetWriterUtils;
 import com.asml.apa.wta.core.utils.WtaUtils;
 import com.asml.apa.wta.spark.datasource.SparkDataSource;
-import java.io.File;
-import java.util.Arrays;
-import java.util.List;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 import org.apache.spark.SparkConf;
-import org.apache.spark.SparkContext;
-import org.apache.spark.api.java.JavaRDD;
-import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.sql.Dataset;
+import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
-import scala.Tuple2;
+import org.openjdk.jmh.annotations.Benchmark;
+import org.openjdk.jmh.annotations.BenchmarkMode;
+import org.openjdk.jmh.annotations.Fork;
+import org.openjdk.jmh.annotations.Measurement;
+import org.openjdk.jmh.annotations.Mode;
+import org.openjdk.jmh.annotations.OutputTimeUnit;
+import org.openjdk.jmh.annotations.Scope;
+import org.openjdk.jmh.annotations.Setup;
+import org.openjdk.jmh.annotations.State;
+import org.openjdk.jmh.annotations.TearDown;
+import org.openjdk.jmh.annotations.Warmup;
+import org.openjdk.jmh.infra.Blackhole;
 
 /**
- * Entry point for the Spark plugin. This class is currently used for full system
- * testing the plugin. This class will be the entry point for the JAR file when
- * running with spark-submit.
+ * Benchmarking script for the Spark plugin.
  *
- * @author Pil Kyu Cho & Atour Mousavi Gourabi
  * @since 1.0.0
+ * @author Pil Kyu Cho
  */
+@State(Scope.Thread)
+@BenchmarkMode(Mode.AverageTime)
+@Fork(value = 1)
+@Warmup(iterations = 10)
+@Measurement(iterations = 50)
+@OutputTimeUnit(TimeUnit.NANOSECONDS)
 public class SparkBenchmark {
 
-  private static JavaRDD<String> testFile;
+  private SparkSession spark;
+  private static String resourcesPath = "benchmarking/spark-benchmarking/src/main/resources/";
+
+  private static String tpcdsDataPath = resourcesPath + "tpcds_parquet_data/";
+
+  private static String sqlQueryPath = resourcesPath + "sql_files/";
+
+  private static String configFilePath = resourcesPath + "config.json";
 
   /**
-   * Private method to invoke a simple Spark job.
+   * Utility method to get the query String from SQL file.
    *
-   * @author Pil Kyu Cho & Atour Mousavi Gourabi
-   * @since 1.0.0
+   * @param filepath      Filepath of the SQL file
+   * @return              Query String
+   * @throws IOException  throws IOException
    */
-  private static void invokeJob() {
-    testFile.flatMap(s -> Arrays.asList(s.split(" ")).iterator())
-            .mapToPair(word -> new Tuple2<>(word, 1))
-            .reduceByKey((a, b) -> a + b)
-            .collect();
+  private static String getQuery(String filepath) throws IOException {
+    return Files.lines(Paths.get(filepath), StandardCharsets.UTF_8)
+            .filter(line -> !line.startsWith("--")) // exclude SQL comments
+            .filter(line -> !line.isBlank()) // exclude empty lines
+            .map(String::trim)
+            .collect(Collectors.joining(" "));
   }
 
   /**
-   * Sets the filepath and reads the user config file along
-   * with output dir for generated parquet files. Then runs a simple spark job to
-   * colelct metrics and uses the parquet utils to write to parquet. User must provide their own
-   * config file and output directory. Otherwise, system will exit.
-   * @param args        Command line arguments for the config, output and text path. Expecting three arguments
-   * @throws Exception  Possible Exception thrown from Parquet utils
-   * @author Pil Kyu Cho
-   * @since 1.0.0
+   * Reads each dataset parquet file and compile them into a single dataframe of tables.
+   *
+   * @param spark   SparkSession instance
    */
-  public static void main(String[] args) throws Exception {
-    // 1. get filepath and directory path arguments from command line
-    String configPath = "";
-    String outputPath = "";
-    String testTextPath = "";
+  private static void importData(
+          SparkSession spark,
+          String parquetFilepath1,
+          String parquetFilepath2,
+          String parquetFilepath3,
+          String parquetFilepath4,
+          String parquetFilepath5,
+          String parquetFilepath6,
+          String parquetFilepath7,
+          String parquetFilepath8,
+          String parquetFilepath9,
+          String parquetFilepath10,
+          String parquetFilepath11,
+          String parquetFilepath12,
+          String parquetFilepath13,
+          String parquetFilepath14,
+          String parquetFilepath15,
+          String parquetFilepath16,
+          String parquetFilepath17,
+          String parquetFilepath18,
+          String parquetFilepath19,
+          String parquetFilepath20,
+          String parquetFilepath21,
+          String parquetFilepath22,
+          String parquetFilepath23,
+          String parquetFilepath24) {
+    Dataset<Row> df1 = spark.read().parquet(tpcdsDataPath + parquetFilepath1);
+    Dataset<Row> df2 = spark.read().parquet(tpcdsDataPath + parquetFilepath2);
+    Dataset<Row> df3 = spark.read().parquet(tpcdsDataPath + parquetFilepath3);
+    Dataset<Row> df4 = spark.read().parquet(tpcdsDataPath + parquetFilepath4);
+    Dataset<Row> df5 = spark.read().parquet(tpcdsDataPath + parquetFilepath5);
+    Dataset<Row> df6 = spark.read().parquet(tpcdsDataPath + parquetFilepath6);
+    Dataset<Row> df7 = spark.read().parquet(tpcdsDataPath + parquetFilepath7);
+    Dataset<Row> df8 = spark.read().parquet(tpcdsDataPath + parquetFilepath8);
+    Dataset<Row> df9 = spark.read().parquet(tpcdsDataPath + parquetFilepath9);
+    Dataset<Row> df10 = spark.read().parquet(tpcdsDataPath + parquetFilepath10);
+    Dataset<Row> df11 = spark.read().parquet(tpcdsDataPath + parquetFilepath11);
+    Dataset<Row> df12 = spark.read().parquet(tpcdsDataPath + parquetFilepath12);
+    Dataset<Row> df13 = spark.read().parquet(tpcdsDataPath + parquetFilepath13);
+    Dataset<Row> df14 = spark.read().parquet(tpcdsDataPath + parquetFilepath14);
+    Dataset<Row> df15 = spark.read().parquet(tpcdsDataPath + parquetFilepath15);
+    Dataset<Row> df16 = spark.read().parquet(tpcdsDataPath + parquetFilepath16);
+    Dataset<Row> df17 = spark.read().parquet(tpcdsDataPath + parquetFilepath17);
+    Dataset<Row> df18 = spark.read().parquet(tpcdsDataPath + parquetFilepath18);
+    Dataset<Row> df19 = spark.read().parquet(tpcdsDataPath + parquetFilepath19);
+    Dataset<Row> df20 = spark.read().parquet(tpcdsDataPath + parquetFilepath20);
+    Dataset<Row> df21 = spark.read().parquet(tpcdsDataPath + parquetFilepath21);
+    Dataset<Row> df22 = spark.read().parquet(tpcdsDataPath + parquetFilepath22);
+    Dataset<Row> df23 = spark.read().parquet(tpcdsDataPath + parquetFilepath23);
+    Dataset<Row> df24 = spark.read().parquet(tpcdsDataPath + parquetFilepath24);
 
-    try {
-      configPath = args[0];
-      outputPath = args[1];
-      testTextPath = args[2];
-    } catch (ArrayIndexOutOfBoundsException e) {
-      System.exit(1);
+    df1.createOrReplaceTempView("call_center");
+    df2.createOrReplaceTempView("catalog_page");
+    df3.createOrReplaceTempView("catalog_returns");
+    df4.createOrReplaceTempView("catalog_sales");
+    df5.createOrReplaceTempView("customer");
+    df6.createOrReplaceTempView("customer_address");
+    df7.createOrReplaceTempView("customer_demographics");
+    df8.createOrReplaceTempView("date_dim");
+    df9.createOrReplaceTempView("household_demographics");
+    df10.createOrReplaceTempView("income_band");
+    df11.createOrReplaceTempView("inventory");
+    df12.createOrReplaceTempView("item");
+    df13.createOrReplaceTempView("promotion");
+    df14.createOrReplaceTempView("reason");
+    df15.createOrReplaceTempView("ship_mode");
+    df16.createOrReplaceTempView("store");
+    df17.createOrReplaceTempView("store_returns");
+    df18.createOrReplaceTempView("store_sales");
+    df19.createOrReplaceTempView("time_dim");
+    df20.createOrReplaceTempView("warehouse");
+    df21.createOrReplaceTempView("web_page");
+    df22.createOrReplaceTempView("web_returns");
+    df23.createOrReplaceTempView("web_sales");
+    df24.createOrReplaceTempView("web_site");
+  }
+
+  /**
+   * Setup method to initialize SparkSession. Not included in the benchmark
+   * runtime measurements.
+   */
+  @Setup
+  public void before() {
+    SparkConf conf = new SparkConf()
+            .setAppName("SparkPlugin")
+            .setMaster("local[1]")
+            // 2 executor per instance of each worker
+            .set("spark.executor.instances", "2")
+            // 2 cores on each executor
+            .set("spark.executor.cores", "2");
+
+    spark = SparkSession.builder().config(conf).getOrCreate();
+    spark.sparkContext().setLogLevel("ERROR");
+
+    importData(
+            spark,
+            "call_center/call_center.parquet",
+            "catalog_page/catalog_page.parquet",
+            "catalog_returns/catalog_returns.parquet",
+            "catalog_sales/catalog_sales.parquet",
+            "customer/customer.parquet",
+            "customer_address/customer_address.parquet",
+            "customer_demographics/customer_demographics.parquet",
+            "date_dim/date_dim.parquet",
+            "household_demographics/household_demographics.parquet",
+            "income_band/income_band.parquet",
+            "inventory/inventory.parquet",
+            "item/item.parquet",
+            "promotion/promotion.parquet",
+            "reason/reason.parquet",
+            "ship_mode/ship_mode.parquet",
+            "store/store.parquet",
+            "store_returns/store_returns.parquet",
+            "store_sales/store_sales.parquet",
+            "time_dim/time_dim.parquet",
+            "warehouse/warehouse.parquet",
+            "web_page/web_page.parquet",
+            "web_returns/web_returns.parquet",
+            "web_sales/web_sales.parquet",
+            "web_site/web_site.parquet");
+  }
+
+  /**
+   * Shuts down the Spark session after every iteration it was invoked.
+   */
+  @TearDown
+  public void after() {
+    spark.stop();
+  }
+
+  /**
+   * Spark job with no plugin that runs all queries from 1 to 99. This is used as a
+   * baseline to compare with Spark job with the plugin.
+   *
+   * @param blackhole consumes the result of the query to avoid compiler optimization
+   */
+  @Benchmark
+  public void coreRunAllQueries(Blackhole blackhole) {
+    String query;
+    for (int i = 1; i < 100; i++) {
+      try {
+        query = getQuery(sqlQueryPath + "query" + i + ".sql");
+        blackhole.consume(spark.sql(query).showString(1, 0, false));
+      } catch (Exception e) {
+      }
     }
+  }
 
-    // 2. delete any potentially pre-existing parquet files
-    String schemaVersion = "schema-1.0";
-    new File(outputPath + "/resources/" + schemaVersion + "/resource.parquet").delete();
-    new File(outputPath + "/tasks/" + schemaVersion + "/task.parquet").delete();
-    new File(outputPath + "/workflows/" + schemaVersion + "/workflow.parquet").delete();
-    new File(outputPath + "/workload/" + schemaVersion + "/workload.json").delete();
-
-    // 3. create spark session and load config object
-    SparkConf conf = new SparkConf().setAppName("SystemTest").setMaster("local");
-    SparkSession spark = SparkSession.builder().config(conf).getOrCreate();
-    SparkContext sc = spark.sparkContext();
-    testFile = JavaSparkContext.fromSparkContext(spark.sparkContext()).textFile(testTextPath);
-
-    // 4. Register listeners
-    SparkDataSource sut = new SparkDataSource(sc, WtaUtils.readConfig(configPath));
+  /**
+   * Spark job that runs all queries from 1 to 99 with the plugin enabled.
+   *
+   * @param blackhole consumes the result of the query to avoid compiler optimization
+   */
+  @Benchmark
+  public void pluginRunAllQueries(Blackhole blackhole) {
+    SparkDataSource sut = new SparkDataSource(spark.sparkContext(), WtaUtils.readConfig(configFilePath));
     sut.registerTaskListener();
     sut.registerJobListener();
     sut.registerApplicationListener();
-
-    // 5. invoke a simple Spark job multiple times to generate metrics
-    for (int i = 0; i < 100; i++) {
-      invokeJob();
+    String query;
+    for (int i = 1; i < 100; i++) {
+      try {
+        query = getQuery(sqlQueryPath + "query" + i + ".sql");
+        blackhole.consume(spark.sql(query).showString(1, 0, false));
+      } catch (Exception e) {
+      }
     }
-    sc.stop();
-
-    // 6. use parquet utils to get metric objects
-    ParquetWriterUtils parquetUtil = new ParquetWriterUtils(new File(outputPath), schemaVersion);
-    List<Task> tasks = sut.getTaskLevelListener().getProcessedObjects();
-    List<Workflow> workFlow = sut.getJobLevelListener().getProcessedObjects();
-    Workload workLoad =
-            sut.getApplicationLevelListener().getProcessedObjects().get(0);
-
-    // 7. generate output
-    parquetUtil.getTasks().addAll(tasks);
-    parquetUtil.getWorkflows().addAll(workFlow);
-    parquetUtil.readWorkload(workLoad);
-    parquetUtil.writeToFile("resource", "task", "workflow", "workload");
   }
 }
