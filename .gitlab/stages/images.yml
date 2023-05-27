@@ -14,7 +14,7 @@ build-base-image:
   script:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
     - docker manifest inspect $BASE_IMAGE
-    - if [[ ! docker manifest inspect $BASE_IMAGE ]] ; then exit 0; fi
+    - if [ docker manifest inspect $BASE_IMAGE ] ; then exit 0; fi
     - docker build -t $BASE_IMAGE docker/base
     - docker push $BASE_IMAGE
 
@@ -26,7 +26,7 @@ build-linux-tooling-image:
     - docker:20.10.16-dind
   script:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-    - if [[ ! docker manifest inspect $LINUX_TOOLING_IMAGE ]] ; then exit 0; fi
+    - if [ docker manifest inspect $LINUX_TOOLING_IMAGE ] ; then exit 0; fi
     - docker build --build-arg base_image=$BASE_IMAGE -t $LINUX_TOOLING_IMAGE docker/linux-tooling
     - docker push $LINUX_TOOLING_IMAGE
 
@@ -40,7 +40,7 @@ build-spark-adapter-image:
     - docker:20.10.16-dind
   script:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-    - if [[ ! docker manifest inspect $SPARK_IMAGE ]] ; then exit 0; fi
+    - if [ docker manifest inspect $SPARK_IMAGE ] ; then exit 0; fi
     - docker build --build-arg base_image=$SPARK_BAREBONES_IMAGE -t $SPARK_IMAGE docker/linux-tooling
     - docker push $SPARK_IMAGE
 
@@ -52,6 +52,6 @@ build-barebones-spark-adapter-image:
     - docker:20.10.16-dind
   script:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-    - if [[ ! docker manifest inspect $SPARK_BAREBONES_IMAGE ]] ; then exit 0; fi
+    - if [ docker manifest inspect $SPARK_BAREBONES_IMAGE ] ; then exit 0; fi
     - docker build --build-arg base_image=$BASE_IMAGE -t $SPARK_BAREBONES_IMAGE docker/spark-adapter
     - docker push $SPARK_BAREBONES_IMAGE
