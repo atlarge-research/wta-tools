@@ -138,13 +138,36 @@
         <version>${failsafe.version}</version>
         <configuration>
           <rerunFailingTestsCount>3</rerunFailingTestsCount>
-          <includes>
-            <include>**/*IntegrationTest.java</include>
-          </includes>
           <classpathDependencyExcludes>
             <classpathDependencyExclude>org.apache.logging.log4j:log4j-slf4j2-impl</classpathDependencyExclude>
           </classpathDependencyExcludes>
         </configuration>
+        <executions>
+          <execution>
+            <id>all-tests</id>
+            <phase>integration-test</phase>
+            <goals>
+              <goal>integration-test</goal>
+            </goals>
+            <configuration>
+              <includes>
+                <include>**/*IntegrationTest.java</include>
+              </includes>
+            </configuration>
+          </execution>
+          <execution>
+            <id>env-tests</id>
+            <phase>none</phase>
+            <goals>
+              <goal>integration-test</goal>
+            </goals>
+            <configuration>
+              <includes>
+                <include>**/*EnvironmentIntegrationTest.java</include>
+              </includes>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -297,4 +320,31 @@
     </plugins>
   </build>
 
+  <profiles>
+    <profile>
+      <id>env-test</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-failsafe-plugin</artifactId>
+            <version>${failsafe.version}</version>
+            <executions>
+              <execution>
+                <id>env-tests</id>
+                <phase>integration-test</phase>
+              </execution>
+              <execution>
+                <id>all-tests</id>
+                <phase>none</phase>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+      <activation>
+        <activeByDefault>false</activeByDefault>
+      </activation>
+    </profile>
+  </profiles>
 </project>
