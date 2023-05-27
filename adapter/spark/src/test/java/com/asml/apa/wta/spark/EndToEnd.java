@@ -35,9 +35,9 @@ public class EndToEnd {
    */
   private static void invokeJob() {
     testFile.flatMap(s -> Arrays.asList(s.split(" ")).iterator())
-            .mapToPair(word -> new Tuple2<>(word, 1))
-            .reduceByKey((a, b) -> a + b)
-            .collect();
+        .mapToPair(word -> new Tuple2<>(word, 1))
+        .reduceByKey((a, b) -> a + b)
+        .collect();
   }
 
   /**
@@ -94,7 +94,7 @@ public class EndToEnd {
     List<Task> tasks = sut.getTaskLevelListener().getProcessedObjects();
     List<Workflow> workFlow = sut.getJobLevelListener().getProcessedObjects();
     Workload workLoad =
-            sut.getApplicationLevelListener().getProcessedObjects().get(0);
+        sut.getApplicationLevelListener().getProcessedObjects().get(0);
 
     // 7. generate output
     parquetUtil.getTasks().addAll(tasks);
