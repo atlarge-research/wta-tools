@@ -1,4 +1,4 @@
-package com.asml.apa.wta.spark;
+package com.asml.apa.wta.benchmarking.spark;
 
 import com.asml.apa.wta.core.model.Task;
 import com.asml.apa.wta.core.model.Workflow;

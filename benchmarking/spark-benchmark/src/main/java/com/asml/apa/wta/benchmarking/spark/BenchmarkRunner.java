@@ -1,6 +1,5 @@
 package com.asml.apa.wta.benchmarking.spark;
 
-import com.asml.apa.wta.spark.SparkBenchmark;
 import org.openjdk.jmh.profile.GCProfiler;
 import org.openjdk.jmh.profile.StackProfiler;
 import org.openjdk.jmh.runner.Runner;
