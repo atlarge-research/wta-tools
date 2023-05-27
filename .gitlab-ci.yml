@@ -22,6 +22,7 @@ include:
   - local: '.gitlab/stages/build.yml'
   - local: '.gitlab/stages/package.yml'
   - local: '.gitlab/stages/test.yml'
+  - local: '.gitlab/stages/coverage.yml'
   - local: '.gitlab/stages/check.yml'
 
 cache:
