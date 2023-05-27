@@ -138,12 +138,12 @@
         <version>${failsafe.version}</version>
         <configuration>
           <rerunFailingTestsCount>3</rerunFailingTestsCount>
-          <classpathDependencyExcludes>
-            <classpathDependencyExclude>org.apache.logging.log4j:log4j-slf4j2-impl</classpathDependencyExclude>
-          </classpathDependencyExcludes>
           <includes>
             <include>**/*IntegrationTest.java</include>
           </includes>
+          <classpathDependencyExcludes>
+            <classpathDependencyExclude>org.apache.logging.log4j:log4j-slf4j2-impl</classpathDependencyExclude>
+          </classpathDependencyExcludes>
         </configuration>
       </plugin>
       <plugin>
