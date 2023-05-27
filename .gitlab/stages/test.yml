@@ -184,7 +184,7 @@ mutation-tests-spark-adapter:
 end-to-end-run-spark-adapter:
   stage: test
 
-  needs: [build-spark-adapter, build-spark-adapter-image]
+  needs: [package-spark-adapter, build-spark-adapter-image]
 
   dependencies:
     - package-spark-adapter
