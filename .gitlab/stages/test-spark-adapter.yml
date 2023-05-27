@@ -6,8 +6,7 @@ unit-tests-spark-adapter:
   script:
     - echo "Spark adapter unit tests started"
     - "mvn -pl adapter/spark jacoco:prepare-agent surefire:test jacoco:report"
-    - "[ -f adapter/spark/target/jacoco.exec ] && mv -f adapter/spark/target/jacoco.exec adapter/spark/target/jacoco-unit-tests.exec"
-    - echo "0" > /dev/null
+    - "[ -f adapter/spark/target/jacoco.exec ] && mv -f adapter/spark/target/jacoco.exec adapter/spark/target/jacoco-unit-tests.exec || echo '0' > /dev/null"
   artifacts:
     name: unit-tests-spark-adapter
     expire_in: 3 days
@@ -25,8 +24,7 @@ integration-tests-spark-adapter:
   script:
     - echo "Spark adapter integration tests started"
     - "mvn -pl adapter/spark jacoco:prepare-agent-integration failsafe:integration-test failsafe:verify jacoco:report-integration"
-    - "[ -f adapter/spark/target/jacoco-it.exec ] && mv -f adapter/spark/target/jacoco-it.exec adapter/spark/target/jacoco-integration-tests.exec"
-    - echo "0" > /dev/null
+    - "[ -f adapter/spark/target/jacoco-it.exec ] && mv -f adapter/spark/target/jacoco-it.exec adapter/spark/target/jacoco-integration-tests.exec || echo '0' > /dev/null"
   artifacts:
     name: integration-tests-spark-adapter
     expire_in: 3 days

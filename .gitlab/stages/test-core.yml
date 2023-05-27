@@ -6,8 +6,7 @@ unit-tests-core:
   script:
     - echo "Core unit tests started"
     - "mvn -pl core jacoco:prepare-agent surefire:test jacoco:report"
-    - "[ -f core/target/jacoco.exec ] && mv -f core/target/jacoco.exec core/target/jacoco-unit-tests.exec"
-    - echo "0" > /dev/null
+    - "[ -f core/target/jacoco.exec ] && mv -f core/target/jacoco.exec core/target/jacoco-unit-tests.exec || echo '0' > /dev/null"
   artifacts:
     name: unit-tests-core
     expire_in: 3 days
@@ -25,8 +24,7 @@ integration-tests-core:
   script:
     - echo "Core integration tests started"
     - "mvn -pl core jacoco:prepare-agent-integration failsafe:integration-test failsafe:verify jacoco:report-integration"
-    - "[ -f core/target/jacoco-it.exec ] && mv -f core/target/jacoco-it.exec core/target/jacoco-integration-tests.exec"
-    - echo "0" > /dev/null
+    - "[ -f core/target/jacoco-it.exec ] && mv -f core/target/jacoco-it.exec core/target/jacoco-integration-tests.exec || echo '0' > /dev/null"
   artifacts:
     name: integration-tests-core
     expire_in: 3 days
