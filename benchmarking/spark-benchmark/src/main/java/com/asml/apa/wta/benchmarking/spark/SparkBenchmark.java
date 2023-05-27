@@ -8,6 +8,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.spark.SparkConf;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
@@ -37,6 +38,7 @@ import org.openjdk.jmh.infra.Blackhole;
 @Warmup(iterations = 10)
 @Measurement(iterations = 50)
 @OutputTimeUnit(TimeUnit.NANOSECONDS)
+@Slf4j
 public class SparkBenchmark {
 
   private SparkSession spark;
@@ -57,10 +59,10 @@ public class SparkBenchmark {
    */
   private static String getQuery(String filepath) throws IOException {
     return Files.lines(Paths.get(filepath), StandardCharsets.UTF_8)
-            .filter(line -> !line.startsWith("--")) // exclude SQL comments
-            .filter(line -> !line.isBlank()) // exclude empty lines
-            .map(String::trim)
-            .collect(Collectors.joining(" "));
+        .filter(line -> !line.startsWith("--")) // exclude SQL comments
+        .filter(line -> !line.isBlank()) // exclude empty lines
+        .map(String::trim)
+        .collect(Collectors.joining(" "));
   }
 
   /**
@@ -69,31 +71,31 @@ public class SparkBenchmark {
    * @param spark   SparkSession instance
    */
   private static void importData(
-          SparkSession spark,
-          String parquetFilepath1,
-          String parquetFilepath2,
-          String parquetFilepath3,
-          String parquetFilepath4,
-          String parquetFilepath5,
-          String parquetFilepath6,
-          String parquetFilepath7,
-          String parquetFilepath8,
-          String parquetFilepath9,
-          String parquetFilepath10,
-          String parquetFilepath11,
-          String parquetFilepath12,
-          String parquetFilepath13,
-          String parquetFilepath14,
-          String parquetFilepath15,
-          String parquetFilepath16,
-          String parquetFilepath17,
-          String parquetFilepath18,
-          String parquetFilepath19,
-          String parquetFilepath20,
-          String parquetFilepath21,
-          String parquetFilepath22,
-          String parquetFilepath23,
-          String parquetFilepath24) {
+      SparkSession spark,
+      String parquetFilepath1,
+      String parquetFilepath2,
+      String parquetFilepath3,
+      String parquetFilepath4,
+      String parquetFilepath5,
+      String parquetFilepath6,
+      String parquetFilepath7,
+      String parquetFilepath8,
+      String parquetFilepath9,
+      String parquetFilepath10,
+      String parquetFilepath11,
+      String parquetFilepath12,
+      String parquetFilepath13,
+      String parquetFilepath14,
+      String parquetFilepath15,
+      String parquetFilepath16,
+      String parquetFilepath17,
+      String parquetFilepath18,
+      String parquetFilepath19,
+      String parquetFilepath20,
+      String parquetFilepath21,
+      String parquetFilepath22,
+      String parquetFilepath23,
+      String parquetFilepath24) {
     Dataset<Row> df1 = spark.read().parquet(tpcdsDataPath + parquetFilepath1);
     Dataset<Row> df2 = spark.read().parquet(tpcdsDataPath + parquetFilepath2);
     Dataset<Row> df3 = spark.read().parquet(tpcdsDataPath + parquetFilepath3);
@@ -152,42 +154,42 @@ public class SparkBenchmark {
   @Setup
   public void before() {
     SparkConf conf = new SparkConf()
-            .setAppName("SparkPlugin")
-            .setMaster("local[1]")
-            // 2 executor per instance of each worker
-            .set("spark.executor.instances", "2")
-            // 2 cores on each executor
-            .set("spark.executor.cores", "2");
+        .setAppName("SparkPlugin")
+        .setMaster("local[1]")
+        // 2 executor per instance of each worker
+        .set("spark.executor.instances", "2")
+        // 2 cores on each executor
+        .set("spark.executor.cores", "2");
 
     spark = SparkSession.builder().config(conf).getOrCreate();
     spark.sparkContext().setLogLevel("ERROR");
 
     importData(
-            spark,
-            "call_center/call_center.parquet",
-            "catalog_page/catalog_page.parquet",
-            "catalog_returns/catalog_returns.parquet",
-            "catalog_sales/catalog_sales.parquet",
-            "customer/customer.parquet",
-            "customer_address/customer_address.parquet",
-            "customer_demographics/customer_demographics.parquet",
-            "date_dim/date_dim.parquet",
-            "household_demographics/household_demographics.parquet",
-            "income_band/income_band.parquet",
-            "inventory/inventory.parquet",
-            "item/item.parquet",
-            "promotion/promotion.parquet",
-            "reason/reason.parquet",
-            "ship_mode/ship_mode.parquet",
-            "store/store.parquet",
-            "store_returns/store_returns.parquet",
-            "store_sales/store_sales.parquet",
-            "time_dim/time_dim.parquet",
-            "warehouse/warehouse.parquet",
-            "web_page/web_page.parquet",
-            "web_returns/web_returns.parquet",
-            "web_sales/web_sales.parquet",
-            "web_site/web_site.parquet");
+        spark,
+        "call_center/call_center.parquet",
+        "catalog_page/catalog_page.parquet",
+        "catalog_returns/catalog_returns.parquet",
+        "catalog_sales/catalog_sales.parquet",
+        "customer/customer.parquet",
+        "customer_address/customer_address.parquet",
+        "customer_demographics/customer_demographics.parquet",
+        "date_dim/date_dim.parquet",
+        "household_demographics/household_demographics.parquet",
+        "income_band/income_band.parquet",
+        "inventory/inventory.parquet",
+        "item/item.parquet",
+        "promotion/promotion.parquet",
+        "reason/reason.parquet",
+        "ship_mode/ship_mode.parquet",
+        "store/store.parquet",
+        "store_returns/store_returns.parquet",
+        "store_sales/store_sales.parquet",
+        "time_dim/time_dim.parquet",
+        "warehouse/warehouse.parquet",
+        "web_page/web_page.parquet",
+        "web_returns/web_returns.parquet",
+        "web_sales/web_sales.parquet",
+        "web_site/web_site.parquet");
   }
 
   /**
@@ -212,6 +214,7 @@ public class SparkBenchmark {
         query = getQuery(sqlQueryPath + "query" + i + ".sql");
         blackhole.consume(spark.sql(query).showString(1, 0, false));
       } catch (Exception e) {
+        log.info("missing query " + i);
       }
     }
   }
@@ -233,6 +236,7 @@ public class SparkBenchmark {
         query = getQuery(sqlQueryPath + "query" + i + ".sql");
         blackhole.consume(spark.sql(query).showString(1, 0, false));
       } catch (Exception e) {
+        log.info("missing query " + i);
       }
     }
   }

@@ -20,10 +20,10 @@ public class BenchmarkRunner {
 
   public static void main(String[] args) throws Exception {
     Options options = new OptionsBuilder()
-            .include(SparkBenchmark.class.getSimpleName())
-            .addProfiler(StackProfiler.class)
-            .addProfiler(GCProfiler.class)
-            .build();
+        .include(SparkBenchmark.class.getSimpleName())
+        .addProfiler(StackProfiler.class)
+        .addProfiler(GCProfiler.class)
+        .build();
     new Runner(options).run();
   }
 }
