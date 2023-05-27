@@ -259,6 +259,14 @@
             <format>HTML</format>
           </formats>
           <outputDirectory>reports/jacoco</outputDirectory>
+          <fileSets>
+            <fileSet>
+              <directory>${project.build.directory}</directory>
+              <includes>
+                <include>*.exec</include>
+              </includes>
+            </fileSet>
+          </fileSets>
         </configuration>
         <executions>
           <execution>
