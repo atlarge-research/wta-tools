@@ -25,7 +25,7 @@ include:
   - local: '.gitlab/stages/package.yml'
   - local: '.gitlab/stages/test-core.yml'
   - local: '.gitlab/stages/test-spark-adapter.yml'
-  - local: '.gitlab/stages/end-to-end.yml'
+  - local: '.gitlab/stages/end-to-end-spark-adapter.yml'
   - local: '.gitlab/stages/check.yml'
 
 cache:

@@ -1,5 +1,5 @@
 end-to-end-spark-adapter:
-  stage: end-to-end
+  stage: end-to-end-spark-adapter
 
   needs: [package-spark-adapter, build-spark-adapter-image]
 
@@ -13,7 +13,7 @@ end-to-end-spark-adapter:
     - echo "This job is empty now, but will be used to spot some pressing issues with the application"
 
 end-to-end-barebones-spark-adapter:
-  stage: end-to-end
+  stage: end-to-end-spark-adapter
 
   needs: [package-spark-adapter, build-barebones-spark-adapter-image]
 
