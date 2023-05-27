@@ -1,9 +1,9 @@
 variables:
-  IMAGE_RELEASE: 0.0.0
-  BASE_IMAGE_TAG: $CI_REGISTRY_IMAGE/base-image:$IMAGE_RELEASE
-  LINUX_TOOLING_IMAGE_TAG: $CI_REGISTRY_IMAGE/linux-tooling-image:$IMAGE_RELEASE
-  SPARK_IMAGE_TAG: $CI_REGISTRY_IMAGE/spark-image:$IMAGE_RELEASE
-  SPARK_BAREBONES_IMAGE_TAG: $CI_REGISTRY_IMAGE/barebones-spark-image:$IMAGE_RELEASE
+  IMAGE_RELEASE_TAG: 0.0.1
+  BASE_IMAGE: $CI_REGISTRY_IMAGE/base-image:$IMAGE_RELEASE_TAG
+  LINUX_TOOLING_IMAGE: $CI_REGISTRY_IMAGE/linux-tooling-image:$IMAGE_RELEASE_TAG
+  SPARK_IMAGE: $CI_REGISTRY_IMAGE/spark-image:$IMAGE_RELEASE_TAG
+  SPARK_BAREBONES_IMAGE: $CI_REGISTRY_IMAGE/barebones-spark-image:$IMAGE_RELEASE_TAG
 
 build-base-image:
   stage: images
@@ -13,8 +13,8 @@ build-base-image:
     - docker:20.10.16-dind
   script:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-    - docker build -t $BASE_IMAGE_TAG docker/base
-    - docker push $BASE_IMAGE_TAG
+    - docker build -t $BASE_IMAGE docker/base
+    - docker push $BASE_IMAGE
 
 build-linux-tooling-image:
   stage: images
@@ -24,8 +24,8 @@ build-linux-tooling-image:
     - docker:20.10.16-dind
   script:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-    - docker build --build-arg base_image=$BASE_IMAGE_TAG -t $LINUX_TOOLING_IMAGE_TAG docker/linux-tooling
-    - docker push $LINUX_TOOLING_IMAGE_TAG
+    - docker build --build-arg base_image=$BASE_IMAGE -t $LINUX_TOOLING_IMAGE docker/linux-tooling
+    - docker push $LINUX_TOOLING_IMAGE
 
 build-spark-adapter-image:
   stage: images
@@ -37,8 +37,8 @@ build-spark-adapter-image:
     - docker:20.10.16-dind
   script:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-    - docker build --build-arg base_image=$SPARK_BAREBONES_IMAGE_TAG -t $SPARK_IMAGE_TAG docker/linux-tooling
-    - docker push $SPARK_IMAGE_TAG
+    - docker build --build-arg base_image=$SPARK_BAREBONES_IMAGE -t $SPARK_IMAGE docker/linux-tooling
+    - docker push $SPARK_IMAGE
 
 build-barebones-spark-adapter-image:
   stage: images
@@ -48,5 +48,5 @@ build-barebones-spark-adapter-image:
     - docker:20.10.16-dind
   script:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-    - docker build --build-arg base_image=$BASE_IMAGE_TAG -t $SPARK_BAREBONES_IMAGE_TAG docker/spark-adapter
-    - docker push $SPARK_BAREBONES_IMAGE_TAG
+    - docker build --build-arg base_image=$BASE_IMAGE -t $SPARK_BAREBONES_IMAGE docker/spark-adapter
+    - docker push $SPARK_BAREBONES_IMAGE
