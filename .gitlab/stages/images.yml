@@ -24,7 +24,7 @@ build-spark-adapter-image:
     - docker:20.10.16-dind
   script:
     - docker load < barebones-spark-setup-image.tar
-    - docker build -t --build-arg base_image=barebones-spark-setup-image spark-setup-image docker/linux-tooling
+    - docker build --build-arg base_image=barebones-spark-setup-image -t spark-setup-image docker/linux-tooling
     - docker save spark-setup-image > spark-setup-image.tar
   artifacts:
     name: spark-image
