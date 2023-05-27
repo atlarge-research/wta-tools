@@ -65,8 +65,8 @@ reports
 config.json
 
 # big generated files for benchmarking
-benchmarking/src/main/resources/sql_files
-benchmarking/src/main/resources/tpcds_data
+benchmarking/spark-benchmark/src/main/resources/sql_files
+benchmarking/spark-benchmark/src/main/resources/tpcds_parquet_data
 
 # serialization files
 *.ser
