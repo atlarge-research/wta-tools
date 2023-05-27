@@ -8,3 +8,5 @@ RUN curl -s "https://get.sdkman.io" | bash
 RUN bash -c 'source "/root/.sdkman/bin/sdkman-init.sh"; sdk install scala 2.13.5'
 ENV SPARK_HOME=/spark-3.2.4-bin-hadoop3.2
 ENV PATH=$PATH:$SPARK_HOME/bin:$SPARK_HOME/sbin
+RUN echo "$SCALA_HOME"
+RUN echo "$JAVA_HOME"
