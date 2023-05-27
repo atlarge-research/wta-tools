@@ -2,7 +2,7 @@ package com.asml.apa.wta.benchmarking.spark;
 
 /**
  * Entry point for running the Spark benchmark.
- * @author Pil Kyu CHo
+ * @author Pil Kyu Cho
  * @since 1.0.0
  */
 public class BenchmarkRunner {

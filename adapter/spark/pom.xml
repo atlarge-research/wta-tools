@@ -13,11 +13,6 @@
 
   <artifactId>spark</artifactId>
 
-  <properties>
-    <scala.version>2.13.5</scala.version>
-    <scala.maven.plugin.version>4.8.1</scala.maven.plugin.version>
-  </properties>
-
   <dependencies>
     <!-- https://mvnrepository.com/artifact/org.apache.spark/spark-core -->
     <dependency>
@@ -38,36 +33,5 @@
       <version>${project.version}</version>
       <scope>compile</scope>
     </dependency>
-    <!-- https://mvnrepository.com/artifact/org.scala-lang/scala-reflect -->
-    <dependency>
-      <groupId>org.scala-lang</groupId>
-      <artifactId>scala-reflect</artifactId>
-      <version>${scala.version}</version>
-    </dependency>
-    <!-- https://mvnrepository.com/artifact/org.scala-lang/scala-reflect -->
-    <dependency>
-      <groupId>org.scala-lang</groupId>
-      <artifactId>scala-library</artifactId>
-      <version>${scala.version}</version>
-    </dependency>
   </dependencies>
-
-  <build>
-    <plugins>
-      <plugin>
-        <!-- https://mvnrepository.com/artifact/net.alchim31.maven/scala-maven-plugin -->
-        <groupId>net.alchim31.maven</groupId>
-        <artifactId>scala-maven-plugin</artifactId>
-        <version>${scala.maven.plugin.version}</version>
-        <executions>
-          <execution>
-            <goals>
-              <goal>compile</goal>
-              <goal>testCompile</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
-  </build>
 </project>
