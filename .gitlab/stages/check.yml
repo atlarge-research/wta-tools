@@ -53,14 +53,6 @@ sast:
   stage: check
   allow_failure: true
 
-spotbugs-sast:
-  stage: check
-  needs: []
-  rules:
-    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
-    - if: $CI_COMMIT_REF_NAME == 'dev'
-    - if: $CI_COMMIT_REF_NAME == 'main'
-
 semgrep-sast:
   stage: check
   needs: []
