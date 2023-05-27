@@ -1,6 +1,7 @@
 ARG base_image=maven:3-openjdk-11
 FROM ${base_image}
 
+RUN apt-get update
 RUN wget https://dlcdn.apache.org/spark/spark-3.2.4/spark-3.2.4-bin-hadoop3.2.tgz
 RUN tar xvf spark-3.2.4-bin-hadoop3.2.tgz
 RUN rm -rf spark-3.2.4-bin-hadoop3.2.tgz
