@@ -1,11 +1,20 @@
+variables:
+  IMAGE_RELEASE: 1.0.0
+  IMAGE_BASE_PATH: $CI_REGISTRY_IMAGE/$CI_PROJECT_PATH
+
 build-base-image:
   stage: images
   image: docker:20.10.16
   needs: []
   services:
     - docker:20.10.16-dind
+  variables:
+    IMAGE_TAG: $IMAGE_BASE_PATH/base-image:$IMAGE_RELEASE
   script:
     - docker build -t base-image docker/base
+    - echo $IMAGE_TAG
+#    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+#    - docker build -t $CI_REGISTRY/base-image docker/base
     - docker save base-image > base-image.tar
   artifacts:
     name: base-image
@@ -22,6 +31,8 @@ build-linux-tooling-image:
     - build-base-image
   services:
     - docker:20.10.16-dind
+  variables:
+    IMAGE_TAG: $IMAGE_BASE_PATH/linux-tooling-image:$IMAGE_RELEASE
   script:
     - docker load < base-image.tar
     - docker build -t linux-tooling-setup-image docker/linux-tooling
@@ -41,6 +52,8 @@ build-spark-adapter-image:
     - build-barebones-spark-adapter-image
   services:
     - docker:20.10.16-dind
+  variables:
+    IMAGE_TAG: $IMAGE_BASE_PATH/spark-image:$IMAGE_RELEASE
   script:
     - docker load < barebones-spark-setup-image.tar
     - docker build --build-arg base_image=barebones-spark-setup-image -t spark-setup-image docker/linux-tooling
@@ -60,6 +73,8 @@ build-barebones-spark-adapter-image:
     - build-base-image
   services:
     - docker:20.10.16-dind
+  variables:
+    IMAGE_TAG: $IMAGE_BASE_PATH/barebones-spark-image:$IMAGE_RELEASE
   script:
     - docker load < base-image.tar
     - docker build -t barebones-spark-setup-image docker/spark-adapter
