@@ -13,9 +13,6 @@ unit-tests-core:
     - echo "Core unit tests started"
     - "mvn -pl core jacoco:prepare-agent surefire:test jacoco:report"
     - "[ -f core/target/jacoco.exec ] && mv -f core/target/jacoco.exec core/target/jacoco-unit-tests.exec"
-    - "cat core/reports/jacoco/index.html | grep -Po 'Total.*?([0-9]{1,3})%' || echo '0%'"
-
-  coverage: /([0-9]{1,3})%/
 
   artifacts:
     name: unit-tests-core
@@ -37,9 +34,6 @@ unit-tests-spark-adapter:
     - echo "Spark adapter unit tests started"
     - "mvn -pl adapter/spark jacoco:prepare-agent surefire:test jacoco:report"
     - "[ -f adapter/spark/target/jacoco.exec ] && mv -f adapter/spark/target/jacoco.exec adapter/spark/target/jacoco-unit-tests.exec"
-    - "cat adapter/spark/reports/jacoco/index.html | grep -Po 'Total.*?([0-9]{1,3})%' || echo '0%'"
-
-  coverage: /([0-9]{1,3})%/
 
   artifacts:
     name: unit-tests-spark-adapter
@@ -62,9 +56,6 @@ integration-tests-core:
     - echo "Core integration tests started"
     - "mvn -pl core jacoco:prepare-agent-integration failsafe:integration-test@all-tests failsafe:verify jacoco:report-integration"
     - "[ -f core/target/jacoco-it.exec ] && mv -f core/target/jacoco-it.exec core/target/jacoco-integration-tests.exec"
-    - "cat core/reports/jacoco/index.html | grep -Po 'Total.*?([0-9]{1,3})%' || echo '0%'"
-
-  coverage: /([0-9]{1,3})%/
 
   artifacts:
     name: integration-tests-core
@@ -86,9 +77,6 @@ integration-tests-spark-adapter:
     - echo "Spark adapter integration tests started"
     - "mvn -pl adapter/spark jacoco:prepare-agent-integration failsafe:integration-test@all-tests failsafe:verify jacoco:report-integration"
     - "[ -f adapter/spark/target/jacoco-it.exec ] && mv -f adapter/spark/target/jacoco-it.exec adapter/spark/target/jacoco-integration-tests.exec"
-    - "cat adapter/spark/reports/jacoco/index.html | grep -Po 'Total.*?([0-9]{1,3})%' || echo '0%'"
-
-  coverage: /([0-9]{1,3})%/
 
   artifacts:
     name: integration-tests-spark-adapter
@@ -111,9 +99,6 @@ environment-integration-tests-core:
     - echo "Core environment integration tests started"
     - "mvn -pl core jacoco:prepare-agent-integration failsafe:integration-test@env-tests failsafe:verify jacoco:report-integration"
     - "[ -f core/target/jacoco-it.exec ] && mv -f core/target/jacoco-it.exec core/target/jacoco-environment-integration-tests.exec"
-    - "cat core/reports/jacoco/index.html | grep -Po 'Total.*?([0-9]{1,3})%' || echo '0%'"
-
-  coverage: /([0-9]{1,3})%/
 
   artifacts:
     name: environment-integration-tests-core
@@ -135,9 +120,6 @@ environment-integration-tests-spark-adapter:
     - echo "Spark adapter environment integration tests started"
     - "mvn -pl adapter/spark jacoco:prepare-agent-integration failsafe:integration-test@env-tests failsafe:verify jacoco:report-integration"
     - "[ -f adapter/spark/target/jacoco-it.exec ] && mv -f adapter/spark/target/jacoco-it.exec adapter/spark/target/jacoco-environment-integration-tests.exec"
-    - "cat adapter/spark/reports/jacoco/index.html | grep -Po 'Total.*?([0-9]{1,3})%' || echo '0%'"
-
-  coverage: /([0-9]{1,3})%/
 
   artifacts:
     name: environment-integration-tests-spark-adapter
