@@ -14,7 +14,7 @@ build-core:
       - core/target
       - .m2/repository/com/asml/apa
 
-build-adapters:
+build-spark-adapter:
   stage: build
 
   needs: [build-core]
@@ -26,7 +26,7 @@ build-adapters:
     - "mvn -pl adapter/spark process-test-classes"
 
   artifacts:
-    name: build-adapters
+    name: build-spark-adapter
     expire_in: 2 hours
     paths:
       - adapter/spark/target

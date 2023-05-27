@@ -12,12 +12,14 @@ workflow:
 stages:
   - images
   - build
+  - package
   - test
   - check
 
 include:
   - local: '.gitlab/stages/images.yml'
   - local: '.gitlab/stages/build.yml'
+  - local: '.gitlab/stages/package.yml'
   - local: '.gitlab/stages/test.yml'
   - local: '.gitlab/stages/check.yml'
 

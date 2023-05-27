@@ -1,0 +1,14 @@
+package-spark-adapter:
+  stage: package
+  needs: [build-spark-adapter]
+  dependencies:
+    - build-spark-adapter
+  script:
+    - echo "Package Spark adapter started"
+    - "mvn -pl adapter/spark maven-assembly-plugin:single"
+
+  artifacts:
+    name: package-spark-adapter
+    expire_in: 2 hours
+    paths:
+      - adapter/spark/target/*.jar
