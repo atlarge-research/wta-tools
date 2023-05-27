@@ -194,7 +194,7 @@ mutation-tests-spark-adapter:
 
 
 line-coverage-core:
-  stage: test
+  stage: coverage
   needs: [environment-integration-tests-core, integration-tests-core, unit-tests-core]
   dependencies:
     - environment-integration-tests-core
@@ -214,7 +214,7 @@ line-coverage-core:
       - core/target/jacoco.exec
 
 line-coverage-spark-adapter:
-  stage: test
+  stage: coverage
   needs: [environment-integration-tests-spark-adapter, integration-tests-spark-adapter, unit-tests-spark-adapter]
   dependencies:
     - environment-integration-tests-spark-adapter
@@ -235,7 +235,7 @@ line-coverage-spark-adapter:
 
 
 branch-coverage-core:
-  stage: test
+  stage: coverage
   needs: [line-coverage-core]
   dependencies:
     - line-coverage-core
@@ -243,7 +243,7 @@ branch-coverage-core:
     - echo "Started creating core branch coverage report"
 
 branch-coverage-spark-adapter:
-  stage: test
+  stage: coverage
   needs: [line-coverage-spark-adapter]
   dependencies:
     - line-coverage-spark-adapter
