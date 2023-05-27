@@ -15,6 +15,7 @@ stages:
   - package
   - test
   - coverage
+  - end-to-end
   - check
 
 include:
@@ -23,6 +24,7 @@ include:
   - local: '.gitlab/stages/package.yml'
   - local: '.gitlab/stages/test.yml'
   - local: '.gitlab/stages/coverage.yml'
+  - local: '.gitlab/stages/end-to-end.yml'
   - local: '.gitlab/stages/check.yml'
 
 cache:

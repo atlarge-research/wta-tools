@@ -1,0 +1,27 @@
+end-to-end-spark-adapter:
+  stage: end-to-end
+
+  needs: [package-spark-adapter, build-spark-adapter-image]
+
+  dependencies:
+    - package-spark-adapter
+    - build-spark-adapter-image
+
+  script:
+    - echo "Spark adapter end-to-end run started"
+    - echo "This job does not provide coverage metrics, it just verifies the system as a whole functions to some degree"
+    - echo "This job is empty now, but will be used to spot some pressing issues with the application"
+
+end-to-end-barebones-spark-adapter:
+  stage: end-to-end
+
+  needs: [package-spark-adapter, build-barebones-spark-adapter-image]
+
+  dependencies:
+    - package-spark-adapter
+    - build-barebones-spark-adapter-image
+
+  script:
+    - echo "Barebones Spark adapter end-to-end run started"
+    - echo "This job does not provide coverage metrics, it just verifies the system as a whole functions in a barebones environment"
+    - echo "This job is empty now, but will be used to spot some pressing issues with the application"
