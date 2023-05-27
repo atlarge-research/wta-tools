@@ -9,7 +9,6 @@ spotless:
   stage: check
   dependencies: []
   needs: []
-
   script:
     - echo "Spotless check started"
     - "mvn spotless:check"
@@ -18,11 +17,9 @@ pmd:
   stage: check
   dependencies: [build-core]
   needs: [build-core]
-
   script:
     - echo "PMD checks started"
     - "mvn pmd:check"
-
   artifacts:
     name: pmd
     expire_in: 3 days
@@ -35,11 +32,9 @@ checkstyle:
   stage: check
   dependencies: []
   needs: []
-
   script:
     - echo "Checkstyle checks started"
     - "mvn checkstyle:check"
-
   artifacts:
     name: checkstyle
     expire_in: 3 days
