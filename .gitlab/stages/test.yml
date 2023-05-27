@@ -26,10 +26,10 @@ unit-tests-core:
 unit-tests-spark-adapter:
   stage: test
 
-  needs: [build-adapters]
+  needs: [build-spark-adapter]
 
   dependencies:
-    - build-adapters
+    - build-spark-adapter
 
   script:
     - echo "Spark adapter unit tests started"
@@ -71,10 +71,10 @@ integration-tests-core:
 integration-tests-spark-adapter:
   stage: test
 
-  needs: [build-adapters]
+  needs: [build-spark-adapter]
 
   dependencies:
-    - build-adapters
+    - build-spark-adapter
 
   script:
     - echo "Spark adapter integration tests started"
@@ -116,10 +116,10 @@ environment-integration-tests-core:
 environment-integration-tests-spark-adapter:
   stage: test
 
-  needs: [build-linux-tooling-image, build-adapters]
+  needs: [build-linux-tooling-image, build-spark-adapter]
 
   dependencies:
-    - build-adapters
+    - build-spark-adapter
 
   script:
     - echo "Spark adapter environment integration tests started"
