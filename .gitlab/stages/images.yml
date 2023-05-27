@@ -1,10 +1,11 @@
 build-linux-tooling-image:
   stage: images
   image: docker:20.10.16
+  needs: []
   services:
     - docker:20.10.16-dind
   script:
-    - docker build -t linux-tooling-setup-image infra/docker/linux-tooling
+    - docker build -t linux-tooling-setup-image docker/linux-tooling
     - docker save linux-tooling-setup-image > linux-tooling-setup-image.tar
   artifacts:
     name: linux-tooling-image
@@ -23,7 +24,7 @@ build-spark-adapter-image:
     - docker:20.10.16-dind
   script:
     - docker load < linux-tooling-setup-image.tar
-    - docker build -t spark-setup-image infra/docker/spark-adapter
+    - docker build -t --build-arg base_image=linux-tooling-setup-image spark-setup-image docker/spark-adapter
     - docker save spark-setup-image > spark-setup-image.tar
   artifacts:
     name: spark-image
@@ -31,3 +32,19 @@ build-spark-adapter-image:
     when: always
     paths:
       - spark-setup-image.tar
+
+build-barebones-spark-adapter-image:
+  stage: images
+  image: docker:20.10.16
+  needs: []
+  services:
+    - docker:20.10.16-dind
+  script:
+    - docker build -t barebones-spark-setup-image docker/spark-adapter
+    - docker save barebones-spark-setup-image > barebones-spark-setup-image.tar
+  artifacts:
+    name: barebones-spark-image
+    expire_in: 3 days
+    when: always
+    paths:
+      - barebones-spark-setup-image.tar
