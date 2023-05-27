@@ -76,23 +76,22 @@ public class Workflow implements BaseTraceObject {
       record.put("id", workflow.id);
     }
     if (checker[1]) {
-      record.put("submitTime", workflow.submitTime);
+      record.put("ts_submit", workflow.submitTime);
     }
     if (checker[2]) {
-      record.put(
-          "tasks", Arrays.stream(workflow.tasks).map(x -> x.getId()).toArray());
+      record.put("tasks", Arrays.stream(workflow.tasks).map(Task::getId).toArray());
     }
     if (checker[3]) {
-      record.put("numberOfTasks", workflow.numberOfTasks);
+      record.put("task_count", workflow.numberOfTasks);
     }
     if (checker[4]) {
-      record.put("criticalPathLength", workflow.criticalPathLength);
+      record.put("critical_path_length", workflow.criticalPathLength);
     }
     if (checker[5]) {
-      record.put("criticalPathTaskCount", workflow.criticalPathTaskCount);
+      record.put("critical_path_task_count", workflow.criticalPathTaskCount);
     }
     if (checker[6]) {
-      record.put("maxNumberOfConcurrentTasks", workflow.maxNumberOfConcurrentTasks);
+      record.put("max_concurrent_tasks", workflow.maxNumberOfConcurrentTasks);
     }
     if (checker[7]) {
       record.put("nfrs", workflow.nfrs);
@@ -104,25 +103,25 @@ public class Workflow implements BaseTraceObject {
       record.put("domain", workflow.domain.getValue());
     }
     if (checker[10]) {
-      record.put("applicationName", workflow.applicationName);
+      record.put("application_name", workflow.applicationName);
     }
     if (checker[11]) {
-      record.put("applicationField", workflow.applicationField);
+      record.put("application_field", workflow.applicationField);
     }
     if (checker[12]) {
-      record.put("totalResources", workflow.totalResources);
+      record.put("total_resources", workflow.totalResources);
     }
     if (checker[13]) {
-      record.put("totalMemoryUsage", workflow.totalMemoryUsage);
+      record.put("total_memory_usage", workflow.totalMemoryUsage);
     }
     if (checker[14]) {
-      record.put("totalNetworkUsage", workflow.totalNetworkUsage);
+      record.put("total_network_usage", workflow.totalNetworkUsage);
     }
     if (checker[15]) {
-      record.put("totalDiskSpaceUsage", workflow.totalDiskSpaceUsage);
+      record.put("total_disk_space_usage", workflow.totalDiskSpaceUsage);
     }
     if (checker[16]) {
-      record.put("totalEnergyConsumption", workflow.totalEnergyConsumption);
+      record.put("total_energy_consumption", workflow.totalEnergyConsumption);
     }
     return record;
   }

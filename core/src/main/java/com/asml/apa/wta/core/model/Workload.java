@@ -1,6 +1,8 @@
 package com.asml.apa.wta.core.model;
 
 import com.asml.apa.wta.core.model.enums.Domain;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Data;
@@ -9,11 +11,13 @@ import lombok.Getter;
 /**
  * Workload class corresponding to WTA format.
  *
- * @author  Lohithsai Yadala Chanchu
+ * @author Lohithsai Yadala Chanchu
+ * @author Atour Mousavi Gourabi
  * @since 1.0.0
  */
 @Data
 @Builder
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class Workload implements BaseTraceObject {
   private static final long serialVersionUID = -4547341610378381743L;
 
@@ -28,9 +32,9 @@ public class Workload implements BaseTraceObject {
 
   private final Domain domain;
 
-  private final long startDate;
+  private final long dateStart;
 
-  private final long endDate;
+  private final long dateEnd;
 
   private final long numSites;
 
@@ -93,28 +97,28 @@ public class Workload implements BaseTraceObject {
   private final double covMemory = -1.0;
 
   @Builder.Default
-  private final long minNetworkUsage = -1L;
+  private final long minNetworkIoTime = -1L;
 
   @Builder.Default
-  private final long maxNetworkUsage = -1L;
+  private final long maxNetworkIoTime = -1L;
 
   @Builder.Default
-  private final double stdNetworkUsage = -1.0;
+  private final double stdNetworkIoTime = -1.0;
 
   @Builder.Default
-  private final double meanNetworkUsage = -1.0;
+  private final double meanNetworkIoTime = -1.0;
 
   @Builder.Default
-  private final double medianNetworkUsage = -1.0;
+  private final double medianNetworkIoTime = -1.0;
 
   @Builder.Default
-  private final long firstQuartileNetworkUsage = -1L;
+  private final long firstQuartileNetworkIoTime = -1L;
 
   @Builder.Default
-  private final long thirdQuartileNetworkUsage = -1L;
+  private final long thirdQuartileNetworkIoTime = -1L;
 
   @Builder.Default
-  private final double covNetworkUsage = -1.0;
+  private final double covNetworkIoTime = -1.0;
 
   @Builder.Default
   private final double minDiskSpaceUsage = -1.0;

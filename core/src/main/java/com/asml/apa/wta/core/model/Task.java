@@ -84,19 +84,19 @@ public class Task implements BaseTraceObject {
       record.put("type", task.type);
     }
     if (checker[2]) {
-      record.put("submitTime", task.submitTime);
+      record.put("ts_submit", task.submitTime);
     }
     if (checker[3]) {
-      record.put("submissionSite", task.submissionSite);
+      record.put("submission_site", task.submissionSite);
     }
     if (checker[4]) {
       record.put("runtime", task.runtime);
     }
     if (checker[5]) {
-      record.put("resourceType", task.resourceType);
+      record.put("resource_type", task.resourceType);
     }
     if (checker[6]) {
-      record.put("resourceAmountRequested", task.resourceAmountRequested);
+      record.put("resource_amount_requested", task.resourceAmountRequested);
     }
     if (checker[7]) {
       record.put("parents", task.parents);
@@ -105,40 +105,40 @@ public class Task implements BaseTraceObject {
       record.put("children", task.children);
     }
     if (checker[9]) {
-      record.put("userId", task.userId);
+      record.put("user_id", task.userId);
     }
     if (checker[10]) {
-      record.put("groupId", task.groupId);
+      record.put("group_id", task.groupId);
     }
     if (checker[11]) {
       record.put("nfrs", task.nfrs);
     }
     if (checker[12]) {
-      record.put("workflowId", task.workflowId);
+      record.put("workflow_id", task.workflowId);
     }
     if (checker[13]) {
-      record.put("waitTime", task.waitTime);
+      record.put("wait_time", task.waitTime);
     }
     if (checker[14]) {
       record.put("params", task.params);
     }
     if (checker[15]) {
-      record.put("memoryRequested", task.memoryRequested);
+      record.put("memory_requested", task.memoryRequested);
     }
     if (checker[16]) {
-      record.put("networkIoTime", task.networkIoTime);
+      record.put("network_io_time", task.networkIoTime);
     }
     if (checker[17]) {
-      record.put("diskIoTime", task.diskIoTime);
+      record.put("disk_io_time", task.diskIoTime);
     }
     if (checker[18]) {
-      record.put("diskSpaceRequested", task.diskSpaceRequested);
+      record.put("disk_space_requested", task.diskSpaceRequested);
     }
     if (checker[19]) {
-      record.put("energyConsumption", task.energyConsumption);
+      record.put("energy_consumption", task.energyConsumption);
     }
     if (checker[20]) {
-      record.put("resourceUsed", task.resourceUsed);
+      record.put("resource_used", task.resourceUsed);
     }
     return record;
   }

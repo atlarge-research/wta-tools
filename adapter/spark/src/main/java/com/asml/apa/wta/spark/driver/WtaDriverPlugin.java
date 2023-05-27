@@ -11,6 +11,7 @@ import org.apache.spark.api.plugin.PluginContext;
 /**
  * Driver component of the plugin.
  *
+ * @author Atour Mousavi Gourabi
  * @author Henry Page
  * @since 1.0.0
  */
@@ -24,7 +25,6 @@ public class WtaDriverPlugin implements DriverPlugin {
   /**
    * This method is called early in the initialization of the Spark driver.
    * Explicitly, it is called before the Spark driver's task scheduler is initialized. It is blocking.
-   *
    * Expensive calls should be postponed or delegated to another thread.
    *
    * @param sparkCtx The current SparkContext.
@@ -35,9 +35,21 @@ public class WtaDriverPlugin implements DriverPlugin {
    */
   @Override
   public Map<String, String> init(SparkContext sparkCtx, PluginContext pluginCtx) {
-    this.sparkContext = sparkCtx;
-    this.sparkDataSource = new SparkDataSource(this.sparkContext);
+    sparkContext = sparkCtx;
+    sparkDataSource = new SparkDataSource(sparkContext);
     return new HashMap<>();
+  }
+
+  /**
+   * Receives messages from the executors.
+   *
+   * @param message the message that was sent by the executors, to be serializable
+   * @return a response to the executor, if no response is expected the result is ignored
+   * @author Atour Mousavi Gourabi
+   */
+  @Override
+  public Object receive(Object message) {
+    return null;
   }
 
   /**

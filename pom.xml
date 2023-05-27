@@ -31,6 +31,9 @@
     <spark.support.version>3.2.4</spark.support.version>
     <mockito.version>5.3.1</mockito.version>
     <jqwik.version>1.7.3</jqwik.version>
+    <slf4j2-mock.version>2.3.0</slf4j2-mock.version>
+    <slf4j.version>2.0.7</slf4j.version>
+    <log4j2.version>2.20.0</log4j2.version>
   </properties>
 
   <modules>
@@ -95,6 +98,37 @@
       <version>${jqwik.version}</version>
       <scope>test</scope>
     </dependency>
+    <!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-api -->
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <version>${slf4j.version}</version>
+    </dependency>
+    <!-- https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-api -->
+    <dependency>
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-api</artifactId>
+      <version>${log4j2.version}</version>
+    </dependency>
+    <!-- https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-core -->
+    <dependency>
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-core</artifactId>
+      <version>${log4j2.version}</version>
+    </dependency>
+    <!-- https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-slf4j2-impl -->
+    <dependency>
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-slf4j2-impl</artifactId>
+      <version>${log4j2.version}</version>
+    </dependency>
+    <!-- https://mvnrepository.com/artifact/org.simplify4u/slf4j2-mock/2.3.0 -->
+    <dependency>
+      <groupId>org.simplify4u</groupId>
+      <artifactId>slf4j2-mock</artifactId>
+      <version>${slf4j2-mock.version}</version>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
   <build>
@@ -108,6 +142,9 @@
           <includes>
             <include>**/*IntegrationTest.java</include>
           </includes>
+          <classpathDependencyExcludes>
+            <classpathDependencyExclude>org.apache.logging.log4j:log4j-slf4j2-impl</classpathDependencyExclude>
+          </classpathDependencyExcludes>
         </configuration>
       </plugin>
       <plugin>
@@ -123,6 +160,9 @@
           <excludes>
             <exclude>**/*IntegrationTest.java</exclude>
           </excludes>
+          <classpathDependencyExcludes>
+            <classpathDependencyExclude>org.apache.logging.log4j:log4j-slf4j2-impl</classpathDependencyExclude>
+          </classpathDependencyExcludes>
         </configuration>
       </plugin>
       <plugin>
@@ -230,6 +270,9 @@
           <targetClasses>
             <targetClass>com.asml.apa.wta.*</targetClass>
           </targetClasses>
+          <classpathDependencyExcludes>
+            <classpathDependencyExclude>org.apache.logging.log4j:log4j-slf4j2-impl</classpathDependencyExclude>
+          </classpathDependencyExcludes>
         </configuration>
         <dependencies>
           <!-- https://mvnrepository.com/artifact/org.pitest/pitest-junit5-plugin -->
