@@ -1,5 +1,5 @@
 variables:
-  IMAGE_RELEASE: 1.0.0
+  IMAGE_RELEASE: 0.0.0
 
 build-base-image:
   stage: images
@@ -12,9 +12,10 @@ build-base-image:
   script:
     - docker build -t base-image docker/base
     - echo $IMAGE_TAG
-#    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-#    - docker build -t $CI_REGISTRY/base-image docker/base
-    - docker save base-image > base-image.tar
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker build -t $IMAGE_TAG docker/base
+    - docker push $IMAGE_TAG
+#    - docker save base-image > base-image.tar
   artifacts:
     name: base-image
     expire_in: 3 days
