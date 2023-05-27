@@ -1,5 +1,6 @@
-package com.asml.apa.wta.benchmarking.sparkmeasure;
+package com.asml.apa.wta.benchmarking.spark;
 
+import com.asml.apa.wta.spark.SparkBenchmark;
 import org.openjdk.jmh.profile.GCProfiler;
 import org.openjdk.jmh.profile.StackProfiler;
 import org.openjdk.jmh.runner.Runner;
@@ -8,17 +9,22 @@ import org.openjdk.jmh.runner.options.OptionsBuilder;
 
 /**
  * Entry point for running the Spark benchmark.
- *
  * @author Pil Kyu CHo
+ * @since 1.0.0
  */
-public class Main {
+public class BenchmarkRunner {
+
+  /**
+   * Private constructor to avoid being initialized.
+   */
+  private BenchmarkRunner() {}
 
   public static void main(String[] args) throws Exception {
     Options options = new OptionsBuilder()
-        .include(SparkBenchmark.class.getSimpleName())
-        .addProfiler(StackProfiler.class)
-        .addProfiler(GCProfiler.class)
-        .build();
+            .include(SparkBenchmark.class.getSimpleName())
+            .addProfiler(StackProfiler.class)
+            .addProfiler(GCProfiler.class)
+            .build();
     new Runner(options).run();
   }
 }
