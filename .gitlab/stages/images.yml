@@ -1,5 +1,9 @@
 variables:
   IMAGE_RELEASE: 0.0.0
+  BASE_IMAGE_TAG: $CI_REGISTRY_IMAGE/base-image:$IMAGE_RELEASE
+  LINUX_TOOLING_IMAGE_TAG: $CI_REGISTRY_IMAGE/linux-tooling-image:$IMAGE_RELEASE
+  SPARK_IMAGE_TAG: $CI_REGISTRY_IMAGE/spark-image:$IMAGE_RELEASE
+  SPARK_BAREBONES_IMAGE_TAG: $CI_REGISTRY_IMAGE/barebones-spark-image:$IMAGE_RELEASE
 
 build-base-image:
   stage: images
@@ -7,42 +11,21 @@ build-base-image:
   needs: []
   services:
     - docker:20.10.16-dind
-  variables:
-    IMAGE_TAG: $CI_REGISTRY_IMAGE/base-image:$IMAGE_RELEASE
   script:
-    - docker build -t base-image docker/base
-    - echo $IMAGE_TAG
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-    - docker build -t $IMAGE_TAG docker/base
-    - docker push $IMAGE_TAG
-#    - docker save base-image > base-image.tar
-  artifacts:
-    name: base-image
-    expire_in: 3 days
-    when: always
-    paths:
-      - base-image.tar
+    - docker build -t $BASE_IMAGE_TAG docker/base
+    - docker push $BASE_IMAGE_TAG
 
 build-linux-tooling-image:
   stage: images
   image: docker:20.10.16
   needs: [build-base-image]
-  dependencies:
-    - build-base-image
   services:
     - docker:20.10.16-dind
-  variables:
-    IMAGE_TAG: $CI_REGISTRY_IMAGE/linux-tooling-image:$IMAGE_RELEASE
   script:
-    - docker load < base-image.tar
-    - docker build -t linux-tooling-setup-image docker/linux-tooling
-    - docker save linux-tooling-setup-image > linux-tooling-setup-image.tar
-  artifacts:
-    name: linux-tooling-image
-    expire_in: 3 days
-    when: always
-    paths:
-      - linux-tooling-setup-image.tar
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker build --build-arg base_image=$BASE_IMAGE_TAG -t $LINUX_TOOLING_IMAGE_TAG docker/linux-tooling
+    - docker push $LINUX_TOOLING_IMAGE_TAG
 
 build-spark-adapter-image:
   stage: images
@@ -52,36 +35,18 @@ build-spark-adapter-image:
     - build-barebones-spark-adapter-image
   services:
     - docker:20.10.16-dind
-  variables:
-    IMAGE_TAG: $CI_REGISTRY_IMAGE/spark-image:$IMAGE_RELEASE
   script:
-    - docker load < barebones-spark-setup-image.tar
-    - docker build --build-arg base_image=barebones-spark-setup-image -t spark-setup-image docker/linux-tooling
-    - docker save spark-setup-image > spark-setup-image.tar
-  artifacts:
-    name: spark-image
-    expire_in: 3 days
-    when: always
-    paths:
-      - spark-setup-image.tar
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker build --build-arg base_image=$SPARK_BAREBONES_IMAGE_TAG -t $SPARK_IMAGE_TAG docker/linux-tooling
+    - docker push $SPARK_IMAGE_TAG
 
 build-barebones-spark-adapter-image:
   stage: images
   image: docker:20.10.16
   needs: [build-base-image]
-  dependencies:
-    - build-base-image
   services:
     - docker:20.10.16-dind
-  variables:
-    IMAGE_TAG: $CI_REGISTRY_IMAGE/barebones-spark-image:$IMAGE_RELEASE
   script:
-    - docker load < base-image.tar
-    - docker build -t barebones-spark-setup-image docker/spark-adapter
-    - docker save barebones-spark-setup-image > barebones-spark-setup-image.tar
-  artifacts:
-    name: barebones-spark-image
-    expire_in: 3 days
-    when: always
-    paths:
-      - barebones-spark-setup-image.tar
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker build --build-arg base_image=$BASE_IMAGE_TAG -t $SPARK_BAREBONES_IMAGE_TAG docker/spark-adapter
+    - docker push $SPARK_BAREBONES_IMAGE_TAG
