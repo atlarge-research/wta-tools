@@ -81,6 +81,11 @@ logs
 # DAS config files
 *.pyc
 benchmarking/das-config-scripts/frameworks
+
 #test output
 core/src/test/resources/WTA
 core/src/test/resources/AvroOutput
+
+#benchmark resources
+benchmarking/spark-benchmark/src/main/resources/tpcds_parquet_data
+benchmarking/spark-benchmark/src/main/resources/sql_files
