@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <assembly xmlns="http://maven.apache.org/ASSEMBLY/3.6.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xsi:schemaLocation="http://maven.apache.org/ASSEMBLY/3.6.0 https://maven.apache.org/xsd/assembly-3.6.0.xsd">
-  <id>jar-for-e2e-tests</id>
+  <id>e2e</id>
   <formats>
     <format>jar</format>
   </formats>

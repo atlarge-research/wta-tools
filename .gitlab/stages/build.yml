@@ -34,9 +34,9 @@ package-spark-adapter-e2e:
     - build-spark-adapter
   script:
     - echo "Package Spark adapter started"
-    - "mvn -pl adapter/spark maven-assembly-plugin:single"
+    - "mvn -pl adapter/spark jar:jar assembly:single@e2e"
   artifacts:
     name: package-spark-adapter-e2e
     expire_in: 1 hour
     paths:
-      - adapter/spark/target/*dependencies.jar
+      - adapter/spark/target/*-e2e.jar
