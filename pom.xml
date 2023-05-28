@@ -34,6 +34,7 @@
     <slf4j2-mock.version>2.3.0</slf4j2-mock.version>
     <slf4j.version>2.0.7</slf4j.version>
     <log4j2.version>2.20.0</log4j2.version>
+    <dependency-plugin.version>3.6.0</dependency-plugin.version>
   </properties>
 
   <modules>
@@ -300,7 +301,7 @@
         </configuration>
         <executions>
           <execution>
-            <id>make-assembly</id>
+            <id>fat-jar</id>
             <phase>package</phase>
             <goals>
               <goal>single</goal>
@@ -308,7 +309,11 @@
           </execution>
         </executions>
       </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <version>${dependency-plugin.version}</version>
+      </plugin>
     </plugins>
   </build>
-
 </project>
