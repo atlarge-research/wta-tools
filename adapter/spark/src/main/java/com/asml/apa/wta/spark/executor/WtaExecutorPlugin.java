@@ -2,7 +2,7 @@ package com.asml.apa.wta.spark.executor;
 
 import com.asml.apa.wta.spark.WtaPlugin;
 import com.asml.apa.wta.spark.datasource.dto.IostatDataSourceDto;
-import com.asml.apa.wta.spark.datasource.ioDependencies.IostatDataSource;
+import com.asml.apa.wta.spark.datasource.iodependencies.IostatDataSource;
 import com.asml.apa.wta.spark.driver.WtaDriverPlugin;
 import java.io.IOException;
 import java.util.LinkedList;
