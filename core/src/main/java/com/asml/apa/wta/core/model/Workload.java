@@ -7,6 +7,8 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
+import org.apache.avro.Schema;
+import org.apache.avro.generic.GenericRecord;
 
 /**
  * Workload class corresponding to WTA format.
@@ -19,7 +21,6 @@ import lombok.Getter;
 @Builder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class Workload implements BaseTraceObject {
-  private static final long serialVersionUID = -4547341610378381743L;
 
   @Getter(value = AccessLevel.NONE)
   private final String schemaVersion = this.getSchemaVersion();
@@ -169,4 +170,15 @@ public class Workload implements BaseTraceObject {
   private final double covEnergy = -1.0;
 
   private final String workloadDescription;
+
+  /**
+   * This method shouldn't be called as it will be output into json file that doesn't require conversion to Record.
+   * @param checker checker
+   * @param schema schema
+   * @return exception will throw
+   */
+  @Override
+  public GenericRecord convertToRecord(Boolean[] checker, Schema schema) {
+    throw new RuntimeException("Something went wrong, this method shouldn't be called!");
+  }
 }

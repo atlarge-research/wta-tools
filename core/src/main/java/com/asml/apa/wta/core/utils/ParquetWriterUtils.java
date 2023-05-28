@@ -163,7 +163,7 @@ public class ParquetWriterUtils {
         new AvroUtils(schema, new File(path, "/resources/" + version + "/" + resourceFileName + ".parquet"));
     List<GenericRecord> resourceList = new ArrayList<>();
     for (Resource resource : resources) {
-      resourceList.add(Resource.convertResourceToRecord(resource, checker, schema));
+      resourceList.add(resource.convertToRecord(checker, schema));
     }
     resourceWriter.writeRecords(resourceList);
     resourceWriter.close();
@@ -279,7 +279,7 @@ public class ParquetWriterUtils {
         new AvroUtils(schema, new File(path, "/tasks/" + version + "/" + taskFileName + ".parquet"));
     List<GenericRecord> taskList = new ArrayList<>();
     for (Task task : tasks) {
-      taskList.add(Task.convertTaskToRecord(task, checker, schema));
+      taskList.add(task.convertToRecord(checker, schema));
     }
     taskWriter.writeRecords(taskList);
     taskWriter.close();
@@ -388,7 +388,7 @@ public class ParquetWriterUtils {
         new AvroUtils(schema, new File(path, "/workflows/" + version + "/" + workflowFileName + ".parquet"));
     List<GenericRecord> workflowList = new ArrayList<>();
     for (Workflow workflow : workflows) {
-      workflowList.add(Workflow.convertWorkflowToRecord(workflow, checker, schema));
+      workflowList.add(workflow.convertToRecord(checker, schema));
     }
     workflowWriter.writeRecords(workflowList);
     workflowWriter.close();
