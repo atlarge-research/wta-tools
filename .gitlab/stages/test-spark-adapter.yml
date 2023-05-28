@@ -95,7 +95,7 @@ e2e-spark-adapter:
     - echo "Spark adapter end-to-end run started"
     - echo "This job does not provide coverage metrics, it just verifies the system as a whole functions to some degree"
     - spark-submit --class com.asml.apa.wta.spark.EndToEnd --master local[1] adapter/spark/target/spark-1.0-SNAPSHOT-e2e.jar adapter/spark/src/test/resources/config.json wta-output adapter/spark/src/test/resources/wordcount.txt
-    - [ -n "$(ls -A wta-output)" ]
+    - [[ $(ls -A wta-output) ]]
 
 e2e-barebones-spark-adapter:
   stage: test-spark-adapter
@@ -108,4 +108,4 @@ e2e-barebones-spark-adapter:
     - echo "Barebones Spark adapter end-to-end run started"
     - echo "This job does not provide coverage metrics, it just verifies the system as a whole functions in a barebones environment"
     - spark-submit --class com.asml.apa.wta.spark.EndToEnd --master local[1] adapter/spark/target/spark-1.0-SNAPSHOT-e2e.jar adapter/spark/src/test/resources/config.json wta-output adapter/spark/src/test/resources/wordcount.txt
-    - [ -n "$(ls -A wta-output)" ]
+    - [[ $(ls -A wta-output) ]]
