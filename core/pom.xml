@@ -51,5 +51,12 @@
       <artifactId>hadoop-common</artifactId>
       <version>${hadoop.version}</version>
     </dependency>
+    <!-- https://mvnrepository.com/artifact/org.apache.hadoop/hadoop-client-api -->
+    <dependency>
+      <groupId>org.apache.hadoop</groupId>
+      <artifactId>hadoop-client-api</artifactId>
+      <version>${hadoop.version}</version>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 </project>
