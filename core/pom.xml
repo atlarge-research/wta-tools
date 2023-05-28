@@ -16,8 +16,8 @@
   <properties>
     <jackson.databind.version>2.15.0</jackson.databind.version>
     <parquet.version>1.12.3</parquet.version>
-    <avro.version>1.8.2</avro.version>
-    <hadoop.version>3.3.0</hadoop.version>
+    <avro.version>1.11.1</avro.version>
+    <hadoop.version>3.3.5</hadoop.version>
   </properties>
 
   <dependencies>
@@ -28,35 +28,30 @@
       <version>${jackson.databind.version}</version>
     </dependency>
     <!-- https://mvnrepository.com/artifact/org.apache.avro/avro -->
-    <!-- avro dependency for the AvroParquetWriter -->
     <dependency>
       <groupId>org.apache.avro</groupId>
       <artifactId>avro</artifactId>
       <version>${avro.version}</version>
     </dependency>
-
     <!-- https://mvnrepository.com/artifact/org.apache.parquet/parquet-hadoop -->
-    <!-- The hadoop library that avro uses internally -->
     <dependency>
       <groupId>org.apache.parquet</groupId>
       <artifactId>parquet-hadoop</artifactId>
       <version>${parquet.version}</version>
     </dependency>
     <!-- https://mvnrepository.com/artifact/org.apache.parquet/parquet-avro -->
-    <!-- avro support for apache avro -->
     <dependency>
       <groupId>org.apache.parquet</groupId>
       <artifactId>parquet-avro</artifactId>
       <version>${parquet.version}</version>
     </dependency>
     <!-- https://mvnrepository.com/artifact/org.apache.hadoop/hadoop-common -->
-    <!-- The hadoop library that avro uses internally -->
     <dependency>
       <groupId>org.apache.hadoop</groupId>
       <artifactId>hadoop-common</artifactId>
       <version>${hadoop.version}</version>
     </dependency>
-    <!-- The hadoop library that avro uses internally -->
+    <!-- https://mvnrepository.com/artifact/org.apache.hadoop/hadoop-client-api -->
     <dependency>
       <groupId>org.apache.hadoop</groupId>
       <artifactId>hadoop-client-api</artifactId>
