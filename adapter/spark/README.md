@@ -10,7 +10,7 @@
 spark-submit --class com.asml.apa.wta.spark.App
 --master local[1] <plugin_jar_location> <config.json_location> <directory_for_outputted_parquet> <file_to_be_processed>
 ```
-- The parquet files should now be located in the <directory_for_outputted_parquet>.
+- The parquet files should now be located in the `<directory_for_outputted_parquet>`.
 
 ## Description
 
