@@ -41,6 +41,7 @@ For the most part, since we are pre-release this will serve no real purpose, oth
 - Wired e2e testing into the pipeline [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 - Make the WtaPlugin class dictate the Spark adapter lifecycle [@pcho](https://gitlab.ewi.tudelft.nl/pcho)
 - Added option to choose between stage and task level metrics [@lyadalachanchu](https://gitlab.ewi.tudelft.nl/lyadalachanchu)
+- Extended BaseTraceObject with a new method [@tqu](https://gitlab.ewi.tudelft.nl/tqu)
 
 ### Changed
 - Refactored listeners into a generic interface to reduce code duplication and increase cc [@hpage](https://gitlab.ewi.tudelft.nl/hpage)
