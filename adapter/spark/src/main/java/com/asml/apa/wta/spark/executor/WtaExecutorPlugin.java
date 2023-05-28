@@ -39,7 +39,7 @@ public class WtaExecutorPlugin implements ExecutorPlugin {
    * Developers are urged not to put inefficient code here as it blocks executor initialization until
    * it is completed.
    *
-   * @param pluginContext The PluginContext object that represents the context of the plugin.
+   * @param pCtx The PluginContext object that represents the context of the plugin.
    * @param extraConf A map object that contains any extra configuration information. This map
    *                  is directly returned from {@link WtaDriverPlugin#init(SparkContext, PluginContext)}
    * @see WtaPlugin#executorPlugin() where a new instance of the plugin is created. This gets called as soon
@@ -49,9 +49,9 @@ public class WtaExecutorPlugin implements ExecutorPlugin {
    * @since 1.0.0
    */
   @Override
-  public void init(PluginContext pluginContext, Map<String, String> extraConf) {
+  public void init(PluginContext pCtx, Map<String, String> extraConf) {
 
-    this.pluginContext = pluginContext;
+    this.pluginContext = pCtx;
 
     List<IostatDataSourceDto> listOfIostatDtos = new LinkedList<>();
 

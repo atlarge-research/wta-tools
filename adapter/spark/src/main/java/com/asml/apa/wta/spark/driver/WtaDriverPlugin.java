@@ -64,7 +64,7 @@ public class WtaDriverPlugin implements DriverPlugin {
       ResourceMetricsRecord iostatMetricsRecord =
           new ResourceMetricsRecord(null, receivedIostatDto, receivedIostatDto.getExecutorId());
       metricStreamingEngine.addToResourceStream(
-          new ResourceKey(((IostatDataSourceDto) message).getExecutorId()), iostatMetricsRecord);
+          new ResourceKey(iostatMetricsRecord.getExecutorId()), iostatMetricsRecord);
     }
     return null;
   }
