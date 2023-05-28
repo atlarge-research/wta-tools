@@ -45,14 +45,4 @@ public class KeyedStream<K, V extends Serializable> {
     streams.putIfAbsent(key, new Stream<>());
     return streams.get(key);
   }
-
-  /**
-   * Clear streams hashmap.
-   *
-   * @author Lohithsai Yadala Chanchu
-   * @since 1.0.0
-   */
-  public void clearStream() {
-    streams.clear();
-  }
 }

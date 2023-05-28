@@ -73,13 +73,10 @@ public class WtaDriverPlugin implements DriverPlugin {
    * Gets called just before shutdown. Recommended that no spark functions are used here.
    *
    * @author Henry Page
-   * @author Lohithsai Yadala Chanchu
    * @since 1.0.0
    */
   @Override
-  public void shutdown() {
-    mse.clearResourceStream();
-  }
+  public void shutdown() {}
 
   /**
    * Initializes the listeners.
