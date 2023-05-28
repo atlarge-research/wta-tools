@@ -1,6 +1,8 @@
 package com.asml.apa.wta.core.model;
 
 import java.io.Serializable;
+import org.apache.avro.Schema;
+import org.apache.avro.generic.GenericRecord;
 
 /**
  * BaseSchema interface that all schema objects implement.
@@ -20,4 +22,6 @@ public interface BaseTraceObject extends Serializable {
   default String getSchemaVersion() {
     return "1.0";
   }
+
+  GenericRecord convertToRecord(Boolean[] checker, Schema schema);
 }
