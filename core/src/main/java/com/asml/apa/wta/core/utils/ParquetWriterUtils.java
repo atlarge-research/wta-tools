@@ -132,20 +132,24 @@ public class ParquetWriterUtils {
           fieldSchema.name("type").type().nullable().stringType().stringDefault("test");
     }
     if (checker[2]) {
-      fieldSchema = fieldSchema.name("numResources").type().doubleType().doubleDefault(0.0);
+      fieldSchema = fieldSchema.name("num_resources").type().doubleType().doubleDefault(0.0);
     }
     if (checker[3]) {
-      fieldSchema =
-          fieldSchema.name("procModel").type().nullable().stringType().stringDefault("test");
+      fieldSchema = fieldSchema
+          .name("proc_model")
+          .type()
+          .nullable()
+          .stringType()
+          .stringDefault("test");
     }
     if (checker[4]) {
       fieldSchema = fieldSchema.name("memory").type().longType().longDefault(0);
     }
     if (checker[5]) {
-      fieldSchema = fieldSchema.name("diskSpace").type().longType().longDefault(0);
+      fieldSchema = fieldSchema.name("disk_space").type().longType().longDefault(0);
     }
     if (checker[6]) {
-      fieldSchema = fieldSchema.name("networkSpeed").type().longType().longDefault(0);
+      fieldSchema = fieldSchema.name("network").type().longType().longDefault(0);
     }
     if (checker[7]) {
       fieldSchema = fieldSchema.name("os").type().nullable().stringType().stringDefault("test");
@@ -175,7 +179,7 @@ public class ParquetWriterUtils {
    */
   private void writeTaskToFile(String taskFileName) throws Exception {
     Boolean[] checker = checkTaskDomain(tasks);
-    SchemaBuilder.FieldAssembler<Schema> fieldSchema = SchemaBuilder.record("resource")
+    SchemaBuilder.FieldAssembler<Schema> fieldSchema = SchemaBuilder.record("task")
         .namespace("com.asml.apa.wta.core.model")
         .fields();
     if (checker[0]) {
@@ -186,17 +190,17 @@ public class ParquetWriterUtils {
           fieldSchema.name("type").type().nullable().stringType().stringDefault("test");
     }
     if (checker[2]) {
-      fieldSchema = fieldSchema.name("submitTime").type().longType().longDefault(0);
+      fieldSchema = fieldSchema.name("ts_submit").type().longType().longDefault(0);
     }
     if (checker[3]) {
-      fieldSchema = fieldSchema.name("submissionSite").type().intType().intDefault(0);
+      fieldSchema = fieldSchema.name("submission_site").type().intType().intDefault(0);
     }
     if (checker[4]) {
       fieldSchema = fieldSchema.name("runtime").type().longType().longDefault(0);
     }
     if (checker[5]) {
       fieldSchema = fieldSchema
-          .name("resourceType")
+          .name("resource_type")
           .type()
           .nullable()
           .stringType()
@@ -204,7 +208,7 @@ public class ParquetWriterUtils {
     }
     if (checker[6]) {
       fieldSchema = fieldSchema
-          .name("resourceAmountRequested")
+          .name("resource_amount_requested")
           .type()
           .doubleType()
           .doubleDefault(0.0);
@@ -230,20 +234,20 @@ public class ParquetWriterUtils {
           .arrayDefault(new ArrayList<Long>());
     }
     if (checker[9]) {
-      fieldSchema = fieldSchema.name("userId").type().intType().intDefault(0);
+      fieldSchema = fieldSchema.name("user_id").type().intType().intDefault(0);
     }
     if (checker[10]) {
-      fieldSchema = fieldSchema.name("groupId").type().intType().intDefault(0);
+      fieldSchema = fieldSchema.name("group_id").type().intType().intDefault(0);
     }
     if (checker[11]) {
       fieldSchema =
           fieldSchema.name("nfrs").type().nullable().stringType().stringDefault("test");
     }
     if (checker[12]) {
-      fieldSchema = fieldSchema.name("workflowId").type().longType().longDefault(0);
+      fieldSchema = fieldSchema.name("workflow_id").type().longType().longDefault(0);
     }
     if (checker[13]) {
-      fieldSchema = fieldSchema.name("waitTime").type().longType().longDefault(0);
+      fieldSchema = fieldSchema.name("wait_time").type().longType().longDefault(0);
     }
     if (checker[14]) {
       fieldSchema =
@@ -251,24 +255,24 @@ public class ParquetWriterUtils {
     }
     if (checker[15]) {
       fieldSchema =
-          fieldSchema.name("memoryRequested").type().doubleType().doubleDefault(0.0);
+          fieldSchema.name("memory_requested").type().doubleType().doubleDefault(0.0);
     }
     if (checker[16]) {
-      fieldSchema = fieldSchema.name("networkIoTime").type().longType().longDefault(0);
+      fieldSchema = fieldSchema.name("network_io_time").type().longType().longDefault(0);
     }
     if (checker[17]) {
-      fieldSchema = fieldSchema.name("diskIoTime").type().longType().longDefault(0);
+      fieldSchema = fieldSchema.name("disk_io_time").type().longType().longDefault(0);
     }
     if (checker[18]) {
       fieldSchema =
-          fieldSchema.name("diskSpaceRequested").type().doubleType().doubleDefault(0.0);
+          fieldSchema.name("disk_space_requested").type().doubleType().doubleDefault(0.0);
     }
     if (checker[19]) {
       fieldSchema =
-          fieldSchema.name("energyConsumption").type().longType().longDefault(0);
+          fieldSchema.name("energy_consumption").type().longType().longDefault(0);
     }
     if (checker[20]) {
-      fieldSchema = fieldSchema.name("resourceUsed").type().longType().longDefault(0);
+      fieldSchema = fieldSchema.name("resource_used").type().longType().longDefault(0);
     }
     Schema schema = fieldSchema.endRecord();
     AvroUtils taskWriter =
@@ -291,14 +295,14 @@ public class ParquetWriterUtils {
    */
   private void writeWorkflowToFile(String workflowFileName) throws Exception {
     Boolean[] checker = checkWorkflowDomain(workflows);
-    SchemaBuilder.FieldAssembler<Schema> fieldSchema = SchemaBuilder.record("resource")
+    SchemaBuilder.FieldAssembler<Schema> fieldSchema = SchemaBuilder.record("workflow")
         .namespace("com.asml.apa.wta.core.model")
         .fields();
     if (checker[0]) {
       fieldSchema = fieldSchema.name("id").type().longType().noDefault();
     }
     if (checker[1]) {
-      fieldSchema = fieldSchema.name("submitTime").type().longType().noDefault();
+      fieldSchema = fieldSchema.name("ts_submit").type().longType().noDefault();
     }
     if (checker[2]) {
       fieldSchema = fieldSchema
@@ -311,22 +315,22 @@ public class ParquetWriterUtils {
           .noDefault();
     }
     if (checker[3]) {
-      fieldSchema = fieldSchema.name("numberOfTasks").type().intType().noDefault();
+      fieldSchema = fieldSchema.name("task_count").type().intType().noDefault();
     }
     if (checker[4]) {
       fieldSchema =
-          fieldSchema.name("criticalPathLength").type().intType().noDefault();
+          fieldSchema.name("critical_path_length").type().intType().noDefault();
     }
     if (checker[5]) {
-      fieldSchema =
-          fieldSchema.name("criticalPathTaskCount").type().intType().noDefault();
-    }
-    if (checker[6]) {
       fieldSchema = fieldSchema
-          .name("maxNumberOfConcurrentTasks")
+          .name("critical_path_task_count")
           .type()
           .intType()
           .noDefault();
+    }
+    if (checker[6]) {
+      fieldSchema =
+          fieldSchema.name("max_concurrent_tasks").type().intType().noDefault();
     }
     if (checker[7]) {
       fieldSchema =
@@ -342,7 +346,7 @@ public class ParquetWriterUtils {
     }
     if (checker[10]) {
       fieldSchema = fieldSchema
-          .name("applicationName")
+          .name("application_name")
           .type()
           .nullable()
           .stringType()
@@ -350,30 +354,34 @@ public class ParquetWriterUtils {
     }
     if (checker[11]) {
       fieldSchema = fieldSchema
-          .name("applicationField")
+          .name("application_field")
           .type()
           .nullable()
           .stringType()
           .noDefault();
     }
     if (checker[12]) {
-      fieldSchema = fieldSchema.name("totalResources").type().doubleType().noDefault();
+      fieldSchema =
+          fieldSchema.name("total_resources").type().doubleType().noDefault();
     }
     if (checker[13]) {
       fieldSchema =
-          fieldSchema.name("totalMemoryUsage").type().doubleType().noDefault();
+          fieldSchema.name("total_memory_usage").type().doubleType().noDefault();
     }
     if (checker[14]) {
       fieldSchema =
-          fieldSchema.name("totalNetworkUsage").type().longType().noDefault();
+          fieldSchema.name("total_network_usage").type().longType().noDefault();
     }
     if (checker[15]) {
       fieldSchema =
-          fieldSchema.name("totalDiskSpaceUsage").type().longType().noDefault();
+          fieldSchema.name("total_disk_space_usage").type().longType().noDefault();
     }
     if (checker[16]) {
-      fieldSchema =
-          fieldSchema.name("totalEnergyConsumption").type().longType().noDefault();
+      fieldSchema = fieldSchema
+          .name("total_energy_consumption")
+          .type()
+          .longType()
+          .noDefault();
     }
     Schema schema = fieldSchema.endRecord();
     AvroUtils workflowWriter =

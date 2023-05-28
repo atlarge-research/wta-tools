@@ -1,15 +1,16 @@
 package com.asml.apa.wta.core.datasource;
 
+import com.asml.apa.wta.core.dto.OperatingSystemDataSourceDto;
 import com.sun.management.OperatingSystemMXBean;
 import java.lang.management.ManagementFactory;
 
 /**
- * Data source that uses Java's operating system MBean to gain access to mainly resource information.
+ * Data source that uses Java's operating system MBean to gain access to resource information.
  *
  * @author Atour Mousavi Gourabi
  * @since 1.0.0
  */
-public abstract class OperatingSystemDataSource {
+public class OperatingSystemDataSource {
 
   private final OperatingSystemMXBean bean;
 
@@ -123,5 +124,24 @@ public abstract class OperatingSystemDataSource {
    */
   public int getAvailableProcessors() {
     return bean.getAvailableProcessors();
+  }
+
+  /**
+   * Gathers the metrics the data source provides.
+   *
+   * @return an {@link OperatingSystemDataSourceDto} containing the gathered metrics
+   * @author Atour Mousavi Gourabi
+   * @since 1.0.0
+   */
+  public OperatingSystemDataSourceDto gatherMetrics() {
+    long vMemSize = getCommittedVirtualMemorySize();
+    long freeMemSize = getFreePhysicalMemorySize();
+    double cpuLoad = getProcessCpuLoad();
+    long cpuTime = getProcessCpuTime();
+    long totalMemSize = getTotalPhysicalMemorySize();
+    int availableProc = getAvailableProcessors();
+    double systemLoadAverage = getSystemLoadAverage();
+    return new OperatingSystemDataSourceDto(
+        vMemSize, freeMemSize, cpuLoad, cpuTime, totalMemSize, availableProc, systemLoadAverage);
   }
 }
