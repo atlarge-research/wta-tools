@@ -22,7 +22,7 @@ pmd:
     - "mvn pmd:check"
   artifacts:
     name: pmd
-    expire_in: 3 days
+    expire_in: 1 day
     when: always
     paths:
       - core/reports/pmd
@@ -37,7 +37,7 @@ checkstyle:
     - "mvn checkstyle:check"
   artifacts:
     name: checkstyle
-    expire_in: 3 days
+    expire_in: 1 day
     when: always
     paths:
       - core/reports/checkstyle/violations.txt
