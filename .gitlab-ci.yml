@@ -13,7 +13,6 @@ workflow:
 stages:
   - images
   - build
-  - package
   - test-core
   - test-spark-adapter
   - e2e-spark-adapter
@@ -22,7 +21,6 @@ stages:
 include:
   - local: '.gitlab/stages/images.yml'
   - local: '.gitlab/stages/build.yml'
-  - local: '.gitlab/stages/package.yml'
   - local: '.gitlab/stages/test-core.yml'
   - local: '.gitlab/stages/test-spark-adapter.yml'
   - local: '.gitlab/stages/check.yml'

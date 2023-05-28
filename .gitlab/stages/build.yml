@@ -26,3 +26,17 @@ build-spark-adapter:
     paths:
       - adapter/spark/target
       - .m2/repository/com/asml/apa
+
+package-spark-adapter-e2e:
+  stage: build
+  needs: [build-spark-adapter]
+  dependencies:
+    - build-spark-adapter
+  script:
+    - echo "Package Spark adapter started"
+    - "mvn -pl adapter/spark maven-assembly-plugin:single"
+  artifacts:
+    name: package-spark-adapter-e2e
+    expire_in: 2 hours
+    paths:
+      - adapter/spark/target/*dependencies.jar
