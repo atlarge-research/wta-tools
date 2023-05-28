@@ -2,40 +2,25 @@ package com.asml.apa.wta.core.datasource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import com.asml.apa.wta.core.datasource.iodependencies.BashUtils;
 import com.asml.apa.wta.core.datasource.iodependencies.IostatDataSource;
 import com.asml.apa.wta.core.dto.IostatDataSourceDto;
 import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 public class IostatDataSourceTest {
 
   @Test
-  public void getAllMetricsReturnsIostatDto() throws IOException, InterruptedException {
-    IostatDataSource sut = Mockito.spy(new IostatDataSource());
+  public void getAllMetricsReturnsIostatDto() throws IOException, InterruptedException, ExecutionException {
+    BashUtils bashUtils = Mockito.mock(BashUtils.class);
+    IostatDataSource sut = Mockito.spy(new IostatDataSource(bashUtils));
 
-    Mockito.doReturn(CompletableFuture.completedFuture("1.0"))
-        .when(sut)
-        .executeCommand("iostat -d | awk '$1 == \"sdc\"' | awk '{print $2}'");
-    Mockito.doReturn(CompletableFuture.completedFuture("2.0"))
-        .when(sut)
-        .executeCommand("iostat -d | awk '$1 == \"sdc\"' | awk '{print $3}'");
-    Mockito.doReturn(CompletableFuture.completedFuture("3.0"))
-        .when(sut)
-        .executeCommand("iostat -d | awk '$1 == \"sdc\"' | awk '{print $4}'");
-    Mockito.doReturn(CompletableFuture.completedFuture("4.0"))
-        .when(sut)
-        .executeCommand("iostat -d | awk '$1 == \"sdc\"' | awk '{print $5}'");
-    Mockito.doReturn(CompletableFuture.completedFuture("5.0"))
-        .when(sut)
-        .executeCommand("iostat -d | awk '$1 == \"sdc\"' | awk '{print $6}'");
-    Mockito.doReturn(CompletableFuture.completedFuture("6.0"))
-        .when(sut)
-        .executeCommand("iostat -d | awk '$1 == \"sdc\"' | awk '{print $7}'");
-    Mockito.doReturn(CompletableFuture.completedFuture("7.0"))
-        .when(sut)
-        .executeCommand("iostat -d | awk '$1 == \"sdc\"' | awk '{print $8}'");
+    Mockito.doReturn(CompletableFuture.completedFuture("str 1.0 2.0 3.0 4.0 5.0 6.0 7.0"))
+        .when(bashUtils)
+        .executeCommand("iostat -d | awk '$1 == \"sdc\"'");
 
     IostatDataSourceDto expected = IostatDataSourceDto.builder()
         .tps(1.0)

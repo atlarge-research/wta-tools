@@ -1,5 +1,6 @@
 package com.asml.apa.wta.spark.executor;
 
+import com.asml.apa.wta.core.datasource.iodependencies.BashUtils;
 import com.asml.apa.wta.core.datasource.iodependencies.IostatDataSource;
 import com.asml.apa.wta.core.dto.IostatDataSourceDto;
 import com.asml.apa.wta.spark.WtaPlugin;
@@ -8,6 +9,7 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -32,7 +34,7 @@ public class WtaExecutorPlugin implements ExecutorPlugin {
 
   private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
-  private IostatDataSource iostatDataSource = new IostatDataSource();
+  private IostatDataSource iostatDataSource = new IostatDataSource(new BashUtils());
 
   /**
    * This method is called when the plugin is initialized on the executor.
@@ -63,8 +65,7 @@ public class WtaExecutorPlugin implements ExecutorPlugin {
               IostatDataSourceDto iostatDataSourceDto =
                   iostatDataSource.getAllMetrics(this.pluginContext.executorID());
               // this list is to be used when batch sending is implemented. For now we're sending the
-              // object
-              // itself.
+              // object itself.
               listOfIostatDtos.add(iostatDataSourceDto);
               // Send the result back to the driver
               try {
@@ -75,7 +76,7 @@ public class WtaExecutorPlugin implements ExecutorPlugin {
                     "Something went wrong while sending iostat metrics. The cause is: {}",
                     e.getCause().toString());
               }
-            } catch (IOException | InterruptedException e) {
+            } catch (ExecutionException | IOException | InterruptedException e) {
               log.error(
                   "Something went wrong while sending iostat metrics. The cause is: {}",
                   e.getCause().toString());

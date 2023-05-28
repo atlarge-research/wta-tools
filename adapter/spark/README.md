@@ -2,7 +2,7 @@
 
 ## Installation and Usage
 - Clone the repository
-- Install sysstat by running the following bash command:
+- Optional (if iostat datasource is needed): Install sysstat by running the following bash command:
 
 ```bash
 sudo apt install sysstat
