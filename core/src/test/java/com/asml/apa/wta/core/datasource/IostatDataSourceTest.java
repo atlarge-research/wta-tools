@@ -1,19 +1,15 @@
-package com.asml.apa.wta.spark.datasource;
+package com.asml.apa.wta.core.datasource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import com.asml.apa.wta.spark.datasource.dto.IostatDataSourceDto;
-import com.asml.apa.wta.spark.datasource.iodependencies.IostatDataSource;
+import com.asml.apa.wta.core.datasource.iodependencies.IostatDataSource;
+import com.asml.apa.wta.core.dto.IostatDataSourceDto;
 import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.slf4j.Logger;
 
 public class IostatDataSourceTest {
-  @Mock
-  Logger log;
 
   @Test
   public void getAllMetricsReturnsIostatDto() throws IOException, InterruptedException {

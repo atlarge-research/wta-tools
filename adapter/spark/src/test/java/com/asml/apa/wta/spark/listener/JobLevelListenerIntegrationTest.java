@@ -1,7 +1,6 @@
 package com.asml.apa.wta.spark.listener;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 import com.asml.apa.wta.core.model.Task;
 import com.asml.apa.wta.core.model.Workflow;

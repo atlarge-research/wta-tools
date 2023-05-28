@@ -1,6 +1,5 @@
-package com.asml.apa.wta.spark.datasource.dto;
+package com.asml.apa.wta.core.dto;
 
-import com.asml.apa.wta.spark.streams.ResourceMetricsRecord;
 import java.time.Instant;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -17,7 +16,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class IostatDataSourceDto extends ResourceMetricsRecord {
+public class IostatDataSourceDto {
   private double tps;
   private double kiloByteReadPerSec;
   private double kiloByteWrtnPerSec;

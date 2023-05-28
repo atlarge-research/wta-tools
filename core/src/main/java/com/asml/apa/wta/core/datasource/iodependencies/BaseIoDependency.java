@@ -1,4 +1,4 @@
-package com.asml.apa.wta.spark.datasource.iodependencies;
+package com.asml.apa.wta.core.datasource.iodependencies;
 
 import java.io.BufferedReader;
 import java.io.IOException;

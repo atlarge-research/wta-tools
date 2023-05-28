@@ -1,6 +1,6 @@
-package com.asml.apa.wta.spark.datasource.iodependencies;
+package com.asml.apa.wta.core.datasource.iodependencies;
 
-import com.asml.apa.wta.spark.datasource.dto.IostatDataSourceDto;
+import com.asml.apa.wta.core.dto.IostatDataSourceDto;
 import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
 import lombok.extern.slf4j.Slf4j;

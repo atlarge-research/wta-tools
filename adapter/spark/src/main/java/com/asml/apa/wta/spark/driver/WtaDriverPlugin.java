@@ -1,10 +1,10 @@
 package com.asml.apa.wta.spark.driver;
 
+import com.asml.apa.wta.core.dto.IostatDataSourceDto;
 import com.asml.apa.wta.spark.datasource.SparkDataSource;
-import com.asml.apa.wta.spark.datasource.SparkOperatingSystemDataSource;
-import com.asml.apa.wta.spark.datasource.dto.IostatDataSourceDto;
 import com.asml.apa.wta.spark.streams.MetricStreamingEngine;
 import com.asml.apa.wta.spark.streams.ResourceKey;
+import com.asml.apa.wta.spark.streams.ResourceMetricsRecord;
 import java.util.HashMap;
 import java.util.Map;
 import lombok.Getter;
@@ -60,14 +60,11 @@ public class WtaDriverPlugin implements DriverPlugin {
    */
   @Override
   public Object receive(Object message) {
-    if (message instanceof SparkOperatingSystemDataSource.Dto) {
-      SparkOperatingSystemDataSource.Dto dto = (SparkOperatingSystemDataSource.Dto) message;
-      ResourceKey resourceKey = new ResourceKey(dto.getExecutorId());
-      mse.addToResourceStream(resourceKey, dto);
-    }
     if (message instanceof IostatDataSourceDto) {
+      ResourceMetricsRecord iostatMetricsRecord = new ResourceMetricsRecord(
+          null, (IostatDataSourceDto) message, ((IostatDataSourceDto) message).getExecutorId());
       mse.addToResourceStream(
-          new ResourceKey(((IostatDataSourceDto) message).getExecutorId()), (IostatDataSourceDto) message);
+          new ResourceKey(((IostatDataSourceDto) message).getExecutorId()), iostatMetricsRecord);
     }
     return null;
   }
