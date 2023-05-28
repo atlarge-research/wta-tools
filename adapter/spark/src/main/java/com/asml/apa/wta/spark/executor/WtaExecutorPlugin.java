@@ -21,7 +21,8 @@ import org.apache.spark.api.plugin.PluginContext;
 /**
  * Executor component of the plugin.
  *
- * @author Henry Page and Lohithsai Yadala Chanchu
+ * @author Henry Page
+ * @author Lohithsai Yadala Chanchu
  * @since 1.0.0
  */
 @Slf4j
@@ -31,14 +32,14 @@ public class WtaExecutorPlugin implements ExecutorPlugin {
 
   private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
-  private IostatDataSource iods = new IostatDataSource();
+  private IostatDataSource iostatDataSource = new IostatDataSource();
 
   /**
    * This method is called when the plugin is initialized on the executor.
    * Developers are urged not to put inefficient code here as it blocks executor initialization until
    * it is completed.
    *
-   * @param pCtx The PluginContext object that represents the context of the plugin.
+   * @param pluginContext The PluginContext object that represents the context of the plugin.
    * @param extraConf A map object that contains any extra configuration information. This map
    *                  is directly returned from {@link WtaDriverPlugin#init(SparkContext, PluginContext)}
    * @see WtaPlugin#executorPlugin() where a new instance of the plugin is created. This gets called as soon
@@ -48,9 +49,9 @@ public class WtaExecutorPlugin implements ExecutorPlugin {
    * @since 1.0.0
    */
   @Override
-  public void init(PluginContext pCtx, Map<String, String> extraConf) {
+  public void init(PluginContext pluginContext, Map<String, String> extraConf) {
 
-    this.pluginContext = pCtx;
+    this.pluginContext = pluginContext;
 
     List<IostatDataSourceDto> listOfIostatDtos = new LinkedList<>();
 
@@ -59,14 +60,15 @@ public class WtaExecutorPlugin implements ExecutorPlugin {
       scheduler.scheduleAtFixedRate(
           () -> {
             try {
-              IostatDataSourceDto iodsDto = iods.getAllMetrics(pluginContext.executorID());
+              IostatDataSourceDto iostatDataSourceDto =
+                  iostatDataSource.getAllMetrics(this.pluginContext.executorID());
               // this list is to be used when batch sending is implemented. For now we're sending the
               // object
               // itself.
-              listOfIostatDtos.add(iodsDto);
+              listOfIostatDtos.add(iostatDataSourceDto);
               // Send the result back to the driver
               try {
-                this.pluginContext.send(iodsDto);
+                this.pluginContext.send(iostatDataSourceDto);
 
               } catch (Exception e) {
                 log.error(
@@ -92,7 +94,8 @@ public class WtaExecutorPlugin implements ExecutorPlugin {
    * <a href="https://spark.apache.org/docs/3.2.1/api/java/org/apache/spark/api/plugin/ExecutorPlugin.html#init-org.apache.spark.api.plugin.PluginContext-java.util.Map-">Refer to the docs</a> for more information.
    */
   @Override
-  public void onTaskStart() { // send the iostat metric dto to driver
+  public void onTaskStart() {
+    // send the iostat metric dto to driver
   }
 
   /**

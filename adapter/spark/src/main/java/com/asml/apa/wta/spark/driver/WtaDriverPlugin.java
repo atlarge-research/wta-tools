@@ -27,12 +27,11 @@ public class WtaDriverPlugin implements DriverPlugin {
   @Getter
   private SparkDataSource sparkDataSource;
 
-  private MetricStreamingEngine mse;
+  private MetricStreamingEngine metricStreamingEngine;
 
   /**
    * This method is called early in the initialization of the Spark driver.
    * Explicitly, it is called before the Spark driver's task scheduler is initialized. It is blocking.
-   *
    * Expensive calls should be postponed or delegated to another thread.
    *
    * @param sparkCtx The current SparkContext.
@@ -46,7 +45,7 @@ public class WtaDriverPlugin implements DriverPlugin {
     this.sparkContext = sparkCtx;
     this.sparkDataSource = new SparkDataSource(this.sparkContext);
     initListeners();
-    this.mse = new MetricStreamingEngine();
+    this.metricStreamingEngine = new MetricStreamingEngine();
     return new HashMap<>();
   }
 
@@ -61,9 +60,10 @@ public class WtaDriverPlugin implements DriverPlugin {
   @Override
   public Object receive(Object message) {
     if (message instanceof IostatDataSourceDto) {
-      ResourceMetricsRecord iostatMetricsRecord = new ResourceMetricsRecord(
-          null, (IostatDataSourceDto) message, ((IostatDataSourceDto) message).getExecutorId());
-      mse.addToResourceStream(
+      IostatDataSourceDto receivedIostatDto = (IostatDataSourceDto) message;
+      ResourceMetricsRecord iostatMetricsRecord =
+          new ResourceMetricsRecord(null, receivedIostatDto, receivedIostatDto.getExecutorId());
+      metricStreamingEngine.addToResourceStream(
           new ResourceKey(((IostatDataSourceDto) message).getExecutorId()), iostatMetricsRecord);
     }
     return null;
