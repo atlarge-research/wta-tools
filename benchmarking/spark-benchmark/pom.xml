@@ -11,12 +11,10 @@
     <relativePath>../../pom.xml</relativePath>
   </parent>
 
-  <artifactId>benchmarking.sparkmeasure</artifactId>
+  <artifactId>spark-benchmark</artifactId>
 
   <properties>
     <jmh.version>1.36</jmh.version>
-    <sparkmeasure.version>0.23</sparkmeasure.version>
-    <jackson.databind.version>2.12.4</jackson.databind.version>
   </properties>
 
   <dependencies>
@@ -43,18 +41,6 @@
       <groupId>org.apache.spark</groupId>
       <artifactId>spark-core_2.13</artifactId>
       <version>${spark.support.version}</version>
-    </dependency>
-    <!-- https://mvnrepository.com/artifact/ch.cern.sparkmeasure/spark-measure -->
-    <dependency>
-      <groupId>ch.cern.sparkmeasure</groupId>
-      <artifactId>spark-measure_2.13</artifactId>
-      <version>${sparkmeasure.version}</version>
-    </dependency>
-    <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind -->
-    <dependency>
-      <groupId>com.fasterxml.jackson.core</groupId>
-      <artifactId>jackson-databind</artifactId>
-      <version>${jackson.databind.version}</version>
     </dependency>
   </dependencies>
 </project>

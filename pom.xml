@@ -14,6 +14,7 @@
     <maven.compiler.target>11</maven.compiler.target>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    <maven.assembly.plugin.version>3.6.0</maven.assembly.plugin.version>
     <spotless.version>2.36.0</spotless.version>
     <junit.version>5.9.3</junit.version>
     <surefire.version>3.1.0</surefire.version>
@@ -38,7 +39,7 @@
   <modules>
     <module>core</module>
     <module>adapter/spark</module>
-    <module>benchmarking/sparkmeasure</module>
+    <module>benchmarking/spark-benchmark</module>
   </modules>
 
   <dependencies>
@@ -287,6 +288,25 @@
           <outputFile>reports/checkstyle/violations.txt</outputFile>
           <outputFileFormat>plain</outputFileFormat>
         </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <version>${maven.assembly.plugin.version}</version>
+        <configuration>
+          <descriptorRefs>
+            <descriptorRef>jar-with-dependencies</descriptorRef>
+          </descriptorRefs>
+        </configuration>
+        <executions>
+          <execution>
+            <id>make-assembly</id>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>
