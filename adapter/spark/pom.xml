@@ -25,6 +25,7 @@
       <groupId>org.apache.spark</groupId>
       <artifactId>spark-sql_2.13</artifactId>
       <version>${spark.support.version}</version>
+      <scope>test</scope>
     </dependency>
     <!-- internal dependency -->
     <dependency>
