@@ -35,6 +35,7 @@ For the most part, since we are pre-release this will serve no real purpose, oth
 - Added Java MX Bean data source for resource metrics [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 - Created README documentation for all modules [@tqu](https://gitlab.ewi.tudelft.nl/tqu) [@hpage](https://gitlab.ewi.tudelft.nl/hpage)
 - Add maven-assembly plugin to create fat jar  [@pcho](https://gitlab.ewi.tudelft.nl/pcho) [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
+- Added license information to the project [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 
 ### Changed
 - Refactored listeners into a generic interface to reduce code duplication and increase cc [@hpage](https://gitlab.ewi.tudelft.nl/hpage)
