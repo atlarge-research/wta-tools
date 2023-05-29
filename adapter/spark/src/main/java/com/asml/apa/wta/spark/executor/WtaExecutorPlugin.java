@@ -16,6 +16,7 @@ import org.apache.spark.api.plugin.PluginContext;
  */
 public class WtaExecutorPlugin implements ExecutorPlugin {
 
+
   /**
    * This method is called when the plugin is initialized on the executor.
    * Developers are urged not to put inefficient code here as it blocks executor initialization until
@@ -28,7 +29,9 @@ public class WtaExecutorPlugin implements ExecutorPlugin {
    * as it is loaded on to the executor.
    */
   @Override
-  public void init(PluginContext pluginContext, Map<String, String> extraConf) {}
+  public void init(PluginContext pluginContext, Map<String, String> extraConf) {
+
+  }
 
   /**
    * Called before task is started.
