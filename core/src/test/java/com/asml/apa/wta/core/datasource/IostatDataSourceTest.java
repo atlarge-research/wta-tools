@@ -16,6 +16,9 @@ public class IostatDataSourceTest {
   @Test
   public void getAllMetricsReturnsIostatDto() throws IOException, InterruptedException, ExecutionException {
     BashUtils bashUtils = Mockito.mock(BashUtils.class);
+    Mockito.doReturn(CompletableFuture.completedFuture("str"))
+        .when(bashUtils)
+        .executeCommand("iostat");
     IostatDataSource sut = Mockito.spy(new IostatDataSource(bashUtils));
 
     Mockito.doReturn(CompletableFuture.completedFuture("str 1.0 2.0 3.0 4.0 5.0 6.0 7.0"))
