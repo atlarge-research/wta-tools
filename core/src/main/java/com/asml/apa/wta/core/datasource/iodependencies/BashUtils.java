@@ -24,22 +24,31 @@ public class BashUtils {
         Process process = new ProcessBuilder(commands).start();
         process.waitFor();
 
-        String line = "";
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
-          line = reader.readLine();
-        } catch (IOException e) {
-          log.error(
-              "Something went wrong while trying to read bash command outputs. The cause is: {}",
-              e.getCause().toString());
-        }
-
-        return line;
+        return readProcessOutput(process);
       } catch (Exception e) {
         log.error(
-            "Something went wrong while trying to read bash command outputs. The cause is: {}",
+            "Something went wrong while trying to execute the bash command. The cause is: {}",
             e.getCause().toString());
         return "";
       }
     });
+  }
+
+  /**
+   * Reads the terminal output.
+   *
+   * @return String that is the terminal output
+   * @author Lohithsai Yadala Chanchu
+   * @since 1.0.0
+   */
+  private String readProcessOutput(Process process) {
+    try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+      return reader.readLine();
+    } catch (IOException e) {
+      log.error(
+          "Something went wrong while trying to read bash command outputs. The cause is: {}",
+          e.getCause().toString());
+      return "";
+    }
   }
 }
