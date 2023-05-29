@@ -64,7 +64,7 @@ reports
 # application configuration
 config.json
 
-# big generated files for benchmarking
+# big files for benchmarking
 benchmarking/spark-benchmark/src/main/resources/sql_files
 benchmarking/spark-benchmark/src/main/resources/tpcds_parquet_data
 
