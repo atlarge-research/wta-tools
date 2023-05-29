@@ -54,7 +54,7 @@ public class BashUtils {
       log.error(
           "Something went wrong while trying to read bash command outputs. The cause is: {}",
           e.getCause().toString());
-      return "";
+      throw new BashCommandExecutionException("Error reading bash command", e);
     }
   }
 }
