@@ -48,7 +48,7 @@ public class TaskLevelListener extends AbstractListener<Task> {
     final TaskInfo curTaskInfo = taskEnd.taskInfo();
     final TaskMetrics curTaskMetrics = taskEnd.taskMetrics();
 
-    final long taskId = curTaskInfo.taskId();
+    final long taskId = curTaskInfo.taskId() + 1;
     final String type = taskEnd.taskType();
     final long submitTime = curTaskInfo.launchTime();
     final long runTime = curTaskMetrics.executorRunTime();
