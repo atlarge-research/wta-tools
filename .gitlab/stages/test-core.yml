@@ -9,10 +9,8 @@ unit-tests-core:
     - "[ -f core/target/jacoco.exec ] && mv -f core/target/jacoco.exec core/target/jacoco-unit-tests.exec || echo '0' > /dev/null"
   artifacts:
     name: unit-tests-core
-    expire_in: 20 minutes
     when: always
     paths:
-      - core/reports/jacoco/
       - core/target/jacoco-unit-tests.exec
 
 integration-tests-core:
@@ -27,10 +25,8 @@ integration-tests-core:
     - "[ -f core/target/jacoco-it.exec ] && mv -f core/target/jacoco-it.exec core/target/jacoco-integration-tests.exec || echo '0' > /dev/null"
   artifacts:
     name: integration-tests-core
-    expire_in: 20 minutes
     when: always
     paths:
-      - core/reports/jacoco/
       - core/target/jacoco-integration-tests.exec
 
 mutation-tests-core:
@@ -71,7 +67,6 @@ line-coverage-core:
     when: always
     paths:
       - core/reports/jacoco/
-      - core/target/jacoco.exec
 
 branch-coverage-core:
   stage: test-core
