@@ -12,7 +12,6 @@ unit-tests-spark-adapter:
     expire_in: 20 minutes
     when: always
     paths:
-      - adapter/spark/reports/jacoco/
       - adapter/spark/target/jacoco-unit-tests.exec
 
 integration-tests-spark-adapter:
@@ -30,7 +29,6 @@ integration-tests-spark-adapter:
     expire_in: 20 minutes
     when: always
     paths:
-      - adapter/spark/reports/jacoco/
       - adapter/spark/target/jacoco-integration-tests.exec
 
 mutation-tests-spark-adapter:
@@ -61,7 +59,6 @@ line-coverage-spark-adapter:
     - build-spark-adapter
   script:
     - echo "Started creating Spark adapter line coverage"
-    - "rm -rf adapter/spark/reports/jacoco"
     - "mvn -pl adapter/spark jacoco:merge jacoco:report"
     - "cat adapter/spark/reports/jacoco/index.html | grep -Po 'Total.*?([0-9]{1,3})%' || echo '0%'"
   coverage: /([0-9]{1,3})%/
@@ -71,7 +68,6 @@ line-coverage-spark-adapter:
     when: always
     paths:
       - adapter/spark/reports/jacoco/
-      - adapter/spark/target/jacoco.exec
 
 branch-coverage-spark-adapter:
   stage: test-spark-adapter

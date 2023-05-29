@@ -12,7 +12,6 @@ unit-tests-core:
     expire_in: 20 minutes
     when: always
     paths:
-      - core/reports/jacoco/
       - core/target/jacoco-unit-tests.exec
 
 integration-tests-core:
@@ -30,7 +29,6 @@ integration-tests-core:
     expire_in: 20 minutes
     when: always
     paths:
-      - core/reports/jacoco/
       - core/target/jacoco-integration-tests.exec
 
 mutation-tests-core:
@@ -61,7 +59,6 @@ line-coverage-core:
     - build-core
   script:
     - echo "Started creating core line coverage"
-    - "rm -rf core/reports/jacoco"
     - "mvn -pl core jacoco:merge jacoco:report"
     - "cat core/reports/jacoco/index.html | grep -Po 'Total.*?([0-9]{1,3})%' || echo '0%'"
   coverage: /([0-9]{1,3})%/
@@ -71,7 +68,6 @@ line-coverage-core:
     when: always
     paths:
       - core/reports/jacoco/
-      - core/target/jacoco.exec
 
 branch-coverage-core:
   stage: test-core
