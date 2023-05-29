@@ -25,6 +25,8 @@ public class SparkDataSource implements CollectorInterface {
 
   private final AbstractListener<Task> taskLevelListener;
 
+  private final StageLevelListener stageLevelListener;
+
   private final AbstractListener<Workflow> jobLevelListener;
 
   private final AbstractListener<Workload> applicationLevelListener;
@@ -40,7 +42,8 @@ public class SparkDataSource implements CollectorInterface {
    * @since 1.0.0
    */
   public SparkDataSource(SparkContext sparkContext, RuntimeConfig config) {
-    taskLevelListener = new TaskLevelListener(sparkContext, config);
+    stageLevelListener = new StageLevelListener(sparkContext, config);
+    taskLevelListener = new TaskLevelListener(sparkContext, config, stageLevelListener);
     jobLevelListener = new JobLevelListener(sparkContext, config, taskLevelListener);
     applicationLevelListener = new ApplicationLevelListener(sparkContext, config, jobLevelListener);
   }

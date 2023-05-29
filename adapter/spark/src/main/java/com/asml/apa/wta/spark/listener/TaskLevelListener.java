@@ -2,15 +2,22 @@ package com.asml.apa.wta.spark.listener;
 
 import com.asml.apa.wta.core.config.RuntimeConfig;
 import com.asml.apa.wta.core.model.Task;
+
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Map;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.Getter;
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.spark.SparkContext;
 import org.apache.spark.executor.TaskMetrics;
 import org.apache.spark.scheduler.SparkListenerJobStart;
 import org.apache.spark.scheduler.SparkListenerStageCompleted;
 import org.apache.spark.scheduler.SparkListenerTaskEnd;
 import org.apache.spark.scheduler.TaskInfo;
+import org.apache.spark.sql.sources.In;
+
 
 /**
  * This class is a task-level listener for the Spark data source.
@@ -24,16 +31,23 @@ public class TaskLevelListener extends AbstractListener<Task> {
   @Getter
   private final Map<Integer, Integer> stageIdsToJobs = new ConcurrentHashMap<>();
 
+  @Getter
+  private final Map<Integer, List<Long>> stageToTasks = new ConcurrentHashMap<>();
+
+  private final StageLevelListener stageLevelListener;
+
   /**
    * Constructor for the task-level listener.
    *
-   * @param sparkContext The current spark context
-   * @param config Additional config specified by the user for the plugin
+   * @param sparkContext       The current spark context
+   * @param config             Additional config specified by the user for the plugin
+   * @param stageLevelListener
    * @author Henry Page
    * @since 1.0.0
    */
-  public TaskLevelListener(SparkContext sparkContext, RuntimeConfig config) {
+  public TaskLevelListener(SparkContext sparkContext, RuntimeConfig config, StageLevelListener stageLevelListener) {
     super(sparkContext, config);
+    this.stageLevelListener = stageLevelListener;
   }
 
   /**
@@ -53,13 +67,25 @@ public class TaskLevelListener extends AbstractListener<Task> {
     final long submitTime = curTaskInfo.launchTime();
     final long runTime = curTaskMetrics.executorRunTime();
     final int userId = sparkContext.sparkUser().hashCode();
+    final int stageId = taskEnd.stageId();
     final long workflowId = stageIdsToJobs.get(taskEnd.stageId());
+    final List<Long> tasks = stageToTasks.get(taskEnd.stageId());
+    if(tasks == null){
+      List<Long> newTasks = new ArrayList<>();
+      newTasks.add(taskId);
+      stageToTasks.put(stageId, newTasks);
+    }else {
+      tasks.add(taskId);
+    }
+    final Integer[] parentStages = stageLevelListener.getStageToParents().get(stageId);
+    final Long[] parents = (Long[]) Arrays.stream(parentStages)
+            .flatMap(x -> Arrays.stream(stageToTasks.get(x).toArray()))
+            .toArray();
 
     // unknown
     final int submissionSite = -1;
     final String resourceType = "N/A";
     final double resourceAmountRequested = -1.0;
-    final long[] parents = new long[0];
     final long[] children = new long[0];
     final int groupId = -1;
     final String nfrs = "";
@@ -82,7 +108,7 @@ public class TaskLevelListener extends AbstractListener<Task> {
         .runtime(runTime)
         .resourceType(resourceType)
         .resourceAmountRequested(resourceAmountRequested)
-        .parents(parents)
+        .parents(ArrayUtils.toPrimitive(parents))
         .children(children)
         .userId(userId)
         .groupId(groupId)
