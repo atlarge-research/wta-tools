@@ -112,7 +112,7 @@ get_framework_registry().framework("spark").add_version(
         "3.2.4", 
         "https://dlcdn.apache.org/spark/spark-3.2.4/spark-3.2.4-bin-hadoop3.2-scala2.13.tgz",
         "tgz", 
-        "spark-3.2.4-bin-hadoop3.2", 
+        "spark-3.2.4-bin-hadoop3.2-scala2.13", 
         "3.2.x",
     )
 )
