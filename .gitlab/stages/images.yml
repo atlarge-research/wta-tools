@@ -33,8 +33,6 @@ build-spark-adapter-image:
   stage: images
   image: docker:20.10.16
   needs: [build-barebones-spark-adapter-image]
-  dependencies:
-    - build-barebones-spark-adapter-image
   services:
     - docker:20.10.16-dind
   script:

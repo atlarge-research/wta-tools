@@ -56,7 +56,6 @@ line-coverage-core:
   dependencies:
     - integration-tests-core
     - unit-tests-core
-    - build-core
   script:
     - echo "Started creating core line coverage"
     - "mvn -pl core jacoco:merge jacoco:report"

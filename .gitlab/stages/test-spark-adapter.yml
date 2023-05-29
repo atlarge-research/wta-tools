@@ -56,7 +56,6 @@ line-coverage-spark-adapter:
   dependencies:
     - integration-tests-spark-adapter
     - unit-tests-spark-adapter
-    - build-spark-adapter
   script:
     - echo "Started creating Spark adapter line coverage"
     - "mvn -pl adapter/spark jacoco:merge jacoco:report"
@@ -86,7 +85,6 @@ e2e-spark-adapter:
   needs: [package-spark-adapter-e2e, build-spark-adapter-image]
   dependencies:
     - package-spark-adapter-e2e
-    - build-spark-adapter-image
   script:
     - echo "Spark adapter end-to-end run started"
     - echo "This job does not provide coverage metrics, it just verifies the system as a whole functions to some degree"
@@ -104,7 +102,6 @@ e2e-barebones-spark-adapter:
   needs: [package-spark-adapter-e2e, build-barebones-spark-adapter-image]
   dependencies:
     - package-spark-adapter-e2e
-    - build-barebones-spark-adapter-image
   script:
     - echo "Barebones Spark adapter end-to-end run started"
     - echo "This job does not provide coverage metrics, it just verifies the system as a whole functions in a barebones environment"
