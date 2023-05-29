@@ -245,21 +245,15 @@
             <format>HTML</format>
           </formats>
           <outputDirectory>reports/jacoco</outputDirectory>
+          <fileSets>
+            <fileSet>
+              <directory>${project.build.directory}</directory>
+              <includes>
+                <include>*.exec</include>
+              </includes>
+            </fileSet>
+          </fileSets>
         </configuration>
-        <executions>
-          <execution>
-            <goals>
-              <goal>prepare-agent</goal>
-            </goals>
-          </execution>
-          <execution>
-            <id>report</id>
-            <phase>prepare-package</phase>
-            <goals>
-              <goal>report</goal>
-            </goals>
-          </execution>
-        </executions>
       </plugin>
       <plugin>
         <groupId>org.pitest</groupId>
@@ -307,22 +301,34 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-assembly-plugin</artifactId>
         <version>${maven.assembly.plugin.version}</version>
-        <configuration>
-          <descriptorRefs>
-            <descriptorRef>jar-with-dependencies</descriptorRef>
-          </descriptorRefs>
-        </configuration>
         <executions>
           <execution>
-            <id>make-assembly</id>
+            <id>make-fat-jar</id>
             <phase>package</phase>
             <goals>
               <goal>single</goal>
             </goals>
+            <configuration>
+              <skipAssembly>${skipTests}</skipAssembly>
+              <descriptorRefs>
+                <descriptorRef>jar-with-dependencies</descriptorRef>
+              </descriptorRefs>
+            </configuration>
+          </execution>
+          <execution>
+            <id>e2e</id>
+            <phase>none</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+            <configuration>
+              <descriptors>
+                <descriptor>adapter/spark/config/assembly-e2e.xml</descriptor>
+              </descriptors>
+            </configuration>
           </execution>
         </executions>
       </plugin>
     </plugins>
   </build>
-
 </project>

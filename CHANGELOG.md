@@ -37,9 +37,12 @@ For the most part, since we are pre-release this will serve no real purpose, oth
 - Add maven-assembly plugin to create fat jar  [@pcho](https://gitlab.ewi.tudelft.nl/pcho) [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 - Added license information to the project [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 - Added iostat datasource [@lyadalachanchu](https://gitlab.ewi.tudelft.nl/lyadalachanchu)
+- Created custom images for e2e and integration testing [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
+- Wired e2e testing into the pipeline [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 
 ### Changed
 - Refactored listeners into a generic interface to reduce code duplication and increase cc [@hpage](https://gitlab.ewi.tudelft.nl/hpage)
+- Merged the JaCoCo coverage metrics for integration and unit tests [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 
 ### Fixed
 - Fixed the slf4j logging module to allow use in testing and `adapter/spark` [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
@@ -50,3 +53,4 @@ For the most part, since we are pre-release this will serve no real purpose, oth
 ### Deprecated
 
 ### Removed
+- Removed Spotbugs SAST from the pipeline [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
