@@ -42,12 +42,14 @@ public class WtaUtils {
       Gson gson = new Gson();
       RuntimeConfig config = gson.fromJson(reader, RuntimeConfig.class);
       if (config.getAuthors() == null || config.getAuthors().length < 1) {
-        log.error("The config file does not specify any authors, it is mandatory to specify at least one author.");
+        log.error(
+            "The config file does not specify any authors, it is mandatory to specify at least one author.");
         throw new IllegalArgumentException("The config file does not specify any authors");
       } else if (config.getDomain() == null) {
         log.error("The config file does not specify a domain, this field is mandatory.");
         throw new IllegalArgumentException("The config file does not specify a domain");
-      } else if (config.getDescription() == null || config.getDescription().isBlank()) {
+      } else if (config.getDescription() == null
+          || config.getDescription().isBlank()) {
         log.info("The config file does not include a description, this field is highly recommended.");
       }
       return config;
