@@ -110,7 +110,7 @@ public class TaskLevelListener extends AbstractListener<Task> {
   @Override
   public void onJobStart(SparkListenerJobStart jobStart) {
     // stage ids are always unique
-    jobStart.stageInfos().foreach(stageInfo -> stageIdsToJobs.put(stageInfo.stageId(), jobStart.jobId()));
+    jobStart.stageInfos().foreach(stageInfo -> stageIdsToJobs.put(stageInfo.stageId(), jobStart.jobId() + 1));
   }
 
   /**

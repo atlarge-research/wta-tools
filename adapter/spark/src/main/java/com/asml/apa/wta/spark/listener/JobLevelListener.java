@@ -46,7 +46,7 @@ public class JobLevelListener extends AbstractListener<Workflow> {
    */
   @Override
   public void onJobStart(SparkListenerJobStart jobStart) {
-    jobSubmitTimes.put(jobStart.jobId(), jobStart.time());
+    jobSubmitTimes.put(jobStart.jobId() + 1, jobStart.time());
   }
 
   /**
