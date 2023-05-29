@@ -69,7 +69,7 @@ public class EndToEnd {
     new File(outputPath + "/resources/" + schemaVersion + "/resource.parquet").delete();
     new File(outputPath + "/tasks/" + schemaVersion + "/task.parquet").delete();
     new File(outputPath + "/workflows/" + schemaVersion + "/workflow.parquet").delete();
-    new File(outputPath + "/workload/" + schemaVersion + "/workload.json").delete();
+    new File(outputPath + "/workload/" + schemaVersion + "/generic_information.json").delete();
 
     // 3. create spark session and load config object
     SparkConf conf = new SparkConf().setAppName("SystemTest").setMaster("local");
