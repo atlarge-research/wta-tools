@@ -10,7 +10,8 @@ build-core:
     expire_in: 20 minutes
     paths:
       - core/target
-      - .m2/repository/com/asml/apa
+      - .m2/repository/com/asml/apa/wta
+    cache: []
 
 build-spark-adapter:
   stage: build
@@ -25,7 +26,8 @@ build-spark-adapter:
     expire_in: 20 minutes
     paths:
       - adapter/spark/target
-      - .m2/repository/com/asml/apa
+      - .m2/repository/com/asml/apa/wta
+    cache: []
 
 package-spark-adapter-e2e:
   stage: build
