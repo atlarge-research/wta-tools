@@ -1,10 +1,7 @@
 package com.asml.apa.wta.spark.driver;
 
-import com.asml.apa.wta.core.dto.IostatDataSourceDto;
 import com.asml.apa.wta.spark.datasource.SparkDataSource;
 import com.asml.apa.wta.spark.streams.MetricStreamingEngine;
-import com.asml.apa.wta.spark.streams.ResourceKey;
-import com.asml.apa.wta.spark.streams.ResourceMetricsRecord;
 import java.util.HashMap;
 import java.util.Map;
 import lombok.Getter;
@@ -55,18 +52,10 @@ public class WtaDriverPlugin implements DriverPlugin {
    * @param message the message that was sent by the executors, to be serializable
    * @return a response to the executor, if no response is expected the result is ignored
    * @author Atour Mousavi Gourabi
-   * @author Lohithsai Yadala Chanchu
    */
   @Override
   public Object receive(Object message) {
-    if (message instanceof IostatDataSourceDto) {
-      IostatDataSourceDto receivedIostatDto = (IostatDataSourceDto) message;
-      ResourceMetricsRecord iostatMetricsRecord =
-          new ResourceMetricsRecord(null, receivedIostatDto, receivedIostatDto.getExecutorId());
-      metricStreamingEngine.addToResourceStream(
-          new ResourceKey(iostatMetricsRecord.getExecutorId()), iostatMetricsRecord);
-    }
-    return null;
+    return message;
   }
 
   /**

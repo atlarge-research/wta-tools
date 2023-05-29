@@ -50,7 +50,7 @@ public class IostatDataSource {
             e.getCause().toString());
       }
     } else {
-      log.error(
+      log.info(
           "System is not running on a unix based os. Metrics from the iostat datasource could not be obtained");
     }
     return null;
