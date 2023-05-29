@@ -7,6 +7,7 @@ build-core:
     - "mvn -pl core install -DskipTests -am"
   artifacts:
     name: build-core
+    expire_in: 20 minutes
     paths:
       - core/target
       - .m2/repository/com/asml/apa/wta
@@ -22,6 +23,7 @@ build-spark-adapter:
     - "mvn -pl adapter/spark process-test-classes"
   artifacts:
     name: build-spark-adapter
+    expire_in: 20 minutes
     paths:
       - adapter/spark/target
       - .m2/repository/com/asml/apa/wta
@@ -37,5 +39,6 @@ package-spark-adapter-e2e:
     - "mvn -pl adapter/spark jar:jar assembly:single@e2e"
   artifacts:
     name: package-spark-adapter-e2e
+    expire_in: 20 minutes
     paths:
       - adapter/spark/target/*-e2e.jar
