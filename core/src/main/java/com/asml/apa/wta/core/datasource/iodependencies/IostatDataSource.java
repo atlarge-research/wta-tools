@@ -71,6 +71,7 @@ public class IostatDataSource {
       log.error(
           "Something went wrong while receiving the iostat bash command outputs. The cause is: {}",
           e.getCause().toString());
+      return false;
     }
     log.info("System does not have the necessary dependencies (sysstat) to run iostat.");
     return false;
