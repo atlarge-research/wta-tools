@@ -47,6 +47,13 @@
       <artifactId>parquet-avro</artifactId>
       <version>${parquet.version}</version>
     </dependency>
+    <!-- https://mvnrepository.com/artifact/org.apache.parquet/parquet-common -->
+    <dependency>
+      <groupId>org.apache.parquet</groupId>
+      <artifactId>parquet-common</artifactId>
+      <version>${parquet.version}</version>
+      <scope>provided</scope>
+    </dependency>
     <!-- https://mvnrepository.com/artifact/org.apache.hadoop/hadoop-common -->
     <dependency>
       <groupId>org.apache.hadoop</groupId>
