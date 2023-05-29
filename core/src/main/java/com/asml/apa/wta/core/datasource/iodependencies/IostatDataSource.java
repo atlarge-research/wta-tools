@@ -32,7 +32,7 @@ public class IostatDataSource {
    */
   public IostatDataSourceDto getAllMetrics(String executorId)
       throws IOException, InterruptedException, ExecutionException {
-    if (bashUtils.isUnix() && isIostatAvailable) {
+    if (isIostatAvailable) {
       CompletableFuture<String> allMetrics = bashUtils.executeCommand("iostat -d | awk '$1 == \"sdc\"'");
 
       String[] metrics = allMetrics.get().trim().split("\\s+");

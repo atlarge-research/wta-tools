@@ -43,15 +43,4 @@ public class BashUtils {
       }
     });
   }
-
-  /**
-   * Checks if system is running on a unix based os.
-   *
-   * @return A boolean that determines if the current os is unix based
-   * @author Lohithsai Yadala Chanchu
-   * @since 1.0.0
-   */
-  public boolean isUnix() {
-    return (os.indexOf("nix") >= 0 || os.indexOf("nux") >= 0 || os.indexOf("aix") > 0);
-  }
 }
