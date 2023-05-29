@@ -53,7 +53,7 @@ public class TaskLevelListener extends AbstractListener<Task> {
     final long submitTime = curTaskInfo.launchTime();
     final long runTime = curTaskMetrics.executorRunTime();
     final int userId = sparkContext.sparkUser().hashCode();
-    final long workflowId = stageIdsToJobs.get(taskEnd.stageId());
+    final long workflowId = stageIdsToJobs.get(taskEnd.stageId()) + 1;
 
     // unknown
     final int submissionSite = -1;
@@ -110,7 +110,7 @@ public class TaskLevelListener extends AbstractListener<Task> {
   @Override
   public void onJobStart(SparkListenerJobStart jobStart) {
     // stage ids are always unique
-    jobStart.stageInfos().foreach(stageInfo -> stageIdsToJobs.put(stageInfo.stageId(), jobStart.jobId()));
+    jobStart.stageInfos().foreach(stageInfo -> stageIdsToJobs.put(stageInfo.stageId(), jobStart.jobId() + 1));
   }
 
   /**
