@@ -414,7 +414,9 @@ public class ParquetWriterUtils {
     Gson gson = new GsonBuilder()
         .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
         .create();
-    gson.toJson(workload, new FileWriter(workloadFileName + ".json"));
+    try (FileWriter fw = new FileWriter("/workload/" + version + "/" + workloadFileName + ".json")) {
+      gson.toJson(workload, fw);
+    }
   }
 
   /**
