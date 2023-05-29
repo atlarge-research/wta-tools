@@ -4,7 +4,7 @@ build-core:
   needs: []
   script:
     - echo "Build core started"
-    - "mvn -pl core prepare-package -DskipTests jar:jar jar:test-jar install:install"
+    - "mvn -pl core install -DskipTests"
   artifacts:
     name: build-core
     expire_in: 20 minutes
