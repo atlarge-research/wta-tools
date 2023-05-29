@@ -100,6 +100,6 @@ public class EndToEnd {
     parquetUtil.getTasks().addAll(tasks);
     parquetUtil.getWorkflows().addAll(workFlow);
     parquetUtil.readWorkload(workLoad);
-    parquetUtil.writeToFile("resource", "task", "workflow", "workload");
+    parquetUtil.writeToFile("resource", "task", "workflow", "generic_information");
   }
 }
