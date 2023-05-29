@@ -8,7 +8,6 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class BashUtils {
-  private final String os = System.getProperty("os.name").toLowerCase();
 
   /**
    * Executes given bash command and returns the terminal output.

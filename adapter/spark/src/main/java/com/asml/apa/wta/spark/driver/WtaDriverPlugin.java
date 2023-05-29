@@ -51,7 +51,7 @@ public class WtaDriverPlugin implements DriverPlugin {
    */
   @Override
   public Object receive(Object message) {
-    return message;
+    return null;
   }
 
   /**
