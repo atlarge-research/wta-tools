@@ -309,6 +309,7 @@
               <goal>single</goal>
             </goals>
             <configuration>
+              <skipAssembly>${skipTests}</skipAssembly>
               <descriptorRefs>
                 <descriptorRef>jar-with-dependencies</descriptorRef>
               </descriptorRefs>
