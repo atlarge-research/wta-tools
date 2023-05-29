@@ -12,12 +12,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.spark.SparkContext;
 import org.apache.spark.api.plugin.DriverPlugin;
 import org.apache.spark.api.plugin.PluginContext;
 
 /**
- * Driver component of the plugin.
+ * Driver component of the plugin. Only one instance of this class is initialized per Spark session.
  *
  * @author Pil Kyu Cho
  * @author Lohithsai Yadala Chanchu
@@ -25,25 +26,15 @@ import org.apache.spark.api.plugin.PluginContext;
  * @author Henry Page
  * @since 1.0.0
  */
+@Slf4j
 public class WtaDriverPlugin implements DriverPlugin {
 
   @Getter
   private SparkDataSource sparkDataSource;
 
-  public static void main(String[] args) {
-    // 1. get filepath and directory path arguments from command line
-    String configPath = "";
-    String outputPath = "";
-    String testTextPath = "";
+  private static String outputPath;
 
-    try {
-      configPath = args[0];
-      outputPath = args[1];
-      testTextPath = args[2];
-    } catch (ArrayIndexOutOfBoundsException e) {
-      System.exit(1);
-    }
-  }
+  private final String schemaVersion = "schema-1.0";
 
   /**
    * This method is called early in the initialization of the Spark driver.
@@ -53,20 +44,35 @@ public class WtaDriverPlugin implements DriverPlugin {
    * @param sparkCtx The current SparkContext.
    * @param pluginCtx Additional plugin-specific about the Spark application where the plugin is running.
    * @return Extra information provided to the executor
+   * @author Pil Kyu Cho
    * @author Henry Page
    * @since 1.0.0
    */
   @Override
   public Map<String, String> init(SparkContext sparkCtx, PluginContext pluginCtx) {
-    sparkDataSource = new SparkDataSource(sparkCtx, WtaUtils.readConfig(configPath));
-    initListeners();
-    // new thread to delete parquet files
-    // 2. delete any potentially pre-existing parquet files
-    String schemaVersion = "schema-1.0";
+    String configFile = System.getProperty("configFile");
+    outputPath = System.getProperty("outputPath");
+    if (configFile == null || outputPath == null) {
+      //TODO: this also shuts down the spark application, which it shouldn't
+      log.error("Please provide the config file path and output directory path as arguments");
+      System.exit(1);
+    }
+
+    // delete any potentially pre-existing parquet files
+    // TODO: run this in another thread to not block
     new File(outputPath + "/resources/" + schemaVersion + "/resource.parquet").delete();
     new File(outputPath + "/tasks/" + schemaVersion + "/task.parquet").delete();
     new File(outputPath + "/workflows/" + schemaVersion + "/workflow.parquet").delete();
     new File(outputPath + "/workload/" + schemaVersion + "/generic_information.json").delete();
+
+    try{
+      sparkDataSource = new SparkDataSource(sparkCtx, WtaUtils.readConfig(configFile));
+    } catch (IllegalArgumentException e){
+      //TODO: this also shuts down the spark application, which it shouldn't
+      log.error("Couldn't find path to config file");
+      System.exit(1);
+    }
+    initListeners();
     return new HashMap<>();
   }
 
@@ -101,12 +107,18 @@ public class WtaDriverPlugin implements DriverPlugin {
     parquetUtil.getTasks().addAll(tasks);
     parquetUtil.getWorkflows().addAll(workFlow);
     parquetUtil.readWorkload(workLoad);
-    parquetUtil.writeToFile(
-            "resource",
-            "task",
-            "workflow",
-            "generic_information"
-    );
+    try {
+      parquetUtil.writeToFile(
+              "resource",
+              "task",
+              "workflow",
+              "generic_information"
+      );
+    } catch (Exception e) {
+      log.error("Failed to write to parquet file, possibly due to invalid output path");
+      //TODO: this also shuts down the spark application, which it shouldn't
+      System.exit(1);
+    }
   }
 
   /**
