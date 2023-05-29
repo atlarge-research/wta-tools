@@ -17,6 +17,7 @@ import org.apache.avro.generic.GenericRecord;
 @Data
 @Builder
 public class Task implements BaseTraceObject {
+
   private static final long serialVersionUID = -1372345471722101373L;
 
   @Getter(value = AccessLevel.NONE)
