@@ -56,7 +56,6 @@
       <groupId>org.apache.hadoop</groupId>
       <artifactId>hadoop-client-api</artifactId>
       <version>${hadoop.version}</version>
-      <scope>test</scope>
     </dependency>
     <!-- https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-api -->
     <dependency>
