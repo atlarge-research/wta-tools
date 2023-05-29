@@ -409,12 +409,12 @@ public class ParquetWriterUtils {
    * @author Tianchen Qu
    */
   private void writeWorkloadToFile(String workloadFileName) throws Exception {
-    File file = new File(this.path, "/workload/" + version);
+    File file = new File(this.path, "workload/" + version);
     file.mkdirs();
     Gson gson = new GsonBuilder()
         .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
         .create();
-    try (FileWriter fw = new FileWriter("/workload/" + version + "/" + workloadFileName + ".json")) {
+    try (FileWriter fw = new FileWriter(new File(file, workloadFileName + ".json"))) {
       gson.toJson(workload, fw);
     }
   }
