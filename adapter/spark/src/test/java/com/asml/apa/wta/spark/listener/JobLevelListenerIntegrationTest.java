@@ -27,7 +27,6 @@ class JobLevelListenerIntegrationTest extends BaseSparkJobIntegrationTest {
         .isEqualTo(spark.sparkContext().getConf().get("spark.app.name"));
     assertThat(workflow.getScheduler()).isEqualTo("DAGScheduler");
 
-    List<Task> test = sut.getTaskLevelListener().getProcessedObjects();
     assertThat(workflow.getTasks()).isNotEmpty().isSortedAccordingTo(Comparator.comparing(Task::getSubmitTime));
     assertThat(sut.getJobLevelListener().getProcessedObjects())
         .hasSize(2)

@@ -65,7 +65,7 @@ class TaskLevelListenerTest extends BaseLevelListenerTest {
     assertEquals("testtaskType", curTask.getType());
     assertEquals(50L, curTask.getSubmitTime());
     assertEquals(100L, curTask.getRuntime());
-    assertEquals(1L, curTask.getWorkflowId());
+    assertEquals(2L, curTask.getWorkflowId());
     assertEquals("testUser".hashCode(), curTask.getUserId());
     assertEquals(-1, curTask.getSubmissionSite());
     assertEquals("N/A", curTask.getResourceType());
