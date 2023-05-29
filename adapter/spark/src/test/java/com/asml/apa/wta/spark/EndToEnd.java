@@ -36,7 +36,7 @@ public class EndToEnd {
   private static void invokeJob() {
     testFile.flatMap(s -> Arrays.asList(s.split(" ")).iterator())
         .mapToPair(word -> new Tuple2<>(word, 1))
-        .reduceByKey((a, b) -> a + b)
+        .reduceByKey(Integer::sum)
         .collect();
   }
 
