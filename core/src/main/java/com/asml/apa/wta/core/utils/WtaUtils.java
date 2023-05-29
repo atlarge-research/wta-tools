@@ -40,7 +40,17 @@ public class WtaUtils {
   public static RuntimeConfig readConfig(String configDir) {
     try (FileReader reader = new FileReader(configDir)) {
       Gson gson = new Gson();
-      return gson.fromJson(reader, RuntimeConfig.class);
+      RuntimeConfig config = gson.fromJson(reader, RuntimeConfig.class);
+      if (config.getAuthors() == null || config.getAuthors().length < 1) {
+        log.error("The config file does not specify any authors, it is mandatory to specify at least one author.");
+        throw new IllegalArgumentException("The config file does not specify any authors");
+      } else if (config.getDomain() == null) {
+        log.error("The config file does not specify a domain, this field is mandatory.");
+        throw new IllegalArgumentException("The config file does not specify a domain");
+      } else if (config.getDescription() == null || config.getDescription().isBlank()) {
+        log.info("The config file does not include a description, this field is highly recommended.");
+      }
+      return config;
     } catch (JsonParseException e) {
       log.error("The config file has invalid fields");
       throw new IllegalArgumentException("The config file has invalid fields");
