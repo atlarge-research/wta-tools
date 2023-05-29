@@ -56,6 +56,7 @@ line-coverage-spark-adapter:
   dependencies:
     - integration-tests-spark-adapter
     - unit-tests-spark-adapter
+    - build-spark-adapter
   script:
     - echo "Started creating Spark adapter line coverage"
     - "mvn -pl adapter/spark jacoco:merge jacoco:report"
