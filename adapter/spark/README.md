@@ -2,6 +2,11 @@
 
 ## Installation and Usage
 - Clone the repository
+- Optional (if more I/O metrics are needed): Install sysstat by running the following bash command:
+
+```bash
+sudo apt install sysstat
+```
 - Run `mvn -pl core clean install && mvn -pl adapter/spark clean package` in the source root.
 - Copy the resulting jar file from `adapter/spark/target`.
 - Execute the following command in the directory where the jar file is located:
