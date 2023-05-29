@@ -11,7 +11,7 @@ build-core:
     paths:
       - core/target
       - .m2/repository/com/asml/apa/wta
-    cache: []
+  cache: []
 
 build-spark-adapter:
   stage: build
@@ -27,7 +27,7 @@ build-spark-adapter:
     paths:
       - adapter/spark/target
       - .m2/repository/com/asml/apa/wta
-    cache: []
+  cache: []
 
 package-spark-adapter-e2e:
   stage: build
