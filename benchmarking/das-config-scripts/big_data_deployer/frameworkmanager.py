@@ -232,4 +232,3 @@ class FrameworkManager:
         framework = self.framework_registry.framework(framework_identifier)
         framework_version = framework.version(version)
         return framework.get_supported_deployment_settings(framework_version)
-

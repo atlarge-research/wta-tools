@@ -1,7 +1,7 @@
 package com.asml.apa.wta.spark;
 
 import com.asml.apa.wta.spark.driver.WtaDriverPlugin;
-import com.asml.apa.wta.spark.executor.WtaExecutorPlugin;
+import com.asml.apa.wta.spark.executor.plugin.WtaExecutorPlugin;
 import org.apache.spark.api.plugin.DriverPlugin;
 import org.apache.spark.api.plugin.ExecutorPlugin;
 import org.apache.spark.api.plugin.SparkPlugin;

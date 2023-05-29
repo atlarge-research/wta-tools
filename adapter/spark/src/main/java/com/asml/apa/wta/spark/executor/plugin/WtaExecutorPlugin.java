@@ -1,8 +1,9 @@
-package com.asml.apa.wta.spark.executor;
+package com.asml.apa.wta.spark.executor.plugin;
 
 import com.asml.apa.wta.spark.WtaPlugin;
 import com.asml.apa.wta.spark.driver.WtaDriverPlugin;
 import java.util.Map;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.spark.SparkContext;
 import org.apache.spark.TaskFailedReason;
 import org.apache.spark.api.plugin.ExecutorPlugin;
@@ -12,25 +13,28 @@ import org.apache.spark.api.plugin.PluginContext;
  * Executor component of the plugin.
  *
  * @author Henry Page
+ * @author Lohithsai Yadala Chanchu
  * @since 1.0.0
  */
+@Slf4j
 public class WtaExecutorPlugin implements ExecutorPlugin {
 
+  private PluginContext pluginContext;
 
   /**
    * This method is called when the plugin is initialized on the executor.
    * Developers are urged not to put inefficient code here as it blocks executor initialization until
    * it is completed.
    *
-   * @param pluginContext The PluginContext object that represents the context of the plugin.
+   * @param pCtx The PluginContext object that represents the context of the plugin.
    * @param extraConf A map object that contains any extra configuration information. This map
    *                  is directly returned from {@link WtaDriverPlugin#init(SparkContext, PluginContext)}
    * @see WtaPlugin#executorPlugin() where a new instance of the plugin is created. This gets called as soon
    * as it is loaded on to the executor.
    */
   @Override
-  public void init(PluginContext pluginContext, Map<String, String> extraConf) {
-
+  public void init(PluginContext pCtx, Map<String, String> extraConf) {
+    this.pluginContext = pCtx;
   }
 
   /**
