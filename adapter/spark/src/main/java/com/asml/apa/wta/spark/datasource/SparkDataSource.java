@@ -1,8 +1,12 @@
 package com.asml.apa.wta.spark.datasource;
 
 import com.asml.apa.wta.core.config.RuntimeConfig;
+import com.asml.apa.wta.core.model.Task;
+import com.asml.apa.wta.core.model.Workflow;
+import com.asml.apa.wta.core.model.Workload;
 import com.asml.apa.wta.core.utils.CollectorInterface;
 import com.asml.apa.wta.core.utils.WtaUtils;
+import com.asml.apa.wta.spark.listener.AbstractListener;
 import com.asml.apa.wta.spark.listener.ApplicationLevelListener;
 import com.asml.apa.wta.spark.listener.JobLevelListener;
 import com.asml.apa.wta.spark.listener.TaskLevelListener;
@@ -19,11 +23,11 @@ import org.apache.spark.SparkContext;
 @Getter
 public class SparkDataSource implements CollectorInterface {
 
-  private final TaskLevelListener taskLevelListener;
+  private final AbstractListener<Task> taskLevelListener;
 
-  private final JobLevelListener jobLevelListener;
+  private final AbstractListener<Workflow> jobLevelListener;
 
-  private final ApplicationLevelListener applicationLevelListener;
+  private final AbstractListener<Workload> applicationLevelListener;
 
   /**
    * Constructor for the Spark data source. This requires a Spark context to ensure a Spark session

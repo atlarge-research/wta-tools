@@ -34,7 +34,7 @@ public class WtaExecutorPlugin implements ExecutorPlugin {
    */
   @Override
   public void init(PluginContext pCtx, Map<String, String> extraConf) {
-    this.pluginContext = pCtx;
+    pluginContext = pCtx;
   }
 
   /**
