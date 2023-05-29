@@ -9,7 +9,7 @@ unit-tests-spark-adapter:
     - "[ -f adapter/spark/target/jacoco.exec ] && mv -f adapter/spark/target/jacoco.exec adapter/spark/target/jacoco-unit-tests.exec || echo '0' > /dev/null"
   artifacts:
     name: unit-tests-spark-adapter
-    expire_in: 1 hour
+    expire_in: 20 minutes
     when: always
     paths:
       - adapter/spark/reports/jacoco/
@@ -27,7 +27,7 @@ integration-tests-spark-adapter:
     - "[ -f adapter/spark/target/jacoco-it.exec ] && mv -f adapter/spark/target/jacoco-it.exec adapter/spark/target/jacoco-integration-tests.exec || echo '0' > /dev/null"
   artifacts:
     name: integration-tests-spark-adapter
-    expire_in: 1 hour
+    expire_in: 20 minutes
     when: always
     paths:
       - adapter/spark/reports/jacoco/
