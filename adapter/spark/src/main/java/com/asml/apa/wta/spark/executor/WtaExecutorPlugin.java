@@ -95,9 +95,7 @@ public class WtaExecutorPlugin implements ExecutorPlugin {
    * <a href="https://spark.apache.org/docs/3.2.1/api/java/org/apache/spark/api/plugin/ExecutorPlugin.html#init-org.apache.spark.api.plugin.PluginContext-java.util.Map-">Refer to the docs</a> for more information.
    */
   @Override
-  public void onTaskStart() {
-    // send the iostat metric dto to driver
-  }
+  public void onTaskStart() {}
 
   /**
    * Gets called when a task is successfully completed.

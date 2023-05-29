@@ -22,6 +22,8 @@ public class IostatDataSourceTest {
         .when(bashUtils)
         .executeCommand("iostat -d | awk '$1 == \"sdc\"'");
 
+    Mockito.doReturn(true).when(bashUtils).isUnix();
+
     IostatDataSourceDto expected = IostatDataSourceDto.builder()
         .tps(1.0)
         .kiloByteReadPerSec(2.0)
