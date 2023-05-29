@@ -15,9 +15,9 @@
 
   <properties>
     <gson.version>2.10.1</gson.version>
-    <parquet.version>1.12.3</parquet.version>
-    <avro.version>1.11.1</avro.version>
-    <hadoop.version>3.3.5</hadoop.version>
+    <parquet.version>1.12.2</parquet.version>
+    <avro.version>1.10.2</avro.version>
+    <hadoop.version>3.3.1</hadoop.version>
   </properties>
 
   <dependencies>
@@ -32,12 +32,14 @@
       <groupId>org.apache.avro</groupId>
       <artifactId>avro</artifactId>
       <version>${avro.version}</version>
+      <scope>provided</scope>
     </dependency>
     <!-- https://mvnrepository.com/artifact/org.apache.parquet/parquet-hadoop -->
     <dependency>
       <groupId>org.apache.parquet</groupId>
       <artifactId>parquet-hadoop</artifactId>
       <version>${parquet.version}</version>
+      <scope>provided</scope>
     </dependency>
     <!-- https://mvnrepository.com/artifact/org.apache.parquet/parquet-avro -->
     <dependency>
@@ -56,6 +58,7 @@
       <groupId>org.apache.hadoop</groupId>
       <artifactId>hadoop-client-api</artifactId>
       <version>${hadoop.version}</version>
+      <scope>provided</scope>
     </dependency>
     <!-- https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-api -->
     <dependency>
