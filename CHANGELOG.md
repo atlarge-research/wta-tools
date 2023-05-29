@@ -43,6 +43,8 @@ For the most part, since we are pre-release this will serve no real purpose, oth
 ### Fixed
 - Fixed the slf4j logging module to allow use in testing and `adapter/spark` [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 - Fixed the Parquet and JSON writer to use snake case to adhere to the WTA [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
+- Fixed the DAS5 framework versions to download [@pcho](https://gitlab.ewi.tudelft.nl/pcho)
+
 
 ### Deprecated
 
