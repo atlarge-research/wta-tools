@@ -11,6 +11,7 @@ import org.apache.spark.api.plugin.PluginContext;
 /**
  * Driver component of the plugin.
  *
+ * @author Lohithsai Yadala Chanchu
  * @author Atour Mousavi Gourabi
  * @author Henry Page
  * @since 1.0.0
@@ -36,7 +37,8 @@ public class WtaDriverPlugin implements DriverPlugin {
   @Override
   public Map<String, String> init(SparkContext sparkCtx, PluginContext pluginCtx) {
     sparkContext = sparkCtx;
-    sparkDataSource = new SparkDataSource(sparkContext);
+    sparkDataSource = new SparkDataSource(this.sparkContext);
+    initListeners();
     return new HashMap<>();
   }
 
@@ -59,7 +61,16 @@ public class WtaDriverPlugin implements DriverPlugin {
    * @since 1.0.0
    */
   @Override
-  public void shutdown() {
-    // clean up
+  public void shutdown() {}
+
+  /**
+   * Initializes the listeners.
+   *
+   * @author Lohithsai Yadala Chanchu
+   * @since 1.0.0
+   */
+  private void initListeners() {
+    this.sparkDataSource.registerTaskListener();
+    // register more listeners as needed
   }
 }
