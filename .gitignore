@@ -61,9 +61,12 @@ gemnasium-maven-plugin.json
 # pipeline reports (JaCoCo, pit)
 reports
 
-# big generated files for benchmarking
-benchmarking/src/main/resources/sql_files
-benchmarking/src/main/resources/tpcds_data
+# application configuration
+config.json
+
+# big files for benchmarking
+benchmarking/spark-benchmark/src/main/resources/sql_files
+benchmarking/spark-benchmark/src/main/resources/tpcds_parquet_data
 
 # serialization files
 *.ser
@@ -79,10 +82,6 @@ logs
 *.pyc
 benchmarking/das-config-scripts/frameworks
 
-#test output
+# test output
 core/src/test/resources/WTA
 core/src/test/resources/AvroOutput
-
-#benchmark resources
-benchmarking/spark-benchmark/src/main/resources/tpcds_parquet_data
-benchmarking/spark-benchmark/src/main/resources/sql_files

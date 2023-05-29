@@ -35,6 +35,7 @@ For the most part, since we are pre-release this will serve no real purpose, oth
 - Added Java MX Bean data source for resource metrics [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 - Created README documentation for all modules [@tqu](https://gitlab.ewi.tudelft.nl/tqu) [@hpage](https://gitlab.ewi.tudelft.nl/hpage)
 - Add maven-assembly plugin to create fat jar  [@pcho](https://gitlab.ewi.tudelft.nl/pcho) [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
+- Added license information to the project [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 - Created custom images for e2e and integration testing [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 - Wired e2e testing into the pipeline [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 
@@ -45,6 +46,8 @@ For the most part, since we are pre-release this will serve no real purpose, oth
 ### Fixed
 - Fixed the slf4j logging module to allow use in testing and `adapter/spark` [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 - Fixed the Parquet and JSON writer to use snake case to adhere to the WTA [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
+- Fixed the DAS5 framework versions to download [@pcho](https://gitlab.ewi.tudelft.nl/pcho)
+
 
 ### Deprecated
 
