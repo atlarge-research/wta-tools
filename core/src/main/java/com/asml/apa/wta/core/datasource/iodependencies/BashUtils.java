@@ -29,9 +29,15 @@ public class BashUtils {
         log.error(
             "Something went wrong while trying to execute the bash command. The cause is: {}",
             e.getCause().toString());
-        return "";
+        throw new BashCommandExecutionException("Error executing bash command", e);
       }
     });
+  }
+
+  public class BashCommandExecutionException extends RuntimeException {
+    public BashCommandExecutionException(String message, Throwable cause) {
+      super(message, cause);
+    }
   }
 
   /**

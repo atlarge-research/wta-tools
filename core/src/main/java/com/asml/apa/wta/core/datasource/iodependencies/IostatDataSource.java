@@ -1,7 +1,6 @@
 package com.asml.apa.wta.core.datasource.iodependencies;
 
 import com.asml.apa.wta.core.dto.IostatDataSourceDto;
-import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import lombok.extern.slf4j.Slf4j;
@@ -30,8 +29,7 @@ public class IostatDataSource {
    * @author Lohithsai Yadala Chanchu
    * @since 1.0.0
    */
-  public IostatDataSourceDto getAllMetrics(String executorId)
-      throws IOException, InterruptedException, ExecutionException {
+  public IostatDataSourceDto getAllMetrics(String executorId) throws InterruptedException, ExecutionException {
     if (isIostatAvailable) {
       CompletableFuture<String> allMetrics = bashUtils.executeCommand("iostat -d | awk '$1 == \"sdc\"'");
 
@@ -53,9 +51,6 @@ public class IostatDataSource {
             "Something went wrong while receiving the iostat bash command outputs. The cause is: {}",
             e.getCause().toString());
       }
-    } else {
-      log.info(
-          "System is not running on a unix based os. Metrics from the iostat datasource could not be obtained");
     }
     return null;
   }
