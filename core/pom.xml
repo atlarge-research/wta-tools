@@ -14,18 +14,18 @@
   <artifactId>core</artifactId>
 
   <properties>
-    <jackson.databind.version>2.15.0</jackson.databind.version>
+    <gson.version>2.10.1</gson.version>
     <parquet.version>1.12.3</parquet.version>
     <avro.version>1.11.1</avro.version>
     <hadoop.version>3.3.5</hadoop.version>
   </properties>
 
   <dependencies>
-    <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind -->
+    <!-- https://mvnrepository.com/artifact/com.google.code.gson/gson -->
     <dependency>
-      <groupId>com.fasterxml.jackson.core</groupId>
-      <artifactId>jackson-databind</artifactId>
-      <version>${jackson.databind.version}</version>
+      <groupId>com.google.code.gson</groupId>
+      <artifactId>gson</artifactId>
+      <version>${gson.version}</version>
     </dependency>
     <!-- https://mvnrepository.com/artifact/org.apache.avro/avro -->
     <dependency>

@@ -4,11 +4,12 @@ import com.asml.apa.wta.core.model.Resource;
 import com.asml.apa.wta.core.model.Task;
 import com.asml.apa.wta.core.model.Workflow;
 import com.asml.apa.wta.core.model.Workload;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import java.io.ByteArrayOutputStream;
+import com.asml.apa.wta.core.model.enums.Domain;
+import com.google.gson.FieldNamingPolicy;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.OutputStream;
+import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -341,8 +342,13 @@ public class ParquetWriterUtils {
           fieldSchema.name("scheduler").type().nullable().stringType().noDefault();
     }
     if (checker[9]) {
-      fieldSchema =
-          fieldSchema.name("domain").type().nullable().stringType().noDefault();
+      fieldSchema = fieldSchema
+          .name("domain")
+          .type()
+          .enumeration("Domain")
+          .namespace("com.asml.apa.wta.core.model.enums")
+          .symbols(Domain.STRINGS)
+          .noDefault();
     }
     if (checker[10]) {
       fieldSchema = fieldSchema
@@ -403,15 +409,12 @@ public class ParquetWriterUtils {
    * @author Tianchen Qu
    */
   private void writeWorkloadToFile(String workloadFileName) throws Exception {
-    ObjectMapper mapper = new ObjectMapper();
-    String workloadJson = mapper.writeValueAsString(workload);
     File file = new File(this.path, "/workload/" + version);
     file.mkdirs();
-    ByteArrayOutputStream writer = new ByteArrayOutputStream();
-    OutputStream dir = new FileOutputStream(new File(file, workloadFileName + ".json"));
-    writer.write(workloadJson.getBytes());
-    writer.writeTo(dir);
-    writer.flush();
+    Gson gson = new GsonBuilder()
+        .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
+        .create();
+    gson.toJson(workload, new FileWriter(workloadFileName + ".json"));
   }
 
   /**
@@ -569,7 +572,7 @@ public class ParquetWriterUtils {
       if (workflow.getScheduler() == null) {
         flg[8] = false;
       }
-      if (workflow.getDomain() == null || workflow.getDomain().getValue() == null) {
+      if (workflow.getDomain() == null) {
         flg[9] = false;
       }
       if (workflow.getApplicationName() == null) {
