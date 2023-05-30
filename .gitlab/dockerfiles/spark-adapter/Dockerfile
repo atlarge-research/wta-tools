@@ -8,5 +8,5 @@ RUN apt-get install -y zip && \
     curl -s "https://get.sdkman.io" | bash && \
     bash -c 'source "/root/.sdkman/bin/sdkman-init.sh"; sdk install scala 2.13.5'
 ENV SCALA_HOME=/root/.sdkman/candidates/scala \
-    SPARK_HOME=/spark-3.2.4-bin-hadoop3.2-scala2.13
+    SPARK_HOME=/spark-3.2.4-bin-hadoop3.2-scala2.13 \
     PATH=$PATH:$SPARK_HOME/bin:$SPARK_HOME/sbin
