@@ -7,7 +7,6 @@ import com.asml.apa.wta.core.model.Workload;
 import com.asml.apa.wta.core.utils.ParquetWriterUtils;
 import com.asml.apa.wta.core.utils.WtaUtils;
 import com.asml.apa.wta.spark.datasource.SparkDataSource;
-
 import java.io.File;
 import java.util.HashMap;
 import java.util.List;
@@ -52,7 +51,7 @@ public class WtaDriverPlugin implements DriverPlugin {
    */
   @Override
   public Map<String, String> init(SparkContext sparkCtx, PluginContext pluginCtx) {
-    try{
+    try {
       RuntimeConfig runtimeConfig = WtaUtils.readConfig(System.getProperty("configFile"));
       sparkDataSource = new SparkDataSource(sparkCtx, runtimeConfig);
       parquetUtil = new ParquetWriterUtils(new File(runtimeConfig.getOutputPath()), "schema-1.0");
@@ -93,18 +92,15 @@ public class WtaDriverPlugin implements DriverPlugin {
       try {
         List<Task> tasks = sparkDataSource.getTaskLevelListener().getProcessedObjects();
         List<Workflow> workFlow = sparkDataSource.getJobLevelListener().getProcessedObjects();
-        Workload workLoad =
-                sparkDataSource.getApplicationLevelListener().getProcessedObjects().get(0);
+        Workload workLoad = sparkDataSource
+            .getApplicationLevelListener()
+            .getProcessedObjects()
+            .get(0);
         parquetUtil.getTasks().addAll(tasks);
         parquetUtil.getWorkflows().addAll(workFlow);
         parquetUtil.readWorkload(workLoad);
-        parquetUtil.writeToFile(
-                "resource",
-                "task",
-                "workflow",
-                "generic_information"
-        );
-      } catch(Exception e) {
+        parquetUtil.writeToFile("resource", "task", "workflow", "generic_information");
+      } catch (Exception e) {
         log.error("Error while writing to Parquet file");
       }
     } else {

@@ -1,7 +1,6 @@
 package com.asml.apa.wta.spark;
 
 import java.util.Arrays;
-
 import lombok.extern.slf4j.Slf4j;
 import org.apache.spark.SparkConf;
 import org.apache.spark.SparkContext;
@@ -49,8 +48,7 @@ public class EndToEnd {
     System.setProperty("configFile", "adapter/spark/src/test/resources/config.json");
     SparkSession spark = SparkSession.builder().config(conf).getOrCreate();
     SparkContext sc = spark.sparkContext();
-    testFile = JavaSparkContext.fromSparkContext(sc)
-            .textFile("adapter/spark/src/test/resources/wordcount.txt");
+    testFile = JavaSparkContext.fromSparkContext(sc).textFile("adapter/spark/src/test/resources/wordcount.txt");
     for (int i = 0; i < 100; i++) {
       invokeJob();
     }

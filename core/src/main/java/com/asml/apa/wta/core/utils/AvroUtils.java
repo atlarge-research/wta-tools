@@ -47,10 +47,10 @@ public class AvroUtils implements AutoCloseable {
     uri = path.getPath();
     configuration = new Configuration();
     writer = AvroParquetWriter.<GenericRecord>builder(HadoopOutputFile.fromPath(hadoopPath, configuration))
-              .withSchema(avroSchema)
-              .build();
+        .withSchema(avroSchema)
+        .build();
     reader = AvroParquetReader.<GenericRecord>builder(HadoopInputFile.fromPath(hadoopPath, configuration))
-              .build();
+        .build();
   }
 
   /**

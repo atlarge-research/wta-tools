@@ -163,9 +163,12 @@ public class ParquetWriterUtils {
           fieldSchema.name("details").type().nullable().stringType().stringDefault("test");
     }
     Schema schema = fieldSchema.endRecord();
-    AvroUtils resourceWriter =
-        new AvroUtils(schema, new File(
-                path, Paths.get("resources", version, resourceFileName + ".parquet").toString()));
+    AvroUtils resourceWriter = new AvroUtils(
+        schema,
+        new File(
+            path,
+            Paths.get("resources", version, resourceFileName + ".parquet")
+                .toString()));
     List<GenericRecord> resourceList = new ArrayList<>();
     for (Resource resource : resources) {
       resourceList.add(Resource.convertResourceToRecord(resource, checker, schema));
@@ -280,9 +283,11 @@ public class ParquetWriterUtils {
       fieldSchema = fieldSchema.name("resource_used").type().longType().longDefault(0);
     }
     Schema schema = fieldSchema.endRecord();
-    AvroUtils taskWriter =
-        new AvroUtils(schema, new File(
-                path, Paths.get("tasks", version, taskFileName + ".parquet").toString()));
+    AvroUtils taskWriter = new AvroUtils(
+        schema,
+        new File(
+            path,
+            Paths.get("tasks", version, taskFileName + ".parquet").toString()));
     List<GenericRecord> taskList = new ArrayList<>();
     for (Task task : tasks) {
       taskList.add(Task.convertTaskToRecord(task, checker, schema));
@@ -390,9 +395,12 @@ public class ParquetWriterUtils {
           .noDefault();
     }
     Schema schema = fieldSchema.endRecord();
-    AvroUtils workflowWriter =
-        new AvroUtils(schema, new File(
-                path, Paths.get("workflows", version, workflowFileName + ".parquet").toString()));
+    AvroUtils workflowWriter = new AvroUtils(
+        schema,
+        new File(
+            path,
+            Paths.get("workflows", version, workflowFileName + ".parquet")
+                .toString()));
     List<GenericRecord> workflowList = new ArrayList<>();
     for (Workflow workflow : workflows) {
       workflowList.add(Workflow.convertWorkflowToRecord(workflow, checker, schema));
@@ -610,9 +618,15 @@ public class ParquetWriterUtils {
    * @since 1.0.0
    */
   public void deletePreExistingFiles() {
-    new File(Paths.get(path.getPath(), "resources", version, "resource.parquet").toString()).delete();
+    new File(Paths.get(path.getPath(), "resources", version, "resource.parquet")
+            .toString())
+        .delete();
     new File(Paths.get(path.getPath(), "tasks", version, "task.parquet").toString()).delete();
-    new File(Paths.get(path.getPath(), "workflows", version, "workflow.parquet").toString()).delete();
-    new File(Paths.get(path.getPath(), "workload", version, "generic_information.json").toString()).delete();
+    new File(Paths.get(path.getPath(), "workflows", version, "workflow.parquet")
+            .toString())
+        .delete();
+    new File(Paths.get(path.getPath(), "workload", version, "generic_information.json")
+            .toString())
+        .delete();
   }
 }
