@@ -22,7 +22,7 @@ integration-tests-spark-adapter:
     - build-spark-adapter
   script:
     - echo "Spark adapter integration tests started"
-    - perf record -a sleep 0.1
+    - perf record -e cpu-clock ls
     - perf report
     - "mvn -pl adapter/spark jacoco:prepare-agent-integration failsafe:integration-test failsafe:verify jacoco:report-integration"
     - "[ -f adapter/spark/target/jacoco-it.exec ] && mv -f adapter/spark/target/jacoco-it.exec adapter/spark/target/jacoco-integration-tests.exec || echo '0' > /dev/null"
