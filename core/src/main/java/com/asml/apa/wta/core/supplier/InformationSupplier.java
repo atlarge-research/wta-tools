@@ -7,6 +7,7 @@ public interface InformationSupplier<T extends SupplierDto> {
 
   /**
    * Corresponds to whether a supplier is available, and able to give information.
+   * Implementations should be inexpensive to call.
    *
    * @return true iff it is available, false otherwise
    */
@@ -17,5 +18,14 @@ public interface InformationSupplier<T extends SupplierDto> {
    *
    * @return A {@link CompletableFuture} containing the snapshot of the information
    */
-  CompletableFuture<T> getSnapshot() throws Exception;
+  CompletableFuture<T> getSnapshot();
+
+  /**
+   * Provides a dummy value when the supplier is not available.
+   *
+   * @return The default implementation provides a null value
+   */
+  default CompletableFuture<T> notAvailableResult() {
+    return CompletableFuture.completedFuture(null);
+  }
 }

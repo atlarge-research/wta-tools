@@ -4,6 +4,7 @@ import com.asml.apa.wta.core.dto.IostatDto;
 import com.asml.apa.wta.core.utils.BashUtils;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -14,13 +15,16 @@ import lombok.extern.slf4j.Slf4j;
  * @since 1.0.0
  */
 @Slf4j
+@RequiredArgsConstructor
 public class IostatSupplier implements InformationSupplier<IostatDto> {
-  private BashUtils bashUtils;
-  private boolean isIostatAvailable;
 
-  public IostatSupplier(BashUtils bashUtils) {
-    this.bashUtils = bashUtils;
-    this.isIostatAvailable = isAvailable();
+  private final BashUtils bashUtils;
+
+  /**
+   * Uses an arbitrary instance of bash utils.
+   */
+  public IostatSupplier() {
+    this(new BashUtils());
   }
 
   /**
@@ -47,7 +51,7 @@ public class IostatSupplier implements InformationSupplier<IostatDto> {
   }
 
   /**
-   * Uses the Iostat dependency to get io metrics.
+   * Uses the Iostat dependency to get io metrics (computed asynchronously).
    *
    * @return IostatDto object that will be sent to the driver (with the necessary information filled out)
    * @author Lohithsai Yadala Chanchu
@@ -56,6 +60,9 @@ public class IostatSupplier implements InformationSupplier<IostatDto> {
    */
   @Override
   public CompletableFuture<IostatDto> getSnapshot() {
+    if (!isAvailable()) {
+      return notAvailableResult();
+    }
 
     CompletableFuture<String> allMetrics = bashUtils.executeCommand("iostat -d | awk '$1 == \"sdc\"'");
 

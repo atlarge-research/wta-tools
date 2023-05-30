@@ -129,7 +129,7 @@ public class OperatingSystemSupplier implements InformationSupplier<OsInfoDto> {
   }
 
   /**
-   * Gathers the metrics the supplier provides.
+   * Gathers the metrics the supplier provides (computed asynchronously).
    *
    * @return an {@link OsInfoDto} containing the gathered metrics
    * @author Atour Mousavi Gourabi
@@ -137,6 +137,10 @@ public class OperatingSystemSupplier implements InformationSupplier<OsInfoDto> {
    */
   @Override
   public CompletableFuture<OsInfoDto> getSnapshot() {
+    if (!isAvailable()) {
+      return notAvailableResult();
+    }
+
     return CompletableFuture.supplyAsync(() -> {
       long vMemSize = getCommittedVirtualMemorySize();
       long freeMemSize = getFreePhysicalMemorySize();
