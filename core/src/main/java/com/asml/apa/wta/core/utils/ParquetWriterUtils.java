@@ -5,9 +5,11 @@ import com.asml.apa.wta.core.model.Task;
 import com.asml.apa.wta.core.model.Workflow;
 import com.asml.apa.wta.core.model.Workload;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -106,16 +108,15 @@ public class ParquetWriterUtils {
    */
   public void writeToFile(
       String resourceFileName, String taskFileName, String workflowFileName, String workloadFileName)
-  {
+          throws IOException {
     try {
       writeResourceToFile(resourceFileName);
       writeTaskToFile(taskFileName);
       writeWorkflowToFile(workflowFileName);
       writeWorkloadToFile(workloadFileName);
     } catch (Exception e){
-      //TODO: this also shuts down the spark application, which it shouldn't
-      log.error("Failed to write to parquet file, possibly due to invalid output path");
-      System.exit(1);
+      throw new IOException(
+              "Failed to write to parquet file, possibly due to invalid output path");
     }
   }
 

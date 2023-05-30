@@ -35,10 +35,13 @@ public class WtaDriverPlugin implements DriverPlugin {
 
   private ParquetWriterUtils parquetUtil;
 
+  private boolean noError = true;
+
   /**
    * This method is called early in the initialization of the Spark driver.
    * Explicitly, it is called before the Spark driver's task scheduler is initialized. It is blocking.
-   * Expensive calls should be postponed or delegated to another thread.
+   * Expensive calls should be postponed or delegated to another thread. If an error occurs while
+   * initializing the plugin, the plugin should call {@link #shutdown()} with noError set to false.
    *
    * @param sparkCtx The current SparkContext.
    * @param pluginCtx Additional plugin-specific about the Spark application where the plugin is running.
@@ -49,11 +52,16 @@ public class WtaDriverPlugin implements DriverPlugin {
    */
   @Override
   public Map<String, String> init(SparkContext sparkCtx, PluginContext pluginCtx) {
-    RuntimeConfig runtimeConfig = WtaUtils.readConfig(System.getProperty("configFile"));
-    sparkDataSource = new SparkDataSource(sparkCtx, runtimeConfig);
-    parquetUtil = new ParquetWriterUtils(new File(runtimeConfig.getOutputPath()), "schema-1.0");
-    parquetUtil.deletePreExistingFiles();
-    initListeners();
+    try{
+      RuntimeConfig runtimeConfig = WtaUtils.readConfig(System.getProperty("configFile"));
+      sparkDataSource = new SparkDataSource(sparkCtx, runtimeConfig);
+      parquetUtil = new ParquetWriterUtils(new File(runtimeConfig.getOutputPath()), "schema-1.0");
+      parquetUtil.deletePreExistingFiles();
+      initListeners();
+    } catch (Exception e) {
+      noError = false;
+      shutdown();
+    }
     return new HashMap<>();
   }
 
@@ -70,8 +78,10 @@ public class WtaDriverPlugin implements DriverPlugin {
   }
 
   /**
-   * Gets called just before shutdown. Collects all the tasks, workflows, and workloads from the
-   * Spark job and writes them to a parquet file. Recommended that no spark functions are used here.
+   * Gets called just before shutdown. If no prior error occurred, it collects all the
+   * tasks, workflows, and workloads from the Spark job and writes them to a parquet file.
+   * Otherwise, logs the error and just shuts down.
+   * Recommended that no spark functions are used here.
    *
    * @author Pil Kyu Cho
    * @author Henry Page
@@ -79,19 +89,28 @@ public class WtaDriverPlugin implements DriverPlugin {
    */
   @Override
   public void shutdown() {
-    List<Task> tasks = sparkDataSource.getTaskLevelListener().getProcessedObjects();
-    List<Workflow> workFlow = sparkDataSource.getJobLevelListener().getProcessedObjects();
-    Workload workLoad =
-            sparkDataSource.getApplicationLevelListener().getProcessedObjects().get(0);
-    parquetUtil.getTasks().addAll(tasks);
-    parquetUtil.getWorkflows().addAll(workFlow);
-    parquetUtil.readWorkload(workLoad);
-    parquetUtil.writeToFile(
-            "resource",
-            "task",
-            "workflow",
-            "generic_information"
-    );
+    if (noError) {
+      try {
+        List<Task> tasks = sparkDataSource.getTaskLevelListener().getProcessedObjects();
+        List<Workflow> workFlow = sparkDataSource.getJobLevelListener().getProcessedObjects();
+        Workload workLoad =
+                sparkDataSource.getApplicationLevelListener().getProcessedObjects().get(0);
+        parquetUtil.getTasks().addAll(tasks);
+        parquetUtil.getWorkflows().addAll(workFlow);
+        parquetUtil.readWorkload(workLoad);
+        parquetUtil.writeToFile(
+                "resource",
+                "task",
+                "workflow",
+                "generic_information"
+        );
+        log.info("shutting down plugin without error");
+      } catch(Exception e) {
+        log.error("Error while writing to Parquet file");
+      }
+    } else {
+      log.error("Error initializing WTA plugin. Shutting down gracefully");
+    }
   }
 
   /**

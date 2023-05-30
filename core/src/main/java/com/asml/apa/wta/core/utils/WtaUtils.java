@@ -20,7 +20,6 @@ import java.util.Map;
  * @author Atour Mousavi Gourabi
  * @since 1.0.0
  */
-@Slf4j
 public class WtaUtils {
 
   private static final String CONFIG_DIR = "config.json";
@@ -38,48 +37,44 @@ public class WtaUtils {
    * @param configDir The directory where the config is located.
    * @return The associated config object
    */
-  public static RuntimeConfig readConfig(String configDir) {
+  public static RuntimeConfig readConfig(String configDir) throws IllegalArgumentException{
     var configBuilder = RuntimeConfig.builder();
+    ObjectMapper mapper = new ObjectMapper();
 
     try (FileInputStream fis = new FileInputStream(configDir)) {
-      ObjectMapper mapper = new ObjectMapper();
-
       JsonNode rootNode = mapper.readTree(fis);
-
       JsonNode workloadNode = rootNode.get("workloadSettings");
       JsonNode resourceNode = rootNode.get("resourceSettings");
       JsonNode logNode = rootNode.get("logSettings");
-      JsonNode outputNode = rootNode.get("outputPath");
+      JsonNode outputNode = rootNode.get("outputSettings");
 
       String[] authors = workloadNode.get("author").asText().split("\\s*,\\s*");
-
       Domain domain = Domain.extractAsEnum(workloadNode.get("domain").asText());
-
       String description = workloadNode.has("description")
-          ? workloadNode.get("description").asText()
-          : "";
+              ? workloadNode.get("description").asText()
+              : "";
+
       Map<String, String> events = resourceNode.has("events")
-          ? mapper.convertValue(resourceNode.get("events"), new TypeReference<>() {})
-          : new HashMap<>();
+              ? mapper.convertValue(resourceNode.get("events"), new TypeReference<>() {})
+              : new HashMap<>();
 
       String logLevel = logNode.has("logLevel") ? logNode.get("logLevel").asText() : "ERROR";
 
-      String outputPath = outputNode.get("outputNode").asText();
+      String outputPath = outputNode.get("outputPath").asText();
 
       configBuilder = configBuilder
-          .authors(authors)
-          .domain(domain)
-          .description(description)
-          .events(events)
-          .logLevel(logLevel)
-          .outputPath(outputPath);
+              .authors(authors)
+              .domain(domain)
+              .description(description)
+              .events(events)
+              .logLevel(logLevel)
+              .outputPath(outputPath);
     } catch (EnumConstantNotPresentException e) {
-      log.error(e.constantName()
+      throw new IllegalArgumentException(e.constantName()
               + " is not a valid domain. It must be BIOMEDICAL, ENGINEERING, INDUSTRIAL, or SCIENTIFIC.");
-      System.exit(1);
     } catch (Exception e) {
-      log.error("The config file has missing/invalid fields or no config file was found");
-      System.exit(1);
+      throw new IllegalArgumentException(
+              "The config file has missing/invalid fields or no config file was found");
     }
     return configBuilder.build();
   }
