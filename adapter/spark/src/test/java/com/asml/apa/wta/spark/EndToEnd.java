@@ -36,10 +36,9 @@ public class EndToEnd {
   }
 
   /**
-   * Sets the filepath and reads the user config file along
-   * with output dir for generated parquet files. Then runs a simple spark job to
-   * colelct metrics and uses the parquet utils to write to parquet. User must provide their own
-   * config file and output directory. Otherwise, system will exit.
+   * Entry point for the e2e test. This method will create a spark session along with the plugin.
+   * The 'configFile' environment variable must be specified. Even if an error occurs on the plugin,
+   * it will not shut down the entire Spark job.
    *
    * @author Pil Kyu Cho
    * @since 1.0.0
@@ -56,6 +55,5 @@ public class EndToEnd {
       invokeJob();
     }
     sc.stop();
-    log.info("Invoked all jobs");
   }
 }

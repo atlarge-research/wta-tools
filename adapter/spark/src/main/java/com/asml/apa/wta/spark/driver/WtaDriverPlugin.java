@@ -58,7 +58,6 @@ public class WtaDriverPlugin implements DriverPlugin {
       parquetUtil = new ParquetWriterUtils(new File(runtimeConfig.getOutputPath()), "schema-1.0");
       parquetUtil.deletePreExistingFiles();
       initListeners();
-      log.info("WTA plugin initialized successfully");
     } catch (Exception e) {
       noError = false;
       shutdown();
@@ -105,7 +104,6 @@ public class WtaDriverPlugin implements DriverPlugin {
                 "workflow",
                 "generic_information"
         );
-        log.info("Generating files successful. Shutting down plugin without error");
       } catch(Exception e) {
         log.error("Error while writing to Parquet file");
       }
