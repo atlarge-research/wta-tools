@@ -1,7 +1,6 @@
 package com.asml.apa.wta.core.model;
 
 import com.asml.apa.wta.core.model.enums.Domain;
-import java.io.Serializable;
 import lombok.Builder;
 import lombok.Data;
 
@@ -14,7 +13,7 @@ import lombok.Data;
  */
 @Data
 @Builder
-public class Workload implements Serializable {
+public class Workload implements BaseTraceObject {
 
   private static final long serialVersionUID = -4547341610378381743L;
 
