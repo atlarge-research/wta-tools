@@ -1,7 +1,6 @@
 package com.asml.apa.wta.core.model.enums;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+import com.google.gson.annotations.SerializedName;
 
 /**
  * Domain enum for WTA traces.
@@ -10,28 +9,18 @@ import lombok.Getter;
  * @author Henry Page
  * @since 1.0.0
  */
-@AllArgsConstructor
 public enum Domain {
-  BIOMEDICAL("Biomedical"),
-  ENGINEERING("Engineering"),
-  INDUSTRIAL("Industrial"),
-  SCIENTIFIC("Scientific");
+  @SerializedName("Biomedical")
+  BIOMEDICAL,
 
-  @Getter
-  private String value;
+  @SerializedName("Engineering")
+  ENGINEERING,
 
-  /**
-   * Extracts the domain value from the given string.
-   *
-   * @param domain The domain in string format
-   * @return The domain in enum format
-   * @throws EnumConstantNotPresentException if the given domain is not one of the 4 valid domains
-   */
-  public static Domain extractAsEnum(String domain) {
-    try {
-      return Domain.valueOf(domain.toUpperCase());
-    } catch (IllegalArgumentException | NullPointerException e) {
-      throw new EnumConstantNotPresentException(Domain.class, domain == null ? "null" : domain.toUpperCase());
-    }
-  }
+  @SerializedName("Industrial")
+  INDUSTRIAL,
+
+  @SerializedName("Scientific")
+  SCIENTIFIC;
+
+  public static final String[] STRINGS = {"Biomedical", "Engineering", "Industrial", "Scientific"};
 }
