@@ -22,8 +22,7 @@ integration-tests-spark-adapter:
     - build-spark-adapter
   script:
     - echo "Spark adapter integration tests started"
-    - whereis perf_5.10
-    - perf_5.10 --help
+    - perf --help
     - "mvn -pl adapter/spark jacoco:prepare-agent-integration failsafe:integration-test failsafe:verify jacoco:report-integration"
     - "[ -f adapter/spark/target/jacoco-it.exec ] && mv -f adapter/spark/target/jacoco-it.exec adapter/spark/target/jacoco-integration-tests.exec || echo '0' > /dev/null"
   artifacts:
