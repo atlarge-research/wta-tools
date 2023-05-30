@@ -70,7 +70,12 @@ public class WtaDriverPlugin implements DriverPlugin {
    * @since 1.0.0
    */
   private void initListeners() {
+  if(sparkDataSource.getRuntimeConfig().isStageLevel()) {
+    this.sparkDataSource.registerStageListener();
+  }
+  else {
     this.sparkDataSource.registerTaskListener();
+  }
     // register more listeners as needed
   }
 }

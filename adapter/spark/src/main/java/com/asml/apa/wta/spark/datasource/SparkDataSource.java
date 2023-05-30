@@ -1,14 +1,11 @@
 package com.asml.apa.wta.spark.datasource;
 
 import com.asml.apa.wta.core.config.RuntimeConfig;
-import com.asml.apa.wta.core.model.Task;
-import com.asml.apa.wta.core.model.Workflow;
-import com.asml.apa.wta.core.model.Workload;
 import com.asml.apa.wta.core.utils.CollectorInterface;
 import com.asml.apa.wta.core.utils.WtaUtils;
-import com.asml.apa.wta.spark.listener.AbstractListener;
 import com.asml.apa.wta.spark.listener.ApplicationLevelListener;
 import com.asml.apa.wta.spark.listener.JobLevelListener;
+import com.asml.apa.wta.spark.listener.StageLevelListener;
 import com.asml.apa.wta.spark.listener.TaskLevelListener;
 import lombok.Getter;
 import org.apache.spark.SparkContext;
@@ -23,11 +20,15 @@ import org.apache.spark.SparkContext;
 @Getter
 public class SparkDataSource implements CollectorInterface {
 
-  private final AbstractListener<Task> taskLevelListener;
+  private final TaskLevelListener taskLevelListener;
 
-  private final AbstractListener<Workflow> jobLevelListener;
+  private final JobLevelListener jobLevelListener;
 
-  private final AbstractListener<Workload> applicationLevelListener;
+  private final ApplicationLevelListener applicationLevelListener;
+
+  private final StageLevelListener stageLevelListener;
+
+  private final RuntimeConfig runtimeConfig;
 
   /**
    * Constructor for the Spark data source. This requires a Spark context to ensure a Spark session
@@ -43,6 +44,8 @@ public class SparkDataSource implements CollectorInterface {
     taskLevelListener = new TaskLevelListener(sparkContext, config);
     jobLevelListener = new JobLevelListener(sparkContext, config, taskLevelListener);
     applicationLevelListener = new ApplicationLevelListener(sparkContext, config, jobLevelListener);
+    stageLevelListener = new StageLevelListener(sparkContext, config);
+    runtimeConfig = config;
   }
 
   /**
@@ -115,5 +118,25 @@ public class SparkDataSource implements CollectorInterface {
    */
   public void removeApplicationListener() {
     applicationLevelListener.remove();
+  }
+
+  /**
+   * This method registers a stage listener to the Spark context.
+   *
+   * @author Lohithsai Yadala Chanchu
+   * @since 1.0.0
+   */
+  public void registerStageListener() {
+    stageLevelListener.register();
+  }
+
+  /**
+   * This method removes a stage listener from the Spark context.
+   *
+   * @author Lohithsai Yadala Chanchu
+   * @since 1.0.0
+   */
+  public void removeStageListener() {
+    stageLevelListener.remove();
   }
 }
