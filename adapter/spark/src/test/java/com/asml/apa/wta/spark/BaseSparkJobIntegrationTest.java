@@ -15,6 +15,7 @@ import scala.Tuple2;
 public class BaseSparkJobIntegrationTest {
 
   protected SparkSession spark;
+
   protected SparkDataSource sut;
 
   protected JavaRDD<String> testFile;
@@ -28,6 +29,7 @@ public class BaseSparkJobIntegrationTest {
         .domain(Domain.SCIENTIFIC)
         .description("Yer a wizard harry")
         .events(Map.of("event1", "Desc of event1", "event2", "Desc of event2"))
+        .outputPath("src/test/resources/WTA")
         .build();
 
     SparkConf conf = new SparkConf()

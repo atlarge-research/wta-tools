@@ -2,5 +2,6 @@
   "authors": ["Test Name"],
   "domain": "Industrial",
   "description": "Test Description",
-  "logLevel": "INFO"
+  "logLevel": "INFO",
+  "outputPath": "/home/user/WTA"
 }

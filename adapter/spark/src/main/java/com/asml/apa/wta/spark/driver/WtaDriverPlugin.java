@@ -26,10 +26,10 @@ import org.apache.spark.api.plugin.PluginContext;
  * @author Henry Page
  * @since 1.0.0
  */
+@Getter
 @Slf4j
 public class WtaDriverPlugin implements DriverPlugin {
 
-  @Getter
   private SparkDataSource sparkDataSource;
 
   private ParquetWriterUtils parquetUtil;
@@ -115,7 +115,7 @@ public class WtaDriverPlugin implements DriverPlugin {
    * @author Lohithsai Yadala Chanchu
    * @since 1.0.0
    */
-  private void initListeners() {
+  public void initListeners() {
     this.sparkDataSource.registerTaskListener();
     this.sparkDataSource.registerJobListener();
     this.sparkDataSource.registerApplicationListener();
