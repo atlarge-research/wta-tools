@@ -1,9 +1,6 @@
 package com.asml.apa.wta.core.model;
 
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Data;
-import lombok.Getter;
+import lombok.*;
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.GenericRecord;
@@ -38,7 +35,8 @@ public class Task implements BaseTraceObject {
 
   private final long[] parents;
 
-  private final long[] children;
+  @Setter
+  private long[] children;
 
   private final int userId;
 

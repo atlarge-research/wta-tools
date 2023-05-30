@@ -9,6 +9,7 @@ import com.asml.apa.wta.core.utils.WtaUtils;
 import com.asml.apa.wta.spark.listener.AbstractListener;
 import com.asml.apa.wta.spark.listener.ApplicationLevelListener;
 import com.asml.apa.wta.spark.listener.JobLevelListener;
+import com.asml.apa.wta.spark.listener.StageLevelListener;
 import com.asml.apa.wta.spark.listener.TaskLevelListener;
 import lombok.Getter;
 import org.apache.spark.SparkContext;
@@ -45,7 +46,7 @@ public class SparkDataSource implements CollectorInterface {
     stageLevelListener = new StageLevelListener(sparkContext, config);
     taskLevelListener = new TaskLevelListener(sparkContext, config, stageLevelListener);
     jobLevelListener = new JobLevelListener(sparkContext, config, taskLevelListener);
-    applicationLevelListener = new ApplicationLevelListener(sparkContext, config, jobLevelListener);
+    applicationLevelListener = new ApplicationLevelListener(sparkContext, config, jobLevelListener, taskLevelListener);
   }
 
   /**

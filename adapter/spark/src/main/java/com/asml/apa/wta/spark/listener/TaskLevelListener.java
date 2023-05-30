@@ -78,9 +78,14 @@ public class TaskLevelListener extends AbstractListener<Task> {
       tasks.add(taskId);
     }
     final Integer[] parentStages = stageLevelListener.getStageToParents().get(stageId);
-    final Long[] parents = (Long[]) Arrays.stream(parentStages)
-            .flatMap(x -> Arrays.stream(stageToTasks.get(x).toArray()))
-            .toArray();
+    final Long[] parents;
+    if(parentStages == null){
+      parents = new Long[0];
+    }else {
+      parents = (Long[]) Arrays.stream(parentStages)
+              .flatMap(x -> Arrays.stream(stageToTasks.get(x).toArray()))
+              .toArray();
+    }
 
     // unknown
     final int submissionSite = -1;

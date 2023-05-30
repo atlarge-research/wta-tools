@@ -1,10 +1,13 @@
 package com.asml.apa.wta.spark.listener;
 
 import com.asml.apa.wta.core.config.RuntimeConfig;
+import com.asml.apa.wta.core.model.Task;
 import com.asml.apa.wta.core.model.Workflow;
 import com.asml.apa.wta.core.model.Workload;
 import com.asml.apa.wta.core.model.enums.Domain;
 import java.util.Arrays;
+import java.util.List;
+
 import lombok.Getter;
 import org.apache.spark.SparkContext;
 import org.apache.spark.scheduler.SparkListenerApplicationEnd;
@@ -24,6 +27,8 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
 
   private final AbstractListener<Workflow> jobLevelListener;
 
+  private final AbstractListener<Task> taskLevelListener;
+
   /**
    * Constructor for the application-level listener.
    *
@@ -34,9 +39,10 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
    * @since 1.0.0
    */
   public ApplicationLevelListener(
-      SparkContext sparkContext, RuntimeConfig config, AbstractListener<Workflow> jobLevelListener) {
+      SparkContext sparkContext, RuntimeConfig config, AbstractListener<Workflow> jobLevelListener, AbstractListener<Task> taskLevelListener) {
     super(sparkContext, config);
     this.jobLevelListener = jobLevelListener;
+    this.taskLevelListener = taskLevelListener;
   }
 
   /**
@@ -62,6 +68,10 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
     final long endDate = applicationEnd.time();
     final String[] authors = config.getAuthors();
     final String workloadDescription = config.getDescription();
+    final List<Task> allTasks = taskLevelListener.processedObjects;
+    for (Task task : allTasks){
+      //get children
+    }
 
     // unknown
     final long numSites = -1L;

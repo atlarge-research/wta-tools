@@ -26,8 +26,10 @@ public class StageLevelListener extends AbstractListener<Task>{  //not sure abou
         super.onStageCompleted(stageCompleted);
         final StageInfo stageInfo = stageCompleted.stageInfo();
         final int stageId = stageInfo.stageId();
+        System.out.println(stageInfo.parentIds().toList());
         final List<Integer> scalaTemp = stageInfo.parentIds().toStream().map(x -> (Integer) x).toList();
         final Integer[] parentIds = new Integer[scalaTemp.length()];
+        scalaTemp.copyToArray(parentIds);
         stageToParents.put(stageId, parentIds);
     }
 }
