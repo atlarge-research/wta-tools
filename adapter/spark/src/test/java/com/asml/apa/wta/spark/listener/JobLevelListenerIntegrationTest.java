@@ -6,7 +6,6 @@ import com.asml.apa.wta.core.model.Task;
 import com.asml.apa.wta.core.model.Workflow;
 import com.asml.apa.wta.spark.BaseSparkJobIntegrationTest;
 import java.util.Comparator;
-import java.util.List;
 import org.junit.jupiter.api.Test;
 
 class JobLevelListenerIntegrationTest extends BaseSparkJobIntegrationTest {
@@ -27,7 +26,6 @@ class JobLevelListenerIntegrationTest extends BaseSparkJobIntegrationTest {
         .isEqualTo(spark.sparkContext().getConf().get("spark.app.name"));
     assertThat(workflow.getScheduler()).isEqualTo("DAGScheduler");
 
-    List<Task> test = sut.getTaskLevelListener().getProcessedObjects();
     assertThat(workflow.getTasks()).isNotEmpty().isSortedAccordingTo(Comparator.comparing(Task::getSubmitTime));
     assertThat(sut.getJobLevelListener().getProcessedObjects())
         .hasSize(2)
