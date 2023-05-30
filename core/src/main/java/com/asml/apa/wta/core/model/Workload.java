@@ -1,12 +1,9 @@
 package com.asml.apa.wta.core.model;
 
 import com.asml.apa.wta.core.model.enums.Domain;
-import lombok.AccessLevel;
+import java.io.Serializable;
 import lombok.Builder;
 import lombok.Data;
-import lombok.Getter;
-
-import java.io.Serializable;
 
 /**
  * Workload class corresponding to WTA format.
