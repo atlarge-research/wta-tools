@@ -1,5 +1,5 @@
 ARG base_image
 FROM ${base_image}
 
-RUN apt-get install -y sysstat
-RUN apt-get install -y linux-perf
+RUN apt-get install -y sysstat && \
+    apt-get install -y linux-perf-5.4
