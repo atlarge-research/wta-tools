@@ -52,6 +52,8 @@ public class WtaUtils {
       } else if (config.getDescription() == null
           || config.getDescription().isBlank()) {
         log.info("The config file does not include a description, this field is highly recommended.");
+      } else if (config.getOutputPath() == null) {
+        throw new IllegalArgumentException("The config file does not specify the output path");
       }
       return config;
     } catch (JsonParseException e) {

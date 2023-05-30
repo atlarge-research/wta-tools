@@ -101,7 +101,7 @@ public class ParquetWriterUtils {
    * @param taskFileName task file name
    * @param workflowFileName workflow file name
    * @param workloadFileName workload file name
-   * @throws Exception possible exception due to io
+   * @throws Exception possible exception due to io error
    * @since 1.0.0
    * @author Pil Kyu Cho
    * @author Tianchen Qu
@@ -345,13 +345,8 @@ public class ParquetWriterUtils {
           fieldSchema.name("scheduler").type().nullable().stringType().noDefault();
     }
     if (checker[9]) {
-      fieldSchema = fieldSchema
-          .name("domain")
-          .type()
-          .enumeration("Domain")
-          .namespace("com.asml.apa.wta.core.model.enums")
-          .symbols(Domain.STRINGS)
-          .noDefault();
+      fieldSchema =
+          fieldSchema.name("domain").type().nullable().stringType().noDefault();
     }
     if (checker[10]) {
       fieldSchema = fieldSchema

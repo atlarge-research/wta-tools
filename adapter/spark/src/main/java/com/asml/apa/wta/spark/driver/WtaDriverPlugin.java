@@ -41,7 +41,7 @@ public class WtaDriverPlugin implements DriverPlugin {
    * This method is called early in the initialization of the Spark driver.
    * Explicitly, it is called before the Spark driver's task scheduler is initialized. It is blocking.
    * Expensive calls should be postponed or delegated to another thread. If an error occurs while
-   * initializing the plugin, the plugin should call {@link #shutdown()} with noError set to false.
+   * initializing the plugin, the plugin should call {@link #shutdown()} with {@link #noError} set to false.
    *
    * @param sparkCtx The current SparkContext.
    * @param pluginCtx Additional plugin-specific about the Spark application where the plugin is running.
@@ -104,12 +104,12 @@ public class WtaDriverPlugin implements DriverPlugin {
                 "workflow",
                 "generic_information"
         );
-        log.info("shutting down plugin without error");
+        log.info("Generating files successful. Shutting down plugin without error");
       } catch(Exception e) {
         log.error("Error while writing to Parquet file");
       }
     } else {
-      log.error("Error initializing WTA plugin. Shutting down gracefully");
+      log.error("Error initializing WTA plugin. Shutting down plugin");
     }
   }
 
