@@ -80,22 +80,29 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
     final String workloadDescription = config.getDescription();
     for (Task task : taskLevelListener.processedObjects) {
       final int stageId = taskLevelListener.getTaskToStage().get(task.getId());
-      final Integer[] parentStages = stageLevelListener.getStageToParents().get(stageId);
+      final Integer[] parentStages =
+          stageLevelListener.getStageToParents().get(stageId);
       final Long[] parents;
       if (parentStages == null) {
         parents = new Long[0];
       } else {
         parents = Arrays.stream(parentStages)
-                .flatMap(x -> Arrays.stream(taskLevelListener.getStageToTasks().get(x)
-                        .toArray(new Long[taskLevelListener.getStageToTasks().get(x).size()])))
-                .toArray(size -> new Long[size]);
+            .flatMap(x -> Arrays.stream(taskLevelListener
+                .getStageToTasks()
+                .get(x)
+                .toArray(
+                    new Long
+                        [taskLevelListener
+                            .getStageToTasks()
+                            .get(x)
+                            .size()])))
+            .toArray(size -> new Long[size]);
       }
       task.setParents(ArrayUtils.toPrimitive(parents));
 
-      ListBuffer<Integer> childrenStages = stageLevelListener
-          .getParentToChildren()
-          .get(stageId);
-      if (childrenStages != null){
+      ListBuffer<Integer> childrenStages =
+          stageLevelListener.getParentToChildren().get(stageId);
+      if (childrenStages != null) {
         Iterator<Integer> iterator = childrenStages.iterator();
         List<Long> children = new ArrayList<>();
         while (iterator.hasNext()) {

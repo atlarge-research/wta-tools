@@ -1,28 +1,24 @@
 package com.asml.apa.wta.spark.listener;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.asml.apa.wta.core.model.Task;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import org.apache.spark.executor.ExecutorMetrics;
 import org.apache.spark.executor.TaskMetrics;
 import org.apache.spark.scheduler.SparkListenerJobStart;
-import org.apache.spark.scheduler.SparkListenerTaskEnd;
 import org.apache.spark.scheduler.SparkListenerStageCompleted;
+import org.apache.spark.scheduler.SparkListenerTaskEnd;
 import org.apache.spark.scheduler.StageInfo;
 import org.apache.spark.scheduler.TaskInfo;
 import org.apache.spark.scheduler.TaskLocality;
-import org.apache.spark.scheduler.TaskLocation;
-import org.apache.spark.storage.RDDInfo;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import scala.collection.immutable.Seq;
 import scala.collection.mutable.ListBuffer;
 
 class TaskLevelListenerTest extends BaseLevelListenerTest {
@@ -52,18 +48,18 @@ class TaskLevelListenerTest extends BaseLevelListenerTest {
     when(mockedMetrics.executorRunTime()).thenReturn(100L);
 
     testStageInfo = new StageInfo(
-            3, 0, "test", 50, null, parents.toList().map(x -> x), "None", mockedMetrics, null, null, 100);
+        3, 0, "test", 50, null, parents.toList().map(x -> x), "None", mockedMetrics, null, null, 100);
     parents.addOne(3);
     taskEndEvent = new SparkListenerTaskEnd(
         3, 1, "testTaskType", null, testTaskInfo, new ExecutorMetrics(), mockedMetrics);
     taskEndEvent2 = new SparkListenerTaskEnd(
-            3, 1, "testTaskType", null, testTaskInfo2, new ExecutorMetrics(), mockedMetrics);
+        3, 1, "testTaskType", null, testTaskInfo2, new ExecutorMetrics(), mockedMetrics);
 
     stageCompleted = new SparkListenerStageCompleted(testStageInfo);
   }
 
   @Test
-  void testTaskStageMappings(){
+  void testTaskStageMappings() {
     ListBuffer<StageInfo> stageBuffer = new ListBuffer<>();
     stageBuffer.addOne(testStageInfo);
 
@@ -78,7 +74,7 @@ class TaskLevelListenerTest extends BaseLevelListenerTest {
     fakeTaskListener.onTaskEnd(taskEndEvent2);
     assertThat(fakeTaskListener.getStageToTasks().size()).isEqualTo(1);
     list.add(2L);
-    assertThat(fakeTaskListener.getStageToTasks()).containsEntry(3,list);
+    assertThat(fakeTaskListener.getStageToTasks()).containsEntry(3, list);
     assertThat(fakeTaskListener.getTaskToStage().size()).isEqualTo(2);
     assertThat(fakeTaskListener.getTaskToStage()).containsEntry(1L, 3);
     assertThat(fakeTaskListener.getTaskToStage()).containsEntry(2L, 3);
