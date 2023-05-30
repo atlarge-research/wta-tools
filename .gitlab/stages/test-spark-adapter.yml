@@ -5,6 +5,7 @@ unit-tests-spark-adapter:
     - build-spark-adapter
   script:
     - echo "Spark adapter unit tests started"
+    - perf --help
     - "mvn -pl adapter/spark jacoco:prepare-agent surefire:test jacoco:report"
     - "[ -f adapter/spark/target/jacoco.exec ] && mv -f adapter/spark/target/jacoco.exec adapter/spark/target/jacoco-unit-tests.exec || echo '0' > /dev/null"
   artifacts:
