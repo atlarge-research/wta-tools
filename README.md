@@ -1,4 +1,4 @@
-# WTA Conversion Tool
+# WTA Generation Toolkit
 
 ## Installation and Usage
 - [Spark Plugin](/adapter/spark/README.md#installation-and-usage)
@@ -19,4 +19,5 @@
 - **Client:** Laurens Versluis on behalf of ASML
 
 ## License
-For open source projects, say how it is licensed.
+This project is licensed under the APACHE-2.0 license.
+For more information see [LICENSE](LICENSE) and [NOTICE](NOTICE).

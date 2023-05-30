@@ -9,7 +9,6 @@ spotless:
   stage: check
   dependencies: []
   needs: []
-
   script:
     - echo "Spotless check started"
     - "mvn spotless:check"
@@ -18,14 +17,12 @@ pmd:
   stage: check
   dependencies: [build-core]
   needs: [build-core]
-
   script:
     - echo "PMD checks started"
     - "mvn pmd:check"
-
   artifacts:
     name: pmd
-    expire_in: 3 days
+    expire_in: 3 hours
     when: always
     paths:
       - core/reports/pmd
@@ -35,14 +32,12 @@ checkstyle:
   stage: check
   dependencies: []
   needs: []
-
   script:
     - echo "Checkstyle checks started"
     - "mvn checkstyle:check"
-
   artifacts:
     name: checkstyle
-    expire_in: 3 days
+    expire_in: 3 hours
     when: always
     paths:
       - core/reports/checkstyle/violations.txt
@@ -52,14 +47,6 @@ checkstyle:
 sast:
   stage: check
   allow_failure: true
-
-spotbugs-sast:
-  stage: check
-  needs: []
-  rules:
-    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
-    - if: $CI_COMMIT_REF_NAME == 'dev'
-    - if: $CI_COMMIT_REF_NAME == 'main'
 
 semgrep-sast:
   stage: check

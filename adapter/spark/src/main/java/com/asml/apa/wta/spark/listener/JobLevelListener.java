@@ -46,7 +46,7 @@ public class JobLevelListener extends AbstractListener<Workflow> {
    */
   @Override
   public void onJobStart(SparkListenerJobStart jobStart) {
-    jobSubmitTimes.put(jobStart.jobId(), jobStart.time());
+    jobSubmitTimes.put(jobStart.jobId() + 1, jobStart.time());
   }
 
   /**
@@ -57,7 +57,7 @@ public class JobLevelListener extends AbstractListener<Workflow> {
    */
   @Override
   public void onJobEnd(SparkListenerJobEnd jobEnd) {
-    final int jobId = jobEnd.jobId();
+    final int jobId = jobEnd.jobId() + 1;
     final long submitTime = jobSubmitTimes.get(jobId);
     final Task[] tasks = taskListener
         .getWithCondition(task -> task.getWorkflowId() == jobId)

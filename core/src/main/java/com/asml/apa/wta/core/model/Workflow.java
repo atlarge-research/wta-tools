@@ -99,7 +99,7 @@ public class Workflow implements BaseTraceObject {
       record.put("scheduler", this.scheduler);
     }
     if (checker[9]) {
-      record.put("domain", this.domain.getValue());
+      record.put("domain", workflow.domain);
     }
     if (checker[10]) {
       record.put("application_name", this.applicationName);
