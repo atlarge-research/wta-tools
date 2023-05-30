@@ -2,7 +2,6 @@ package com.asml.apa.wta.spark.listener;
 
 import com.asml.apa.wta.core.config.RuntimeConfig;
 import com.asml.apa.wta.core.model.Task;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Map;
@@ -33,6 +32,9 @@ public class TaskLevelListener extends AbstractListener<Task> {
 
   @Getter
   private final Map<Integer, List<Long>> stageToTasks = new ConcurrentHashMap<>();
+
+  @Getter
+  private final Map<Long, Integer> taskToStage = new ConcurrentHashMap<>();
 
   private final StageLevelListener stageLevelListener;
 
@@ -86,7 +88,7 @@ public class TaskLevelListener extends AbstractListener<Task> {
               .flatMap(x -> Arrays.stream(stageToTasks.get(x).toArray()))
               .toArray();
     }
-
+    taskToStage.put(taskId, stageId);
     // unknown
     final int submissionSite = -1;
     final String resourceType = "N/A";

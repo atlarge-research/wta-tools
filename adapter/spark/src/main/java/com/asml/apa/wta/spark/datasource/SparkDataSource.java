@@ -24,7 +24,7 @@ import org.apache.spark.SparkContext;
 @Getter
 public class SparkDataSource implements CollectorInterface {
 
-  private final AbstractListener<Task> taskLevelListener;
+  private final TaskLevelListener taskLevelListener;
 
   private final StageLevelListener stageLevelListener;
 
@@ -46,7 +46,7 @@ public class SparkDataSource implements CollectorInterface {
     stageLevelListener = new StageLevelListener(sparkContext, config);
     taskLevelListener = new TaskLevelListener(sparkContext, config, stageLevelListener);
     jobLevelListener = new JobLevelListener(sparkContext, config, taskLevelListener);
-    applicationLevelListener = new ApplicationLevelListener(sparkContext, config, jobLevelListener, taskLevelListener);
+    applicationLevelListener = new ApplicationLevelListener(sparkContext, config, jobLevelListener, taskLevelListener, stageLevelListener);
   }
 
   /**
