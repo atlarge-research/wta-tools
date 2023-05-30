@@ -43,7 +43,7 @@ For the most part, since we are pre-release this will serve no real purpose, oth
 ### Changed
 - Refactored listeners into a generic interface to reduce code duplication and increase cc [@hpage](https://gitlab.ewi.tudelft.nl/hpage)
 - Merged the JaCoCo coverage metrics for integration and unit tests [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
-- Decreased JAR size by over 65% [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
+- Decreased JAR size by around 75% [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 - Modified the config format [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 
 ### Fixed
