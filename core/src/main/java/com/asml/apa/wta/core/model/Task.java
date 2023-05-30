@@ -37,7 +37,8 @@ public class Task implements BaseTraceObject {
 
   private final double resourceAmountRequested;
 
-  private final long[] parents;
+  @Setter
+  private long[] parents;
 
   @Setter
   private long[] children;

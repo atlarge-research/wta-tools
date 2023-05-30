@@ -9,9 +9,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import lombok.Getter;
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.spark.SparkContext;
 import org.apache.spark.scheduler.SparkListenerApplicationEnd;
 import org.apache.spark.scheduler.SparkListenerApplicationStart;
+import scala.collection.Iterator;
+import scala.collection.mutable.ListBuffer;
 
 /**
  * This class is an application-level listener for the Spark data source.
@@ -75,18 +78,32 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
     final long endDate = applicationEnd.time();
     final String[] authors = config.getAuthors();
     final String workloadDescription = config.getDescription();
-    final List<Task> allTasks = taskLevelListener.processedObjects;
-    for (Task task : allTasks) {
+    for (Task task : taskLevelListener.processedObjects) {
       final int stageId = taskLevelListener.getTaskToStage().get(task.getId());
-      List<Integer> childrenStages = (List<Integer>) stageLevelListener
-          .getParentToChildren()
-          .get(taskLevelListener.getTaskToStage().get(stageId));
-      List<Long> children = new ArrayList<>();
-      for (Integer id : childrenStages) {
-        children.addAll(taskLevelListener.getStageToTasks().get(id));
+      final Integer[] parentStages = stageLevelListener.getStageToParents().get(stageId);
+      final Long[] parents;
+      if (parentStages == null) {
+        parents = new Long[0];
+      } else {
+        parents = Arrays.stream(parentStages)
+                .flatMap(x -> Arrays.stream(taskLevelListener.getStageToTasks().get(x)
+                        .toArray(new Long[taskLevelListener.getStageToTasks().get(x).size()])))
+                .toArray(size -> new Long[size]);
       }
-      long[] i = new long[children.size()];
-      task.setChildren(i);
+      task.setParents(ArrayUtils.toPrimitive(parents));
+
+      ListBuffer<Integer> childrenStages = stageLevelListener
+          .getParentToChildren()
+          .get(stageId);
+      if (childrenStages != null){
+        Iterator<Integer> iterator = childrenStages.iterator();
+        List<Long> children = new ArrayList<>();
+        while (iterator.hasNext()) {
+          children.addAll(taskLevelListener.getStageToTasks().get(iterator.next()));
+        }
+        Long[] temp = children.toArray(size -> new Long[size]);
+        task.setChildren(ArrayUtils.toPrimitive(temp));
+      }
     }
 
     // unknown

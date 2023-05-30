@@ -1,11 +1,9 @@
 package com.asml.apa.wta.spark.listener;
 
-import static org.assertj.core.api.Assertions.as;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import java.util.Arrays;
-import java.util.Map;
+
 import org.apache.spark.executor.TaskMetrics;
 import org.apache.spark.scheduler.SparkListenerStageCompleted;
 import org.apache.spark.scheduler.StageInfo;
