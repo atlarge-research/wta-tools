@@ -1,7 +1,6 @@
 package com.asml.apa.wta.spark.datasource;
 
 import com.asml.apa.wta.core.config.RuntimeConfig;
-import com.asml.apa.wta.core.model.Task;
 import com.asml.apa.wta.core.model.Workflow;
 import com.asml.apa.wta.core.model.Workload;
 import com.asml.apa.wta.core.utils.CollectorInterface;
@@ -46,7 +45,8 @@ public class SparkDataSource implements CollectorInterface {
     stageLevelListener = new StageLevelListener(sparkContext, config);
     taskLevelListener = new TaskLevelListener(sparkContext, config, stageLevelListener);
     jobLevelListener = new JobLevelListener(sparkContext, config, taskLevelListener);
-    applicationLevelListener = new ApplicationLevelListener(sparkContext, config, jobLevelListener, taskLevelListener, stageLevelListener);
+    applicationLevelListener = new ApplicationLevelListener(
+        sparkContext, config, jobLevelListener, taskLevelListener, stageLevelListener);
   }
 
   /**

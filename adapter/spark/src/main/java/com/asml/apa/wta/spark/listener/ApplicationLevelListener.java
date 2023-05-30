@@ -5,16 +5,13 @@ import com.asml.apa.wta.core.model.Task;
 import com.asml.apa.wta.core.model.Workflow;
 import com.asml.apa.wta.core.model.Workload;
 import com.asml.apa.wta.core.model.enums.Domain;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
 import lombok.Getter;
 import org.apache.spark.SparkContext;
 import org.apache.spark.scheduler.SparkListenerApplicationEnd;
 import org.apache.spark.scheduler.SparkListenerApplicationStart;
-import scala.collection.mutable.ListBuffer;
 
 /**
  * This class is an application-level listener for the Spark data source.
@@ -44,7 +41,11 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
    * @since 1.0.0
    */
   public ApplicationLevelListener(
-      SparkContext sparkContext, RuntimeConfig config, AbstractListener<Workflow> jobLevelListener, TaskLevelListener taskLevelListener, StageLevelListener stageLevelListener) {
+      SparkContext sparkContext,
+      RuntimeConfig config,
+      AbstractListener<Workflow> jobLevelListener,
+      TaskLevelListener taskLevelListener,
+      StageLevelListener stageLevelListener) {
     super(sparkContext, config);
     this.jobLevelListener = jobLevelListener;
     this.taskLevelListener = taskLevelListener;
@@ -75,11 +76,13 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
     final String[] authors = config.getAuthors();
     final String workloadDescription = config.getDescription();
     final List<Task> allTasks = taskLevelListener.processedObjects;
-    for (Task task : allTasks){
+    for (Task task : allTasks) {
       final int stageId = taskLevelListener.getTaskToStage().get(task.getId());
-      List<Integer> childrenStages = (List<Integer>) stageLevelListener.getParentToChildren().get(taskLevelListener.getTaskToStage().get(stageId));
+      List<Integer> childrenStages = (List<Integer>) stageLevelListener
+          .getParentToChildren()
+          .get(taskLevelListener.getTaskToStage().get(stageId));
       List<Long> children = new ArrayList<>();
-      for (Integer id : childrenStages){
+      for (Integer id : childrenStages) {
         children.addAll(taskLevelListener.getStageToTasks().get(id));
       }
       long[] i = new long[children.size()];

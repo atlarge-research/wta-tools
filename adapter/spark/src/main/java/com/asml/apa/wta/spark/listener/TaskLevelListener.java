@@ -4,8 +4,8 @@ import com.asml.apa.wta.core.config.RuntimeConfig;
 import com.asml.apa.wta.core.model.Task;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Map;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.Getter;
 import org.apache.commons.lang.ArrayUtils;
@@ -15,8 +15,6 @@ import org.apache.spark.scheduler.SparkListenerJobStart;
 import org.apache.spark.scheduler.SparkListenerStageCompleted;
 import org.apache.spark.scheduler.SparkListenerTaskEnd;
 import org.apache.spark.scheduler.TaskInfo;
-import org.apache.spark.sql.sources.In;
-
 
 /**
  * This class is a task-level listener for the Spark data source.
@@ -72,21 +70,21 @@ public class TaskLevelListener extends AbstractListener<Task> {
     final int stageId = taskEnd.stageId();
     final long workflowId = stageIdsToJobs.get(taskEnd.stageId());
     final List<Long> tasks = stageToTasks.get(taskEnd.stageId());
-    if(tasks == null){
+    if (tasks == null) {
       List<Long> newTasks = new ArrayList<>();
       newTasks.add(taskId);
       stageToTasks.put(stageId, newTasks);
-    }else {
+    } else {
       tasks.add(taskId);
     }
     final Integer[] parentStages = stageLevelListener.getStageToParents().get(stageId);
     final Long[] parents;
-    if(parentStages == null){
+    if (parentStages == null) {
       parents = new Long[0];
-    }else {
+    } else {
       parents = (Long[]) Arrays.stream(parentStages)
-              .flatMap(x -> Arrays.stream(stageToTasks.get(x).toArray()))
-              .toArray();
+          .flatMap(x -> Arrays.stream(stageToTasks.get(x).toArray()))
+          .toArray();
     }
     taskToStage.put(taskId, stageId);
     // unknown
