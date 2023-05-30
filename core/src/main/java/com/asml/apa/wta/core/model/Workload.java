@@ -17,6 +17,7 @@ import org.apache.avro.generic.GenericRecord;
 @Data
 @Builder
 public class Workload implements BaseTraceObject {
+  private static final long serialVersionUID = -4547341610378381743L;
 
   private static final long serialVersionUID = -4547341610378381743L;
 
@@ -168,7 +169,7 @@ public class Workload implements BaseTraceObject {
    * This method shouldn't be called as it will be output into json file that doesn't require conversion to Record.
    * @param checker checker
    * @param schema schema
-   * @return exception will throw
+   * @throws RuntimeException exception since this shouldn't be called
    */
   @Override
   public GenericRecord convertToRecord(Boolean[] checker, Schema schema) {
