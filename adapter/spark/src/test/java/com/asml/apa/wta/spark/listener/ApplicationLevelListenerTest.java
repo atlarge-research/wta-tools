@@ -95,16 +95,27 @@ class ApplicationLevelListenerTest extends BaseLevelListenerTest {
     Task task = fakeTaskListener.processedObjects.get(0);
     assertThat(task.getParents().length).isEqualTo(0);
     assertThat(task.getChildren().length).isEqualTo(2);
-    assertThat(task.getChildren()).contains(3, 4);
+    assertThat(task.getChildren()).contains(4, 5);
+    task = fakeTaskListener.processedObjects.get(1);
+    assertThat(task.getParents().length).isEqualTo(0);
+    assertThat(task.getChildren().length).isEqualTo(2);
+    assertThat(task.getChildren()).contains(4, 5);
+    task = fakeTaskListener.processedObjects.get(2);
+    assertThat(task.getParents().length).isEqualTo(2);
+    assertThat(task.getParents()).contains(2, 3);
+    assertThat(task.getChildren().length).isEqualTo(0);
+    task = fakeTaskListener.processedObjects.get(3);
+    assertThat(task.getParents().length).isEqualTo(2);
+    assertThat(task.getParents()).contains(2, 3);
+    assertThat(task.getChildren().length).isEqualTo(0);
   }
 
+  @Test
   void applicationListenerCollectsDesiredInformation() {
     fakeApplicationListener.onApplicationEnd(applicationEndObj);
     assertThat(fakeApplicationListener.getProcessedObjects()).hasSize(1);
 
     Workload workload = fakeApplicationListener.getProcessedObjects().get(0);
-    assertThat(workload.getWorkflows()).hasSize(0);
-    assertThat(workload.getWorkflows().length).isEqualTo(workload.getTotalWorkflows());
     assertThat(workload.getTotalTasks()).isEqualTo(0);
     assertThat(workload.getDomain()).isEqualTo(fakeConfig.getDomain());
     long sutStartTime = mockedSparkContext.startTime();

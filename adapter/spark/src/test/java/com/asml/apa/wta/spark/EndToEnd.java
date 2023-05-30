@@ -36,7 +36,7 @@ public class EndToEnd {
   private static void invokeJob() {
     testFile.flatMap(s -> Arrays.asList(s.split(" ")).iterator())
         .mapToPair(word -> new Tuple2<>(word, 1))
-        .reduceByKey((a, b) -> a + b)
+        .reduceByKey(Integer::sum)
         .collect();
   }
 
@@ -69,7 +69,7 @@ public class EndToEnd {
     new File(outputPath + "/resources/" + schemaVersion + "/resource.parquet").delete();
     new File(outputPath + "/tasks/" + schemaVersion + "/task.parquet").delete();
     new File(outputPath + "/workflows/" + schemaVersion + "/workflow.parquet").delete();
-    new File(outputPath + "/workload/" + schemaVersion + "/workload.json").delete();
+    new File(outputPath + "/workload/" + schemaVersion + "/generic_information.json").delete();
 
     // 3. create spark session and load config object
     SparkConf conf = new SparkConf().setAppName("SystemTest").setMaster("local");
@@ -100,6 +100,6 @@ public class EndToEnd {
     parquetUtil.getTasks().addAll(tasks);
     parquetUtil.getWorkflows().addAll(workFlow);
     parquetUtil.readWorkload(workLoad);
-    parquetUtil.writeToFile("resource", "task", "workflow", "workload");
+    parquetUtil.writeToFile("resource", "task", "workflow", "generic_information");
   }
 }

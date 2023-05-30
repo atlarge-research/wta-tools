@@ -1,14 +1,6 @@
 {
-  "workloadSettings":
-  {
-    "author": "Test Name",
-    "domain": "Industrial",
-    "description": "Test Description"
-  },
-  "resourceSettings":
-  {},
-  "logSettings":
-  {
-    "logLevel": "INFO"
-  }
+  "authors": ["Test Name"],
+  "domain": "Industrial",
+  "description": "Test Description",
+  "logLevel": "INFO"
 }

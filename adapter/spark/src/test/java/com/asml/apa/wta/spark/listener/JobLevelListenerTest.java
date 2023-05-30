@@ -17,7 +17,7 @@ class JobLevelListenerTest extends BaseLevelListenerTest {
   void recordsTheTimeWhenJobIsSubmittedInMap() {
     fakeJobListener.onJobStart(
         new SparkListenerJobStart(559, 40L, new ListBuffer<StageInfo>().toList(), new Properties()));
-    assertThat(((JobLevelListener) fakeJobListener).getJobSubmitTimes()).containsEntry(559, 40L);
+    assertThat(((JobLevelListener) fakeJobListener).getJobSubmitTimes()).containsEntry(560, 40L);
   }
 
   @Test
@@ -29,7 +29,7 @@ class JobLevelListenerTest extends BaseLevelListenerTest {
     assertThat(fakeJobListener.getProcessedObjects()).hasSize(1);
 
     Workflow fakeJobListenerWorkflow = fakeJobListener.getProcessedObjects().get(0);
-    assertThat(fakeJobListenerWorkflow.getId()).isEqualTo(559);
+    assertThat(fakeJobListenerWorkflow.getId()).isEqualTo(560);
     assertThat(fakeJobListenerWorkflow.getSubmitTime()).isEqualTo(40L);
     assertThat(fakeJobListenerWorkflow.getScheduler()).isEqualTo("DAGScheduler");
     assertThat(fakeJobListenerWorkflow.getDomain()).isEqualTo(fakeConfig.getDomain());

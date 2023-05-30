@@ -38,12 +38,12 @@ class TaskLevelListenerTest extends BaseLevelListenerTest {
   @BeforeEach
   void setup() {
 
-    testTaskInfo = new TaskInfo(1, 0, 1, 50L, "testExecutor", "local", TaskLocality.NODE_LOCAL(), false);
-    testTaskInfo2 = new TaskInfo(2, 0, 1, 50L, "testExecutor", "local", TaskLocality.NODE_LOCAL(), false);
+    testTaskInfo = new TaskInfo(0, 0, 1, 50L, "testExecutor", "local", TaskLocality.NODE_LOCAL(), false);
+    testTaskInfo2 = new TaskInfo(1, 0, 1, 50L, "testExecutor", "local", TaskLocality.NODE_LOCAL(), false);
 
     ListBuffer<Integer> parents = new ListBuffer<>();
+    parents.addOne(0);
     parents.addOne(1);
-    parents.addOne(2);
     TaskMetrics mockedMetrics = mock(TaskMetrics.class);
     when(mockedMetrics.executorRunTime()).thenReturn(100L);
 
@@ -93,7 +93,7 @@ class TaskLevelListenerTest extends BaseLevelListenerTest {
     assertEquals("testTaskType", curTask.getType());
     assertEquals(50L, curTask.getSubmitTime());
     assertEquals(100L, curTask.getRuntime());
-    assertEquals(1L, curTask.getWorkflowId());
+    assertEquals(2L, curTask.getWorkflowId());
     assertEquals("testUser".hashCode(), curTask.getUserId());
     assertEquals(-1, curTask.getSubmissionSite());
     assertEquals("N/A", curTask.getResourceType());
