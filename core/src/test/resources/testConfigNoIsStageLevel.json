@@ -1,21 +1,10 @@
 {
-  "workloadSettings":
-  {
-    "author": "Test Name",
-    "domain": "SCIENTIFIC",
-    "description": "Test Description"
+  "authors": ["Test Name"],
+  "domain": "Scientific",
+  "description": "Test Description",
+  "events": {
+    "f1": "v1",
+    "f2": "v2"
   },
-  "resourceSettings":
-  {
-    "events": {
-      "f1": "v1",
-      "f2": "v2"
-    }
-  },
-  "logSettings":
-  {
-    "logLevel": "INFO"
-  },
-  "sparkMetricsLevel":
-  {}
+  "logLevel": "INFO"
 }

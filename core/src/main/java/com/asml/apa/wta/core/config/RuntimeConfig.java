@@ -29,5 +29,6 @@ public class RuntimeConfig {
   @Builder.Default
   private String logLevel = "ERROR";
 
-  private boolean stageLevel;
+  @Builder.Default
+  private boolean isStageLevel = false;
 }

@@ -1,19 +1,10 @@
 {
-  "workloadSettings":
-  {
-    "author": "John Doe",
-    "domain": "SCIENTIFIC",
-    "description": "Processing data for scientific research purposes"
+  "authors": ["John Doe", "Jane Doe"],
+  "domain": "Scientific",
+  "description": "Processing data for scientific research purposes",
+  "events": {
+    "f1": "v1",
+    "f2": "v2"
   },
-  "resourceSettings":
-  {
-    "events": {
-      "f1": "v1",
-      "f2": "v2"
-    }
-  },
-  "logSettings":
-  {
-    "logLevel": "INFO"
-  }
+  "logLevel": "INFO"
 }

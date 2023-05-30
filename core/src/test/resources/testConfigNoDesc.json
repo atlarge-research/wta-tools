@@ -1,22 +1,10 @@
 {
-  "workloadSettings":
-  {
-    "author": "Test Name",
-    "domain": "ENGINEERING"
+  "authors": ["Test Name"],
+  "domain": "Engineering",
+  "events": {
+    "f1": "v1",
+    "f2": "v2"
   },
-  "resourceSettings":
-  {
-    "events": {
-      "f1": "v1",
-      "f2": "v2"
-    }
-  },
-  "logSettings":
-  {
-    "logLevel": "INFO"
-  },
-  "sparkMetricsLevel":
-  {
-    "isStageLevel": "true"
-  }
+  "logLevel": "INFO",
+  "isStageLevel": "true"
 }
