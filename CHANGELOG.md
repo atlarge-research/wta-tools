@@ -43,6 +43,8 @@ For the most part, since we are pre-release this will serve no real purpose, oth
 ### Changed
 - Refactored listeners into a generic interface to reduce code duplication and increase cc [@hpage](https://gitlab.ewi.tudelft.nl/hpage)
 - Merged the JaCoCo coverage metrics for integration and unit tests [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
+- Decreased JAR size by around 75% [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
+- Modified the config format [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 
 ### Fixed
 - Fixed the slf4j logging module to allow use in testing and `adapter/spark` [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
