@@ -1,6 +1,6 @@
 package com.asml.apa.wta.spark.dto;
 
-import com.asml.apa.wta.core.dto.BigSupplierDto;
+import com.asml.apa.wta.core.dto.BaseSupplierDto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -12,7 +12,7 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @SuperBuilder
 @EqualsAndHashCode(callSuper = true)
-public class SparkSupplierDto extends BigSupplierDto {
+public class SparkBaseSupplierWrapperDto extends BaseSupplierDto {
 
   private String executorId;
 }

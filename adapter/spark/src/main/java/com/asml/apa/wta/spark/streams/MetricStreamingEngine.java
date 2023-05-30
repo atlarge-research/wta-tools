@@ -1,6 +1,7 @@
 package com.asml.apa.wta.spark.streams;
 
 import com.asml.apa.wta.core.streams.KeyedStream;
+import com.asml.apa.wta.spark.dto.SparkBaseSupplierWrapperDto;
 
 /**
  * Facade that maintains the resource and task streams.
@@ -10,7 +11,7 @@ import com.asml.apa.wta.core.streams.KeyedStream;
  */
 public class MetricStreamingEngine {
 
-  private final KeyedStream<ResourceKey, ResourceMetricsRecord> resourceStream;
+  private final KeyedStream<String, SparkBaseSupplierWrapperDto> resourceStream;
   private final KeyedStream<TaskKey, TaskMetricsRecord> taskStream;
 
   /**
@@ -32,8 +33,8 @@ public class MetricStreamingEngine {
    * @author Atour Mousavi Gourabi
    * @since 1.0.0
    */
-  public void addToResourceStream(ResourceKey resource, ResourceMetricsRecord record) {
-    resourceStream.addToStream(resource, record);
+  public void addToResourceStream(String resourceKey, SparkBaseSupplierWrapperDto record) {
+    resourceStream.addToStream(resourceKey, record);
   }
 
   /**

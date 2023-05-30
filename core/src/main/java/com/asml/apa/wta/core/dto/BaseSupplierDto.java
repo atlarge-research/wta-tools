@@ -7,9 +7,8 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
 /**
- * <h1>Base Resource Dto</h1>
- * <p>Contains information that can be gathered regardless of the application.
- * Adapters can extend this Dto with additional application-specific information.</p>
+ * Contains information that can be gathered regardless of the application.
+ * Adapters can extend this Dto with additional application-specific information.
  *
  * @author Henry Page
  * @since 1.0.0
@@ -18,11 +17,11 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @AllArgsConstructor
 @SuperBuilder
-public class BigSupplierDto implements Serializable {
+public class BaseSupplierDto implements Serializable {
 
   private static final long serialVersionUID = -3101218638564306099L;
 
-  protected OsInfoDto osInfoDto;
+  private OsInfoDto osInfoDto;
 
-  protected IostatDto iostatDto;
+  private IostatDto iostatDto;
 }
