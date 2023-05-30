@@ -10,7 +10,6 @@ import com.google.gson.annotations.SerializedName;
  * @since 1.0.0
  */
 public enum Domain {
-
   @SerializedName("Biomedical")
   BIOMEDICAL,
 
