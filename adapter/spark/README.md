@@ -39,6 +39,30 @@ public void onJobStart(SparkListenerJobStart jobStart) {
     jobStart.stageInfos().foreach(stageInfo -> stageIdsToJobs.put(stageInfo.stageId(), jobStart.jobId()));
 }
 ```
+### Running the Spark plugin
+There are two ways to make use of the plugin
+1. Integrate the plugin into the Spark application source code
+2. Create the plugin as a JAR and run alongside the main Spark application via **spark-submit**
+
+For the first approach, create a `SparkConf` object and set the following config:
+
+```java
+conf.set("spark.plugins", "com.asml.apa.wta.spark.WtaPlugin");
+System.setProperty("configFile", "adapter/spark/src/test/resources/config.json");
+```
+The first line registers the main plugin class within the Spark session. The second line creates an environment variable
+for the plugin class to use.
+
+For the second approach, create a JAR file of the plugin and run it alongside the main Spark application using
+**spark-submit**. Here is an example of how to run the plugin alongside the main Spark application:
+
+```bash
+spark-submit --class org.example.Main --master local[1] 
+--conf spark.plugins=com.asml.apa.wta.spark.WtaPlugin 
+--conf "spark.driver.extraJavaOptions=-DconfigFile=/home/user/config.json" 
+--jars /home/philly/SparkPlugin.jar /home/philly/SimpleSpark.jar 
+/home/philly/wordcount.txt
+```
 
 ### Spark Plugin API
 We also use the Spark Plugin API to connect our plugin to the Spark job. The plugin consists of two components: The driver plugin and the executor plugin.
