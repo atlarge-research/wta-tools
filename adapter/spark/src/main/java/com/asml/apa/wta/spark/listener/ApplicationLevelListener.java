@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import lombok.Getter;
-import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.spark.SparkContext;
 import org.apache.spark.scheduler.SparkListenerApplicationEnd;
 import org.apache.spark.scheduler.SparkListenerApplicationStart;
@@ -40,6 +40,8 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
    * @param sparkContext The current spark context
    * @param config Additional config specified by the user for the plugin
    * @param jobLevelListener The job-level listener to be used by this listener
+   * @param taskLevelListener The task-level listener to be used by this listener
+   * @param stageLevelListener The stage-level listener to be used by this listener
    * @author Henry Page
    * @since 1.0.0
    */

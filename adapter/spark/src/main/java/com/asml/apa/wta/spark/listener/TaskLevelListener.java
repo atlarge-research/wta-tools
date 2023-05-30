@@ -32,20 +32,16 @@ public class TaskLevelListener extends AbstractListener<Task> {
   @Getter
   private final Map<Long, Integer> taskToStage = new ConcurrentHashMap<>();
 
-  private final StageLevelListener stageLevelListener;
-
   /**
    * Constructor for the task-level listener.
    *
    * @param sparkContext       The current spark context
    * @param config             Additional config specified by the user for the plugin
-   * @param stageLevelListener
    * @author Henry Page
    * @since 1.0.0
    */
-  public TaskLevelListener(SparkContext sparkContext, RuntimeConfig config, StageLevelListener stageLevelListener) {
+  public TaskLevelListener(SparkContext sparkContext, RuntimeConfig config) {
     super(sparkContext, config);
-    this.stageLevelListener = stageLevelListener;
   }
 
   /**

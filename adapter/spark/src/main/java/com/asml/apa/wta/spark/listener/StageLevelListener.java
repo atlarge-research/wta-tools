@@ -23,6 +23,11 @@ public class StageLevelListener extends AbstractListener<Task> { // not sure abo
     super(sparkContext, config);
   }
 
+  /**
+   * This method will store the stage hierarchy information from the callback.
+   *
+   * @param stageCompleted callback from stage completion
+   */
   @Override
   public void onStageCompleted(SparkListenerStageCompleted stageCompleted) {
     super.onStageCompleted(stageCompleted);
