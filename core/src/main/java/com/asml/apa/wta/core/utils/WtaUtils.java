@@ -45,6 +45,7 @@ public class WtaUtils {
       JsonNode workloadNode = rootNode.get("workloadSettings");
       JsonNode resourceNode = rootNode.get("resourceSettings");
       JsonNode logNode = rootNode.get("logSettings");
+      JsonNode sparkMetricsNode = rootNode.get("sparkMetricsLevel");
 
       String[] authors = workloadNode.get("author").asText().split("\\s*,\\s*");
 
@@ -59,12 +60,17 @@ public class WtaUtils {
 
       String logLevel = logNode.has("logLevel") ? logNode.get("logLevel").asText() : "ERROR";
 
+      boolean sparkMetricsLevel = sparkMetricsNode.has("isStageLevel")
+          ? sparkMetricsNode.get("isStageLevel").asBoolean()
+          : false;
+
       configBuilder = configBuilder
           .authors(authors)
           .domain(domain)
           .description(description)
           .events(events)
-          .logLevel(logLevel);
+          .logLevel(logLevel)
+          .stageLevel(sparkMetricsLevel);
     } catch (EnumConstantNotPresentException e) {
       throw new IllegalArgumentException(e.constantName()
           + " is not a valid domain. It must be BIOMEDICAL, ENGINEERING, INDUSTRIAL, or SCIENTIFIC.");

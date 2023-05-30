@@ -2,17 +2,20 @@
   "workloadSettings":
   {
     "author": "Test Name",
-    "domain": "Industrial",
+    "domain": "SCIENTIFIC",
     "description": "Test Description"
   },
   "resourceSettings":
-  {},
+  {
+    "events": {
+      "f1": "v1",
+      "f2": "v2"
+    }
+  },
   "logSettings":
   {
     "logLevel": "INFO"
   },
   "sparkMetricsLevel":
-  {
-    "isStageLevel": "true"
-  }
+  {}
 }

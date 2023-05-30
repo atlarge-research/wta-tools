@@ -15,5 +15,9 @@
   "logSettings":
   {
     "logLevel": "INFO"
+  },
+  "sparkMetricsLevel":
+  {
+    "isStageLevel": "true"
   }
 }
