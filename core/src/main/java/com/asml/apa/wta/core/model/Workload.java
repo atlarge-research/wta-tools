@@ -94,28 +94,28 @@ public class Workload implements BaseTraceObject {
   private final double covMemory = -1.0;
 
   @Builder.Default
-  private final long minNetworkIoTime = -1L;
+  private final long minNetworkUsage = -1L;
 
   @Builder.Default
-  private final long maxNetworkIoTime = -1L;
+  private final long maxNetworkUsage = -1L;
 
   @Builder.Default
-  private final double stdNetworkIoTime = -1.0;
+  private final double stdNetworkUsage = -1.0;
 
   @Builder.Default
-  private final double meanNetworkIoTime = -1.0;
+  private final double meanNetworkUsage = -1.0;
 
   @Builder.Default
-  private final double medianNetworkIoTime = -1.0;
+  private final double medianNetworkUsage = -1.0;
 
   @Builder.Default
-  private final long firstQuartileNetworkIoTime = -1L;
+  private final long firstQuartileNetworkUsage = -1L;
 
   @Builder.Default
-  private final long thirdQuartileNetworkIoTime = -1L;
+  private final long thirdQuartileNetworkUsage = -1L;
 
   @Builder.Default
-  private final double covNetworkIoTime = -1.0;
+  private final double covNetworkUsage = -1.0;
 
   @Builder.Default
   private final double minDiskSpaceUsage = -1.0;
