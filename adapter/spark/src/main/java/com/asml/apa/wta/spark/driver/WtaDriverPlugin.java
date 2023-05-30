@@ -1,5 +1,6 @@
 package com.asml.apa.wta.spark.driver;
 
+import com.asml.apa.wta.core.config.RuntimeConfig;
 import com.asml.apa.wta.core.model.Task;
 import com.asml.apa.wta.core.model.Workflow;
 import com.asml.apa.wta.core.model.Workload;
@@ -32,9 +33,7 @@ public class WtaDriverPlugin implements DriverPlugin {
   @Getter
   private SparkDataSource sparkDataSource;
 
-  private static String outputPath;
-
-  private final String schemaVersion = "schema-1.0";
+  private ParquetWriterUtils parquetUtil;
 
   /**
    * This method is called early in the initialization of the Spark driver.
@@ -50,28 +49,10 @@ public class WtaDriverPlugin implements DriverPlugin {
    */
   @Override
   public Map<String, String> init(SparkContext sparkCtx, PluginContext pluginCtx) {
-    String configFile = System.getProperty("configFile");
-    outputPath = System.getProperty("outputPath");
-    if (configFile == null || outputPath == null) {
-      //TODO: this also shuts down the spark application, which it shouldn't
-      log.error("Please provide the config file path and output directory path as arguments");
-      System.exit(1);
-    }
-
-    // delete any potentially pre-existing parquet files
-    // TODO: run this in another thread to not block
-    new File(outputPath + "/resources/" + schemaVersion + "/resource.parquet").delete();
-    new File(outputPath + "/tasks/" + schemaVersion + "/task.parquet").delete();
-    new File(outputPath + "/workflows/" + schemaVersion + "/workflow.parquet").delete();
-    new File(outputPath + "/workload/" + schemaVersion + "/generic_information.json").delete();
-
-    try{
-      sparkDataSource = new SparkDataSource(sparkCtx, WtaUtils.readConfig(configFile));
-    } catch (IllegalArgumentException e){
-      //TODO: this also shuts down the spark application, which it shouldn't
-      log.error("Couldn't find path to config file");
-      System.exit(1);
-    }
+    RuntimeConfig runtimeConfig = WtaUtils.readConfig(System.getProperty("configFile"));
+    sparkDataSource = new SparkDataSource(sparkCtx, runtimeConfig);
+    parquetUtil = new ParquetWriterUtils(new File(runtimeConfig.getOutputPath()), "schema-1.0");
+    parquetUtil.deletePreExistingFiles();
     initListeners();
     return new HashMap<>();
   }
@@ -98,27 +79,19 @@ public class WtaDriverPlugin implements DriverPlugin {
    */
   @Override
   public void shutdown() {
-    ParquetWriterUtils parquetUtil = new ParquetWriterUtils(new File(outputPath), schemaVersion);
     List<Task> tasks = sparkDataSource.getTaskLevelListener().getProcessedObjects();
     List<Workflow> workFlow = sparkDataSource.getJobLevelListener().getProcessedObjects();
     Workload workLoad =
             sparkDataSource.getApplicationLevelListener().getProcessedObjects().get(0);
-
     parquetUtil.getTasks().addAll(tasks);
     parquetUtil.getWorkflows().addAll(workFlow);
     parquetUtil.readWorkload(workLoad);
-    try {
-      parquetUtil.writeToFile(
-              "resource",
-              "task",
-              "workflow",
-              "generic_information"
-      );
-    } catch (Exception e) {
-      log.error("Failed to write to parquet file, possibly due to invalid output path");
-      //TODO: this also shuts down the spark application, which it shouldn't
-      System.exit(1);
-    }
+    parquetUtil.writeToFile(
+            "resource",
+            "task",
+            "workflow",
+            "generic_information"
+    );
   }
 
   /**

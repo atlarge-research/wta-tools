@@ -15,5 +15,6 @@
   "logSettings":
   {
     "logLevel": "INFO"
-  }
+  },
+  "outputPath": "home/user/WTA"
 }

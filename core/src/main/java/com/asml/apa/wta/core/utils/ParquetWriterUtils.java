@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.avro.Schema;
 import org.apache.avro.SchemaBuilder;
 import org.apache.avro.generic.GenericRecord;
@@ -25,6 +26,7 @@ import org.apache.avro.generic.GenericRecord;
  */
 @SuppressWarnings({"CyclomaticComplexity", "HiddenField"})
 @Getter
+@Slf4j
 public class ParquetWriterUtils {
 
   private final String version;
@@ -98,17 +100,23 @@ public class ParquetWriterUtils {
    * @param taskFileName task file name
    * @param workflowFileName workflow file name
    * @param workloadFileName workload file name
-   * @throws Exception possible exception due to io
    * @since 1.0.0
+   * @author Pil Kyu Cho
    * @author Tianchen Qu
    */
   public void writeToFile(
       String resourceFileName, String taskFileName, String workflowFileName, String workloadFileName)
-      throws Exception {
-    writeResourceToFile(resourceFileName);
-    writeTaskToFile(taskFileName);
-    writeWorkflowToFile(workflowFileName);
-    writeWorkloadToFile(workloadFileName);
+  {
+    try {
+      writeResourceToFile(resourceFileName);
+      writeTaskToFile(taskFileName);
+      writeWorkflowToFile(workflowFileName);
+      writeWorkloadToFile(workloadFileName);
+    } catch (Exception e){
+      //TODO: this also shuts down the spark application, which it shouldn't
+      log.error("Failed to write to parquet file, possibly due to invalid output path");
+      System.exit(1);
+    }
   }
 
   /**
@@ -595,5 +603,18 @@ public class ParquetWriterUtils {
       }
     }
     return flg;
+  }
+
+  /**
+   * Deletes any potentially pre-existing parquet files. If files already exist, parquet writer
+   * will throw an exception.
+   * @author Pil Kyu Cho
+   * @since 1.0.0
+   */
+  public void deletePreExistingFiles() {
+    new File(path.getName() + "/resources/" + version + "/resource.parquet").delete();
+    new File(path.getName() + "/tasks/" + version + "/task.parquet").delete();
+    new File(path.getName() + "/workflows/" + version + "/workflow.parquet").delete();
+    new File(path.getName() + "/workload/" + version + "/generic_information.json").delete();
   }
 }

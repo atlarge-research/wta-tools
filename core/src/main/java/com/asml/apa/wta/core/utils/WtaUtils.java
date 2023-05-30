@@ -5,6 +5,8 @@ import com.asml.apa.wta.core.model.enums.Domain;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
+
 import java.io.FileInputStream;
 import java.util.HashMap;
 import java.util.Map;
@@ -12,11 +14,13 @@ import java.util.Map;
 /**
  * Utility class for WTA.
  *
+ * @author Pil Kyu CHo
  * @author Henry Page
  * @author Lohithsai Yadala Chanchu
  * @author Atour Mousavi Gourabi
  * @since 1.0.0
  */
+@Slf4j
 public class WtaUtils {
 
   private static final String CONFIG_DIR = "config.json";
@@ -45,6 +49,7 @@ public class WtaUtils {
       JsonNode workloadNode = rootNode.get("workloadSettings");
       JsonNode resourceNode = rootNode.get("resourceSettings");
       JsonNode logNode = rootNode.get("logSettings");
+      JsonNode outputNode = rootNode.get("outputPath");
 
       String[] authors = workloadNode.get("author").asText().split("\\s*,\\s*");
 
@@ -59,18 +64,22 @@ public class WtaUtils {
 
       String logLevel = logNode.has("logLevel") ? logNode.get("logLevel").asText() : "ERROR";
 
+      String outputPath = outputNode.get("outputNode").asText();
+
       configBuilder = configBuilder
           .authors(authors)
           .domain(domain)
           .description(description)
           .events(events)
-          .logLevel(logLevel);
+          .logLevel(logLevel)
+          .outputPath(outputPath);
     } catch (EnumConstantNotPresentException e) {
-      throw new IllegalArgumentException(e.constantName()
-          + " is not a valid domain. It must be BIOMEDICAL, ENGINEERING, INDUSTRIAL, or SCIENTIFIC.");
+      log.error(e.constantName()
+              + " is not a valid domain. It must be BIOMEDICAL, ENGINEERING, INDUSTRIAL, or SCIENTIFIC.");
+      System.exit(1);
     } catch (Exception e) {
-      throw new IllegalArgumentException(
-          "The config file has missing/invalid fields or no config file was found");
+      log.error("The config file has missing/invalid fields or no config file was found");
+      System.exit(1);
     }
     return configBuilder.build();
   }
