@@ -4,12 +4,12 @@ import com.asml.apa.wta.core.model.Resource;
 import com.asml.apa.wta.core.model.Task;
 import com.asml.apa.wta.core.model.Workflow;
 import com.asml.apa.wta.core.model.Workload;
-import com.asml.apa.wta.core.model.enums.Domain;
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import java.io.File;
 import java.io.FileWriter;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -164,7 +164,8 @@ public class ParquetWriterUtils {
     }
     Schema schema = fieldSchema.endRecord();
     AvroUtils resourceWriter =
-        new AvroUtils(schema, new File(path, "/resources/" + version + "/" + resourceFileName + ".parquet"));
+        new AvroUtils(schema, new File(
+                path, Paths.get("resources", version, resourceFileName + ".parquet").toString()));
     List<GenericRecord> resourceList = new ArrayList<>();
     for (Resource resource : resources) {
       resourceList.add(Resource.convertResourceToRecord(resource, checker, schema));
@@ -280,7 +281,8 @@ public class ParquetWriterUtils {
     }
     Schema schema = fieldSchema.endRecord();
     AvroUtils taskWriter =
-        new AvroUtils(schema, new File(path, "/tasks/" + version + "/" + taskFileName + ".parquet"));
+        new AvroUtils(schema, new File(
+                path, Paths.get("tasks", version, taskFileName + ".parquet").toString()));
     List<GenericRecord> taskList = new ArrayList<>();
     for (Task task : tasks) {
       taskList.add(Task.convertTaskToRecord(task, checker, schema));
@@ -389,7 +391,8 @@ public class ParquetWriterUtils {
     }
     Schema schema = fieldSchema.endRecord();
     AvroUtils workflowWriter =
-        new AvroUtils(schema, new File(path, "/workflows/" + version + "/" + workflowFileName + ".parquet"));
+        new AvroUtils(schema, new File(
+                path, Paths.get("workflows", version, workflowFileName + ".parquet").toString()));
     List<GenericRecord> workflowList = new ArrayList<>();
     for (Workflow workflow : workflows) {
       workflowList.add(Workflow.convertWorkflowToRecord(workflow, checker, schema));
@@ -407,7 +410,7 @@ public class ParquetWriterUtils {
    * @author Tianchen Qu
    */
   private void writeWorkloadToFile(String workloadFileName) throws Exception {
-    File file = new File(this.path, "workload/" + version);
+    File file = new File(Paths.get(this.path.getPath(), "workload", version).toString());
     file.mkdirs();
     Gson gson = new GsonBuilder()
         .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
@@ -607,9 +610,9 @@ public class ParquetWriterUtils {
    * @since 1.0.0
    */
   public void deletePreExistingFiles() {
-    new File(path.getName() + "/resources/" + version + "/resource.parquet").delete();
-    new File(path.getName() + "/tasks/" + version + "/task.parquet").delete();
-    new File(path.getName() + "/workflows/" + version + "/workflow.parquet").delete();
-    new File(path.getName() + "/workload/" + version + "/generic_information.json").delete();
+    new File(Paths.get(path.getPath(), "resources", version, "resource.parquet").toString()).delete();
+    new File(Paths.get(path.getPath(), "tasks", version, "task.parquet").toString()).delete();
+    new File(Paths.get(path.getPath(), "workflows", version, "workflow.parquet").toString()).delete();
+    new File(Paths.get(path.getPath(), "workload", version, "generic_information.json").toString()).delete();
   }
 }
