@@ -5,7 +5,6 @@ unit-tests-spark-adapter:
     - build-spark-adapter
   script:
     - echo "Spark adapter unit tests started"
-    - perf --help
     - "mvn -pl adapter/spark jacoco:prepare-agent surefire:test jacoco:report"
     - "[ -f adapter/spark/target/jacoco.exec ] && mv -f adapter/spark/target/jacoco.exec adapter/spark/target/jacoco-unit-tests.exec || echo '0' > /dev/null"
   artifacts:
@@ -23,6 +22,7 @@ integration-tests-spark-adapter:
     - build-spark-adapter
   script:
     - echo "Spark adapter integration tests started"
+    - perf --help
     - "mvn -pl adapter/spark jacoco:prepare-agent-integration failsafe:integration-test failsafe:verify jacoco:report-integration"
     - "[ -f adapter/spark/target/jacoco-it.exec ] && mv -f adapter/spark/target/jacoco-it.exec adapter/spark/target/jacoco-integration-tests.exec || echo '0' > /dev/null"
   artifacts:
