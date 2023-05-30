@@ -53,6 +53,7 @@ public class WtaUtils {
           || config.getDescription().isBlank()) {
         log.info("The config file does not include a description, this field is highly recommended.");
       } else if (config.getOutputPath() == null) {
+        log.error("The config file does not specify an output path, this field is mandatory.");
         throw new IllegalArgumentException("The config file does not specify the output path");
       }
       return config;
@@ -65,6 +66,9 @@ public class WtaUtils {
     } catch (IOException e) {
       log.error("Something went wrong while reading {}", configDir);
       throw new IllegalArgumentException("Something went wrong while reading " + configDir);
+    } catch (Exception e) {
+      log.error("Config file was not properly provided");
+      throw new IllegalArgumentException("Config file was not properly provided");
     }
   }
 
