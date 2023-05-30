@@ -1,6 +1,6 @@
 {
   "authors": ["Test Name"],
-  "domain": "INDUSTRIAL",
+  "domain": "Industrial",
   "description": "Test Description",
   "events": {
     "f1": "v1",

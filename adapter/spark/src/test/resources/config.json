@@ -1,6 +1,6 @@
 {
   "authors": ["John Doe", "Jane Doe"],
-  "domain": "SCIENTIFIC",
+  "domain": "Scientific",
   "description": "Processing data for scientific research purposes",
   "events": {
     "f1": "v1",
