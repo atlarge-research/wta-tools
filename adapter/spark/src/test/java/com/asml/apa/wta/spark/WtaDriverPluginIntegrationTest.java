@@ -1,19 +1,20 @@
 package com.asml.apa.wta.spark;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Arrays;
 import org.apache.spark.SparkConf;
 import org.apache.spark.SparkContext;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
-import static org.assertj.core.api.Assertions.assertThat;
 import org.apache.spark.sql.SparkSession;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import scala.Tuple2;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.Arrays;
 
 class WtaDriverPluginIntegrationTest {
 
@@ -38,16 +39,16 @@ class WtaDriverPluginIntegrationTest {
   @AfterEach
   void teardown() throws IOException {
     Files.walk(directoryPath)
-            .sorted(java.util.Comparator.reverseOrder())
-            .map(Path::toFile)
-            .forEach(java.io.File::delete);
+        .sorted(java.util.Comparator.reverseOrder())
+        .map(Path::toFile)
+        .forEach(java.io.File::delete);
   }
 
   private void invokeJob() {
     testFile.flatMap(s -> Arrays.asList(s.split(" ")).iterator())
-            .mapToPair(word -> new Tuple2<>(word, 1))
-            .reduceByKey((a, b) -> a + b)
-            .collect();
+        .mapToPair(word -> new Tuple2<>(word, 1))
+        .reduceByKey((a, b) -> a + b)
+        .collect();
   }
 
   @Test

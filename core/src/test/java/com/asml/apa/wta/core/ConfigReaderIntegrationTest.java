@@ -14,14 +14,13 @@ class ConfigReaderIntegrationTest {
 
   @Test
   void readsConfigNullArg() {
-    assertThatThrownBy(() -> WtaUtils.readConfig(null))
-            .isInstanceOf(IllegalArgumentException.class);
+    assertThatThrownBy(() -> WtaUtils.readConfig(null)).isInstanceOf(IllegalArgumentException.class);
   }
 
   @Test
   void readsConfigNoFileInFilepath() {
     assertThatThrownBy(() -> WtaUtils.readConfig("nonExistentFile.json"))
-            .isInstanceOf(IllegalArgumentException.class);
+        .isInstanceOf(IllegalArgumentException.class);
   }
 
   @Test
@@ -71,9 +70,8 @@ class ConfigReaderIntegrationTest {
   @Test
   void readsConfigFileWhereAuthorFieldNotThere() {
     assertThatThrownBy(() -> WtaUtils.readConfig("src/test/resources/testConfigInvalidAuthor.json"))
-            .isInstanceOf(IllegalArgumentException.class);
+        .isInstanceOf(IllegalArgumentException.class);
   }
-
 
   @Test
   void readsConfigFileWhereLogSettingIsNotThere() {
@@ -92,12 +90,12 @@ class ConfigReaderIntegrationTest {
   @Test
   void readsConfigFileWithInvalidDomain() {
     assertThatThrownBy(() -> WtaUtils.readConfig("src/test/resources/testConfigInvalidDomain.json"))
-            .isInstanceOf(IllegalArgumentException.class);
+        .isInstanceOf(IllegalArgumentException.class);
   }
 
   @Test
   void readsConfigFileWhereOutputPathIsNotThere() {
     assertThatThrownBy(() -> WtaUtils.readConfig("src/test/resources/testConfigNoOutputPath.json"))
-            .isInstanceOf(IllegalArgumentException.class);
+        .isInstanceOf(IllegalArgumentException.class);
   }
 }

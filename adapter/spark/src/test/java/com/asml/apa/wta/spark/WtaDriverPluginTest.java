@@ -1,15 +1,16 @@
 package com.asml.apa.wta.spark;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.*;
+
 import com.asml.apa.wta.core.utils.WtaUtils;
 import com.asml.apa.wta.spark.driver.WtaDriverPlugin;
+import java.util.HashMap;
 import org.apache.spark.SparkContext;
 import org.apache.spark.api.plugin.PluginContext;
-import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import java.util.HashMap;
-import static org.mockito.Mockito.*;
 
 class WtaDriverPluginTest {
 
