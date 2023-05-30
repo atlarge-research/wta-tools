@@ -1,5 +1,6 @@
 package com.asml.apa.wta.spark.listener;
 
+import static org.assertj.core.api.Assertions.as;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -37,15 +38,9 @@ class StageLevelListenerTest extends BaseLevelListenerTest {
   void onStageCompletedTest() {
     fakeStageListener.onStageCompleted(stageCompleted);
     assertThat(fakeStageListener.getStageToParents()).containsEntry(3, new Integer[] {1, 2});
+    assertThat(fakeStageListener.getStageToParents().size()).isEqualTo(1);
     assertThat(fakeStageListener.getParentToChildren()).containsEntry(1, new ListBuffer<Integer>().addOne(3));
     assertThat(fakeStageListener.getParentToChildren()).containsEntry(2, new ListBuffer<Integer>().addOne(3));
-  }
-
-  public boolean equalsArray(Map<Integer, Integer[]> first, Map<Integer, Integer[]> second) {
-    if (first.size() != second.size()) {
-      return false;
-    }
-
-    return first.entrySet().stream().allMatch(e -> Arrays.equals(e.getValue(), second.get(e.getKey())));
+    assertThat(fakeStageListener.getParentToChildren().size()).isEqualTo(2);
   }
 }
