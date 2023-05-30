@@ -19,6 +19,7 @@ import lombok.Getter;
 @Builder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class Workload implements BaseTraceObject {
+
   private static final long serialVersionUID = -4547341610378381743L;
 
   @Getter(value = AccessLevel.NONE)
