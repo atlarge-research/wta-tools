@@ -39,6 +39,7 @@ For the most part, since we are pre-release this will serve no real purpose, oth
 - Added iostat datasource [@lyadalachanchu](https://gitlab.ewi.tudelft.nl/lyadalachanchu)
 - Created custom images for e2e and integration testing [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 - Wired e2e testing into the pipeline [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
+- Implemented Parent Children fields for Task [@tqu](https://gitlab.ewi.tudelft.nl/tqu)
 
 ### Changed
 - Refactored listeners into a generic interface to reduce code duplication and increase cc [@hpage](https://gitlab.ewi.tudelft.nl/hpage)
