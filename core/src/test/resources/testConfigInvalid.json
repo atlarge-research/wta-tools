@@ -1,7 +1,4 @@
 {
-  "workloadSettings":
-  {
-    "domain": "BIOMEDICAL",
-    "description": "Test Description"
-  }
+  "domain": "Biomedical",
+  "description": "Test Description"
 }

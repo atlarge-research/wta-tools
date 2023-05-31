@@ -1,0 +1,80 @@
+unit-tests-core:
+  stage: test-core
+  needs: [build-core]
+  dependencies:
+    - build-core
+  script:
+    - echo "Core unit tests started"
+    - "mvn -pl core jacoco:prepare-agent surefire:test jacoco:report"
+    - "[ -f core/target/jacoco.exec ] && mv -f core/target/jacoco.exec core/target/jacoco-unit-tests.exec || echo '0' > /dev/null"
+  artifacts:
+    name: unit-tests-core
+    expire_in: 20 minutes
+    when: always
+    paths:
+      - core/target/jacoco-unit-tests.exec
+
+integration-tests-core:
+  stage: test-core
+  image: $LINUX_TOOLING_IMAGE
+  needs: [build-linux-tooling-image, build-core]
+  dependencies:
+    - build-core
+  script:
+    - echo "Core integration tests started"
+    - "mvn -pl core jacoco:prepare-agent-integration failsafe:integration-test failsafe:verify jacoco:report-integration"
+    - "[ -f core/target/jacoco-it.exec ] && mv -f core/target/jacoco-it.exec core/target/jacoco-integration-tests.exec || echo '0' > /dev/null"
+  artifacts:
+    name: integration-tests-core
+    expire_in: 20 minutes
+    when: always
+    paths:
+      - core/target/jacoco-integration-tests.exec
+
+mutation-tests-core:
+  stage: test-core
+  image: $LINUX_TOOLING_IMAGE
+  needs: [build-linux-tooling-image, build-core]
+  dependencies:
+    - build-core
+  script:
+    - echo "Core mutation tests core started"
+    - "mvn -pl core $PITEST_OPTS pitest:mutationCoverage"
+    - "cat core/reports/pitest/index.html | awk -F '</?td>' 'FNR == 25 { print $2 }' || echo '0%'"
+  coverage: /([0-9]{1,3})%/
+  artifacts:
+    name: mutation-tests-core
+    expire_in: 3 hours
+    when: always
+    paths:
+      - core/reports/pitest/
+
+
+line-coverage-core:
+  stage: test-core
+  needs: [integration-tests-core, unit-tests-core, build-core]
+  dependencies:
+    - integration-tests-core
+    - unit-tests-core
+    - build-core
+  script:
+    - echo "Started creating core line coverage"
+    - "mvn -pl core jacoco:merge jacoco:report"
+    - "cat core/reports/jacoco/index.html | grep -Po 'Total.*?([0-9]{1,3})%' || echo '0%'"
+  coverage: /([0-9]{1,3})%/
+  artifacts:
+    name: line-coverage-core
+    expire_in: 3 hours
+    when: always
+    paths:
+      - core/reports/jacoco/
+
+branch-coverage-core:
+  stage: test-core
+  needs: [line-coverage-core]
+  dependencies:
+    - line-coverage-core
+  script:
+    - echo "Started generating core branch coverage"
+    - "cat core/reports/jacoco/index.html | grep -Po '%.*?of.*?([0-9]{1,3})%' || echo '0%'"
+  coverage: /([0-9]{1,3})%/
