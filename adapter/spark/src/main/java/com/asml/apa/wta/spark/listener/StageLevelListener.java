@@ -2,7 +2,6 @@ package com.asml.apa.wta.spark.listener;
 
 import com.asml.apa.wta.core.config.RuntimeConfig;
 import com.asml.apa.wta.core.model.Task;
-import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.Getter;
@@ -11,7 +10,6 @@ import org.apache.spark.executor.TaskMetrics;
 import org.apache.spark.scheduler.SparkListenerJobStart;
 import org.apache.spark.scheduler.SparkListenerStageCompleted;
 import org.apache.spark.scheduler.StageInfo;
-import scala.collection.JavaConverters;
 
 /**
  * This class is a stage-level listener for the Spark data source.
@@ -53,19 +51,13 @@ public class StageLevelListener extends AbstractListener<Task> {
     final long runTime = curStageMetrics.executorRunTime();
     final int userId = sparkContext.sparkUser().hashCode();
     final long workflowId = stageIdsToJobs.get(stageId);
-    Long[] parentIdArrayIntermediate =
-        JavaConverters.seqAsJavaListConverter(curStageInfo.parentIds()).asJava().stream()
-            .map(id -> Long.parseLong(id.toString()))
-            .toArray(Long[]::new);
-    final long[] parentIdLongArray = Arrays.stream(parentIdArrayIntermediate)
-        .mapToLong(Long::valueOf)
-        .toArray();
 
     // unknown
     final String type = "";
     final int submissionSite = -1;
     final String resourceType = "N/A";
     final double resourceAmountRequested = -1.0;
+    final long[] parents = new long[0];
     final long[] children = new long[0];
     final int groupId = -1;
     final String nfrs = "";
@@ -88,7 +80,7 @@ public class StageLevelListener extends AbstractListener<Task> {
         .runtime(runTime)
         .resourceType(resourceType)
         .resourceAmountRequested(resourceAmountRequested)
-        .parents(parentIdLongArray)
+        .parents(parents)
         .children(children)
         .userId(userId)
         .groupId(groupId)
