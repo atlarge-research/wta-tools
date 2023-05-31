@@ -1,10 +1,10 @@
 {
   "authors": ["Test Name"],
-  "domain": "Industrial",
+  "domain": "Scientific",
   "description": "Test Description",
   "events": {
     "f1": "v1",
     "f2": "v2"
   },
-  "outputPath": "/home/user/WTA"
+  "logLevel": "INFO"
 }

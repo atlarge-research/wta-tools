@@ -62,7 +62,7 @@ public class WtaExecutorPlugin implements ExecutorPlugin {
    * @since 1.0.0
    */
   private void startSending() {
-    this.scheduler.scheduleAtFixedRate(this::sendBuffer, 1, 5, TimeUnit.SECONDS);
+    this.scheduler.scheduleAtFixedRate(this::sendBuffer, 1, 2, TimeUnit.SECONDS);
   }
 
   /**

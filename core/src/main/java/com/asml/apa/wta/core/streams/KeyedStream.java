@@ -3,6 +3,7 @@ package com.asml.apa.wta.core.streams;
 import java.io.Serializable;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import lombok.Getter;
 import lombok.NonNull;
 
 /**
@@ -13,6 +14,7 @@ import lombok.NonNull;
  * @author Atour Mousavi Gourabi
  * @since 1.0.0
  */
+@Getter
 public class KeyedStream<K, V extends Serializable> {
 
   private final Map<K, Stream<V>> streams = new ConcurrentHashMap<>();

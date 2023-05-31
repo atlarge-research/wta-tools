@@ -2,6 +2,7 @@ package com.asml.apa.wta.spark.streams;
 
 import com.asml.apa.wta.core.streams.KeyedStream;
 import com.asml.apa.wta.spark.dto.SparkBaseSupplierWrapperDto;
+import lombok.Getter;
 
 /**
  * Facade that maintains the resource and task streams.
@@ -9,6 +10,7 @@ import com.asml.apa.wta.spark.dto.SparkBaseSupplierWrapperDto;
  * @author Atour Mousavi Gourabi
  * @since 1.0.0
  */
+@Getter
 public class MetricStreamingEngine {
 
   private final KeyedStream<String, SparkBaseSupplierWrapperDto> resourceStream;

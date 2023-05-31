@@ -28,4 +28,6 @@ public class RuntimeConfig {
 
   @Builder.Default
   private String logLevel = "ERROR";
+
+  private String outputPath;
 }

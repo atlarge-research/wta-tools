@@ -3,14 +3,13 @@ package com.asml.apa.wta.core.supplier;
 import com.asml.apa.wta.core.dto.BaseSupplierDto;
 import com.asml.apa.wta.core.dto.IostatDto;
 import com.asml.apa.wta.core.dto.OsInfoDto;
-import lombok.Getter;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import lombok.Getter;
 
 /**
  * Used to extract resources from dependencies. Should be instantiated once per executor/node.
@@ -51,7 +50,6 @@ public abstract class SupplierExtractionEngine<T extends BaseSupplierDto> {
   public void ping() {
     CompletableFuture<OsInfoDto> osInfoDtoCompletableFuture = this.operatingSystemSupplier.getSnapshot();
     CompletableFuture<IostatDto> iostatDtoCompletableFuture = this.iostatSupplier.getSnapshot();
-
 
     CompletableFuture.allOf(osInfoDtoCompletableFuture, iostatDtoCompletableFuture)
         .thenRunAsync(() -> {
