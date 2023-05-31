@@ -54,6 +54,7 @@ class WtaDriverPluginIntegrationTest {
     assertThat(Files.isDirectory(directoryPath)).isTrue();
     assertThat(Files.list(directoryPath).findAny()).isEmpty();
 
+    System.setProperty("configFile", "src/test/resources/config.json");
     conf.set("spark.plugins", pluginClass);
     SparkContext sc = SparkSession.builder().config(conf).getOrCreate().sparkContext();
 
@@ -67,9 +68,9 @@ class WtaDriverPluginIntegrationTest {
   void pluginNotInitialisedByInvalidConfigFile() throws IOException {
     assertThat(Files.isDirectory(directoryPath)).isTrue();
     assertThat(Files.list(directoryPath).findAny()).isEmpty();
-    conf.set("spark.plugins", pluginClass);
 
     System.setProperty("configFile", "nonExistingFile.json");
+    conf.set("spark.plugins", pluginClass);
     SparkContext sc = SparkSession.builder().config(conf).getOrCreate().sparkContext();
 
     testFile = JavaSparkContext.fromSparkContext(sc).textFile(resourcePath);
