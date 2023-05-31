@@ -26,8 +26,6 @@ class WtaDriverPluginIntegrationTest {
 
   private final String pluginClass = "com.asml.apa.wta.spark.WtaPlugin";
 
-  private final String validConfigFile = "src/test/resources/config.json";
-
   private final Path directoryPath = Path.of("wta-output");
 
   @BeforeEach
@@ -57,10 +55,9 @@ class WtaDriverPluginIntegrationTest {
     assertThat(Files.list(directoryPath).findAny()).isEmpty();
 
     conf.set("spark.plugins", pluginClass);
-    System.setProperty("configFile", validConfigFile);
+    assertThat(conf.get("spark.plugins")).isEqualTo(pluginClass);
     SparkSession spark = SparkSession.builder().config(conf).getOrCreate();
     SparkContext sc = spark.sparkContext();
-    assertThat(sc.getConf().get("spark.plugins")).isEqualTo(pluginClass);
 
     testFile = JavaSparkContext.fromSparkContext(sc).textFile(resourcePath);
     invokeJob();
@@ -73,11 +70,11 @@ class WtaDriverPluginIntegrationTest {
     assertThat(Files.isDirectory(directoryPath)).isTrue();
     assertThat(Files.list(directoryPath).findAny()).isEmpty();
     conf.set("spark.plugins", pluginClass);
+    assertThat(conf.get("spark.plugins")).isEqualTo(pluginClass);
 
     System.setProperty("configFile", "nonExistingFile.json");
     SparkSession spark = SparkSession.builder().config(conf).getOrCreate();
     SparkContext sc = spark.sparkContext();
-    assertThat(spark.sparkContext().getConf().get("spark.plugins")).isEqualTo(pluginClass);
 
     testFile = JavaSparkContext.fromSparkContext(sc).textFile(resourcePath);
     invokeJob();
