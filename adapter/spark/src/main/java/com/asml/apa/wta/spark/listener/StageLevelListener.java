@@ -11,12 +11,17 @@ import org.apache.spark.scheduler.StageInfo;
 import scala.collection.immutable.List;
 import scala.collection.mutable.ListBuffer;
 
+/**
+ * This class is a stage-level listener for the Spark data source.
+ *
+ * @author Tianchen Qu
+ * @since 1.0.0
+ */
+@Getter
 public class StageLevelListener extends AbstractListener<Task> { // not sure about the type
 
-  @Getter
   private final Map<Integer, Integer[]> stageToParents = new ConcurrentHashMap<>();
 
-  @Getter
   private final Map<Integer, ListBuffer<Integer>> parentToChildren = new ConcurrentHashMap<>();
 
   public StageLevelListener(SparkContext sparkContext, RuntimeConfig config) {
@@ -27,6 +32,9 @@ public class StageLevelListener extends AbstractListener<Task> { // not sure abo
    * This method will store the stage hierarchy information from the callback.
    *
    * @param stageCompleted callback from stage completion
+   *
+   * @author Tianchen Qu
+   * @since 1.0.0
    */
   @Override
   public void onStageCompleted(SparkListenerStageCompleted stageCompleted) {
@@ -44,10 +52,10 @@ public class StageLevelListener extends AbstractListener<Task> { // not sure abo
       if (children == null) {
         children = new ListBuffer<>();
         children.addOne(stageId);
+        parentToChildren.put(id, children);
       } else {
         children.addOne(stageId);
       }
-      parentToChildren.put(id, children);
     }
   }
 }

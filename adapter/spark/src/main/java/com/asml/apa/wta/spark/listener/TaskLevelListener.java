@@ -19,17 +19,16 @@ import org.apache.spark.scheduler.TaskInfo;
  *
  * @author Pil Kyu Cho
  * @author Henry Page
+ * @author Tianchen Qu
  * @since 1.0.0
  */
+@Getter
 public class TaskLevelListener extends AbstractListener<Task> {
 
-  @Getter
   private final Map<Integer, Integer> stageIdsToJobs = new ConcurrentHashMap<>();
 
-  @Getter
   private final Map<Integer, List<Long>> stageToTasks = new ConcurrentHashMap<>();
 
-  @Getter
   private final Map<Long, Integer> taskToStage = new ConcurrentHashMap<>();
 
   /**
@@ -49,6 +48,7 @@ public class TaskLevelListener extends AbstractListener<Task> {
    *
    * @param taskEnd   SparkListenerTaskEnd The object corresponding to information on task end
    * @author Henry Page
+   * @author Tianchen Qu
    * @since 1.0.0
    */
   @Override
@@ -62,15 +62,14 @@ public class TaskLevelListener extends AbstractListener<Task> {
     final long runTime = curTaskMetrics.executorRunTime();
     final int userId = sparkContext.sparkUser().hashCode();
     final int stageId = taskEnd.stageId();
-    final long workflowId = stageIdsToJobs.get(taskEnd.stageId());
-    final List<Long> tasks = stageToTasks.get(taskEnd.stageId());
+    final long workflowId = stageIdsToJobs.get(stageId);
+    final List<Long> tasks = stageToTasks.get(stageId);
     if (tasks == null) {
       List<Long> newTasks = new ArrayList<>();
       newTasks.add(taskId);
       stageToTasks.put(stageId, newTasks);
     } else {
       tasks.add(taskId);
-      stageToTasks.put(stageId, tasks);
     }
     final long[] parents = new long[0];
     final long[] children = new long[0];

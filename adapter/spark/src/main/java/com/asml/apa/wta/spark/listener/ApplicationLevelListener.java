@@ -23,12 +23,13 @@ import scala.collection.mutable.ListBuffer;
  *
  * @author Pil Kyu Cho
  * @author Henry Page
+ * @author Tianchen Qu
  * @since 1.0.0
  */
 @Getter
 public class ApplicationLevelListener extends AbstractListener<Workload> {
 
-  private final AbstractListener<Workflow> jobLevelListener;
+  private final JobLevelListener jobLevelListener;
 
   private final TaskLevelListener taskLevelListener;
 
@@ -48,7 +49,7 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
   public ApplicationLevelListener(
       SparkContext sparkContext,
       RuntimeConfig config,
-      AbstractListener<Workflow> jobLevelListener,
+      JobLevelListener jobLevelListener,
       TaskLevelListener taskLevelListener,
       StageLevelListener stageLevelListener) {
     super(sparkContext, config);
@@ -85,22 +86,13 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
       final Integer[] parentStages =
           stageLevelListener.getStageToParents().get(stageId);
       final Long[] parents;
-      if (parentStages == null) {
-        parents = new Long[0];
-      } else {
+      if (parentStages != null) {
         parents = Arrays.stream(parentStages)
-            .flatMap(x -> Arrays.stream(taskLevelListener
-                .getStageToTasks()
-                .get(x)
-                .toArray(
-                    new Long
-                        [taskLevelListener
-                            .getStageToTasks()
-                            .get(x)
-                            .size()])))
+            .flatMap(x -> Arrays.stream(
+                taskLevelListener.getStageToTasks().get(x).toArray(new Long[0])))
             .toArray(size -> new Long[size]);
+        task.setParents(ArrayUtils.toPrimitive(parents));
       }
-      task.setParents(ArrayUtils.toPrimitive(parents));
 
       ListBuffer<Integer> childrenStages =
           stageLevelListener.getParentToChildren().get(stageId);
@@ -110,7 +102,7 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
         while (iterator.hasNext()) {
           children.addAll(taskLevelListener.getStageToTasks().get(iterator.next()));
         }
-        Long[] temp = children.toArray(size -> new Long[size]);
+        Long[] temp = children.toArray(new Long[0]);
         task.setChildren(ArrayUtils.toPrimitive(temp));
       }
     }

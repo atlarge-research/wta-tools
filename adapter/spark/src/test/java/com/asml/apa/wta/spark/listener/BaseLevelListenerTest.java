@@ -4,8 +4,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.asml.apa.wta.core.config.RuntimeConfig;
-import com.asml.apa.wta.core.model.Workflow;
-import com.asml.apa.wta.core.model.Workload;
 import com.asml.apa.wta.core.model.enums.Domain;
 import java.util.Map;
 import org.apache.spark.SparkConf;
@@ -20,8 +18,8 @@ public class BaseLevelListenerTest {
 
   protected TaskLevelListener fakeTaskListener;
   protected StageLevelListener fakeStageListener;
-  protected AbstractListener<Workflow> fakeJobListener;
-  protected AbstractListener<Workload> fakeApplicationListener;
+  protected JobLevelListener fakeJobListener;
+  protected ApplicationLevelListener fakeApplicationListener;
 
   @BeforeEach
   void setupCommonListenerDependencies() {
