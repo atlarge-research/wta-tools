@@ -25,7 +25,7 @@ integration-tests-spark-adapter:
     - "perf list"
     - "perf record -e instructions,cache-misses awk 'BEGIN{for(i=0;i<10000;i++){}}' >/dev/null"
     - "ls -la perf.data"
-    - "cat perf.data"
+    - "uname -r"
     - "perf --version"
     - "perf script > perf.data.txt"
     - "mvn -pl adapter/spark jacoco:prepare-agent-integration failsafe:integration-test failsafe:verify jacoco:report-integration"
@@ -35,6 +35,7 @@ integration-tests-spark-adapter:
     expire_in: 20 minutes
     when: always
     paths:
+      - perf.data
       - adapter/spark/target/jacoco-integration-tests.exec
 
 mutation-tests-spark-adapter:
