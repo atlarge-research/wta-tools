@@ -2,6 +2,7 @@ package com.asml.apa.wta.spark.listener;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
 import com.asml.apa.wta.core.model.Task;
@@ -14,6 +15,7 @@ import org.apache.spark.scheduler.TaskLocation;
 import org.apache.spark.storage.RDDInfo;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import scala.Option;
 import scala.collection.immutable.Seq;
 import scala.collection.mutable.ListBuffer;
 
@@ -22,6 +24,8 @@ class StageLevelListenerTest extends BaseLevelListenerTest {
   StageInfo testStageInfo;
 
   SparkListenerStageCompleted stageEndEvent;
+
+  StageInfo spyStageInfo;
 
   @BeforeEach
   void setup() {
@@ -40,13 +44,16 @@ class StageLevelListenerTest extends BaseLevelListenerTest {
         new ListBuffer<Seq<TaskLocation>>().toList(),
         null,
         3);
-    stageEndEvent = new SparkListenerStageCompleted(testStageInfo);
+    spyStageInfo = spy(testStageInfo);
+    Option<Object> submissionTimeOption = Option.apply(10L);
+    when(spyStageInfo.submissionTime()).thenReturn(submissionTimeOption);
+    stageEndEvent = new SparkListenerStageCompleted(spyStageInfo);
   }
 
   @Test
-  void testTaskEndMetricExtraction() {
+  void testStageEndMetricExtraction() {
     ListBuffer<StageInfo> stageBuffer = new ListBuffer<>();
-    stageBuffer.addOne(testStageInfo);
+    stageBuffer.addOne(spyStageInfo);
 
     fakeStageListener.onJobStart(new SparkListenerJobStart(1, 2L, stageBuffer.toList(), new Properties()));
     fakeStageListener.onStageCompleted(stageEndEvent);
@@ -54,7 +61,7 @@ class StageLevelListenerTest extends BaseLevelListenerTest {
     Task curTask = fakeStageListener.getProcessedObjects().get(0);
     assertEquals(1, curTask.getId());
     assertEquals("", curTask.getType());
-    assertEquals(-1L, curTask.getSubmitTime());
+    assertEquals(10L, curTask.getSubmitTime());
     assertEquals(100L, curTask.getRuntime());
     assertEquals(1L, curTask.getWorkflowId());
     assertEquals("testUser".hashCode(), curTask.getUserId());
