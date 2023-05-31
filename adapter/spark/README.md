@@ -20,7 +20,7 @@ conf.set("spark.plugins", "com.asml.apa.wta.spark.WtaPlugin");
 System.setProperty("configFile", "adapter/spark/src/test/resources/config.json");
 ```
 The first line registers the main plugin class within the Spark session. The second line creates an environment variable
-for the plugin class to use. 
+for the plugin class to use.
 
 ### Second approach
 For the second approach, create a JAR file of the plugin and run it alongside the main Spark application using
@@ -31,9 +31,9 @@ For the second approach, create a JAR file of the plugin and run it alongside th
 - Execute the following command in the directory where the jar file is located:
 
 ```bash
-spark-submit --class <main class path to spark application> --master local[1] 
---conf spark.plugins=com.asml.apa.wta.spark.WtaPlugin 
---conf "spark.driver.extraJavaOptions=-DconfigFile=<config.json_location>" 
+spark-submit --class <main class path to spark application> --master local[1]
+--conf spark.plugins=com.asml.apa.wta.spark.WtaPlugin
+--conf "spark.driver.extraJavaOptions=-DconfigFile=<config.json_location>"
 --jars <plugin_jar_location> <Spark_jar_location>
 <optional arguments for spark application>
 ```
