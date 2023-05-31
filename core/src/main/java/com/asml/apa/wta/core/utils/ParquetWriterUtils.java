@@ -12,7 +12,9 @@ import java.io.FileWriter;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.avro.Schema;
@@ -42,12 +44,31 @@ public class ParquetWriterUtils {
 
   private Workload workload = null;
 
+  private Map<String, File> files;
+
   public ParquetWriterUtils(File path, String version) {
     resources = new ArrayList<>();
     tasks = new ArrayList<>();
     workflows = new ArrayList<>();
     this.path = path;
     this.version = version;
+    files = new HashMap<>();
+    files.put(
+        "resources",
+        new File(Paths.get(path.getPath(), "resources", version, "resource.parquet")
+            .toString()));
+    files.put(
+        "tasks",
+        new File(Paths.get(path.getPath(), "tasks", version, "task.parquet")
+            .toString()));
+    files.put(
+        "workflows",
+        new File(Paths.get(path.getPath(), "workflows", version, "workflow.parquet")
+            .toString()));
+    files.put(
+        "workload",
+        new File(Paths.get(path.getPath(), "workload", version, "generic_information.json")
+            .toString()));
   }
 
   /**
@@ -618,15 +639,6 @@ public class ParquetWriterUtils {
    * @since 1.0.0
    */
   public void deletePreExistingFiles() {
-    new File(Paths.get(path.getPath(), "resources", version, "resource.parquet")
-            .toString())
-        .delete();
-    new File(Paths.get(path.getPath(), "tasks", version, "task.parquet").toString()).delete();
-    new File(Paths.get(path.getPath(), "workflows", version, "workflow.parquet")
-            .toString())
-        .delete();
-    new File(Paths.get(path.getPath(), "workload", version, "generic_information.json")
-            .toString())
-        .delete();
+    files.forEach((key, value) -> value.delete());
   }
 }
