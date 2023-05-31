@@ -90,6 +90,7 @@ public class WtaDriverPlugin implements DriverPlugin {
   public void shutdown() {
     if (noError) {
       try {
+        removeListeners();
         List<Task> tasks = sparkDataSource.getTaskLevelListener().getProcessedObjects();
         List<Workflow> workFlow = sparkDataSource.getJobLevelListener().getProcessedObjects();
         Workload workLoad = sparkDataSource
@@ -109,7 +110,7 @@ public class WtaDriverPlugin implements DriverPlugin {
   }
 
   /**
-   * Initializes the listeners.
+   * Initializes the listeners to get Spark metrics.
    *
    * @author Pil Kyu Cho
    * @author Lohithsai Yadala Chanchu
@@ -119,5 +120,17 @@ public class WtaDriverPlugin implements DriverPlugin {
     this.sparkDataSource.registerTaskListener();
     this.sparkDataSource.registerJobListener();
     this.sparkDataSource.registerApplicationListener();
+  }
+
+  /**
+   * Removes the listeners.
+   *
+   * @author Pil Kyu Cho
+   * @since 1.0.0
+   */
+  public void removeListeners() {
+    this.sparkDataSource.removeTaskListener();
+    this.sparkDataSource.removeTaskListener();
+    this.sparkDataSource.removeApplicationListener();
   }
 }

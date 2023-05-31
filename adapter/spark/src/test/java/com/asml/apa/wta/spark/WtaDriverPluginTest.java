@@ -39,6 +39,7 @@ class WtaDriverPluginTest {
     assertThat(sut.isNoError()).isTrue();
     verify(sut, times(0)).shutdown();
     verify(sut, times(1)).initListeners();
+    verify(sut, times(0)).removeListeners();
   }
 
   @Test
@@ -51,5 +52,22 @@ class WtaDriverPluginTest {
     assertThat(sut.isNoError()).isFalse();
     verify(sut, times(1)).shutdown();
     verify(sut, times(0)).initListeners();
+    verify(sut, times(0)).removeListeners();
+  }
+
+  @Test
+  void wtaDriverPluginShutdown() {
+    assertThat(sut.isNoError()).isTrue();
+    sut.shutdown();
+    verify(sut, times(1)).removeListeners();
+  }
+
+  @Test
+  void wtaDriverPluginShutdownFromError() {
+    System.setProperty("configFile", "non-existing-file.json");
+    sut.init(mockedSparkContext, mockedPluginContext);
+    assertThat(sut.isNoError()).isFalse();
+    sut.shutdown();
+    verify(sut, times(0)).removeListeners();
   }
 }
