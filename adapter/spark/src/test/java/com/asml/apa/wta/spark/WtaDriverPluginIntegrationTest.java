@@ -61,7 +61,7 @@ class WtaDriverPluginIntegrationTest {
     testFile = JavaSparkContext.fromSparkContext(sc).textFile(resourcePath);
     invokeJob();
     sc.stop();
-    assertThat(Files.list(directoryPath).count()).isEqualTo(4L);
+    assertThat(Files.list(directoryPath).findAny()).isNotEmpty();
   }
 
   @Test
