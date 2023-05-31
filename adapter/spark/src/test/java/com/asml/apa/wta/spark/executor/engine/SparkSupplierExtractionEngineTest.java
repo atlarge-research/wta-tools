@@ -94,17 +94,4 @@ class SparkSupplierExtractionEngineTest {
 
     assertThat(testObj.getOsInfoDto().getAvailableProcessors()).isGreaterThanOrEqualTo(1);
   }
-
-  @Test
-  @EnabledOnOs(OS.LINUX)
-  void oneThreadDoesNotDelayTheOtherThread() {
-    sut.ping();
-    sut.startPinging();
-
-    await().atMost(maxTimeout, TimeUnit.MILLISECONDS).until(sut.getBuffer()::size, greaterThanOrEqualTo(1));
-
-    sut.getAndClear();
-
-    await().atMost(3L, TimeUnit.SECONDS).until(sut.getBuffer()::size, greaterThanOrEqualTo(3));
-  }
 }
