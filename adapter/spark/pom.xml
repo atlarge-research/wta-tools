@@ -26,7 +26,7 @@
       <groupId>org.apache.spark</groupId>
       <artifactId>spark-sql_2.13</artifactId>
       <version>${spark.support.version}</version>
-      <scope>provided</scope>
+      <scope>test</scope>
     </dependency>
     <!-- https://mvnrepository.com/artifact/org.scala-lang/scala-library -->
     <dependency>
