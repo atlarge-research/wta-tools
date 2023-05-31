@@ -2,12 +2,8 @@ package com.asml.apa.wta.spark.listener;
 
 import com.asml.apa.wta.core.config.RuntimeConfig;
 import com.asml.apa.wta.core.model.Task;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import lombok.Getter;
 import org.apache.spark.SparkContext;
 import org.apache.spark.executor.TaskMetrics;
-import org.apache.spark.scheduler.SparkListenerJobStart;
 import org.apache.spark.scheduler.SparkListenerStageCompleted;
 import org.apache.spark.scheduler.StageInfo;
 
@@ -17,10 +13,7 @@ import org.apache.spark.scheduler.StageInfo;
  * @author Lohithsai Yadala Chanchu
  * @since 1.0.0
  */
-public class StageLevelListener extends AbstractListener<Task> {
-
-  @Getter
-  private final Map<Integer, Integer> stageIdsToJobs = new ConcurrentHashMap<>();
+public class StageLevelListener extends TaskStageBaseListener {
 
   /**
    * Constructor for the stage-level listener.
@@ -47,10 +40,10 @@ public class StageLevelListener extends AbstractListener<Task> {
     final TaskMetrics curStageMetrics = curStageInfo.taskMetrics();
 
     final int stageId = curStageInfo.stageId();
-    final Long submitTime = (Long) curStageInfo.submissionTime().getOrElse(() -> -1L);
+    final Long submitTime = curStageInfo.submissionTime().getOrElse(() -> -1L);
     final long runTime = curStageMetrics.executorRunTime();
     final int userId = sparkContext.sparkUser().hashCode();
-    final long workflowId = stageIdsToJobs.get(stageId);
+    final long workflowId = this.getStageIdsToJobs().get(stageId);
 
     // unknown
     final String type = "";
@@ -95,20 +88,6 @@ public class StageLevelListener extends AbstractListener<Task> {
         .energyConsumption(energyConsumption)
         .resourceUsed(resourceUsed)
         .build());
-    stageIdsToJobs.remove(stageCompleted.stageInfo().stageId());
-  }
-
-  /**
-   * This method is called every time a job starts.
-   * In the context of the WTA, this is a workflow.
-   *
-   * @param jobStart The object corresponding to information on job start.
-   * @author Henry Page
-   * @since 1.0.0
-   */
-  @Override
-  public void onJobStart(SparkListenerJobStart jobStart) {
-    // stage ids are always unique
-    jobStart.stageInfos().foreach(stageInfo -> stageIdsToJobs.put(stageInfo.stageId(), jobStart.jobId()));
+    this.getStageIdsToJobs().remove(stageCompleted.stageInfo().stageId());
   }
 }

@@ -2,13 +2,8 @@ package com.asml.apa.wta.spark.listener;
 
 import com.asml.apa.wta.core.config.RuntimeConfig;
 import com.asml.apa.wta.core.model.Task;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import lombok.Getter;
 import org.apache.spark.SparkContext;
 import org.apache.spark.executor.TaskMetrics;
-import org.apache.spark.scheduler.SparkListenerJobStart;
-import org.apache.spark.scheduler.SparkListenerStageCompleted;
 import org.apache.spark.scheduler.SparkListenerTaskEnd;
 import org.apache.spark.scheduler.TaskInfo;
 
@@ -19,10 +14,7 @@ import org.apache.spark.scheduler.TaskInfo;
  * @author Henry Page
  * @since 1.0.0
  */
-public class TaskLevelListener extends AbstractListener<Task> {
-
-  @Getter
-  private final Map<Integer, Integer> stageIdsToJobs = new ConcurrentHashMap<>();
+public class TaskLevelListener extends TaskStageBaseListener {
 
   /**
    * Constructor for the task-level listener.
@@ -53,7 +45,7 @@ public class TaskLevelListener extends AbstractListener<Task> {
     final long submitTime = curTaskInfo.launchTime();
     final long runTime = curTaskMetrics.executorRunTime();
     final int userId = sparkContext.sparkUser().hashCode();
-    final long workflowId = stageIdsToJobs.get(taskEnd.stageId());
+    final long workflowId = this.getStageIdsToJobs().get(taskEnd.stageId());
 
     // unknown
     final int submissionSite = -1;
@@ -97,32 +89,5 @@ public class TaskLevelListener extends AbstractListener<Task> {
         .energyConsumption(energyConsumption)
         .resourceUsed(resourceUsed)
         .build());
-  }
-
-  /**
-   * This method is called every time a job starts.
-   * In the context of the WTA, this is a workflow.
-   *
-   * @param jobStart The object corresponding to information on job start.
-   * @author Henry Page
-   * @since 1.0.0
-   */
-  @Override
-  public void onJobStart(SparkListenerJobStart jobStart) {
-    // stage ids are always unique
-    jobStart.stageInfos().foreach(stageInfo -> stageIdsToJobs.put(stageInfo.stageId(), jobStart.jobId() + 1));
-  }
-
-  /**
-   * Callback for when a stage ends.
-   *
-   * @param stageCompleted The stage completion event
-   * @author Henry Page
-   * @since 1.0.0
-   */
-  @Override
-  public void onStageCompleted(SparkListenerStageCompleted stageCompleted) {
-    // all tasks are guaranteed to be completed, so we can remove the stage id to reduce memory usage.
-    stageIdsToJobs.remove(stageCompleted.stageInfo().stageId());
   }
 }
