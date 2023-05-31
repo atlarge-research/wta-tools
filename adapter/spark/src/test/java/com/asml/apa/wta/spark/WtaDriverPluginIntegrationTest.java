@@ -28,7 +28,7 @@ class WtaDriverPluginIntegrationTest {
 
   private final String validConfigFile = "src/test/resources/config.json";
 
-  private final Path directoryPath = Path.of("src/test/resources/WTA");
+  private final Path directoryPath = Path.of("wta-output");
 
   @BeforeEach
   void setup() throws IOException {

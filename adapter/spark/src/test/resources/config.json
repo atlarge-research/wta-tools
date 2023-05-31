@@ -7,5 +7,5 @@
     "f2": "v2"
   },
   "logLevel": "INFO",
-  "outputPath": "src/test/resources/WTA"
+  "outputPath": "wta-output"
 }

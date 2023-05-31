@@ -86,3 +86,4 @@ benchmarking/das-config-scripts/frameworks
 core/src/test/resources/WTA
 core/src/test/resources/AvroOutput
 adapter/spark/src/test/resources/WTA
+wta-output
