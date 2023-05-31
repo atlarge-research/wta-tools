@@ -3,6 +3,8 @@ package com.asml.apa.wta.core.supplier;
 import com.asml.apa.wta.core.dto.BaseSupplierDto;
 import com.asml.apa.wta.core.dto.IostatDto;
 import com.asml.apa.wta.core.dto.OsInfoDto;
+import lombok.Getter;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -22,6 +24,7 @@ public abstract class SupplierExtractionEngine<T extends BaseSupplierDto> {
 
   protected final IostatSupplier iostatSupplier;
 
+  @Getter
   protected final Collection<T> buffer = new ArrayList<>();
 
   private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
@@ -48,6 +51,7 @@ public abstract class SupplierExtractionEngine<T extends BaseSupplierDto> {
   public void ping() {
     CompletableFuture<OsInfoDto> osInfoDtoCompletableFuture = this.operatingSystemSupplier.getSnapshot();
     CompletableFuture<IostatDto> iostatDtoCompletableFuture = this.iostatSupplier.getSnapshot();
+
 
     CompletableFuture.allOf(osInfoDtoCompletableFuture, iostatDtoCompletableFuture)
         .thenRunAsync(() -> {
