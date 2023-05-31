@@ -101,7 +101,7 @@ public class ParquetWriterUtils {
    * @param taskFileName task file name
    * @param workflowFileName workflow file name
    * @param workloadFileName workload file name
-   * @throws Exception possible exception due to io error
+   * @throws Exception possible exception due to I/O error
    * @since 1.0.0
    * @author Pil Kyu Cho
    * @author Tianchen Qu

@@ -32,11 +32,11 @@ class WtaDriverPluginTest {
   @Test
   void wtaDriverPluginInitialized() {
     System.setProperty("configFile", "src/test/resources/config.json");
-    assertThat(sut.isNoError()).isTrue();
+    assertThat(sut.isError()).isFalse();
     assertThat(sut.init(mockedSparkContext, mockedPluginContext)).isEqualTo(new HashMap<>());
     assertThat(sut.getSparkDataSource()).isNotNull();
     assertThat(sut.getParquetUtil()).isNotNull();
-    assertThat(sut.isNoError()).isTrue();
+    assertThat(sut.isError()).isFalse();
     verify(sut, times(0)).shutdown();
     verify(sut, times(1)).initListeners();
     verify(sut, times(0)).removeListeners();
@@ -45,11 +45,11 @@ class WtaDriverPluginTest {
   @Test
   void wtaDriverPluginInitializeThrowsException() {
     System.setProperty("configFile", "non-existing-file.json");
-    assertThat(sut.isNoError()).isTrue();
+    assertThat(sut.isError()).isFalse();
     sut.init(mockedSparkContext, mockedPluginContext);
     assertThat(sut.getSparkDataSource()).isNull();
     assertThat(sut.getParquetUtil()).isNull();
-    assertThat(sut.isNoError()).isFalse();
+    assertThat(sut.isError()).isTrue();
     verify(sut, times(1)).shutdown();
     verify(sut, times(0)).initListeners();
     verify(sut, times(0)).removeListeners();
@@ -57,7 +57,7 @@ class WtaDriverPluginTest {
 
   @Test
   void wtaDriverPluginShutdown() {
-    assertThat(sut.isNoError()).isTrue();
+    assertThat(sut.isError()).isFalse();
     sut.shutdown();
     verify(sut, times(1)).removeListeners();
   }
@@ -66,7 +66,7 @@ class WtaDriverPluginTest {
   void wtaDriverPluginShutdownFromError() {
     System.setProperty("configFile", "non-existing-file.json");
     sut.init(mockedSparkContext, mockedPluginContext);
-    assertThat(sut.isNoError()).isFalse();
+    assertThat(sut.isError()).isTrue();
     sut.shutdown();
     verify(sut, times(0)).removeListeners();
   }

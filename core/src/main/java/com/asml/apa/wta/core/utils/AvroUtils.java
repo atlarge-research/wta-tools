@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.List;
 import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericRecord;
 import org.apache.hadoop.conf.Configuration;
@@ -23,7 +22,6 @@ import org.apache.parquet.hadoop.util.HadoopOutputFile;
  * @since 1.0.0
  * @author Tianchen Qu
  */
-@Slf4j
 public class AvroUtils implements AutoCloseable {
 
   private final URI path;

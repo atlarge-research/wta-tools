@@ -68,8 +68,9 @@ public class WtaUtils {
       log.error("Something went wrong while reading {}", configDir);
       throw new IllegalArgumentException("Something went wrong while reading " + configDir);
     } catch (Exception e) {
-      log.error("Config file was not properly provided");
-      throw new IllegalArgumentException("Config file was not properly provided");
+      log.error("\"configFile\" was not set in the command line arguments or system property");
+      throw new IllegalArgumentException(
+          "\"configFile\" was not set in the command line arguments or system property");
     }
   }
 

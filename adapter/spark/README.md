@@ -40,7 +40,7 @@ spark-submit --class <main class path to spark application> --master local[1]
 - The parquet files should now be located in the `outputPath` as specified in the config file.
 
 ## Description
-This plugin will NOT block the main Spark application. Even if the plugin fails to initialise, the main Spark
+This plugin will **not** block the main Spark application. Even if the plugin fails to initialise, the main Spark
 application will still run.
 
 The Spark Adapter consists of two main parts that allows the application to collect metrics.

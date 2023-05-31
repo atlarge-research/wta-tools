@@ -34,13 +34,13 @@ public class WtaDriverPlugin implements DriverPlugin {
 
   private ParquetWriterUtils parquetUtil;
 
-  private boolean noError = true;
+  private boolean error = false;
 
   /**
    * This method is called early in the initialization of the Spark driver.
    * Explicitly, it is called before the Spark driver's task scheduler is initialized. It is blocking.
    * Expensive calls should be postponed or delegated to another thread. If an error occurs while
-   * initializing the plugin, the plugin should call {@link #shutdown()} with {@link #noError} set to false.
+   * initializing the plugin, the plugin should call {@link #shutdown()} with {@link #error} set to false.
    *
    * @param sparkCtx The current SparkContext.
    * @param pluginCtx Additional plugin-specific about the Spark application where the plugin is running.
@@ -58,7 +58,7 @@ public class WtaDriverPlugin implements DriverPlugin {
       parquetUtil.deletePreExistingFiles();
       initListeners();
     } catch (Exception e) {
-      noError = false;
+      error = true;
       shutdown();
     }
     return new HashMap<>();
@@ -88,7 +88,9 @@ public class WtaDriverPlugin implements DriverPlugin {
    */
   @Override
   public void shutdown() {
-    if (noError) {
+    if (error) {
+      log.error("Error initialising WTA plugin. Shutting down plugin");
+    } else {
       try {
         removeListeners();
         List<Task> tasks = sparkDataSource.getTaskLevelListener().getProcessedObjects();
@@ -104,8 +106,6 @@ public class WtaDriverPlugin implements DriverPlugin {
       } catch (Exception e) {
         log.error("Error while writing to Parquet file");
       }
-    } else {
-      log.error("Error initialising WTA plugin. Shutting down plugin");
     }
   }
 
