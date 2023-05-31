@@ -21,14 +21,14 @@ public class SparkSupplierExtractionEngine extends SupplierExtractionEngine<Spar
    * @param pluginContext The plugin context.
    */
   public SparkSupplierExtractionEngine(PluginContext pluginContext) {
-    super();
     this.pluginContext = pluginContext;
   }
 
   /**
+   * Augments the base supplier Dto with Spark information.
    *
-   * @param record The resource metrics record to transform
-   * @return A
+   * @param record The {@link BaseSupplierDto} to transform
+   * @return A {@link SparkBaseSupplierWrapperDto} containing information pertaining to Spark
    */
   @Override
   public SparkBaseSupplierWrapperDto transform(BaseSupplierDto record) {

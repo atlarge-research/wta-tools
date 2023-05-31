@@ -11,8 +11,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
 /**
- * <h1>Resource Extraction Engine</h1>
- * <p>Used to extract resources from dependencies. Should be instantiated once per executor/node</p>
+ * Used to extract resources from dependencies. Should be instantiated once per executor/node.
  *
  * @author Henry Page
  * @since 1.0.0

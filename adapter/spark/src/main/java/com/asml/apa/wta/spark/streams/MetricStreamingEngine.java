@@ -28,8 +28,8 @@ public class MetricStreamingEngine {
   /**
    * Adds resource metrics to the resource stream.
    *
-   * @param resource the {@link com.asml.apa.wta.spark.streams.ResourceKey} of the resource
-   * @param record the {@link ResourceMetricsRecord} containing the metrics
+   * @param resourceKey A {@link String} identifying the resource. This is usually the executorID.
+   * @param record the {@link com.asml.apa.wta.spark.datasource.SparkDataSource} containing metrics.
    * @author Atour Mousavi Gourabi
    * @since 1.0.0
    */

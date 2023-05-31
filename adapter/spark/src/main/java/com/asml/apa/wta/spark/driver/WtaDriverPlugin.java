@@ -28,8 +28,6 @@ public class WtaDriverPlugin implements DriverPlugin {
   @Getter
   private SparkDataSource sparkDataSource;
 
-  private boolean SHUTDOWN_FLAG = false;
-
   /**
    * This method is called early in the initialization of the Spark driver.
    * Explicitly, it is called before the Spark driver's task scheduler is initialized. It is blocking.
@@ -60,9 +58,6 @@ public class WtaDriverPlugin implements DriverPlugin {
    */
   @Override
   public Object receive(Object message) {
-    if (SHUTDOWN_FLAG) {
-      return null;
-    }
     List<SparkBaseSupplierWrapperDto> resources = (List<SparkBaseSupplierWrapperDto>) message;
     resources.forEach(r -> mse.addToResourceStream(r.getExecutorId(), r));
     return null;
@@ -75,9 +70,7 @@ public class WtaDriverPlugin implements DriverPlugin {
    * @since 1.0.0
    */
   @Override
-  public void shutdown() {
-    this.SHUTDOWN_FLAG = true;
-  }
+  public void shutdown() {}
 
   /**
    * Initializes the listeners.
