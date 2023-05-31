@@ -24,6 +24,7 @@ integration-tests-spark-adapter:
     - echo "Spark adapter integration tests started"
     - "perf list"
     - "perf record -e instructions,cache-misses awk 'BEGIN{for(i=0;i<10000;i++){}}' >/dev/null"
+    - "ls -la perf.data"
     - "perf report -v"
     - "mvn -pl adapter/spark jacoco:prepare-agent-integration failsafe:integration-test failsafe:verify jacoco:report-integration"
     - "[ -f adapter/spark/target/jacoco-it.exec ] && mv -f adapter/spark/target/jacoco-it.exec adapter/spark/target/jacoco-integration-tests.exec || echo '0' > /dev/null"
