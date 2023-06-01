@@ -8,7 +8,6 @@ variables:
 build-base-image:
   stage: images
   image: docker:20.10.16
-  needs: []
   services:
     - docker:20.10.16-dind
   script:

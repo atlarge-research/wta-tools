@@ -25,4 +25,6 @@ include:
   - local: '.gitlab/stages/test-spark-adapter.yml'
   - local: '.gitlab/stages/check.yml'
 
-cache: []
+default:
+  cache: []
+  needs: []
