@@ -45,5 +45,6 @@ package-spark-adapter-e2e:
         files:
           - pom.xml
           - core/pom.xml
+        prefix: package
       paths:
         - .m2/repository
