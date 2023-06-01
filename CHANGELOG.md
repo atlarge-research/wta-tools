@@ -40,6 +40,7 @@ For the most part, since we are pre-release this will serve no real purpose, oth
 - Created custom images for e2e and integration testing [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 - Wired e2e testing into the pipeline [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 - Make the WtaPlugin class dictate the Spark adapter lifecycle [@pcho](https://gitlab.ewi.tudelft.nl/pcho)
+- Added option to choose between stage and task level metrics [@lyadalachanchu](https://gitlab.ewi.tudelft.nl/lyadalachanchu)
 
 ### Changed
 - Refactored listeners into a generic interface to reduce code duplication and increase cc [@hpage](https://gitlab.ewi.tudelft.nl/hpage)

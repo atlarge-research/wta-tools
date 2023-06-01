@@ -3,5 +3,6 @@
   "domain": "Industrial",
   "description": "Test Description",
   "logLevel": "INFO",
-  "outputPath": "/home/user/WTA"
+  "outputPath": "/home/user/WTA",
+  "isStageLevel": "true"
 }

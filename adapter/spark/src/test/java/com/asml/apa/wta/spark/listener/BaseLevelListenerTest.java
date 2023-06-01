@@ -20,6 +20,7 @@ public class BaseLevelListenerTest {
   protected RuntimeConfig fakeConfig;
 
   protected AbstractListener<Task> fakeTaskListener;
+  protected AbstractListener<Task> fakeStageListener;
   protected AbstractListener<Workflow> fakeJobListener;
   protected AbstractListener<Workload> fakeApplicationListener;
 
@@ -42,6 +43,8 @@ public class BaseLevelListenerTest {
         .build();
 
     fakeTaskListener = new TaskLevelListener(mockedSparkContext, fakeConfig);
+
+    fakeStageListener = new StageLevelListener(mockedSparkContext, fakeConfig);
 
     fakeJobListener = new JobLevelListener(mockedSparkContext, fakeConfig, fakeTaskListener);
 

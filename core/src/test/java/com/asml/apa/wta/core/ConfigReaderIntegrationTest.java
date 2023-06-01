@@ -29,6 +29,7 @@ class ConfigReaderIntegrationTest {
     assertThat(cr.getAuthors()).isEqualTo(new String[] {"Test Name"});
     assertThat(cr.getDomain()).isEqualTo(Domain.SCIENTIFIC);
     assertThat(cr.getDescription()).isEqualTo("Test Description");
+    assertThat(cr.isStageLevel()).isEqualTo(true);
     Map<String, String> map = new HashMap<>();
     map.put("f1", "v1");
     map.put("f2", "v2");
@@ -43,6 +44,7 @@ class ConfigReaderIntegrationTest {
     assertThat(cr.getAuthors()).isEqualTo(new String[] {"Test Name"});
     assertThat(cr.getDomain()).isEqualTo(Domain.ENGINEERING);
     assertThat(cr.getDescription()).isEqualTo("");
+    assertThat(cr.isStageLevel()).isEqualTo(true);
     Map<String, String> map = new HashMap<>();
     map.put("f1", "v1");
     map.put("f2", "v2");
@@ -58,6 +60,7 @@ class ConfigReaderIntegrationTest {
     assertThat(cr.getDomain()).isEqualTo(Domain.INDUSTRIAL);
     assertThat(cr.getDescription()).isEqualTo("Test Description");
     assertThat(cr.getEvents()).isEqualTo(new HashMap<>());
+    assertThat(cr.isStageLevel()).isEqualTo(true);
     assertThat(cr.getOutputPath()).isEqualTo("/home/user/WTA");
   }
 
@@ -79,6 +82,7 @@ class ConfigReaderIntegrationTest {
     assertThat(cr.getAuthors()).isEqualTo(new String[] {"Test Name"});
     assertThat(cr.getDomain()).isEqualTo(Domain.INDUSTRIAL);
     assertThat(cr.getDescription()).isEqualTo("Test Description");
+    assertThat(cr.isStageLevel()).isEqualTo(true);
     Map<String, String> map = new HashMap<>();
     map.put("f1", "v1");
     map.put("f2", "v2");
@@ -97,5 +101,19 @@ class ConfigReaderIntegrationTest {
   void readsConfigFileWhereOutputPathIsNotThere() {
     assertThatThrownBy(() -> WtaUtils.readConfig("src/test/resources/testConfigNoOutputPath.json"))
         .isInstanceOf(IllegalArgumentException.class);
+  }
+
+  @Test
+  void readsConfigFileWhereIsStageLevelIsNotThere() {
+    RuntimeConfig cr = WtaUtils.readConfig("src/test/resources/testConfigNoIsStageLevel.json");
+    assertThat(cr.getAuthors()).isEqualTo(new String[] {"Test Name"});
+    assertThat(cr.getDomain()).isEqualTo(Domain.SCIENTIFIC);
+    assertThat(cr.getDescription()).isEqualTo("Test Description");
+    assertThat(cr.isStageLevel()).isEqualTo(false);
+    Map<String, String> map = new HashMap<>();
+    map.put("f1", "v1");
+    map.put("f2", "v2");
+    assertThat(cr.getEvents()).isEqualTo(map);
+    assertThat(cr.getLogLevel()).isEqualTo("INFO");
   }
 }

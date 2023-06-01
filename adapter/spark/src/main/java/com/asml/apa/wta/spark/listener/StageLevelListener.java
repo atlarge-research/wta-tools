@@ -4,50 +4,49 @@ import com.asml.apa.wta.core.config.RuntimeConfig;
 import com.asml.apa.wta.core.model.Task;
 import org.apache.spark.SparkContext;
 import org.apache.spark.executor.TaskMetrics;
-import org.apache.spark.scheduler.SparkListenerTaskEnd;
-import org.apache.spark.scheduler.TaskInfo;
+import org.apache.spark.scheduler.SparkListenerStageCompleted;
+import org.apache.spark.scheduler.StageInfo;
 
 /**
- * This class is a task-level listener for the Spark data source.
+ * This class is a stage-level listener for the Spark data source.
  *
- * @author Pil Kyu Cho
- * @author Henry Page
+ * @author Lohithsai Yadala Chanchu
  * @since 1.0.0
  */
-public class TaskLevelListener extends TaskStageBaseListener {
+public class StageLevelListener extends TaskStageBaseListener {
 
   /**
-   * Constructor for the task-level listener.
+   * Constructor for the stage-level listener.
    *
    * @param sparkContext The current spark context
    * @param config Additional config specified by the user for the plugin
-   * @author Henry Page
+   * @author Lohithsai Yadala Chanchu
    * @since 1.0.0
    */
-  public TaskLevelListener(SparkContext sparkContext, RuntimeConfig config) {
+  public StageLevelListener(SparkContext sparkContext, RuntimeConfig config) {
     super(sparkContext, config);
   }
 
   /**
-   * This method is called every time a task ends, task-level metrics should be collected here, and added.
+   * This method is called every time a stage ends, stage-level metrics should be collected here, and added.
    *
-   * @param taskEnd   SparkListenerTaskEnd The object corresponding to information on task end
-   * @author Henry Page
+   * @param stageCompleted   SparkListenerStageCompleted The object corresponding to information on stage completion
+   * @author Lohithsai Yadala Chanchu
    * @since 1.0.0
    */
   @Override
-  public void onTaskEnd(SparkListenerTaskEnd taskEnd) {
-    final TaskInfo curTaskInfo = taskEnd.taskInfo();
-    final TaskMetrics curTaskMetrics = taskEnd.taskMetrics();
+  public void onStageCompleted(final SparkListenerStageCompleted stageCompleted) {
+    final StageInfo curStageInfo = stageCompleted.stageInfo();
+    final TaskMetrics curStageMetrics = curStageInfo.taskMetrics();
 
-    final long taskId = curTaskInfo.taskId() + 1;
-    final String type = taskEnd.taskType();
-    final long submitTime = curTaskInfo.launchTime();
-    final long runTime = curTaskMetrics.executorRunTime();
+    final int stageId = curStageInfo.stageId();
+    final Long submitTime = curStageInfo.submissionTime().getOrElse(() -> -1L);
+    final long runTime = curStageMetrics.executorRunTime();
     final int userId = sparkContext.sparkUser().hashCode();
-    final long workflowId = stageIdsToJobs.get(taskEnd.stageId());
+    final long workflowId = stageIdsToJobs.get(stageId);
 
     // unknown
+    final String type = "";
     final int submissionSite = -1;
     final String resourceType = "N/A";
     final double resourceAmountRequested = -1.0;
@@ -67,7 +66,7 @@ public class TaskLevelListener extends TaskStageBaseListener {
     // TODO(#61): CALL EXTERNAL DEPENDENCIES
 
     processedObjects.add(Task.builder()
-        .id(taskId)
+        .id(stageId)
         .type(type)
         .submissionSite(submissionSite)
         .submitTime(submitTime)
@@ -89,5 +88,6 @@ public class TaskLevelListener extends TaskStageBaseListener {
         .energyConsumption(energyConsumption)
         .resourceUsed(resourceUsed)
         .build());
+    stageIdsToJobs.remove(stageCompleted.stageInfo().stageId());
   }
 }
