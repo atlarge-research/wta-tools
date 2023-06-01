@@ -22,8 +22,7 @@ integration-tests-spark-adapter:
     - build-spark-adapter
   script:
     - echo "Spark adapter integration tests started"
-    - "perf record -e instructions,cache-misses awk 'BEGIN{for(i=0;i<10000;i++){}}'"
-    - "perf report -i perf.data"
+    - "perf stat -e instructions,cache-misses awk 'BEGIN{for(i=0;i<10000;i++){}}'"
     - "mvn -pl adapter/spark jacoco:prepare-agent-integration failsafe:integration-test failsafe:verify jacoco:report-integration"
     - "[ -f adapter/spark/target/jacoco-it.exec ] && mv -f adapter/spark/target/jacoco-it.exec adapter/spark/target/jacoco-integration-tests.exec || echo '0' > /dev/null"
   artifacts:
