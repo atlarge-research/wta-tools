@@ -13,6 +13,17 @@ import org.junit.jupiter.api.Test;
 class ConfigReaderIntegrationTest {
 
   @Test
+  void readsConfigNullArg() {
+    assertThatThrownBy(() -> WtaUtils.readConfig(null)).isInstanceOf(IllegalArgumentException.class);
+  }
+
+  @Test
+  void readsConfigNoFileInFilepath() {
+    assertThatThrownBy(() -> WtaUtils.readConfig("nonExistentFile.json"))
+        .isInstanceOf(IllegalArgumentException.class);
+  }
+
+  @Test
   void readsConfigFileCorrectly() {
     RuntimeConfig cr = WtaUtils.readConfig("src/test/resources/testConfig.json");
     assertThat(cr.getAuthors()).isEqualTo(new String[] {"Test Name"});
@@ -24,6 +35,7 @@ class ConfigReaderIntegrationTest {
     map.put("f2", "v2");
     assertThat(cr.getEvents()).isEqualTo(map);
     assertThat(cr.getLogLevel()).isEqualTo("INFO");
+    assertThat(cr.getOutputPath()).isEqualTo("/home/user/WTA");
   }
 
   @Test
@@ -38,6 +50,7 @@ class ConfigReaderIntegrationTest {
     map.put("f2", "v2");
     assertThat(cr.getEvents()).isEqualTo(map);
     assertThat(cr.getLogLevel()).isEqualTo("INFO");
+    assertThat(cr.getOutputPath()).isEqualTo("/home/user/WTA");
   }
 
   @Test
@@ -48,11 +61,18 @@ class ConfigReaderIntegrationTest {
     assertThat(cr.getDescription()).isEqualTo("Test Description");
     assertThat(cr.getEvents()).isEqualTo(new HashMap<>());
     assertThat(cr.isStageLevel()).isEqualTo(true);
+    assertThat(cr.getOutputPath()).isEqualTo("/home/user/WTA");
   }
 
   @Test
-  void readsConfigFileWhereTheAuthorIsNotThere() {
-    assertThatThrownBy(() -> WtaUtils.readConfig("src/test/resources/testConfigInvalid.json"))
+  void readsConfigFileWhereNoAuthorsAreGiven() {
+    assertThatThrownBy(() -> WtaUtils.readConfig("src/test/resources/testConfigNoAuthor.json"))
+        .isInstanceOf(IllegalArgumentException.class);
+  }
+
+  @Test
+  void readsConfigFileWhereAuthorFieldNotThere() {
+    assertThatThrownBy(() -> WtaUtils.readConfig("src/test/resources/testConfigInvalidAuthor.json"))
         .isInstanceOf(IllegalArgumentException.class);
   }
 
@@ -68,6 +88,19 @@ class ConfigReaderIntegrationTest {
     map.put("f2", "v2");
     assertThat(cr.getEvents()).isEqualTo(map);
     assertThat(cr.getLogLevel()).isEqualTo("ERROR");
+    assertThat(cr.getOutputPath()).isEqualTo("/home/user/WTA");
+  }
+
+  @Test
+  void readsConfigFileWithInvalidDomain() {
+    assertThatThrownBy(() -> WtaUtils.readConfig("src/test/resources/testConfigInvalidDomain.json"))
+        .isInstanceOf(IllegalArgumentException.class);
+  }
+
+  @Test
+  void readsConfigFileWhereOutputPathIsNotThere() {
+    assertThatThrownBy(() -> WtaUtils.readConfig("src/test/resources/testConfigNoOutputPath.json"))
+        .isInstanceOf(IllegalArgumentException.class);
   }
 
   @Test

@@ -31,4 +31,6 @@ public class RuntimeConfig {
 
   @Builder.Default
   private boolean isStageLevel = false;
+
+  private String outputPath;
 }
