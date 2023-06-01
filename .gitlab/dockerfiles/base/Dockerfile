@@ -4,7 +4,7 @@ RUN apt-get -y update
 RUN apt-get install -y curl && \
     apt-get install -y zip
 RUN curl -s "https://get.sdkman.io" | bash && \
-    source "/root/.sdkman/bin/sdkman-init.sh"; sdk install java 11.0.12-open && \
+    bash -c 'source "/root/.sdkman/bin/sdkman-init.sh"; sdk install java 11.0.12-open' && \
     mv /root/.sdkman/candidates/java/11.0.12-open /usr/local/openjdk/11.0.12 && \
     rm -rf /root/.sdkman/candidates/java
 ENV JAVA_HOME=/usr/local/openjdk/11.0.12
