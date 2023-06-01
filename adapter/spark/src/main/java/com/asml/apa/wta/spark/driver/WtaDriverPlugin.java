@@ -115,7 +115,7 @@ public class WtaDriverPlugin implements DriverPlugin {
    * @author Lohithsai Yadala Chanchu
    * @since 1.0.0
    */
-  private void initListeners() {
+  public void initListeners() {
     if (sparkDataSource.getRuntimeConfig().isStageLevel()) {
       this.sparkDataSource.registerStageListener();
     } else {

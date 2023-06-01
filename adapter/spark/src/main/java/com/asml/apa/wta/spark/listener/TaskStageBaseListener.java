@@ -18,7 +18,7 @@ import org.apache.spark.scheduler.SparkListenerStageCompleted;
 public abstract class TaskStageBaseListener extends AbstractListener<Task> {
 
   @Getter
-  private final Map<Integer, Integer> stageIdsToJobs = new ConcurrentHashMap<>();
+  protected final Map<Integer, Integer> stageIdsToJobs = new ConcurrentHashMap<>();
 
   /**
    * Constructor for the stage-level listener.
