@@ -1,3 +1,17 @@
-FROM maven:3-openjdk-11
+FROM ubuntu:jammy-20230425
 
-RUN apt-get update
+RUN apt-get -y update
+RUN apt-get install -y curl && \
+    apt-get install -y zip
+RUN curl -s "https://get.sdkman.io" | bash && \
+    source "/root/.sdkman/bin/sdkman-init.sh"; sdk install java 11.0.12-open && \
+    mv /root/.sdkman/candidates/java/11.0.12-open /usr/local/openjdk/11.0.12 && \
+    rm -rf /root/.sdkman/candidates/java
+ENV JAVA_HOME=/usr/local/openjdk/11.0.12
+RUN wget https://dlcdn.apache.org/maven/maven-3/3.9.2/binaries/apache-maven-3.9.2-bin.tar.gz && \
+    tar xvf apache-maven-3.9.2-bin.tar.gz && \
+    rm -rf apache-maven-3.9.2-bin.tar.gz && \
+    mv apache-maven-3.9.2-bin /opt/maven/3.9.2 \
+ENV MAVEN_HOME=/opt/maven/3.9.2 \
+    MAVEN_CONFIG=/root/.m2
+ENV PATH=$PATH:$MAVEN_HOME/bin
