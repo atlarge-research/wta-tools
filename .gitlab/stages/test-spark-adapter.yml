@@ -27,6 +27,7 @@ integration-tests-spark-adapter:
     - "perf record -e instructions,cache-misses awk 'BEGIN{for(i=0;i<10000;i++){}}' >/dev/null"
     - "ls -la perf.data"
     - "uname -r"
+    - "lsb_release -r"
     - "perf script > perf.data.txt"
     - "mvn -pl adapter/spark jacoco:prepare-agent-integration failsafe:integration-test failsafe:verify jacoco:report-integration"
     - "[ -f adapter/spark/target/jacoco-it.exec ] && mv -f adapter/spark/target/jacoco-it.exec adapter/spark/target/jacoco-integration-tests.exec || echo '0' > /dev/null"
