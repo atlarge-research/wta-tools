@@ -24,7 +24,7 @@ public interface BaseTraceObject extends Serializable {
   }
 
   /**
-   * All WTA objects that is stored in the parquet file need this method to convert the object to record for the writer.
+   * All WTA objects that are stored as Parquet files rely on this method to convert the object to a record.
    *
    * @param checker array indicating what column to ignore
    * @param schema schema for the output object
