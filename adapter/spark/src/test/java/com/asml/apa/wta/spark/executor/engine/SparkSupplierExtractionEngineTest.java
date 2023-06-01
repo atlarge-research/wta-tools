@@ -27,7 +27,7 @@ class SparkSupplierExtractionEngineTest {
    * We enforce a max timeout to prevent the test from hanging indefinitely.
    * This needs to be modified as dependencies take longer to resolve.
    */
-  private static final long maxTimeout = 150L;
+  private static final long maxTimeout = 500L;
 
   PluginContext mockPluginContext;
   SparkSupplierExtractionEngine sut;
