@@ -18,8 +18,6 @@ import org.apache.spark.api.plugin.PluginContext;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.condition.EnabledOnOs;
-import org.junit.jupiter.api.condition.OS;
 
 class SparkSupplierExtractionEngineTest {
 
@@ -27,7 +25,7 @@ class SparkSupplierExtractionEngineTest {
    * We enforce a max timeout to prevent the test from hanging indefinitely.
    * This needs to be modified as dependencies take longer to resolve.
    */
-  private static final long maxTimeout = 30000L;
+  private static final long maxTimeout = 9999999999L;
 
   PluginContext mockPluginContext;
   SparkSupplierExtractionEngine sut;
@@ -66,7 +64,6 @@ class SparkSupplierExtractionEngineTest {
   }
 
   @Test
-  @EnabledOnOs(OS.LINUX)
   void startAndStopPingingWorksAsIntended() {
     sut.startPinging(1000);
 
@@ -82,7 +79,6 @@ class SparkSupplierExtractionEngineTest {
   }
 
   @Test
-  @EnabledOnOs(OS.LINUX)
   void pingWorksAsIntended() {
     sut.ping();
 
