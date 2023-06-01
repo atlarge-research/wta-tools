@@ -19,6 +19,8 @@ public class SparkSupplierExtractionEngine extends SupplierExtractionEngine<Spar
    * Specialised extraction engine for Spark.
    *
    * @param pluginContext The plugin context.
+   * @author Henry Page
+   * @since 1.0.0
    */
   public SparkSupplierExtractionEngine(PluginContext pluginContext) {
     this.pluginContext = pluginContext;
@@ -29,6 +31,8 @@ public class SparkSupplierExtractionEngine extends SupplierExtractionEngine<Spar
    *
    * @param record The {@link BaseSupplierDto} to transform
    * @return A {@link SparkBaseSupplierWrapperDto} containing information pertaining to Spark
+   * @author Henry Page
+   * @since 1.0.0
    */
   @Override
   public SparkBaseSupplierWrapperDto transform(BaseSupplierDto record) {
