@@ -3,12 +3,14 @@ package com.asml.apa.wta.core.supplier;
 import com.asml.apa.wta.core.dto.BaseSupplierDto;
 import com.asml.apa.wta.core.dto.IostatDto;
 import com.asml.apa.wta.core.dto.OsInfoDto;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import lombok.Getter;
 
 /**
@@ -53,21 +55,23 @@ public abstract class SupplierExtractionEngine<T extends BaseSupplierDto> {
 
     CompletableFuture.allOf(osInfoDtoCompletableFuture, iostatDtoCompletableFuture)
         .thenRunAsync(() -> {
+          LocalDateTime timestamp = LocalDateTime.now();
           OsInfoDto osInfoDto = osInfoDtoCompletableFuture.join();
           IostatDto iostatDto = iostatDtoCompletableFuture.join();
 
-          buffer.add(transform(new BaseSupplierDto(osInfoDto, iostatDto)));
+          buffer.add(transform(new BaseSupplierDto(timestamp, osInfoDto, iostatDto)));
         });
   }
 
   /**
    * Starts pinging the suppliers at a fixed rate.
    *
+   * @param resourcePingInterval How often to ping the suppliers, in milliseconds
    * @author Henry Page
    * @since 1.0.0
    */
-  public void startPinging() {
-    scheduler.scheduleAtFixedRate(this::ping, 0, 1, java.util.concurrent.TimeUnit.SECONDS);
+  public void startPinging(int resourcePingInterval) {
+    scheduler.scheduleAtFixedRate(this::ping, 0, resourcePingInterval, TimeUnit.MILLISECONDS);
   }
 
   /**

@@ -7,5 +7,7 @@
     "f2": "v2"
   },
   "logLevel": "INFO",
-  "outputPath": "wta-output"
+  "outputPath": "wta-output",
+  "resourcePingInterval": 1000,
+  "executorSynchronizationInterval": 2000
 }

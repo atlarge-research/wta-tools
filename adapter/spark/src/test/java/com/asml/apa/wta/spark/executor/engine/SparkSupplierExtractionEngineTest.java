@@ -11,6 +11,7 @@ import com.asml.apa.wta.core.dto.BaseSupplierDto;
 import com.asml.apa.wta.core.dto.IostatDto;
 import com.asml.apa.wta.core.dto.OsInfoDto;
 import com.asml.apa.wta.spark.dto.SparkBaseSupplierWrapperDto;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import org.apache.spark.api.plugin.PluginContext;
@@ -49,12 +50,15 @@ class SparkSupplierExtractionEngineTest {
     OsInfoDto fakeOsInfo = OsInfoDto.builder().availableProcessors(1).build();
     IostatDto fakeIoStatDto = IostatDto.builder().kiloByteRead(40).build();
 
-    BaseSupplierDto baseSupplierDto = new BaseSupplierDto(fakeOsInfo, fakeIoStatDto);
+    LocalDateTime fakeTime = LocalDateTime.of(2000, 1, 1, 0, 0);
+
+    BaseSupplierDto baseSupplierDto = new BaseSupplierDto(fakeTime, fakeOsInfo, fakeIoStatDto);
 
     SparkBaseSupplierWrapperDto result = sut.transform(baseSupplierDto);
 
     assertThat(result)
         .isEqualTo(SparkBaseSupplierWrapperDto.builder()
+            .timestamp(fakeTime)
             .osInfoDto(fakeOsInfo)
             .iostatDto(fakeIoStatDto)
             .executorId("test-executor-id")
@@ -64,7 +68,7 @@ class SparkSupplierExtractionEngineTest {
   @Test
   @EnabledOnOs(OS.LINUX)
   void startAndStopPingingWorksAsIntended() {
-    sut.startPinging();
+    sut.startPinging(1000);
 
     await().atMost(4, TimeUnit.SECONDS).until(sut.getBuffer()::size, greaterThanOrEqualTo(3));
 

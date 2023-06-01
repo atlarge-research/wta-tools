@@ -6,7 +6,6 @@ import static org.mockito.Mockito.*;
 import com.asml.apa.wta.core.utils.WtaUtils;
 import com.asml.apa.wta.spark.driver.WtaDriverPlugin;
 import com.asml.apa.wta.spark.dto.SparkBaseSupplierWrapperDto;
-import java.util.HashMap;
 import java.util.List;
 import org.apache.spark.SparkContext;
 import org.apache.spark.api.plugin.PluginContext;
@@ -39,7 +38,8 @@ class WtaDriverPluginTest {
   void wtaDriverPluginInitialized() {
     injectConfig();
     assertThat(sut.isError()).isFalse();
-    assertThat(sut.init(mockedSparkContext, mockedPluginContext)).isEqualTo(new HashMap<>());
+    assertThat(sut.init(mockedSparkContext, mockedPluginContext))
+        .containsKeys("executorSynchronizationInterval", "resourcePingInterval");
     assertThat(sut.getSparkDataSource()).isNotNull();
     assertThat(sut.getParquetUtil()).isNotNull();
     assertThat(sut.isError()).isFalse();

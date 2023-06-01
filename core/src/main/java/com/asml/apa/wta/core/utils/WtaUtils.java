@@ -57,6 +57,7 @@ public class WtaUtils {
         log.error("The config file does not specify an output path, this field is mandatory.");
         throw new IllegalArgumentException("The config file does not specify the output path");
       }
+
       return config;
     } catch (JsonParseException e) {
       log.error("The config file has invalid fields");

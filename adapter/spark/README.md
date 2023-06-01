@@ -12,7 +12,7 @@ There are two ways to make use of the plugin
 1. Integrate the plugin into the Spark application source code
 2. Create the plugin as a JAR and run alongside the main Spark application via **spark-submit**
 
-### First approach
+### Development
 For the first approach, create a `SparkConf` object and set the following config:
 
 ```java
@@ -22,7 +22,7 @@ System.setProperty("configFile", "adapter/spark/src/test/resources/config.json")
 The first line registers the main plugin class within the Spark session. The second line creates an environment variable
 for the plugin class to use.
 
-### Second approach
+### CLI
 For the second approach, create a JAR file of the plugin and run it alongside the main Spark application using
 **spark-submit**. Here is an example of how to run the plugin alongside the main Spark application:
 
@@ -38,6 +38,10 @@ spark-submit --class <main class path to spark application> --master local[1]
 <optional arguments for spark application>
 ```
 - The parquet files should now be located in the `outputPath` as specified in the config file.
+
+## Configuration
+General configuration instructions are located [here](/../../README.md#configuration). See above for [instructions](#installation-and-usage) on how to provide the configuration to the plugin.
+
 
 ## Description
 This plugin will **not** block the main Spark application. Even if the plugin fails to initialise, the main Spark

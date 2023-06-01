@@ -55,6 +55,7 @@ public class WtaDriverPlugin implements DriverPlugin {
    */
   @Override
   public Map<String, String> init(SparkContext sparkCtx, PluginContext pluginCtx) {
+    Map<String, String> executorVars = new HashMap<>();
     try {
       RuntimeConfig runtimeConfig = WtaUtils.readConfig(System.getProperty("configFile"));
       sparkDataSource = new SparkDataSource(sparkCtx, runtimeConfig);
@@ -62,11 +63,15 @@ public class WtaDriverPlugin implements DriverPlugin {
       parquetUtil = new ParquetWriterUtils(new File(runtimeConfig.getOutputPath()), "schema-1.0");
       parquetUtil.deletePreExistingFiles();
       initListeners();
+      executorVars.put("resourcePingInterval", String.valueOf(runtimeConfig.getResourcePingInterval()));
+      executorVars.put(
+          "executorSynchronizationInterval",
+          String.valueOf(runtimeConfig.getExecutorSynchronizationInterval()));
     } catch (Exception e) {
       error = true;
       shutdown();
     }
-    return new HashMap<>();
+    return executorVars;
   }
 
   /**

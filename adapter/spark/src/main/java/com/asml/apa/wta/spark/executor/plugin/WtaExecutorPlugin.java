@@ -48,21 +48,29 @@ public class WtaExecutorPlugin implements ExecutorPlugin {
    */
   @Override
   public void init(PluginContext pCtx, Map<String, String> extraConf) {
+    int resourcePingInterval = extraConf.get("resourcePingInterval") == null
+        ? 1000
+        : Integer.parseInt(extraConf.get("resourcePingInterval"));
+    int executorSynchronizationInterval = extraConf.get("executorSynchronizationInterval") == null
+        ? 2000
+        : Integer.parseInt(extraConf.get("executorSynchronizationInterval"));
     this.pluginContext = pCtx;
     this.supplierEngine = new SparkSupplierExtractionEngine(pluginContext);
-    this.supplierEngine.startPinging();
-    this.startSending();
+    this.supplierEngine.startPinging(resourcePingInterval);
+    this.startSending(executorSynchronizationInterval);
   }
 
   /**
    * Scheduled task to send the resource buffer of the extraction engine, with an initial delay
    * of 1 second and a fixed rate of 5 seconds.
    *
+   * @param executorSynchronizationInterval How often to synchronize the buffer in milliseconds
    * @author Henry Page
    * @since 1.0.0
    */
-  private void startSending() {
-    this.scheduler.scheduleAtFixedRate(this::sendBuffer, 1, 2, TimeUnit.SECONDS);
+  private void startSending(int executorSynchronizationInterval) {
+    this.scheduler.scheduleAtFixedRate(
+        this::sendBuffer, 1000, executorSynchronizationInterval, TimeUnit.MILLISECONDS);
   }
 
   /**

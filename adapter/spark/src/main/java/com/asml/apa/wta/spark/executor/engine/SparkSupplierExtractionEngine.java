@@ -38,6 +38,7 @@ public class SparkSupplierExtractionEngine extends SupplierExtractionEngine<Spar
   public SparkBaseSupplierWrapperDto transform(BaseSupplierDto record) {
     return SparkBaseSupplierWrapperDto.builder()
         .executorId(pluginContext.executorID())
+        .timestamp(record.getTimestamp())
         .osInfoDto(record.getOsInfoDto())
         .iostatDto(record.getIostatDto())
         .build();

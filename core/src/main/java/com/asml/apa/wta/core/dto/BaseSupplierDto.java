@@ -1,6 +1,7 @@
 package com.asml.apa.wta.core.dto;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -20,6 +21,8 @@ import lombok.experimental.SuperBuilder;
 public class BaseSupplierDto implements Serializable {
 
   private static final long serialVersionUID = -3101218638564306099L;
+
+  private LocalDateTime timestamp;
 
   private OsInfoDto osInfoDto;
 
