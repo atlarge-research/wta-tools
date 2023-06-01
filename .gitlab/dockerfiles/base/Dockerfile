@@ -14,7 +14,6 @@ RUN wget https://dlcdn.apache.org/maven/maven-3/3.9.2/binaries/apache-maven-3.9.
     tar xvf apache-maven-3.9.2-bin.tar.gz && \
     rm -rf apache-maven-3.9.2-bin.tar.gz && \
     mkdir -p /opt/maven/3.9.2 && \
-    ls -la && \
     mv apache-maven-3.9.2 /opt/maven/3.9.2
 ENV MAVEN_HOME=/opt/maven/3.9.2 \
     MAVEN_CONFIG=/root/.m2
