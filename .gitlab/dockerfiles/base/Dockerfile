@@ -18,6 +18,3 @@ RUN wget https://dlcdn.apache.org/maven/maven-3/3.9.2/binaries/apache-maven-3.9.
 ENV MAVEN_HOME=/opt/maven/3.9.2 \
     MAVEN_CONFIG=/root/.m2
 ENV PATH=$PATH:$MAVEN_HOME/bin
-RUN echo "$PATH" && \
-    ls -la $MAVEN_HOME && \
-    mvn -v
