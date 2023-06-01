@@ -2,7 +2,8 @@ FROM ubuntu:jammy-20230425
 
 RUN apt-get -y update
 RUN apt-get install -y curl && \
-    apt-get install -y zip
+    apt-get install -y zip && \
+    apt-get install -y wget
 RUN curl -s "https://get.sdkman.io" | bash && \
     bash -c 'source "/root/.sdkman/bin/sdkman-init.sh"; sdk install java 11.0.12-open' && \
     mkdir -p /usr/local/openjdk/11.0.12 && \
