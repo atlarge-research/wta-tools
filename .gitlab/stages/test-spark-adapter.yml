@@ -15,10 +15,10 @@ unit-tests-spark-adapter:
       - adapter/spark/target/jacoco-unit-tests.exec
   cache:
     - key:
+        prefix: test
         files:
           - pom.xml
           - core/pom.xml
-        prefix: test
       paths:
         - .m2/repository
 
@@ -40,10 +40,10 @@ integration-tests-spark-adapter:
       - adapter/spark/target/jacoco-integration-tests.exec
   cache:
     - key:
+        prefix: test
         files:
           - pom.xml
           - core/pom.xml
-        prefix: test
       paths:
         - .m2/repository
 
@@ -66,10 +66,10 @@ mutation-tests-spark-adapter:
       - adapter/spark/reports/pitest/
   cache:
     - key:
+        prefix: test
         files:
           - pom.xml
           - core/pom.xml
-        prefix: test
       paths:
         - .m2/repository
 
@@ -93,10 +93,10 @@ line-coverage-spark-adapter:
       - adapter/spark/reports/jacoco/
   cache:
     - key:
+        prefix: maven
         files:
           - pom.xml
           - core/pom.xml
-        prefix: maven
       paths:
         - .m2/repository
 

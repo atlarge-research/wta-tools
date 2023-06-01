@@ -14,10 +14,10 @@ spotless:
     - "mvn spotless:check"
   cache:
     - key:
+        prefix: spotless
         files:
           - pom.xml
           - core/pom.xml
-        prefix: spotless
       paths:
         - .m2/repository
 
@@ -37,10 +37,10 @@ pmd:
       - adapter/spark/reports/pmd
   cache:
     - key:
+        prefix: test
         files:
           - pom.xml
           - core/pom.xml
-        prefix: test
       paths:
         - .m2/repository
 
@@ -60,10 +60,10 @@ checkstyle:
       - adapter/spark/reports/checkstyle/violations.txt
   cache:
     - key:
+        prefix: checkstyle
         files:
           - pom.xml
           - core/pom.xml
-        prefix: checkstyle
       paths:
         - .m2/repository
 

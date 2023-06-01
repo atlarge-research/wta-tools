@@ -13,10 +13,10 @@ build-core:
       - .m2/repository/com/asml/apa/wta
   cache:
     - key:
+        prefix: test
         files:
           - pom.xml
           - core/pom.xml
-        prefix: test
       paths:
         - .m2/repository
 
@@ -36,10 +36,10 @@ build-spark-adapter:
       - .m2/repository/com/asml/apa/wta
   cache:
     - key:
+        prefix: test
         files:
           - pom.xml
           - core/pom.xml
-        prefix: test
       paths:
         - .m2/repository
 
@@ -58,9 +58,9 @@ package-spark-adapter-e2e:
       - adapter/spark/target/*-e2e.jar
   cache:
     - key:
+        prefix: test
         files:
           - pom.xml
           - core/pom.xml
-        prefix: test
       paths:
         - .m2/repository

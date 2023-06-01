@@ -15,10 +15,10 @@ unit-tests-core:
       - core/target/jacoco-unit-tests.exec
   cache:
     - key:
+        prefix: test
         files:
           - pom.xml
           - core/pom.xml
-        prefix: test
       paths:
         - .m2/repository
 
@@ -40,10 +40,10 @@ integration-tests-core:
       - core/target/jacoco-integration-tests.exec
   cache:
     - key:
+        prefix: test
         files:
           - pom.xml
           - core/pom.xml
-        prefix: test
       paths:
         - .m2/repository
 
@@ -66,10 +66,10 @@ mutation-tests-core:
       - core/reports/pitest/
   cache:
     - key:
+        prefix: test
         files:
           - pom.xml
           - core/pom.xml
-        prefix: test
       paths:
         - .m2/repository
 
@@ -93,10 +93,10 @@ line-coverage-core:
       - core/reports/jacoco/
   cache:
     - key:
+        prefix: maven
         files:
           - pom.xml
           - core/pom.xml
-        prefix: maven
       paths:
         - .m2/repository
 
