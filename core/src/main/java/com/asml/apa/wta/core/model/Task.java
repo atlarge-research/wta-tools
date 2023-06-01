@@ -67,6 +67,7 @@ public class Task implements BaseTraceObject {
 
   /**
    * Converts the POJO object into record object, enabling it to be written by Avro.
+   * It will put all fields allowed by the checker into the record.
    *
    * @param checker checker for which column to skip
    * @param schema schema
