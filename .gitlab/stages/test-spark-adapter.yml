@@ -13,6 +13,14 @@ unit-tests-spark-adapter:
     when: always
     paths:
       - adapter/spark/target/jacoco-unit-tests.exec
+  cache:
+    - key:
+        files:
+          - pom.xml
+          - core/pom.xml
+          - adapter/spark/pom.xml
+      paths:
+        - .m2/repository
 
 integration-tests-spark-adapter:
   stage: test-spark-adapter
@@ -31,6 +39,14 @@ integration-tests-spark-adapter:
     paths:
       - perf.data
       - adapter/spark/target/jacoco-integration-tests.exec
+  cache:
+    - key:
+        files:
+          - pom.xml
+          - core/pom.xml
+          - adapter/spark/pom.xml
+      paths:
+        - .m2/repository
 
 mutation-tests-spark-adapter:
   stage: test-spark-adapter
@@ -49,6 +65,14 @@ mutation-tests-spark-adapter:
     when: always
     paths:
       - adapter/spark/reports/pitest/
+  cache:
+    - key:
+        files:
+          - pom.xml
+          - core/pom.xml
+          - adapter/spark/pom.xml
+      paths:
+        - .m2/repository
 
 
 line-coverage-spark-adapter:

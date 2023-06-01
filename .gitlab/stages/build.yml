@@ -11,7 +11,6 @@ build-core:
     paths:
       - core/target
       - .m2/repository/com/asml/apa/wta
-  cache: []
 
 build-spark-adapter:
   stage: build
@@ -27,7 +26,6 @@ build-spark-adapter:
     paths:
       - adapter/spark/target
       - .m2/repository/com/asml/apa/wta
-  cache: []
 
 package-spark-adapter-e2e:
   stage: build
@@ -42,3 +40,11 @@ package-spark-adapter-e2e:
     expire_in: 20 minutes
     paths:
       - adapter/spark/target/*-e2e.jar
+  cache:
+    - key:
+        files:
+          - pom.xml
+          - core/pom.xml
+          - adapter/spark/pom.xml
+      paths:
+        - .m2/repository

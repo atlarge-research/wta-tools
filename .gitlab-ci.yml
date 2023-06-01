@@ -25,6 +25,4 @@ include:
   - local: '.gitlab/stages/test-spark-adapter.yml'
   - local: '.gitlab/stages/check.yml'
 
-cache:
-  paths:
-    - .m2/repository
+cache: []

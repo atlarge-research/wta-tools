@@ -13,6 +13,14 @@ unit-tests-core:
     when: always
     paths:
       - core/target/jacoco-unit-tests.exec
+  cache:
+    - key:
+        files:
+          - pom.xml
+          - core/pom.xml
+          - adapter/spark/pom.xml
+      paths:
+        - .m2/repository
 
 integration-tests-core:
   stage: test-core
@@ -33,6 +41,14 @@ integration-tests-core:
     when: always
     paths:
       - core/target/jacoco-integration-tests.exec
+  cache:
+    - key:
+        files:
+          - pom.xml
+          - core/pom.xml
+          - adapter/spark/pom.xml
+      paths:
+        - .m2/repository
 
 mutation-tests-core:
   stage: test-core
@@ -51,6 +67,14 @@ mutation-tests-core:
     when: always
     paths:
       - core/reports/pitest/
+  cache:
+    - key:
+        files:
+          - pom.xml
+          - core/pom.xml
+          - adapter/spark/pom.xml
+      paths:
+        - .m2/repository
 
 
 line-coverage-core:
