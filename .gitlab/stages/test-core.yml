@@ -22,7 +22,7 @@ integration-tests-core:
     - build-core
   script:
     - echo "Core integration tests started"
-    - "perf record -e instructions,cache-misses awk 'BEGIN{for(i=0;i<40000000;i++){}}"
+    - "perf record -e instructions,cache-misses awk 'BEGIN{for(i=0;i<40000000;i++){}}'"
     - "perf report --symfs /host"
     - "mvn -pl core jacoco:prepare-agent-integration failsafe:integration-test failsafe:verify jacoco:report-integration"
     - "[ -f core/target/jacoco-it.exec ] && mv -f core/target/jacoco-it.exec core/target/jacoco-integration-tests.exec || echo '0' >/dev/null"
