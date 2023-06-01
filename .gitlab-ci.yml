@@ -2,7 +2,7 @@ variables:
   MAVEN_OPTS: "-Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository"
   PITEST_OPTS: "-DwithHistory"
 
-image: maven:3-openjdk-11
+image: $BASE_IMAGE
 
 workflow:
   rules:

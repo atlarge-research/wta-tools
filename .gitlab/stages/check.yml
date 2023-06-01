@@ -8,7 +8,7 @@ include:
 spotless:
   stage: check
   dependencies: []
-  needs: []
+  needs: [build-base-image]
   script:
     - echo "Spotless check started"
     - "mvn spotless:check"
@@ -31,7 +31,7 @@ pmd:
 checkstyle:
   stage: check
   dependencies: []
-  needs: []
+  needs: [build-base-image]
   script:
     - echo "Checkstyle checks started"
     - "mvn checkstyle:check"
