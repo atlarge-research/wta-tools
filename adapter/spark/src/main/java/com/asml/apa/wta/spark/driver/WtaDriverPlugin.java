@@ -121,6 +121,7 @@ public class WtaDriverPlugin implements DriverPlugin {
     } else {
       this.sparkDataSource.registerTaskListener();
     }
+    this.sparkDataSource.registerJobListener();
     this.sparkDataSource.registerApplicationListener();
   }
   /**
