@@ -6,6 +6,6 @@
     "f2": "v2"
   },
   "logLevel": "INFO",
-  "outputPath": "/home/user/WTA"
+  "outputPath": "/home/user/WTA",
   "isStageLevel": "true"
 }
