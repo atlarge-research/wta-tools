@@ -12,6 +12,14 @@ spotless:
   script:
     - echo "Spotless check started"
     - "mvn spotless:check"
+  cache:
+    - key:
+        files:
+          - pom.xml
+          - core/pom.xml
+        prefix: spotless
+      paths:
+        - .m2/repository
 
 pmd:
   stage: check
@@ -27,6 +35,14 @@ pmd:
     paths:
       - core/reports/pmd
       - adapter/spark/reports/pmd
+  cache:
+    - key:
+        files:
+          - pom.xml
+          - core/pom.xml
+        prefix: test
+      paths:
+        - .m2/repository
 
 checkstyle:
   stage: check
@@ -42,6 +58,14 @@ checkstyle:
     paths:
       - core/reports/checkstyle/violations.txt
       - adapter/spark/reports/checkstyle/violations.txt
+  cache:
+    - key:
+        files:
+          - pom.xml
+          - core/pom.xml
+        prefix: checkstyle
+      paths:
+        - .m2/repository
 
 
 sast:

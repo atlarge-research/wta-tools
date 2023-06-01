@@ -11,6 +11,14 @@ build-core:
     paths:
       - core/target
       - .m2/repository/com/asml/apa/wta
+  cache:
+    - key:
+        files:
+          - pom.xml
+          - core/pom.xml
+        prefix: test
+      paths:
+        - .m2/repository
 
 build-spark-adapter:
   stage: build
@@ -26,6 +34,14 @@ build-spark-adapter:
     paths:
       - adapter/spark/target
       - .m2/repository/com/asml/apa/wta
+  cache:
+    - key:
+        files:
+          - pom.xml
+          - core/pom.xml
+        prefix: test
+      paths:
+        - .m2/repository
 
 package-spark-adapter-e2e:
   stage: build
@@ -45,6 +61,6 @@ package-spark-adapter-e2e:
         files:
           - pom.xml
           - core/pom.xml
-        prefix: package
+        prefix: test
       paths:
         - .m2/repository

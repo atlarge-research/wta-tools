@@ -94,6 +94,14 @@ line-coverage-core:
     when: always
     paths:
       - core/reports/jacoco/
+  cache:
+    - key:
+        files:
+          - pom.xml
+          - core/pom.xml
+        prefix: maven
+      paths:
+        - .m2/repository
 
 branch-coverage-core:
   stage: test-core

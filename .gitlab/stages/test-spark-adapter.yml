@@ -37,7 +37,6 @@ integration-tests-spark-adapter:
     expire_in: 20 minutes
     when: always
     paths:
-      - perf.data
       - adapter/spark/target/jacoco-integration-tests.exec
   cache:
     - key:
@@ -92,6 +91,14 @@ line-coverage-spark-adapter:
     when: always
     paths:
       - adapter/spark/reports/jacoco/
+  cache:
+    - key:
+        files:
+          - pom.xml
+          - core/pom.xml
+        prefix: maven
+      paths:
+        - .m2/repository
 
 branch-coverage-spark-adapter:
   stage: test-spark-adapter
