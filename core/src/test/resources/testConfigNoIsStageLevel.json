@@ -7,9 +7,5 @@
     "f2": "v2"
   },
   "logLevel": "INFO",
-  "outputPath": "/home/user/WTA",
-  "isStageLevel": "true",
-  "resourcePingInterval": 2000,
-  "executorSynchronizationInterval": 4000
-
+  "outputPath": "/home/user/WTA"
 }

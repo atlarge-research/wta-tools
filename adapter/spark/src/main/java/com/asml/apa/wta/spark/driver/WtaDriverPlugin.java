@@ -124,16 +124,18 @@ public class WtaDriverPlugin implements DriverPlugin {
   /**
    * Initializes the listeners to get Spark metrics.
    *
-   * @author Pil Kyu Cho
    * @author Lohithsai Yadala Chanchu
    * @since 1.0.0
    */
   public void initListeners() {
-    this.sparkDataSource.registerTaskListener();
+    if (sparkDataSource.getRuntimeConfig().isStageLevel()) {
+      this.sparkDataSource.registerStageListener();
+    } else {
+      this.sparkDataSource.registerTaskListener();
+    }
     this.sparkDataSource.registerJobListener();
     this.sparkDataSource.registerApplicationListener();
   }
-
   /**
    * Removes the listeners.
    *
