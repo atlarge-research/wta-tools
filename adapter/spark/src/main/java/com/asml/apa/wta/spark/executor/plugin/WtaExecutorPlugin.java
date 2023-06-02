@@ -2,10 +2,9 @@ package com.asml.apa.wta.spark.executor.plugin;
 
 import com.asml.apa.wta.spark.WtaPlugin;
 import com.asml.apa.wta.spark.driver.WtaDriverPlugin;
-import com.asml.apa.wta.spark.dto.SparkBaseSupplierWrapperDto;
+import com.asml.apa.wta.spark.dto.ResourceCollectionDto;
 import com.asml.apa.wta.spark.executor.engine.SparkSupplierExtractionEngine;
 import java.io.IOException;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -81,8 +80,8 @@ public class WtaExecutorPlugin implements ExecutorPlugin {
    * @since 1.0.0
    */
   private void sendBuffer() {
-    List<SparkBaseSupplierWrapperDto> bufferSnapshot = this.supplierEngine.getAndClear();
-    if (bufferSnapshot.isEmpty()) {
+    ResourceCollectionDto bufferSnapshot = new ResourceCollectionDto(this.supplierEngine.getAndClear());
+    if (bufferSnapshot.getResourceCollection().isEmpty()) {
       return;
     }
     try {

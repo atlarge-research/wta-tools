@@ -7,7 +7,7 @@ import com.asml.apa.wta.core.model.Workload;
 import com.asml.apa.wta.core.utils.ParquetWriterUtils;
 import com.asml.apa.wta.core.utils.WtaUtils;
 import com.asml.apa.wta.spark.datasource.SparkDataSource;
-import com.asml.apa.wta.spark.dto.SparkBaseSupplierWrapperDto;
+import com.asml.apa.wta.spark.dto.ResourceCollectionDto;
 import com.asml.apa.wta.spark.streams.MetricStreamingEngine;
 import java.io.File;
 import java.util.HashMap;
@@ -83,8 +83,11 @@ public class WtaDriverPlugin implements DriverPlugin {
    */
   @Override
   public Object receive(Object message) {
-    List<SparkBaseSupplierWrapperDto> resources = (List<SparkBaseSupplierWrapperDto>) message;
-    resources.forEach(r -> metricStreamingEngine.addToResourceStream(r.getExecutorId(), r));
+    if (message instanceof ResourceCollectionDto) {
+      ((ResourceCollectionDto) message)
+          .getResourceCollection()
+          .forEach(r -> metricStreamingEngine.addToResourceStream(r.getExecutorId(), r));
+    }
     return null;
   }
 

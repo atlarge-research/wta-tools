@@ -46,4 +46,9 @@ class OperatingSystemSupplierTest {
     assertThat(sut.isAvailable()).isTrue();
     assertThat(sut.getAvailableProcessors()).isGreaterThanOrEqualTo(1);
   }
+
+  @Test
+  void getArchitecture() {
+    assertThat(sut.getArch()).isNotBlank();
+  }
 }

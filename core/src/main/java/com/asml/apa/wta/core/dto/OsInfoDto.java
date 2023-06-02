@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
  * Data transfer object for the {@link OperatingSystemSupplier}.
  *
  * @author Atour Mousavi Gourabi
+ * @author Henry Page
  * @since 1.0.0
  */
 @Data
@@ -33,4 +34,6 @@ public class OsInfoDto implements SupplierDto {
   private int availableProcessors;
 
   private double systemLoadAverage;
+
+  private String architecture;
 }

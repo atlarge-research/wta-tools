@@ -5,6 +5,7 @@ import static org.mockito.Mockito.*;
 
 import com.asml.apa.wta.core.utils.WtaUtils;
 import com.asml.apa.wta.spark.driver.WtaDriverPlugin;
+import com.asml.apa.wta.spark.dto.ResourceCollectionDto;
 import com.asml.apa.wta.spark.dto.SparkBaseSupplierWrapperDto;
 import java.util.List;
 import org.apache.spark.SparkContext;
@@ -81,7 +82,8 @@ class WtaDriverPluginTest {
   void receiveAddsIntoMetricStreamCorrectly() {
     injectConfig();
     sut.init(mockedSparkContext, mockedPluginContext);
-    sut.receive(List.of(new SparkBaseSupplierWrapperDto("1"), new SparkBaseSupplierWrapperDto("2")));
+    sut.receive(new ResourceCollectionDto(
+        List.of(new SparkBaseSupplierWrapperDto("1"), new SparkBaseSupplierWrapperDto("2"))));
     assertThat(sut.getMetricStreamingEngine()
             .getResourceStream()
             .getStreams()

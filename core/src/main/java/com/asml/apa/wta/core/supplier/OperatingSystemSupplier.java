@@ -130,9 +130,9 @@ public class OperatingSystemSupplier implements InformationSupplier<OsInfoDto> {
   }
 
   /**
-   * Retrieves the operating system name.
+   * Retrieves the architecture abbreviation.
    *
-   * @return the operating system name
+   * @return The underlying architecture e.g. amd64
    * @author Henry Page
    * @since 1.0.0
    */
@@ -161,8 +161,16 @@ public class OperatingSystemSupplier implements InformationSupplier<OsInfoDto> {
       long totalMemSize = getTotalPhysicalMemorySize();
       int availableProc = getAvailableProcessors();
       double systemLoadAverage = getSystemLoadAverage();
+      String architecture = getArch();
       return new OsInfoDto(
-          vMemSize, freeMemSize, cpuLoad, cpuTime, totalMemSize, availableProc, systemLoadAverage);
+          vMemSize,
+          freeMemSize,
+          cpuLoad,
+          cpuTime,
+          totalMemSize,
+          availableProc,
+          systemLoadAverage,
+          architecture);
     });
   }
 }
