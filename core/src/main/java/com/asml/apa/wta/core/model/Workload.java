@@ -79,10 +79,10 @@ public class Workload implements BaseTraceObject {
   private final double medianMemory = -1.0;
 
   @Builder.Default
-  private final long firstQuartileMemory = -1L;
+  private final double firstQuartileMemory = -1.0;
 
   @Builder.Default
-  private final long thirdQuartileMemory = -1L;
+  private final double thirdQuartileMemory = -1.0;
 
   @Builder.Default
   private final double covMemory = -1.0;
@@ -100,7 +100,7 @@ public class Workload implements BaseTraceObject {
   private final double meanNetworkUsage = -1.0;
 
   @Builder.Default
-  private final double medianNetworkUsage = -1.0;
+  private final long medianNetworkUsage = -1L;
 
   @Builder.Default
   private final long firstQuartileNetworkUsage = -1L;
@@ -124,22 +124,22 @@ public class Workload implements BaseTraceObject {
   private final double meanDiskSpaceUsage = -1.0;
 
   @Builder.Default
-  private final long medianDiskSpaceUsage = -1L;
+  private final double medianDiskSpaceUsage = -1.0;
 
   @Builder.Default
-  private final long firstQuartileDiskSpaceUsage = -1L;
+  private final double firstQuartileDiskSpaceUsage = -1.0;
 
   @Builder.Default
-  private final long thirdQuartileDiskSpaceUsage = -1L;
+  private final double thirdQuartileDiskSpaceUsage = -1.0;
 
   @Builder.Default
   private final double covDiskSpaceUsage = -1.0;
 
   @Builder.Default
-  private final int minEnergy = -1;
+  private final double minEnergy = -1.0;
 
   @Builder.Default
-  private final int maxEnergy = -1;
+  private final double maxEnergy = -1.0;
 
   @Builder.Default
   private final double stdEnergy = -1.0;
@@ -148,13 +148,13 @@ public class Workload implements BaseTraceObject {
   private final double meanEnergy = -1.0;
 
   @Builder.Default
-  private final int medianEnergy = -1;
+  private final double medianEnergy = -1.0;
 
   @Builder.Default
-  private final int firstQuartileEnergy = -1;
+  private final double firstQuartileEnergy = -1.0;
 
   @Builder.Default
-  private final int thirdQuartileEnergy = -1;
+  private final double thirdQuartileEnergy = -1.0;
 
   @Builder.Default
   private final double covEnergy = -1.0;

@@ -285,7 +285,7 @@ public class ParquetWriterUtils {
     }
     if (checker[19]) {
       fieldSchema =
-          fieldSchema.name("energy_consumption").type().longType().longDefault(0);
+          fieldSchema.name("energy_consumption").type().doubleType().doubleDefault(0.0);
     }
     if (checker[20]) {
       fieldSchema = fieldSchema.name("resource_used").type().longType().longDefault(0);
@@ -338,7 +338,7 @@ public class ParquetWriterUtils {
     }
     if (checker[4]) {
       fieldSchema =
-          fieldSchema.name("critical_path_length").type().intType().noDefault();
+          fieldSchema.name("critical_path_length").type().longType().noDefault();
     }
     if (checker[5]) {
       fieldSchema = fieldSchema
@@ -393,13 +393,13 @@ public class ParquetWriterUtils {
     }
     if (checker[15]) {
       fieldSchema =
-          fieldSchema.name("total_disk_space_usage").type().longType().noDefault();
+          fieldSchema.name("total_disk_space_usage").type().doubleType().noDefault();
     }
     if (checker[16]) {
       fieldSchema = fieldSchema
           .name("total_energy_consumption")
           .type()
-          .longType()
+          .doubleType()
           .noDefault();
     }
     Schema schema = fieldSchema.endRecord();
@@ -544,7 +544,7 @@ public class ParquetWriterUtils {
       if (task.getDiskSpaceRequested() == -1.0) {
         flg[18] = false;
       }
-      if (task.getEnergyConsumption() == -1) {
+      if (task.getEnergyConsumption() == -1.0) {
         flg[19] = false;
       }
       if (task.getResourceUsed() == -1) {
@@ -576,7 +576,7 @@ public class ParquetWriterUtils {
       if (workflow.getNumberOfTasks() == -1) {
         flg[3] = false;
       }
-      if (workflow.getCriticalPathLength() == -1) {
+      if (workflow.getCriticalPathLength() == -1L) {
         flg[4] = false;
       }
       if (workflow.getCriticalPathTaskCount() == -1) {
@@ -612,7 +612,7 @@ public class ParquetWriterUtils {
       if (workflow.getTotalDiskSpaceUsage() == -1) {
         flg[15] = false;
       }
-      if (workflow.getTotalEnergyConsumption() == -1) {
+      if (workflow.getTotalEnergyConsumption() == -1.0) {
         flg[16] = false;
       }
     }

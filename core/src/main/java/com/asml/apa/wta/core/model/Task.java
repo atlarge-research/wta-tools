@@ -61,7 +61,7 @@ public class Task implements BaseTraceObject {
 
   private final double diskSpaceRequested;
 
-  private final long energyConsumption;
+  private final double energyConsumption;
 
   private final long resourceUsed;
 
