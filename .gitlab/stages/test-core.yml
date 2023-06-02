@@ -33,7 +33,6 @@ integration-tests-core:
     - apt-get install -y linux-tools-`uname -r`
     - perf list
     - sysctl -w kernel.perf_event_paranoid=-1
-    - sysctl kernel.perf_event_paranoid
     - perf record -a -e cycles,power/energy-pkg >/dev/null
     - perf report --group
     - "mvn -pl core jacoco:prepare-agent-integration failsafe:integration-test failsafe:verify jacoco:report-integration"
