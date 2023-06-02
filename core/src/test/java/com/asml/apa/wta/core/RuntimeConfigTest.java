@@ -13,8 +13,10 @@ class RuntimeConfigTest {
     RuntimeConfig cr = RuntimeConfig.builder().build();
     assertThat(cr.getAuthors()).isNull();
     assertThat(cr.getDomain()).isNull();
+    assertThat(cr.isStageLevel()).isFalse();
     assertThat(cr.getDescription()).isEqualTo("");
     assertThat(cr.getEvents()).isEqualTo(new HashMap<String, String>());
     assertThat(cr.getLogLevel()).isEqualTo("ERROR");
+    assertThat(cr.getOutputPath()).isNull();
   }
 }

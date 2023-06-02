@@ -1,28 +1,32 @@
 package com.asml.apa.wta.core.utils;
 
 import com.asml.apa.wta.core.config.RuntimeConfig;
-import com.asml.apa.wta.core.model.enums.Domain;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import java.io.FileInputStream;
-import java.util.HashMap;
-import java.util.Map;
+import com.google.gson.Gson;
+import com.google.gson.JsonParseException;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Utility class for WTA.
  *
+ * @author Pil Kyu CHo
  * @author Henry Page
  * @author Lohithsai Yadala Chanchu
  * @author Atour Mousavi Gourabi
  * @since 1.0.0
  */
+@SuppressWarnings("CyclomaticComplexity")
+@Slf4j
 public class WtaUtils {
 
   private static final String CONFIG_DIR = "config.json";
 
   /**
    * Utility classes should not have a public or default constructor.
+   *
+   * @throws IllegalStateException when called
    */
   private WtaUtils() {
     throw new IllegalStateException();
@@ -33,46 +37,41 @@ public class WtaUtils {
    *
    * @param configDir The directory where the config is located.
    * @return The associated config object
+   * @author Atour Mousavi Gourabi
    */
   public static RuntimeConfig readConfig(String configDir) {
-    var configBuilder = RuntimeConfig.builder();
-
-    try (FileInputStream fis = new FileInputStream(configDir)) {
-      ObjectMapper mapper = new ObjectMapper();
-
-      JsonNode rootNode = mapper.readTree(fis);
-
-      JsonNode workloadNode = rootNode.get("workloadSettings");
-      JsonNode resourceNode = rootNode.get("resourceSettings");
-      JsonNode logNode = rootNode.get("logSettings");
-
-      String[] authors = workloadNode.get("author").asText().split("\\s*,\\s*");
-
-      Domain domain = Domain.extractAsEnum(workloadNode.get("domain").asText());
-
-      String description = workloadNode.has("description")
-          ? workloadNode.get("description").asText()
-          : "";
-      Map<String, String> events = resourceNode.has("events")
-          ? mapper.convertValue(resourceNode.get("events"), new TypeReference<>() {})
-          : new HashMap<>();
-
-      String logLevel = logNode.has("logLevel") ? logNode.get("logLevel").asText() : "ERROR";
-
-      configBuilder = configBuilder
-          .authors(authors)
-          .domain(domain)
-          .description(description)
-          .events(events)
-          .logLevel(logLevel);
-    } catch (EnumConstantNotPresentException e) {
-      throw new IllegalArgumentException(e.constantName()
-          + " is not a valid domain. It must be BIOMEDICAL, ENGINEERING, INDUSTRIAL, or SCIENTIFIC.");
+    try (FileReader reader = new FileReader(configDir)) {
+      Gson gson = new Gson();
+      RuntimeConfig config = gson.fromJson(reader, RuntimeConfig.class);
+      if (config.getAuthors() == null || config.getAuthors().length < 1) {
+        log.error(
+            "The config file does not specify any authors, it is mandatory to specify at least one author.");
+        throw new IllegalArgumentException("The config file does not specify any authors");
+      } else if (config.getDomain() == null) {
+        log.error("The config file does not specify a domain, this field is mandatory.");
+        throw new IllegalArgumentException("The config file does not specify a domain");
+      } else if (config.getDescription() == null
+          || config.getDescription().isBlank()) {
+        log.info("The config file does not include a description, this field is highly recommended.");
+      } else if (config.getOutputPath() == null) {
+        log.error("The config file does not specify an output path, this field is mandatory.");
+        throw new IllegalArgumentException("The config file does not specify the output path");
+      }
+      return config;
+    } catch (JsonParseException e) {
+      log.error("The config file has invalid fields");
+      throw new IllegalArgumentException("The config file has invalid fields");
+    } catch (FileNotFoundException e) {
+      log.error("No config file was found at {}", configDir);
+      throw new IllegalArgumentException("No config file was found at " + configDir);
+    } catch (IOException e) {
+      log.error("Something went wrong while reading {}", configDir);
+      throw new IllegalArgumentException("Something went wrong while reading " + configDir);
     } catch (Exception e) {
+      log.error("\"configFile\" was not set in the command line arguments or system property");
       throw new IllegalArgumentException(
-          "The config file has missing/invalid fields or no config file was found");
+          "\"configFile\" was not set in the command line arguments or system property");
     }
-    return configBuilder.build();
   }
 
   /**

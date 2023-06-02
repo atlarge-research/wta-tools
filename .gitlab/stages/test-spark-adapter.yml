@@ -80,6 +80,7 @@ line-coverage-spark-adapter:
   dependencies:
     - integration-tests-spark-adapter
     - unit-tests-spark-adapter
+    - build-spark-adapter
   script:
     - echo "Started creating Spark adapter line coverage"
     - "mvn -pl adapter/spark jacoco:merge jacoco:report"
@@ -127,6 +128,7 @@ e2e-spark-adapter:
     expire_in: 3 hours
     paths:
       - wta-output
+  cache: []
 
 e2e-barebones-spark-adapter:
   stage: test-spark-adapter
@@ -144,3 +146,4 @@ e2e-barebones-spark-adapter:
     expire_in: 3 hours
     paths:
       - wta-output
+  cache: []

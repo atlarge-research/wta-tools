@@ -7,6 +7,7 @@ import com.asml.apa.wta.core.model.Workload;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -38,9 +39,17 @@ class ParquetWriterUtilsIntegrationTest {
     utils = new ParquetWriterUtils(new File("./src/test/resources/WTA"), "schema-1.0");
   }
 
+  @AfterEach
+  void cleanup() {
+    new File("./src/test/resources/WTA/resources/schema-1.0/test1.parquet").delete();
+    new File("./src/test/resources/WTA/tasks/schema-1.0/test2.parquet").delete();
+    new File("./src/test/resources/WTA/workflows/schema-1.0/test3.parquet").delete();
+    new File("./src/test/resources/WTA/workload/schema-1.0/test4.json").delete();
+  }
+
   @Test
   void writeToFileTest() {
-    Resource.ResourceBuilder resourceBuilder = Resource.builder()
+    resource = Resource.builder()
         .id(1)
         .type("test")
         .os("test os")
@@ -49,26 +58,25 @@ class ParquetWriterUtilsIntegrationTest {
         .numResources(4.0)
         .memory(8)
         .networkSpeed(16)
-        .procModel("test model");
-    resource = resourceBuilder.build();
-    Task.TaskBuilder taskBuilder = Task.builder()
+        .procModel("test model")
+        .build();
+    task = Task.builder()
         .nfrs("test")
         .children(new long[1])
         .parents(new long[1])
         .type("test")
         .params("test")
-        .resourceType("test");
-    task = taskBuilder.build();
+        .resourceType("test")
+        .build();
     Task[] tArray = new Task[1];
     tArray[0] = task;
-    Workflow.WorkflowBuilder workflowBuilder = Workflow.builder()
+    workflow = Workflow.builder()
         .applicationField("test")
         .applicationName("test")
         .scheduler("test")
         .nfrs("test")
-        .tasks(tArray);
-    workflow = workflowBuilder.build();
-    System.out.println(workflow);
+        .tasks(tArray)
+        .build();
     Workload.WorkloadBuilder workloadBuilder = Workload.builder();
     workload = workloadBuilder.build();
     for (int i = 1; i < 1000; i++) {
@@ -77,13 +85,7 @@ class ParquetWriterUtilsIntegrationTest {
     utils.readTask(task);
     utils.readWorkflow(workflow);
     utils.readWorkload(workload);
-    Assertions.assertDoesNotThrow(() -> {
-      utils.writeToFile("test1", "test2", "test3", "test4");
-      new File("./src/test/resources/WTA/resources/schema-1.0/test1.parquet").delete();
-      new File("./src/test/resources/WTA/tasks/schema-1.0/test2.parquet").delete();
-      new File("./src/test/resources/WTA/workflows/schema-1.0/test3.parquet").delete();
-      new File("./src/test/resources/WTA/workload/schema-1.0/test4.json").delete();
-    });
+    Assertions.assertDoesNotThrow(() -> utils.writeToFile("test1", "test2", "test3", "test4"));
   }
 
   @Test
@@ -127,12 +129,6 @@ class ParquetWriterUtilsIntegrationTest {
     utils.readTask(taskAlt);
     utils.readWorkflow(workflowAlt);
     utils.readWorkload(workload);
-    Assertions.assertDoesNotThrow(() -> {
-      utils.writeToFile("test1", "test2", "test3", "test4");
-      new File("./src/test/resources/WTA/resources/schema-1.0/test1.parquet").delete();
-      new File("./src/test/resources/WTA/tasks/schema-1.0/test2.parquet").delete();
-      new File("./src/test/resources/WTA/workflows/schema-1.0/test3.parquet").delete();
-      new File("./src/test/resources/WTA/workload/schema-1.0/test4.json").delete();
-    });
+    Assertions.assertDoesNotThrow(() -> utils.writeToFile("test1", "test2", "test3", "test4"));
   }
 }
