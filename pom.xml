@@ -266,6 +266,9 @@
           <classpathDependencyExcludes>
             <classpathDependencyExclude>org.apache.logging.log4j:log4j-slf4j2-impl</classpathDependencyExclude>
           </classpathDependencyExcludes>
+          <excludedTestClasses>
+            <param>com.asml.apa.wta.spark.MultithreadTest</param>
+          </excludedTestClasses>
         </configuration>
         <dependencies>
           <!-- https://mvnrepository.com/artifact/org.pitest/pitest-junit5-plugin -->
