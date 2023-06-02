@@ -82,9 +82,17 @@ class WtaDriverPluginTest {
     injectConfig();
     sut.init(mockedSparkContext, mockedPluginContext);
     sut.receive(List.of(new SparkBaseSupplierWrapperDto("1"), new SparkBaseSupplierWrapperDto("2")));
-    assertThat(sut.getMse().getResourceStream().getStreams().get("1").isEmpty())
+    assertThat(sut.getMetricStreamingEngine()
+            .getResourceStream()
+            .getStreams()
+            .get("1")
+            .isEmpty())
         .isFalse();
-    assertThat(sut.getMse().getResourceStream().getStreams().get("2").isEmpty())
+    assertThat(sut.getMetricStreamingEngine()
+            .getResourceStream()
+            .getStreams()
+            .get("2")
+            .isEmpty())
         .isFalse();
   }
 }

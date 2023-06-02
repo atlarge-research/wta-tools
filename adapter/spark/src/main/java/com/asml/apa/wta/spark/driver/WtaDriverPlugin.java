@@ -32,7 +32,7 @@ import org.apache.spark.api.plugin.PluginContext;
 @Slf4j
 public class WtaDriverPlugin implements DriverPlugin {
 
-  private MetricStreamingEngine mse;
+  private MetricStreamingEngine metricStreamingEngine;
 
   private SparkDataSource sparkDataSource;
 
@@ -59,7 +59,7 @@ public class WtaDriverPlugin implements DriverPlugin {
     try {
       RuntimeConfig runtimeConfig = WtaUtils.readConfig(System.getProperty("configFile"));
       sparkDataSource = new SparkDataSource(sparkCtx, runtimeConfig);
-      mse = new MetricStreamingEngine();
+      metricStreamingEngine = new MetricStreamingEngine();
       parquetUtil = new ParquetWriterUtils(new File(runtimeConfig.getOutputPath()), "schema-1.0");
       parquetUtil.deletePreExistingFiles();
       initListeners();
@@ -84,7 +84,7 @@ public class WtaDriverPlugin implements DriverPlugin {
   @Override
   public Object receive(Object message) {
     List<SparkBaseSupplierWrapperDto> resources = (List<SparkBaseSupplierWrapperDto>) message;
-    resources.forEach(r -> mse.addToResourceStream(r.getExecutorId(), r));
+    resources.forEach(r -> metricStreamingEngine.addToResourceStream(r.getExecutorId(), r));
     return null;
   }
 

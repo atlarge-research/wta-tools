@@ -9,6 +9,7 @@ import java.util.concurrent.CompletableFuture;
  * Supplier that uses Java's operating system MBean to gain access to resource information.
  *
  * @author Atour Mousavi Gourabi
+ * @author Henry Page
  * @since 1.0.0
  */
 public class OperatingSystemSupplier implements InformationSupplier<OsInfoDto> {
@@ -126,6 +127,17 @@ public class OperatingSystemSupplier implements InformationSupplier<OsInfoDto> {
    */
   public int getAvailableProcessors() {
     return bean.getAvailableProcessors();
+  }
+
+  /**
+   * Retrieves the operating system name.
+   *
+   * @return the operating system name
+   * @author Henry Page
+   * @since 1.0.0
+   */
+  public String getArch() {
+    return bean.getArch();
   }
 
   /**

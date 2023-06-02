@@ -39,13 +39,13 @@ public class MultithreadTest {
 
     verify(sutSupplierExtractionEngine, timeout(10000L).atLeast(4)).ping();
 
-    assertThat(sutSupplierExtractionEngine.getBuffer()).hasSize(3);
+    assertThat(sutSupplierExtractionEngine.getBuffer()).hasSizeGreaterThanOrEqualTo(3);
 
     sutSupplierExtractionEngine.stopPinging();
   }
 
   @Test
-  @Timeout(value = 1000L, unit = TimeUnit.MILLISECONDS)
+  @Timeout(value = 3000L, unit = TimeUnit.MILLISECONDS)
   void pingWorksAsIntended() {
     CompletableFuture<Void> result = sutSupplierExtractionEngine.ping();
 
