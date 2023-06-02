@@ -49,7 +49,12 @@ public class BashUtils {
    */
   private String readProcessOutput(Process process) {
     try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
-      return reader.readLine();
+      StringBuilder output = new StringBuilder();
+      String line;
+      while ((line = reader.readLine()) != null) {
+        output.append(line).append(System.lineSeparator());
+      }
+      return output.toString();
     } catch (IOException e) {
       log.error(
           "Something went wrong while trying to read bash command outputs. The cause is: {}",

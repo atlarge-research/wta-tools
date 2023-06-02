@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import com.asml.apa.wta.core.datasource.iodependencies.BashUtils;
 import com.asml.apa.wta.core.datasource.iodependencies.IostatDataSource;
 import com.asml.apa.wta.core.dto.IostatDataSourceDto;
-import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import org.junit.jupiter.api.Test;
@@ -14,7 +13,7 @@ import org.mockito.Mockito;
 public class IostatDataSourceTest {
 
   @Test
-  public void getAllMetricsReturnsIostatDto() throws IOException, InterruptedException, ExecutionException {
+  public void getAllMetricsReturnsIostatDto() throws InterruptedException, ExecutionException {
     BashUtils bashUtils = Mockito.mock(BashUtils.class);
     Mockito.doReturn(CompletableFuture.completedFuture("str"))
         .when(bashUtils)
