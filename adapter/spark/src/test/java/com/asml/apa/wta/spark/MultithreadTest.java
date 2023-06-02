@@ -37,7 +37,7 @@ public class MultithreadTest {
   void startAndStopPingingWorksAsIntended() {
     sutSupplierExtractionEngine.startPinging(1000);
 
-    verify(sutSupplierExtractionEngine, timeout(10000L).atLeast(3)).ping();
+    verify(sutSupplierExtractionEngine, timeout(10000L).atLeast(4)).ping();
 
     assertThat(sutSupplierExtractionEngine.getBuffer()).hasSize(3);
 
