@@ -392,8 +392,11 @@ public class ParquetWriterUtils {
           fieldSchema.name("total_network_usage").type().longType().noDefault();
     }
     if (checker[15]) {
-      fieldSchema =
-          fieldSchema.name("total_disk_space_usage").type().doubleType().noDefault();
+      fieldSchema = fieldSchema
+          .name("total_disk_space_usage")
+          .type()
+          .doubleType()
+          .noDefault();
     }
     if (checker[16]) {
       fieldSchema = fieldSchema
