@@ -55,7 +55,7 @@ public class Workflow implements BaseTraceObject {
 
   private final long totalNetworkUsage;
 
-  private final long totalDiskSpaceUsage;
+  private final double totalDiskSpaceUsage;
 
   private final long totalEnergyConsumption;
 

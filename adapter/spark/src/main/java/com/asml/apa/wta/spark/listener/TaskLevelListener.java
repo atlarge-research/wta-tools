@@ -46,6 +46,7 @@ public class TaskLevelListener extends TaskStageBaseListener {
     final long runTime = curTaskMetrics.executorRunTime();
     final int userId = sparkContext.sparkUser().hashCode();
     final long workflowId = stageIdsToJobs.get(taskEnd.stageId());
+    final double diskSpaceRequested = (double) curTaskMetrics.diskBytesSpilled()/1048576;
 
     // unknown
     final int submissionSite = -1;
@@ -59,7 +60,6 @@ public class TaskLevelListener extends TaskStageBaseListener {
     final double memoryRequested = -1.0;
     final long networkIoTime = -1L;
     final long diskIoTime = -1L;
-    final double diskSpaceRequested = -1.0;
     final long energyConsumption = -1L;
     final long waitTime = -1L;
     final long resourceUsed = -1L;

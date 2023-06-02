@@ -66,7 +66,7 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
     // unknown
     final long numSites = -1L;
     final long numResources = -1L;
-    final long numUsers = -1L;
+    final long numUsers = -1L; 
     final long numGroups = -1L;
     final double totalResourceSeconds = -1.0;
     // all statistics (stdev, mean, etc.) are unknown

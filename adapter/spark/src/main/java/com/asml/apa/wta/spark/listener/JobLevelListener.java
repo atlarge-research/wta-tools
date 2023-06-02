@@ -4,8 +4,13 @@ import com.asml.apa.wta.core.config.RuntimeConfig;
 import com.asml.apa.wta.core.model.Task;
 import com.asml.apa.wta.core.model.Workflow;
 import com.asml.apa.wta.core.model.enums.Domain;
+
+import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import lombok.Getter;
 import org.apache.spark.SparkContext;
 import org.apache.spark.scheduler.SparkListenerJobEnd;
@@ -23,6 +28,8 @@ public class JobLevelListener extends AbstractListener<Workflow> {
   private final AbstractListener<Task> taskListener;
 
   private final Map<Integer, Long> jobSubmitTimes = new ConcurrentHashMap<>();
+
+  private int criticalPathTasks = -1;
 
   /**
    * Constructor for the job-level listener.
@@ -47,6 +54,7 @@ public class JobLevelListener extends AbstractListener<Workflow> {
   @Override
   public void onJobStart(SparkListenerJobStart jobStart) {
     jobSubmitTimes.put(jobStart.jobId() + 1, jobStart.time());
+    criticalPathTasks = jobStart.stageIds().length();
   }
 
   /**
@@ -67,18 +75,19 @@ public class JobLevelListener extends AbstractListener<Workflow> {
     final String scheduler = "DAGScheduler";
     final Domain domain = config.getDomain();
     final String appName = sparkContext.appName();
+    final int criticalPathTaskCount = criticalPathTasks;
+    final double totalResources = Arrays.stream(tasks).map(Task::getResourceAmountRequested).reduce(0.0, Double::sum);
+    final double totalMemoryUsage = Arrays.stream(tasks).map(Task::getMemoryRequested).reduce(0.0, Double::sum);
+    final long totalNetworkUsage = Arrays.stream(tasks).map(Task::getNetworkIoTime).reduce(0L, Long::sum);
+    final double totalDiskSpaceUsage = Arrays.stream(tasks).map(Task::getDiskSpaceRequested).reduce(0.0, Double::sum);
+    final long totalEnergyConsumption = Arrays.stream(tasks).map(Task::getEnergyConsumption).reduce(0L, Long::sum);
 
     // unknown
     final int criticalPathLength = -1;
-    final int criticalPathTaskCount = -1;
     final int maxNumberOfConcurrentTasks = -1;
     final String nfrs = "";
     final String applicationField = "ETL";
-    final double totalResources = -1.0;
-    final double totalMemoryUsage = -1.0;
-    final long totalNetworkUsage = -1L;
-    final long totalDiskSpaceUsage = -1L;
-    final long totalEnergyConsumption = -1L;
+
     processedObjects.add(Workflow.builder()
         .id(jobId)
         .submitTime(submitTime)
