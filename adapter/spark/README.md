@@ -2,11 +2,36 @@
 
 ## Installation and Usage
 - Clone the repository
-- Optional (if more I/O metrics are needed): Install sysstat by running the following bash command:
+- Optional (if more I/O metrics are needed): Install `sysstat` by running the following bash command:
 
-```bash
-sudo apt install sysstat
-```
+    ```bash
+    sudo apt-get install sysstat
+    ```
+
+- To allow advanced performance metrics to be gathered, you can opt to make the `perf` utility available. To do this, you need to do the following:
+
+    On Ubuntu:
+    
+    ```bash
+    apt-get install linux-tools-common
+    apt-get install linux-tools-generic
+    apt-get install linux-tools-`uname -r`
+    ```
+    
+    On Debian:
+    
+    ```bash
+    sudo apt-get install linux-perf
+    ```
+    
+    Followed by setting `perf_event_paranoid` to 0:
+    
+    ```bash
+    sysctl -w kernel.perf_event_paranoid=0
+    ```
+    
+    It is important to note that the installed version of `perf` must be compatible with the kernel. Especially for containerised environments, this could be an issue.
+
 - Run `mvn -pl core clean install && mvn -pl adapter/spark clean package` in the source root.
 - Copy the resulting jar file from `adapter/spark/target`.
 - Execute the following command in the directory where the jar file is located:
