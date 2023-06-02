@@ -18,7 +18,7 @@ import scala.collection.mutable.ListBuffer;
  * @since 1.0.0
  */
 @Getter
-public class StageLevelListener extends AbstractListener<Task> { // not sure about the type
+public class StageLevelListener extends AbstractListener<Task> {
 
   private final Map<Integer, Integer[]> stageToParents = new ConcurrentHashMap<>();
 
