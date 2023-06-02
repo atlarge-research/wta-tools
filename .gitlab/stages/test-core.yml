@@ -32,7 +32,7 @@ integration-tests-core:
     - echo "Core integration tests started"
     - perf list
     - sysctl -w kernel.perf_event_paranoid=-1
-    - perf stat -a -e power/energy-pkg sleep 1 >/dev/null
+    - perf stat -e power/energy-pkg -a sleep 1 >/dev/null
     - "mvn -pl core jacoco:prepare-agent-integration failsafe:integration-test failsafe:verify jacoco:report-integration"
     - "[ -f core/target/jacoco-it.exec ] && mv -f core/target/jacoco-it.exec core/target/jacoco-integration-tests.exec || echo '0' >/dev/null"
   artifacts:
