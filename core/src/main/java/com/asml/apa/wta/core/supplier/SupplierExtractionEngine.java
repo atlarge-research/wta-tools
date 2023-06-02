@@ -46,14 +46,15 @@ public abstract class SupplierExtractionEngine<T extends BaseSupplierDto> {
    * Ping the suppliers and add the results to the buffer.
    * Developers are encouraged to override this to add/remove additional information.
    *
+   * @return A completablefuture that completes when the result has been resolved
    * @author Henry Page
    * @since 1.0.0
    */
-  public void ping() {
+  public CompletableFuture<Void> ping() {
     CompletableFuture<OsInfoDto> osInfoDtoCompletableFuture = this.operatingSystemSupplier.getSnapshot();
     CompletableFuture<IostatDto> iostatDtoCompletableFuture = this.iostatSupplier.getSnapshot();
 
-    CompletableFuture.allOf(osInfoDtoCompletableFuture, iostatDtoCompletableFuture)
+    return CompletableFuture.allOf(osInfoDtoCompletableFuture, iostatDtoCompletableFuture)
         .thenRunAsync(() -> {
           LocalDateTime timestamp = LocalDateTime.now();
           OsInfoDto osInfoDto = osInfoDtoCompletableFuture.join();

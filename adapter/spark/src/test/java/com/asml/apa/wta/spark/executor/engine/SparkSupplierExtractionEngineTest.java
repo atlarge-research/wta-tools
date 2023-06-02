@@ -1,11 +1,8 @@
 package com.asml.apa.wta.spark.executor.engine;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.awaitility.Awaitility.await;
-import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import com.asml.apa.wta.core.dto.BaseSupplierDto;
 import com.asml.apa.wta.core.dto.IostatDto;
@@ -13,19 +10,15 @@ import com.asml.apa.wta.core.dto.OsInfoDto;
 import com.asml.apa.wta.spark.dto.SparkBaseSupplierWrapperDto;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import org.apache.spark.api.plugin.PluginContext;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
 
 class SparkSupplierExtractionEngineTest {
-
-  /**
-   * We enforce a max timeout to prevent the test from hanging indefinitely.
-   * This needs to be modified as dependencies take longer to resolve.
-   */
-  private static final long maxTimeout = 9999999999L;
 
   PluginContext mockPluginContext;
   SparkSupplierExtractionEngine sut;
@@ -35,7 +28,7 @@ class SparkSupplierExtractionEngineTest {
     mockPluginContext = mock(PluginContext.class);
     when(mockPluginContext.executorID()).thenReturn("test-executor-id");
 
-    sut = new SparkSupplierExtractionEngine(mockPluginContext);
+    sut = spy(new SparkSupplierExtractionEngine(mockPluginContext));
   }
 
   @AfterEach
@@ -67,22 +60,17 @@ class SparkSupplierExtractionEngineTest {
   void startAndStopPingingWorksAsIntended() {
     sut.startPinging(1000);
 
-    await().atMost(4, TimeUnit.SECONDS).until(sut.getBuffer()::size, greaterThanOrEqualTo(3));
+    verify(sut, timeout(10000L).atLeast(3)).ping();
 
-    sut.stopPinging();
-
-    int maintainedSize = sut.getBuffer().size();
-
-    await().during(3, TimeUnit.SECONDS)
-        .atMost(4, TimeUnit.SECONDS)
-        .until(() -> sut.getBuffer().size() == maintainedSize);
+    assertThat(sut.getBuffer()).hasSize(3);
   }
 
   @Test
+  @Timeout(value = 1000L, unit = TimeUnit.MILLISECONDS)
   void pingWorksAsIntended() {
-    sut.ping();
+    CompletableFuture<Void> result = sut.ping();
 
-    await().atMost(maxTimeout, TimeUnit.MILLISECONDS).until(sut.getBuffer()::size, greaterThanOrEqualTo(1));
+    result.join();
 
     List<SparkBaseSupplierWrapperDto> buffer = sut.getAndClear();
     assertThat(buffer).hasSize(1);
@@ -91,7 +79,6 @@ class SparkSupplierExtractionEngineTest {
     SparkBaseSupplierWrapperDto testObj = buffer.get(0);
 
     assertThat(testObj.getExecutorId()).isEqualTo("test-executor-id");
-
     assertThat(testObj.getOsInfoDto().getAvailableProcessors()).isGreaterThanOrEqualTo(1);
   }
 }

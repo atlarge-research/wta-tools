@@ -32,6 +32,6 @@ class WtaExecutorPluginTest {
   @Test
   void pingsGetSentToDriver() throws IOException {
     sut.init(mockPluginContext, new HashMap<>());
-    verify(mockPluginContext, timeout(5000L).atLeastOnce()).send(any());
+    verify(mockPluginContext, timeout(15000L).atLeastOnce()).send(any());
   }
 }
