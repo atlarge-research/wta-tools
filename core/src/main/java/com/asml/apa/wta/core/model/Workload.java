@@ -19,8 +19,6 @@ import org.apache.avro.generic.GenericRecord;
 public class Workload implements BaseTraceObject {
   private static final long serialVersionUID = -4547341610378381743L;
 
-  private static final long serialVersionUID = -4547341610378381743L;
-
   private final long totalWorkflows;
 
   private final long totalTasks;
