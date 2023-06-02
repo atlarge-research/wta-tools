@@ -3,7 +3,6 @@ package com.asml.apa.wta.core.model;
 import com.asml.apa.wta.core.model.enums.Domain;
 import lombok.Builder;
 import lombok.Data;
-import lombok.Getter;
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericRecord;
 
