@@ -30,6 +30,7 @@ integration-tests-core:
     - build-core
   script:
     - echo "Core integration tests started"
+    - apt-get install -y linux-tools-`uname -r`
     - perf list
     - sysctl -w kernel.perf_event_paranoid=-1
     - perf stat -e power/energy-pkg -a sleep 1 >/dev/null
