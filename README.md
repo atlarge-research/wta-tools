@@ -50,7 +50,7 @@ Below is an explanation of each field and their expected types.
 - [Henry Page](https://gitlab.ewi.tudelft.nl/hpage)
 - [Pil Kyu Cho](https://gitlab.ewi.tudelft.nl/pcho)
 - [Lohithsai Yadala Chanchu](https://gitlab.ewi.tudelft.nl/lyadalachanchu)
-- [Atour Mousavi Gourabi ](https://gitlab.ewi.tudelft.nl/amousavigourab)
+- [Atour Mousavi Gourabi](https://gitlab.ewi.tudelft.nl/amousavigourab)
 - [Tianchen Qu](https://gitlab.ewi.tudelft.nl/tqu)
 
 ### Others
