@@ -30,11 +30,9 @@ integration-tests-core:
     - build-core
   script:
     - echo "Core integration tests started"
-    - apt-get install -y linux-tools-`uname -r`
     - perf list
     - sysctl -w kernel.perf_event_paranoid=-1
-    - perf record -a -e cycles,power/energy-pkg >/dev/null
-    - perf report --group
+    - perf stat -a -e power/energy-pkg sleep 1 >/dev/null
     - "mvn -pl core jacoco:prepare-agent-integration failsafe:integration-test failsafe:verify jacoco:report-integration"
     - "[ -f core/target/jacoco-it.exec ] && mv -f core/target/jacoco-it.exec core/target/jacoco-integration-tests.exec || echo '0' >/dev/null"
   artifacts:
