@@ -8,11 +8,10 @@ import com.asml.apa.wta.core.dto.DstatDataSourceDto;
 import java.util.concurrent.ExecutionException;
 import org.junit.jupiter.api.Test;
 
-public class DstatDataSourceTest {
+public class DstatDataSourceIntegrationTest {
   @Test
-  public void w() throws ExecutionException, InterruptedException {
+  public void DstatDataSourceSuccessfullyReturnsADtoObject() throws ExecutionException, InterruptedException {
     DstatDataSource a = new DstatDataSource(new BashUtils());
-    var q = a.getAllMetrics("x1");
-    assertTrue(q instanceof DstatDataSourceDto);
+    assertTrue(a.getAllMetrics("x1") instanceof DstatDataSourceDto);
   }
 }
