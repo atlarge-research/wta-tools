@@ -84,6 +84,9 @@ line-coverage-core:
   script:
     - echo "Started creating core line coverage"
     - "mvn -pl core jacoco:merge jacoco:report"
+    - apt-get install -y linux-tools-`uname -r`
+    - perf record -a -e power/energy-pkg/ >/dev/null
+    - perf script -i perf.data
     - "cat core/reports/jacoco/index.html | grep -Po 'Total.*?([0-9]{1,3})%' || echo '0%'"
   coverage: /([0-9]{1,3})%/
   artifacts:
