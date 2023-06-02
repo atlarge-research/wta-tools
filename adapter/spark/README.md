@@ -1,5 +1,20 @@
 # Spark Adapter Layer
 
+## Overview
+
+![img.png](./src/main/resources/architecture.png)
+
+The Spark Adapter is responsible for parsing Spark execution information into WTA objects.
+The diagram above illustrates the workflow of the adapter. 
+
+- **Label 1:** Heartbeat sent by the executor to the driver every 10 seconds to send metrics.
+  These are intercepted by the `SparkListenerAPI`.
+- **Label 2:** RPC messages sent using the `SparkPluginAPI` for executors to communicate
+  any additional information to the driver-side of the plugin.
+- **Label 3:** The task scheduler is responsible for sending tasks to each executor, at each stage,
+  the task scheduler gets sets of tasks from the DAG to run. 
+- **Label 4:** Once the job has ended, all objects will be serialised into parquet format.
+
 ## Installation and Usage
 - Clone the repository
 - Optional (if more I/O metrics are needed): Install sysstat by running the following bash command:
