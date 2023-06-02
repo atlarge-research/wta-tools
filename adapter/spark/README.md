@@ -11,8 +11,8 @@ The diagram above illustrates the workflow of the adapter.
   These are intercepted by the `SparkListenerAPI`.
 - **Label 2:** RPC messages sent using the `SparkPluginAPI` for executors to communicate
   any additional information to the driver-side of the plugin.
-- **Label 3:** The task scheduler is responsible for sending tasks to each executor, at each stage,
-  the task scheduler gets sets of tasks from the DAG to run.
+- **Label 3:** At each stage, the task scheduler gets sets of tasks from the DAG and the task scheduler
+  sends the tasks to each executor.
 - **Label 4:** Once the job has ended, all objects will be serialised into parquet format.
 
 ## Installation and Usage
