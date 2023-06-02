@@ -21,12 +21,12 @@ import lombok.Getter;
  */
 public abstract class SupplierExtractionEngine<T extends BaseSupplierDto> {
 
-  protected final OperatingSystemSupplier operatingSystemSupplier;
+  private final OperatingSystemSupplier operatingSystemSupplier;
 
-  protected final IostatSupplier iostatSupplier;
+  private final IostatSupplier iostatSupplier;
 
   @Getter
-  protected final Collection<T> buffer = new ArrayList<>();
+  private final Collection<T> buffer = new ArrayList<>();
 
   private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
