@@ -23,7 +23,6 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <maven.assembly.plugin.version>3.6.0</maven.assembly.plugin.version>
-    <maven.compiler.plugin.version>3.11.0</maven.compiler.plugin.version>
     <spotless.version>2.36.0</spotless.version>
     <junit.version>5.9.3</junit.version>
     <surefire.version>3.1.0</surefire.version>

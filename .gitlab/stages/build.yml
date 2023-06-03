@@ -45,8 +45,9 @@ package-spark-adapter-e2e_2.12:
 
 package-spark-adapter-e2e_2.13:
   stage: build
-  needs: [build-core]
+  needs: [build-spark-adapter, build-core]
   dependencies:
+    - build-spark-adapter
     - build-core
   script:
     - echo "Package Spark adapter for Scala 2.13 started"
