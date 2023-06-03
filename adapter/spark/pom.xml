@@ -84,7 +84,7 @@
             <id>e2e-compile</id>
             <phase>compile</phase>
             <goals>
-              <goal>compile</goal>
+              <goal>testCompile</goal>
             </goals>
             <configuration>
               <includes>
