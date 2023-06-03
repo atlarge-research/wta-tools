@@ -1,6 +1,5 @@
 variables:
   SAST_JAVA_VERSION: "11"
-  SECURE_LOG_LEVEL: debug
 
 include:
   - template: Jobs/SAST.gitlab-ci.yml
