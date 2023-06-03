@@ -47,6 +47,8 @@ integration-tests-core:
           - core/pom.xml
       paths:
         - .m2/repository
+
+
 line-coverage-core:
   stage: test-core
   needs: [integration-tests-core, unit-tests-core, build-core]
