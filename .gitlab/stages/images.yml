@@ -33,7 +33,7 @@ build-linux-tooling-image:
     - docker push $LINUX_TOOLING_IMAGE
   cache: []
 
-build-barebones-spark-adapter-IMAGE_2_12:
+build-barebones-spark-adapter-image_2_12:
   stage: images
   image: docker:20.10.16
   needs: [build-base-image]
@@ -46,10 +46,10 @@ build-barebones-spark-adapter-IMAGE_2_12:
     - docker push $SPARK_BAREBONES_IMAGE_2_12
   cache: []
 
-build-spark-adapter-IMAGE_2_12:
+build-spark-adapter-image_2_12:
   stage: images
   image: docker:20.10.16
-  needs: [build-barebones-spark-adapter-IMAGE_2_12]
+  needs: [build-barebones-spark-adapter-image_2_12]
   services:
     - docker:20.10.16-dind
   script:
@@ -59,7 +59,7 @@ build-spark-adapter-IMAGE_2_12:
     - docker push $SPARK_IMAGE_2_12
   cache: []
 
-build-barebones-spark-adapter-IMAGE_2_13:
+build-barebones-spark-adapter-image_2_13:
   stage: images
   image: docker:20.10.16
   needs: [build-base-image]
@@ -72,10 +72,10 @@ build-barebones-spark-adapter-IMAGE_2_13:
     - docker push $SPARK_BAREBONES_IMAGE_2_13
   cache: []
 
-build-spark-adapter-IMAGE_2_13:
+build-spark-adapter-image_2_13:
   stage: images
   image: docker:20.10.16
-  needs: [build-barebones-spark-adapter-IMAGE_2_13]
+  needs: [build-barebones-spark-adapter-image_2_13]
   services:
     - docker:20.10.16-dind
   script:
