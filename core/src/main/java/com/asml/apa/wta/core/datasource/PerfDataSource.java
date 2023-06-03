@@ -46,7 +46,7 @@ public class PerfDataSource {
   /**
    * Gather the perf energy metrics.
    *
-   * @return the joules used by the CPU package over the past second.
+   * @return the joules used by the CPU package over the past second
    * @author Atour Mousavi Gourabi
    * @since 1.0.0
    */
