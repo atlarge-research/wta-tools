@@ -84,9 +84,12 @@
             <id>e2e-compile</id>
             <phase>compile</phase>
             <goals>
-              <goal>testCompile</goal>
+              <goal>compile</goal>
             </goals>
             <configuration>
+              <sourceDirectories>
+                <sourceDirectory>src/test/java</sourceDirectory>
+              </sourceDirectories>
               <excludes>
                 <exclude>**/*Test.java</exclude>
               </excludes>
