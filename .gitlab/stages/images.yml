@@ -49,7 +49,7 @@ build-barebones-spark-adapter-image_2.12:
 build-spark-adapter-image_2.12:
   stage: images
   image: docker:20.10.16
-  needs: [build-barebones-spark-adapter-image]
+  needs: [build-barebones-spark-adapter-image_2.12]
   services:
     - docker:20.10.16-dind
   script:
@@ -75,7 +75,7 @@ build-barebones-spark-adapter-image_2.13:
 build-spark-adapter-image_2.13:
   stage: images
   image: docker:20.10.16
-  needs: [build-barebones-spark-adapter-image]
+  needs: [build-barebones-spark-adapter-image_2.13]
   services:
     - docker:20.10.16-dind
   script:
