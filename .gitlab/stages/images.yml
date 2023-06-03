@@ -1,9 +1,11 @@
 variables:
-  IMAGE_RELEASE_TAG: 1.0.0
+  IMAGE_RELEASE_TAG: 1.0.0-djlafjdkfzjldfjxlfjdklafjkd
   BASE_IMAGE: $CI_REGISTRY_IMAGE/base-image:$IMAGE_RELEASE_TAG
   LINUX_TOOLING_IMAGE: $CI_REGISTRY_IMAGE/linux-tooling-image:$IMAGE_RELEASE_TAG
-  SPARK_IMAGE: $CI_REGISTRY_IMAGE/spark-image:$IMAGE_RELEASE_TAG
-  SPARK_BAREBONES_IMAGE: $CI_REGISTRY_IMAGE/barebones-spark-image:$IMAGE_RELEASE_TAG
+  SPARK_IMAGE_2.12: $CI_REGISTRY_IMAGE/spark-image_2.12:$IMAGE_RELEASE_TAG
+  SPARK_BAREBONES_IMAGE_2.12: $CI_REGISTRY_IMAGE/barebones-spark-image_2.12:$IMAGE_RELEASE_TAG
+  SPARK_IMAGE_2.13: $CI_REGISTRY_IMAGE/spark-image_2.13:$IMAGE_RELEASE_TAG
+  SPARK_BAREBONES_IMAGE_2.13: $CI_REGISTRY_IMAGE/barebones-spark-image_2.13:$IMAGE_RELEASE_TAG
 
 build-base-image:
   stage: images
@@ -31,20 +33,7 @@ build-linux-tooling-image:
     - docker push $LINUX_TOOLING_IMAGE
   cache: []
 
-build-spark-adapter-image:
-  stage: images
-  image: docker:20.10.16
-  needs: [build-barebones-spark-adapter-image]
-  services:
-    - docker:20.10.16-dind
-  script:
-    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-    - if docker manifest inspect $SPARK_IMAGE > /dev/null ; then exit 0 ; fi
-    - docker build --build-arg base_image=$SPARK_BAREBONES_IMAGE -t $SPARK_IMAGE .gitlab/dockerfiles/linux-tooling
-    - docker push $SPARK_IMAGE
-  cache: []
-
-build-barebones-spark-adapter-image:
+build-barebones-spark-adapter-image_2.12:
   stage: images
   image: docker:20.10.16
   needs: [build-base-image]
@@ -52,7 +41,46 @@ build-barebones-spark-adapter-image:
     - docker:20.10.16-dind
   script:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-    - if docker manifest inspect $SPARK_BAREBONES_IMAGE > /dev/null ; then exit 0 ; fi
-    - docker build --build-arg base_image=$BASE_IMAGE -t $SPARK_BAREBONES_IMAGE .gitlab/dockerfiles/spark-adapter
-    - docker push $SPARK_BAREBONES_IMAGE
+    - if docker manifest inspect $SPARK_BAREBONES_IMAGE_2.12 > /dev/null ; then exit 0 ; fi
+    - docker build --build-arg base_image=$BASE_IMAGE -t $SPARK_BAREBONES_IMAGE_2.12 .gitlab/dockerfiles/spark-adapter_2.12
+    - docker push $SPARK_BAREBONES_IMAGE_2.12
+  cache: []
+
+build-spark-adapter-image_2.12:
+  stage: images
+  image: docker:20.10.16
+  needs: [build-barebones-spark-adapter-image]
+  services:
+    - docker:20.10.16-dind
+  script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - if docker manifest inspect $SPARK_IMAGE_2.12 > /dev/null ; then exit 0 ; fi
+    - docker build --build-arg base_image=$SPARK_BAREBONES_IMAGE_2.12 -t $SPARK_IMAGE_2.12 .gitlab/dockerfiles/linux-tooling
+    - docker push $SPARK_IMAGE_2.12
+  cache: []
+
+build-barebones-spark-adapter-image_2.13:
+  stage: images
+  image: docker:20.10.16
+  needs: [build-base-image]
+  services:
+    - docker:20.10.16-dind
+  script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - if docker manifest inspect $SPARK_BAREBONES_IMAGE_2.13 > /dev/null ; then exit 0 ; fi
+    - docker build --build-arg base_image=$BASE_IMAGE -t $SPARK_BAREBONES_IMAGE_2.13 .gitlab/dockerfiles/spark-adapter_2.13
+    - docker push $SPARK_BAREBONES_IMAGE_2.13
+  cache: []
+
+build-spark-adapter-image_2.13:
+  stage: images
+  image: docker:20.10.16
+  needs: [build-barebones-spark-adapter-image]
+  services:
+    - docker:20.10.16-dind
+  script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - if docker manifest inspect $SPARK_IMAGE_2.13 > /dev/null ; then exit 0 ; fi
+    - docker build --build-arg base_image=$SPARK_BAREBONES_IMAGE_2.13 -t $SPARK_IMAGE_2.13 .gitlab/dockerfiles/linux-tooling
+    - docker push $SPARK_IMAGE_2.13
   cache: []

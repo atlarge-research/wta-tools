@@ -35,7 +35,7 @@ package-spark-adapter-e2e_2.12:
   dependencies:
     - build-spark-adapter
   script:
-    - echo "Package Spark adapter started"
+    - echo "Package Spark adapter for Scala 2.12 started"
     - "mvn -pl adapter/spark jar:jar assembly:single@e2e"
   artifacts:
     name: package-spark-adapter-e2e_2.12
@@ -45,12 +45,12 @@ package-spark-adapter-e2e_2.12:
 
 package-spark-adapter-e2e_2.13:
   stage: build
-  needs: [build-spark-adapter]
+  needs: [build-core]
   dependencies:
-    - build-spark-adapter
+    - build-core
   script:
-    - echo "Package Spark adapter started"
-    - "mvn -pl adapter/spark -Dspark.scala.version=2.13 jar:jar assembly:single@e2e"
+    - echo "Package Spark adapter for Scala 2.13 started"
+    - "mvn -pl adapter/spark -Dspark.scala.version=2.13 process-test-classes jar:jar assembly:single@e2e"
   artifacts:
     name: package-spark-adapter-e2e_2.13
     expire_in: 20 minutes
