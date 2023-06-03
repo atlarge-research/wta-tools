@@ -162,8 +162,6 @@
           <classpathDependencyExcludes>
             <classpathDependencyExclude>org.apache.logging.log4j:log4j-slf4j2-impl</classpathDependencyExclude>
           </classpathDependencyExcludes>
-          <forkedProcessExitTimeoutInSeconds>120</forkedProcessExitTimeoutInSeconds>
-          <reuseForks>true</reuseForks>
         </configuration>
       </plugin>
       <plugin>
