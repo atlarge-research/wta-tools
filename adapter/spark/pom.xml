@@ -79,12 +79,20 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
         <version>${maven.compiler.plugin.version}</version>
-        <configuration>
-          <includes>
-            <include>**/EndToEnd.java</include>
-            <include>src/main/java/**.java</include>
-          </includes>
-        </configuration>
+        <executions>
+          <execution>
+            <id>e2e-compile</id>
+            <phase>compile</phase>
+            <goals>
+              <goal>compile</goal>
+            </goals>
+            <configuration>
+              <includes>
+                <include>**/EndToEnd.java</include>
+              </includes>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>
