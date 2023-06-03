@@ -13,27 +13,24 @@
 
   <artifactId>spark</artifactId>
 
+  <properties>
+    <spark.scala.version>2.13</spark.scala.version>
+  </properties>
+
   <dependencies>
     <!-- https://mvnrepository.com/artifact/org.apache.spark/spark-core -->
     <dependency>
       <groupId>org.apache.spark</groupId>
-      <artifactId>spark-core_2.13</artifactId>
+      <artifactId>spark-core_${spark.scala.version}</artifactId>
       <version>${spark.support.version}</version>
       <scope>provided</scope>
     </dependency>
     <!-- https://mvnrepository.com/artifact/org.apache.spark/spark-sql -->
     <dependency>
       <groupId>org.apache.spark</groupId>
-      <artifactId>spark-sql_2.13</artifactId>
+      <artifactId>spark-sql_${spark.scala.version}</artifactId>
       <version>${spark.support.version}</version>
       <scope>test</scope>
-    </dependency>
-    <!-- https://mvnrepository.com/artifact/org.scala-lang/scala-library -->
-    <dependency>
-      <groupId>org.scala-lang</groupId>
-      <artifactId>scala-library</artifactId>
-      <version>2.13.5</version>
-      <scope>provided</scope>
     </dependency>
     <!-- internal dependency -->
     <dependency>
