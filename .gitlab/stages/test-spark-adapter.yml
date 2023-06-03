@@ -65,7 +65,7 @@ branch-coverage-spark-adapter:
 e2e-spark-adapter_2.12:
   stage: test-spark-adapter
   image: $SPARK_IMAGE_2.12
-  needs: [package-spark-adapter-e2e_2.12, build-spark-adapter-image]
+  needs: [package-spark-adapter-e2e_2.12, build-spark-adapter-image_2.12]
   dependencies:
     - package-spark-adapter-e2e_2.12
   script:
@@ -83,7 +83,7 @@ e2e-spark-adapter_2.12:
 e2e-barebones-spark-adapter_2.12:
   stage: test-spark-adapter
   image: $SPARK_BAREBONES_IMAGE_2.12
-  needs: [package-spark-adapter-e2e_2.12, build-barebones-spark-adapter-image]
+  needs: [package-spark-adapter-e2e_2.12, build-barebones-spark-adapter-image_2.12]
   dependencies:
     - package-spark-adapter-e2e_2.12
   script:
@@ -102,7 +102,7 @@ e2e-barebones-spark-adapter_2.12:
 e2e-spark-adapter_2.13:
   stage: test-spark-adapter
   image: $SPARK_IMAGE_2.13
-  needs: [package-spark-adapter-e2e_2.13, build-spark-adapter-image]
+  needs: [package-spark-adapter-e2e_2.13, build-spark-adapter-image_2.13]
   dependencies:
     - package-spark-adapter-e2e_2.13
   script:
@@ -120,7 +120,7 @@ e2e-spark-adapter_2.13:
 e2e-barebones-spark-adapter_2.13:
   stage: test-spark-adapter
   image: $SPARK_BAREBONES_IMAGE_2.13
-  needs: [package-spark-adapter-e2e_2.13, build-barebones-spark-adapter-image]
+  needs: [package-spark-adapter-e2e_2.13, build-barebones-spark-adapter-image_2.13]
   dependencies:
     - package-spark-adapter-e2e_2.13
   script:
