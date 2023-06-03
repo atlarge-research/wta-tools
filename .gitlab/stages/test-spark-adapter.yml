@@ -62,37 +62,74 @@ branch-coverage-spark-adapter:
   coverage: /([0-9]{1,3})%/
 
 
-e2e-spark-adapter:
+e2e-spark-adapter_2.12:
   stage: test-spark-adapter
   image: $SPARK_IMAGE
-  needs: [package-spark-adapter-e2e, build-spark-adapter-image]
+  needs: [package-spark-adapter-e2e_2.12, build-spark-adapter-image]
   dependencies:
-    - package-spark-adapter-e2e
+    - package-spark-adapter-e2e_2.12
   script:
     - echo "Spark adapter end-to-end run started"
     - echo "This job does not provide coverage metrics, it just verifies the system as a whole functions to some degree"
     - spark-submit --class com.asml.apa.wta.spark.EndToEnd --master local[1] adapter/spark/target/spark-1.0-SNAPSHOT-e2e.jar adapter/spark/src/test/resources/config.json wta-output adapter/spark/src/test/resources/wordcount.txt
     - if ! [ -n "$(ls -A wta-output 2>/dev/null)" ] ; then exit 1 ; fi
   artifacts:
-    name: e2e-output
+    name: e2e-output_2.12
     expire_in: 3 hours
     paths:
       - wta-output
   cache: []
 
-e2e-barebones-spark-adapter:
+e2e-barebones-spark-adapter_2.12:
   stage: test-spark-adapter
   image: $SPARK_BAREBONES_IMAGE
-  needs: [package-spark-adapter-e2e, build-barebones-spark-adapter-image]
+  needs: [package-spark-adapter-e2e_2.12, build-barebones-spark-adapter-image]
   dependencies:
-    - package-spark-adapter-e2e
+    - package-spark-adapter-e2e_2.12
   script:
     - echo "Barebones Spark adapter end-to-end run started"
     - echo "This job does not provide coverage metrics, it just verifies the system as a whole functions in a barebones environment"
     - spark-submit --class com.asml.apa.wta.spark.EndToEnd --master local[1] adapter/spark/target/spark-1.0-SNAPSHOT-e2e.jar adapter/spark/src/test/resources/config.json wta-output adapter/spark/src/test/resources/wordcount.txt
     - if ! [ -n "$(ls -A wta-output 2>/dev/null)" ] ; then exit 1 ; fi
   artifacts:
-    name: barebones-e2e-output
+    name: barebones-e2e-output_2.12
+    expire_in: 3 hours
+    paths:
+      - wta-output
+  cache: []
+
+
+e2e-spark-adapter_2.13:
+  stage: test-spark-adapter
+  image: $SPARK_IMAGE
+  needs: [package-spark-adapter-e2e_2.13, build-spark-adapter-image]
+  dependencies:
+    - package-spark-adapter-e2e_2.13
+  script:
+    - echo "Spark adapter end-to-end run started"
+    - echo "This job does not provide coverage metrics, it just verifies the system as a whole functions to some degree"
+    - spark-submit --class com.asml.apa.wta.spark.EndToEnd --master local[1] adapter/spark/target/spark-1.0-SNAPSHOT-e2e.jar adapter/spark/src/test/resources/config.json wta-output adapter/spark/src/test/resources/wordcount.txt
+    - if ! [ -n "$(ls -A wta-output 2>/dev/null)" ] ; then exit 1 ; fi
+  artifacts:
+    name: e2e-output_2.13
+    expire_in: 3 hours
+    paths:
+      - wta-output
+  cache: []
+
+e2e-barebones-spark-adapter_2.13:
+  stage: test-spark-adapter
+  image: $SPARK_BAREBONES_IMAGE
+  needs: [package-spark-adapter-e2e_2.13, build-barebones-spark-adapter-image]
+  dependencies:
+    - package-spark-adapter-e2e_2.13
+  script:
+    - echo "Barebones Spark adapter end-to-end run started"
+    - echo "This job does not provide coverage metrics, it just verifies the system as a whole functions in a barebones environment"
+    - spark-submit --class com.asml.apa.wta.spark.EndToEnd --master local[1] adapter/spark/target/spark-1.0-SNAPSHOT-e2e.jar adapter/spark/src/test/resources/config.json wta-output adapter/spark/src/test/resources/wordcount.txt
+    - if ! [ -n "$(ls -A wta-output 2>/dev/null)" ] ; then exit 1 ; fi
+  artifacts:
+    name: barebones-e2e-output_2.13
     expire_in: 3 hours
     paths:
       - wta-output

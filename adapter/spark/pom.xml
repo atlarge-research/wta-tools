@@ -14,7 +14,8 @@
   <artifactId>spark</artifactId>
 
   <properties>
-    <spark.scala.version>2.13</spark.scala.version>
+    <spark.scala.version>2.12</spark.scala.version>
+    <spark.support.version>3.2.4</spark.support.version>
   </properties>
 
   <dependencies>

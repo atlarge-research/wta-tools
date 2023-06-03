@@ -36,7 +36,6 @@
     <pitest.junit.version>1.1.2</pitest.junit.version>
     <checkstyle.version>3.2.2</checkstyle.version>
     <assertj.version>3.24.2</assertj.version>
-    <spark.support.version>3.2.4</spark.support.version>
     <mockito.version>5.3.1</mockito.version>
     <jqwik.version>1.7.3</jqwik.version>
     <slf4j2-mock.version>2.3.0</slf4j2-mock.version>
