@@ -42,7 +42,7 @@ build-barebones-spark-adapter-image_2_12:
   script:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
     - if docker manifest inspect $SPARK_BAREBONES_IMAGE_2_12 > /dev/null ; then exit 0 ; fi
-    - docker build --build-arg base_image=$BASE_IMAGE -t $SPARK_BAREBONES_IMAGE_2_12 .gitlab/dockerfiles/spark-adapter_2.12
+    - docker build --build-arg base_image=$BASE_IMAGE -t $SPARK_BAREBONES_IMAGE_2_12 .gitlab/dockerfiles/spark-adapter_2_12
     - docker push $SPARK_BAREBONES_IMAGE_2_12
   cache: []
 
@@ -68,7 +68,7 @@ build-barebones-spark-adapter-image_2_13:
   script:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
     - if docker manifest inspect $SPARK_BAREBONES_IMAGE_2_13 > /dev/null ; then exit 0 ; fi
-    - docker build --build-arg base_image=$BASE_IMAGE -t $SPARK_BAREBONES_IMAGE_2_13 .gitlab/dockerfiles/spark-adapter_2.13
+    - docker build --build-arg base_image=$BASE_IMAGE -t $SPARK_BAREBONES_IMAGE_2_13 .gitlab/dockerfiles/spark-adapter_2_13
     - docker push $SPARK_BAREBONES_IMAGE_2_13
   cache: []
 
