@@ -82,6 +82,7 @@
         <configuration>
           <includes>
             <include>**/EndToEnd.java</include>
+            <include>src/main/java/**.java</include>
           </includes>
         </configuration>
       </plugin>
