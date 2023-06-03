@@ -61,18 +61,6 @@
               </descriptorRefs>
             </configuration>
           </execution>
-          <execution>
-            <id>e2e</id>
-            <phase>none</phase>
-            <goals>
-              <goal>single</goal>
-            </goals>
-            <configuration>
-              <descriptors>
-                <descriptor>config/assembly-e2e.xml</descriptor>
-              </descriptors>
-            </configuration>
-          </execution>
         </executions>
       </plugin>
     </plugins>
@@ -107,6 +95,16 @@
               <testExcludes>
                 <exclude>**/*Test.java</exclude>
               </testExcludes>
+            </configuration>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-assembly-plugin</artifactId>
+            <version>${maven.assembly.plugin.version}</version>
+            <configuration>
+              <descriptors>
+                <descriptor>config/assembly-e2e.xml</descriptor>
+              </descriptors>
             </configuration>
           </plugin>
         </plugins>
