@@ -8,6 +8,7 @@ import com.asml.apa.wta.spark.driver.WtaDriverPlugin;
 import com.asml.apa.wta.spark.dto.ResourceCollectionDto;
 import com.asml.apa.wta.spark.dto.SparkBaseSupplierWrapperDto;
 import java.util.List;
+import java.util.Map;
 import org.apache.spark.SparkContext;
 import org.apache.spark.api.plugin.PluginContext;
 import org.junit.jupiter.api.BeforeEach;
@@ -60,6 +61,15 @@ class WtaDriverPluginTest {
     verify(sut, times(1)).shutdown();
     verify(sut, times(0)).initListeners();
     verify(sut, times(0)).removeListeners();
+  }
+
+  @Test
+  void wtaDriverPluginDoesNotInitializeWithNegativeResourceTimer() {
+    System.setProperty("configFile", "testConfigNegativeResourcePingInterval.json");
+    assertThat(sut.isError()).isFalse();
+    Map<String, String> result = sut.init(mockedSparkContext, mockedPluginContext);
+    assertThat(sut.isError()).isTrue();
+    assertThat(result).isEmpty();
   }
 
   @Test

@@ -70,7 +70,6 @@ public class SparkSupplierExtractionEngine extends SupplierExtractionEngine<Spar
    * @since 1.0.0
    */
   private void sendBuffer(List<SparkBaseSupplierWrapperDto> snapshots) {
-    var test = this.pluginContext.executorID();
     ResourceCollectionDto bufferSnapshot = new ResourceCollectionDto(snapshots);
     if (bufferSnapshot.getResourceCollection().isEmpty()) {
       return;

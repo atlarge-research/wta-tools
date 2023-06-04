@@ -9,6 +9,6 @@
   "logLevel": "INFO",
   "outputPath": "/home/user/WTA",
   "isStageLevel": "true",
-  "resourcePingInterval": 2000,
+  "resourcePingInterval": 0,
   "executorSynchronizationInterval": 4000
 }

@@ -43,8 +43,8 @@ public class Resource implements BaseTraceObject {
 
   /**
    * Converts the POJO object into record object, enabling it to be written by Avro.
+   * It will put all fields allowed by the checker into the record.
    *
-   * @param resource resource
    * @param checker checker for which column to skip
    * @param schema schema
    * @return record
@@ -52,34 +52,34 @@ public class Resource implements BaseTraceObject {
    * @author Tianchen Qu
    */
   @SuppressWarnings("CyclomaticComplexity")
-  public static GenericRecord convertResourceToRecord(Resource resource, Boolean[] checker, Schema schema) {
+  public GenericRecord convertToRecord(Boolean[] checker, Schema schema) {
     GenericData.Record record = new GenericData.Record(schema);
     if (checker[0]) {
-      record.put("id", resource.getId());
+      record.put("id", this.getId());
     }
     if (checker[1]) {
-      record.put("type", resource.getType());
+      record.put("type", this.getType());
     }
     if (checker[2]) {
-      record.put("num_resources", resource.getNumResources());
+      record.put("num_resources", this.getNumResources());
     }
     if (checker[3]) {
-      record.put("proc_model", resource.getProcModel());
+      record.put("proc_model", this.getProcModel());
     }
     if (checker[4]) {
-      record.put("memory", resource.getMemory());
+      record.put("memory", this.getMemory());
     }
     if (checker[5]) {
-      record.put("disk_space", resource.getDiskSpace());
+      record.put("disk_space", this.getDiskSpace());
     }
     if (checker[6]) {
-      record.put("network", resource.getNetworkSpeed());
+      record.put("network", this.getNetworkSpeed());
     }
     if (checker[7]) {
-      record.put("os", resource.getOs());
+      record.put("os", this.getOs());
     }
     if (checker[8]) {
-      record.put("details", resource.getDetails());
+      record.put("details", this.getDetails());
     }
     return record;
   }

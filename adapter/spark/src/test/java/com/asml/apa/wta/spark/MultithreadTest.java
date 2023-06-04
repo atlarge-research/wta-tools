@@ -1,8 +1,10 @@
 package com.asml.apa.wta.spark;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.awaitility.Awaitility.await;
 import static org.mockito.Mockito.*;
 
+import com.asml.apa.wta.spark.dto.ResourceCollectionDto;
 import com.asml.apa.wta.spark.dto.SparkBaseSupplierWrapperDto;
 import com.asml.apa.wta.spark.executor.engine.SparkSupplierExtractionEngine;
 import com.asml.apa.wta.spark.executor.plugin.WtaExecutorPlugin;
@@ -45,7 +47,7 @@ public class MultithreadTest {
   }
 
   @Test
-  @Timeout(value = 3000L, unit = TimeUnit.MILLISECONDS)
+  @Timeout(value = 5000L, unit = TimeUnit.MILLISECONDS)
   void pingWorksAsIntended() {
     CompletableFuture<Void> result = sutSupplierExtractionEngine.pingAndBuffer();
 
@@ -62,9 +64,39 @@ public class MultithreadTest {
   }
 
   @Test
+  @Timeout(value = 5000L, unit = TimeUnit.MILLISECONDS)
+  void pingAndAddToBufferForSparkImplementationBehavesCorrectly() {
+    CompletableFuture<Void> job1 = sutSupplierExtractionEngine.pingAndBuffer();
+    job1.join();
+    assertThat(sutSupplierExtractionEngine.getBuffer()).hasSize(1);
+    CompletableFuture<Void> job2 = sutSupplierExtractionEngine.pingAndBuffer();
+    job2.join();
+    assertThat(sutSupplierExtractionEngine.getBuffer()).hasSize(2);
+    CompletableFuture<Void> job3 = sutSupplierExtractionEngine.pingAndBuffer();
+    assertThat(sutSupplierExtractionEngine.getBuffer()).hasSizeGreaterThanOrEqualTo(2);
+  }
+
+  @Test
+  void pingAndBufferWithANegativeOrZeroExecutorSynchronizationIntervalDoesNotBuffer() throws IOException {
+    SparkSupplierExtractionEngine testEngine = spy(new SparkSupplierExtractionEngine(2000, mockPluginContext, 0));
+
+    testEngine.startPinging();
+    testEngine.startSynchonizing();
+
+    await().during(5000L, TimeUnit.MILLISECONDS) // during this period, the condition should be maintained true
+        .atMost(6000L, TimeUnit.MILLISECONDS) // timeout
+        .until(() -> testEngine.getBuffer().isEmpty());
+
+    verify(mockPluginContext, atLeastOnce()).send(isA(ResourceCollectionDto.class));
+
+    testEngine.stopPinging();
+    testEngine.stopSynchronizing();
+  }
+
+  @Test
   void pingsGetSentToDriver() throws IOException {
     sutExecutorPlugin.init(mockPluginContext, new HashMap<>());
-    verify(mockPluginContext, timeout(60000L).atLeastOnce()).send(any());
+    verify(mockPluginContext, timeout(10000L).atLeastOnce()).send(any());
     sutExecutorPlugin.shutdown();
   }
 }

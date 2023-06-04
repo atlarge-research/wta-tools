@@ -74,7 +74,7 @@ public abstract class SupplierExtractionEngine<T extends BaseSupplierDto> {
    * @return A {@link CompletableFuture} representing the result of the ping operation
    */
   public CompletableFuture<Void> pingAndBuffer() {
-    return ping().thenAccept(buffer::add);
+    return ping().thenAcceptAsync(buffer::add);
   }
 
   /**
