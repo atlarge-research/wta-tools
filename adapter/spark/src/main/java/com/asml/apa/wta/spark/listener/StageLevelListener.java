@@ -64,10 +64,10 @@ public class StageLevelListener extends TaskStageBaseListener {
       ListBuffer<Integer> children = parentToChildren.get(id);
       if (children == null) {
         children = new ListBuffer<>();
-        children.update(0, stageId);
+        children.$plus$eq(stageId);
         parentToChildren.put(id, children);
       } else {
-        children.update(children.length(),stageId);
+        children.$plus$eq(stageId);
       }
     }
     // dummy values

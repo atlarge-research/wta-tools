@@ -7,6 +7,8 @@ import static org.mockito.Mockito.when;
 import com.asml.apa.wta.core.model.Task;
 import com.asml.apa.wta.core.model.Workload;
 import java.util.Properties;
+import java.util.stream.Collectors;
+
 import org.apache.spark.executor.ExecutorMetrics;
 import org.apache.spark.executor.TaskMetrics;
 import org.apache.spark.scheduler.SparkListenerApplicationEnd;
@@ -18,6 +20,7 @@ import org.apache.spark.scheduler.TaskInfo;
 import org.apache.spark.scheduler.TaskLocality;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import scala.collection.JavaConverters;
 import scala.collection.mutable.ListBuffer;
 
 class ApplicationLevelListenerTest extends BaseLevelListenerTest {
@@ -60,10 +63,10 @@ class ApplicationLevelListenerTest extends BaseLevelListenerTest {
     when(mockedMetrics.executorRunTime()).thenReturn(100L);
 
     testStageInfo = new StageInfo(
-        5, 0, "test", 50, null, parents.toList().map(x -> x), "None", mockedMetrics, null, null, 100);
-    parents.addOne(5);
+        5, 0, "test", 50, null, JavaConverters.collectionAsScalaIterable(JavaConverters.asJavaCollection(parents).stream().map(x -> (Object) x).collect(Collectors.toList())).toList(), "None", mockedMetrics, null, null, 100);
+    parents.$plus$eq(5);
     testStageInfo2 = new StageInfo(
-        6, 0, "test", 50, null, parents.toList().map(x -> x), "None", mockedMetrics, null, null, 100);
+        6, 0, "test", 50, null, JavaConverters.collectionAsScalaIterable(JavaConverters.asJavaCollection(parents).stream().map(x -> (Object) x).collect(Collectors.toList())).toList(), "None", mockedMetrics, null, null, 100);
     taskEndEvent = new SparkListenerTaskEnd(
         5, 1, "testTaskType", null, testTaskInfo, new ExecutorMetrics(), mockedMetrics);
     taskEndEvent2 = new SparkListenerTaskEnd(
@@ -81,8 +84,8 @@ class ApplicationLevelListenerTest extends BaseLevelListenerTest {
   @Test
   void parentChildrenAggregationTest() {
     ListBuffer<StageInfo> stageBuffer = new ListBuffer<>();
-    stageBuffer.addOne(testStageInfo);
-    stageBuffer.addOne(testStageInfo2);
+    stageBuffer.$plus$eq(testStageInfo);
+    stageBuffer.$plus$eq(testStageInfo2);
 
     fakeTaskListener.onJobStart(new SparkListenerJobStart(1, 2L, stageBuffer.toList(), new Properties()));
     fakeTaskListener.onTaskEnd(taskEndEvent);

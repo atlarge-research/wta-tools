@@ -9,6 +9,7 @@ import org.apache.spark.scheduler.SparkListenerStageCompleted;
 import org.apache.spark.scheduler.StageInfo;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import scala.collection.JavaConverters;
 import scala.collection.mutable.ListBuffer;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -18,6 +19,8 @@ import static org.mockito.Mockito.when;
 
 import com.asml.apa.wta.core.model.Task;
 import java.util.Properties;
+import java.util.stream.Collectors;
+
 import org.apache.spark.executor.TaskMetrics;
 import org.apache.spark.scheduler.SparkListenerJobStart;
 import org.apache.spark.scheduler.SparkListenerStageCompleted;
@@ -34,7 +37,11 @@ class StageLevelListenerTest extends BaseLevelListenerTest {
 
   SparkListenerStageCompleted stageCompleted;
 
+  SparkListenerStageCompleted stageEndEvent;
+
   StageInfo testStageInfo;
+
+  StageInfo spyStageInfo;
 
   @BeforeEach
   void setup() {
@@ -42,12 +49,12 @@ class StageLevelListenerTest extends BaseLevelListenerTest {
     when(mockedMetrics.executorRunTime()).thenReturn(100L);
 
     ListBuffer<Integer> parents = new ListBuffer<>();
-    parents.addOne(1);
-    parents.addOne(2);
+    parents.$plus$eq(1);
+    parents.$plus$eq(2);
 
 
     testStageInfo = new StageInfo(
-        3, 0, "test", 50, null, parents.toList().map(x -> x), "None", mockedMetrics, null, null, 100);
+        3, 0, "test", 50, null, JavaConverters.collectionAsScalaIterable(JavaConverters.asJavaCollection(parents).stream().map(x -> (Object) x).collect(Collectors.toList())).toList(), "None", mockedMetrics, null, null, 100);
 
     spyStageInfo = spy(testStageInfo);
     Option<Object> submissionTimeOption = Option.apply(10L);
@@ -89,8 +96,8 @@ class StageLevelListenerTest extends BaseLevelListenerTest {
     fakeStageListener.onStageCompleted(stageCompleted);
     assertThat(fakeStageListener.getStageToParents()).containsEntry(3, new Integer[] {1, 2});
     assertThat(fakeStageListener.getStageToParents().size()).isEqualTo(1);
-    assertThat(fakeStageListener.getParentToChildren()).containsEntry(1, new ListBuffer<Integer>().addOne(3));
-    assertThat(fakeStageListener.getParentToChildren()).containsEntry(2, new ListBuffer<Integer>().addOne(3));
+    assertThat(fakeStageListener.getParentToChildren()).containsEntry(1, new ListBuffer<Integer>().$plus$eq(3));
+    assertThat(fakeStageListener.getParentToChildren()).containsEntry(2, new ListBuffer<Integer>().$plus$eq(3));
     assertThat(fakeStageListener.getParentToChildren().size()).isEqualTo(2);
   }
 }
