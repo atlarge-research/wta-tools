@@ -3,6 +3,7 @@ package com.asml.apa.wta.core.supplier;
 import com.asml.apa.wta.core.dto.BaseSupplierDto;
 import com.asml.apa.wta.core.dto.IostatDto;
 import com.asml.apa.wta.core.dto.OsInfoDto;
+import com.asml.apa.wta.core.utils.BashUtils;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -43,7 +44,7 @@ public abstract class SupplierExtractionEngine<T extends BaseSupplierDto> {
   public SupplierExtractionEngine(int resourcePingInterval) {
     this.resourcePingInterval = resourcePingInterval;
     this.operatingSystemSupplier = new OperatingSystemSupplier();
-    this.iostatSupplier = new IostatSupplier();
+    this.iostatSupplier = new IostatSupplier(new BashUtils());
   }
 
   /**

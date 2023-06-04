@@ -33,17 +33,6 @@ public class IostatSupplier implements InformationSupplier<IostatDto> {
   }
 
   /**
-   * Uses an arbitrary instance of bash utils.
-   *
-   * @author Henry Page
-   * @since 1.0.0
-   */
-  public IostatSupplier() {
-    this(new BashUtils());
-    this.isAvailable = isAvailable();
-  }
-
-  /**
    * Checks if the supplier is available.
    *
    * @return A boolean that represents if the iostat supplier is available
