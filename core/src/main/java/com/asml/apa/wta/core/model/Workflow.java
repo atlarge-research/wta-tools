@@ -33,7 +33,7 @@ public class Workflow implements BaseTraceObject {
 
   private final int numberOfTasks;
 
-  private final int criticalPathLength;
+  private final long criticalPathLength;
 
   private final int criticalPathTaskCount;
 
@@ -55,9 +55,9 @@ public class Workflow implements BaseTraceObject {
 
   private final long totalNetworkUsage;
 
-  private final long totalDiskSpaceUsage;
+  private final double totalDiskSpaceUsage;
 
-  private final long totalEnergyConsumption;
+  private final double totalEnergyConsumption;
 
   /**
    * Converts the POJO object into record object, enabling it to be written by Avro.
