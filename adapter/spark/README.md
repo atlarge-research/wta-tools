@@ -16,14 +16,15 @@ The diagram above illustrates the workflow of the adapter.
 - **Label 4:** Once the job has ended, all objects will be serialised into parquet format.
 
 ## Installation and Usage
-- Clone the repository
-- Optional (if more I/O metrics are needed): Install `sysstat` by running the following bash command:
+1.  Clone the repository
+2.  Optional (if more I/O metrics are needed): Install `sysstat` by running the following bash command:
 
     ```bash
     sudo apt-get install sysstat
     ```
 
-- To allow advanced performance metrics to be gathered, you can opt to make the `perf` utility available. To do this, you need to do the following:
+3.  To allow advanced performance metrics to be gathered, you can opt to make the `perf` utility available.
+    To do this, you need to do the following:
 
     On Ubuntu:
 
@@ -36,7 +37,13 @@ The diagram above illustrates the workflow of the adapter.
     On Debian:
 
     ```bash
-    sudo apt-get install linux-perf
+    apt-get install linux-perf
+    ```
+  
+    On CentOS / RHEL:
+
+    ```bash
+    yum install perf
     ```
 
     Followed by setting `perf_event_paranoid` to 0:
