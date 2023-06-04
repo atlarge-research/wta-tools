@@ -16,7 +16,7 @@ import org.apache.spark.storage.RDDInfo;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import scala.Option;
-import scala.collection.immutable.Seq;
+import scala.collection.Seq;
 import scala.collection.mutable.ListBuffer;
 
 class StageLevelListenerTest extends BaseLevelListenerTest {
@@ -53,7 +53,7 @@ class StageLevelListenerTest extends BaseLevelListenerTest {
   @Test
   void testStageEndMetricExtraction() {
     ListBuffer<StageInfo> stageBuffer = new ListBuffer<>();
-    stageBuffer.addOne(spyStageInfo);
+    stageBuffer.$plus$eq(spyStageInfo);
 
     fakeStageListener.onJobStart(new SparkListenerJobStart(1, 2L, stageBuffer.toList(), new Properties()));
     fakeStageListener.onStageCompleted(stageEndEvent);
