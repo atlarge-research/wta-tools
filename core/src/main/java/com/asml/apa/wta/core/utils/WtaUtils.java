@@ -11,11 +11,13 @@ import lombok.extern.slf4j.Slf4j;
 /**
  * Utility class for WTA.
  *
+ * @author Pil Kyu CHo
  * @author Henry Page
  * @author Lohithsai Yadala Chanchu
  * @author Atour Mousavi Gourabi
  * @since 1.0.0
  */
+@SuppressWarnings("CyclomaticComplexity")
 @Slf4j
 public class WtaUtils {
 
@@ -51,6 +53,9 @@ public class WtaUtils {
       } else if (config.getDescription() == null
           || config.getDescription().isBlank()) {
         log.info("The config file does not include a description, this field is highly recommended.");
+      } else if (config.getOutputPath() == null) {
+        log.error("The config file does not specify an output path, this field is mandatory.");
+        throw new IllegalArgumentException("The config file does not specify the output path");
       }
       return config;
     } catch (JsonParseException e) {
@@ -62,6 +67,10 @@ public class WtaUtils {
     } catch (IOException e) {
       log.error("Something went wrong while reading {}", configDir);
       throw new IllegalArgumentException("Something went wrong while reading " + configDir);
+    } catch (Exception e) {
+      log.error("\"configFile\" was not set in the command line arguments or system property");
+      throw new IllegalArgumentException(
+          "\"configFile\" was not set in the command line arguments or system property");
     }
   }
 

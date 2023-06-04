@@ -69,7 +69,7 @@ public class JobLevelListener extends AbstractListener<Workflow> {
     final String appName = sparkContext.appName();
 
     // unknown
-    final int criticalPathLength = -1;
+    final long criticalPathLength = -1;
     final int criticalPathTaskCount = -1;
     final int maxNumberOfConcurrentTasks = -1;
     final String nfrs = "";
@@ -77,8 +77,8 @@ public class JobLevelListener extends AbstractListener<Workflow> {
     final double totalResources = -1.0;
     final double totalMemoryUsage = -1.0;
     final long totalNetworkUsage = -1L;
-    final long totalDiskSpaceUsage = -1L;
-    final long totalEnergyConsumption = -1L;
+    final double totalDiskSpaceUsage = -1.0;
+    final double totalEnergyConsumption = -1.0;
     processedObjects.add(Workflow.builder()
         .id(jobId)
         .submitTime(submitTime)

@@ -1,5 +1,20 @@
 # Spark Adapter Layer
 
+## Overview
+
+![img.png](./src/main/resources/architecture.png)
+
+The Spark Adapter is responsible for parsing Spark execution information into WTA objects.
+The diagram above illustrates the workflow of the adapter.
+
+- **Label 1:** Heartbeat sent by the executor to the driver every 10 seconds to send metrics.
+  These are intercepted by the `SparkListenerAPI`.
+- **Label 2:** RPC messages sent using the `SparkPluginAPI` for executors to communicate
+  any additional information to the driver-side of the plugin.
+- **Label 3:** At each stage, the task scheduler gets sets of tasks from the DAG and the task scheduler
+  sends the tasks to each executor.
+- **Label 4:** Once the job has ended, all objects will be serialised into parquet format.
+
 ## Installation and Usage
 - Clone the repository
 - Optional (if more I/O metrics are needed): Install sysstat by running the following bash command:
@@ -7,17 +22,45 @@
 ```bash
 sudo apt install sysstat
 ```
+
+There are two ways to make use of the plugin
+1. Integrate the plugin into the Spark application source code
+2. Create the plugin as a JAR and run alongside the main Spark application via **spark-submit**
+
+### First approach
+For the first approach, create a `SparkConf` object and set the following config:
+
+```java
+conf.set("spark.plugins", "com.asml.apa.wta.spark.WtaPlugin");
+System.setProperty("configFile", "adapter/spark/src/test/resources/config.json");
+```
+The first line registers the main plugin class within the Spark session. The second line creates an environment variable
+for the plugin class to use.
+
+### Second approach
+For the second approach, create a JAR file of the plugin and run it alongside the main Spark application using
+**spark-submit**. Here is an example of how to run the plugin alongside the main Spark application:
+
 - Run `mvn -pl core clean install && mvn -pl adapter/spark clean package` in the source root.
 - Copy the resulting jar file from `adapter/spark/target`.
 - Execute the following command in the directory where the jar file is located:
 
 ```bash
-spark-submit --class com.asml.apa.wta.spark.App
---master local[1] <plugin_jar_location> <config.json_location> <directory_for_outputted_parquet> <file_to_be_processed>
+spark-submit --class <main class path to spark application> --master local[1]
+--conf spark.plugins=com.asml.apa.wta.spark.WtaPlugin
+--conf "spark.driver.extraJavaOptions=-DconfigFile=<config.json_location>"
+--jars <plugin_jar_location> <Spark_jar_location>
+<optional arguments for spark application>
 ```
-- The parquet files should now be located in the `<directory_for_outputted_parquet>`.
+- The Parquet files should now be located in the `outputPath` as specified in the config file.
+
+Note: this way, the plugin will be compiled for Scala 2.12. If you want to compile for a Scala 2.13 version of Spark,
+you will need to set the `spark.scala.version` flag to 2.13, such as in
+`mvn -pl adapter/spark -Dspark.scala.version=2.13 clean package`.
 
 ## Description
+This plugin will **not** block the main Spark application. Even if the plugin fails to initialise, the main Spark
+application will still run.
 
 The Spark Adapter consists of two main parts that allows the application to collect metrics.
 - SparkListenerInterface

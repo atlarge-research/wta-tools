@@ -19,6 +19,7 @@ import org.apache.spark.scheduler.TaskInfo;
 import org.apache.spark.scheduler.TaskLocality;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import scala.collection.Seq;
 import scala.collection.mutable.ListBuffer;
 
 class TaskLevelListenerTest extends BaseLevelListenerTest {
@@ -83,7 +84,7 @@ class TaskLevelListenerTest extends BaseLevelListenerTest {
   @Test
   void testTaskEndMetricExtraction() {
     ListBuffer<StageInfo> stageBuffer = new ListBuffer<>();
-    stageBuffer.addOne(testStageInfo);
+    stageBuffer.$plus$eq(testStageInfo);
 
     fakeTaskListener.onJobStart(new SparkListenerJobStart(1, 2L, stageBuffer.toList(), new Properties()));
     fakeTaskListener.onTaskEnd(taskEndEvent);

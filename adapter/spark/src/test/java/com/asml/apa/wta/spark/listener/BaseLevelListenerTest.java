@@ -42,6 +42,8 @@ public class BaseLevelListenerTest {
 
     fakeTaskListener = new TaskLevelListener(mockedSparkContext, fakeConfig);
 
+    fakeStageListener = new StageLevelListener(mockedSparkContext, fakeConfig);
+
     fakeJobListener = new JobLevelListener(mockedSparkContext, fakeConfig, fakeTaskListener);
 
     fakeApplicationListener = new ApplicationLevelListener(
