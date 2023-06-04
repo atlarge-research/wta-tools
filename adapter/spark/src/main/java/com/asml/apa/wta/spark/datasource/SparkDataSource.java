@@ -24,13 +24,13 @@ import org.apache.spark.SparkContext;
 @Getter
 public class SparkDataSource implements CollectorInterface {
 
-  private final AbstractListener<Task> taskLevelListener;
+  private final TaskLevelListener taskLevelListener;
 
-  private final AbstractListener<Workflow> jobLevelListener;
+  private final JobLevelListener jobLevelListener;
 
-  private final AbstractListener<Workload> applicationLevelListener;
+  private final ApplicationLevelListener applicationLevelListener;
 
-  private final AbstractListener<Task> stageLevelListener;
+  private final StageLevelListener stageLevelListener;
 
   private final RuntimeConfig runtimeConfig;
 
@@ -52,7 +52,7 @@ public class SparkDataSource implements CollectorInterface {
     } else {
       jobLevelListener = new JobLevelListener(sparkContext, config, taskLevelListener);
     }
-    applicationLevelListener = new ApplicationLevelListener(sparkContext, config, jobLevelListener);
+    applicationLevelListener = new ApplicationLevelListener(sparkContext, config, jobLevelListener, taskLevelListener);
     runtimeConfig = config;
   }
 

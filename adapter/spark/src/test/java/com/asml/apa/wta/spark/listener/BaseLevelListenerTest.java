@@ -19,10 +19,10 @@ public class BaseLevelListenerTest {
 
   protected RuntimeConfig fakeConfig;
 
-  protected AbstractListener<Task> fakeTaskListener;
-  protected AbstractListener<Task> fakeStageListener;
-  protected AbstractListener<Workflow> fakeJobListener;
-  protected AbstractListener<Workload> fakeApplicationListener;
+  protected TaskLevelListener fakeTaskListener;
+  protected StageLevelListener fakeStageListener;
+  protected JobLevelListener fakeJobListener;
+  protected ApplicationLevelListener fakeApplicationListener;
 
   @BeforeEach
   void setupCommonListenerDependencies() {
@@ -48,6 +48,6 @@ public class BaseLevelListenerTest {
 
     fakeJobListener = new JobLevelListener(mockedSparkContext, fakeConfig, fakeTaskListener);
 
-    fakeApplicationListener = new ApplicationLevelListener(mockedSparkContext, fakeConfig, fakeJobListener);
+    fakeApplicationListener = new ApplicationLevelListener(mockedSparkContext, fakeConfig, fakeJobListener, fakeTaskListener);
   }
 }
