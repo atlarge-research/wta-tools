@@ -53,9 +53,15 @@ public class PerfDataSource {
    * @author Pil Kyu Cho
    * @since 1.0.0
    */
-  public double gatherMetrics() throws ExecutionException, InterruptedException {
-    CompletableFuture<String> energyMetrics = bashUtils.executeCommand(
-        "perf stat -e power/energy-pkg/ -a sleep 1 2>&1 | grep -oP '^\\s+\\K[\\d,]+(?=\\s+Joules)' | sed 's/,/./g'");
-    return Double.parseDouble(energyMetrics.get());
+  public double gatherMetrics() {
+    try {
+      CompletableFuture<String> energyMetrics = bashUtils.executeCommand(
+              "perf stat -e power/energy-pkg/ -a sleep 1 2>&1 | grep -oP '^\\s+\\K[\\d,]+(?=\\s+Joules)' | sed 's/,/./g'");
+      return Double.parseDouble(energyMetrics.get());
+    } catch (NumberFormatException e) {
+      throw new NumberFormatException("The captured string can not be parsed into a double.");
+    } catch (BashCommandExecutionException | ExecutionException | InterruptedException e) {
+      return 0.0;
+    }
   }
 }
