@@ -53,7 +53,7 @@ public class PerfDataSource {
    */
   public double gatherMetrics() throws ExecutionException, InterruptedException {
     CompletableFuture<String> energyMetrics = bashUtils.executeCommand(
-          "perf stat -e power/energy-pkg/ -a sleep 1 2>&1 | grep -m 1 -oP \"^\\s+\\K[\\d,]+(?=\\s+Joules)\"");
+        "perf stat -e power/energy-pkg/ -a sleep 1 2>&1 | grep -m 1 -oP \"^\\s+\\K[\\d,]+(?=\\s+Joules)\"");
     return Double.parseDouble(energyMetrics.get());
   }
 }
