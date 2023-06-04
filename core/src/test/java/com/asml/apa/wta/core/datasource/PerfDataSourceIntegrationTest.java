@@ -15,4 +15,9 @@ public class PerfDataSourceIntegrationTest {
   void perfEnergyDataSourceIsAvailable() {
     assertThat(sut.isAvailable()).isTrue();
   }
+
+  @Test
+  void perfEnergyGatherMetricsSuccessful() {
+    assertThat(sut.gatherMetrics()).isGreaterThan(0.0);
+  }
 }
