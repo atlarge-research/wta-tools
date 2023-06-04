@@ -41,6 +41,7 @@ For the most part, since we are pre-release this will serve no real purpose, oth
 - Wired e2e testing into the pipeline [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 - Make the WtaPlugin class dictate the Spark adapter lifecycle [@pcho](https://gitlab.ewi.tudelft.nl/pcho)
 - Added option to choose between stage and task level metrics [@lyadalachanchu](https://gitlab.ewi.tudelft.nl/lyadalachanchu)
+- Added functionality to ping resources and syncronize with driver. [@hpage](https://gitlab.ewi.tudelft.nl/hpage)
 - Added the option to compile the plugin for Scala 2.12 and 2.13 [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 - Extended BaseTraceObject with a new method [@tqu](https://gitlab.ewi.tudelft.nl/tqu)
 - Added energy consumption metrics data source [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab) [@pcho](https://gitlab.ewi.tudelft.nl/pcho)

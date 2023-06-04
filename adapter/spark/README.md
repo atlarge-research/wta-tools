@@ -58,7 +58,7 @@ There are two ways to make use of the plugin
 1. Integrate the plugin into the Spark application source code
 2. Create the plugin as a JAR and run alongside the main Spark application via **spark-submit**
 
-### First approach
+### Plugin Integration
 For the first approach, create a `SparkConf` object and set the following config:
 
 ```java
@@ -68,7 +68,7 @@ System.setProperty("configFile", "adapter/spark/src/test/resources/config.json")
 The first line registers the main plugin class within the Spark session. The second line creates an environment variable
 for the plugin class to use.
 
-### Second approach
+### CLI Execution
 For the second approach, create a JAR file of the plugin and run it alongside the main Spark application using
 **spark-submit**. Here is an example of how to run the plugin alongside the main Spark application:
 
@@ -88,6 +88,10 @@ spark-submit --class <main class path to spark application> --master local[1]
 Note: this way, the plugin will be compiled for Scala 2.12. If you want to compile for a Scala 2.13 version of Spark,
 you will need to set the `spark.scala.version` flag to 2.13, such as in
 `mvn -pl adapter/spark -Dspark.scala.version=2.13 clean package`.
+
+## Configuration
+General configuration instructions are located [here](/../../README.md#configuration). See above for [instructions](#installation-and-usage) on how to provide the configuration to the plugin.
+
 
 ## Description
 This plugin will **not** block the main Spark application. Even if the plugin fails to initialise, the main Spark

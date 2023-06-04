@@ -17,6 +17,8 @@ class RuntimeConfigTest {
     assertThat(cr.getDescription()).isEqualTo("");
     assertThat(cr.getEvents()).isEqualTo(new HashMap<String, String>());
     assertThat(cr.getLogLevel()).isEqualTo("ERROR");
+    assertThat(cr.getResourcePingInterval()).isEqualTo(1000);
+    assertThat(cr.getExecutorSynchronizationInterval()).isEqualTo(2000);
     assertThat(cr.getOutputPath()).isNull();
   }
 }

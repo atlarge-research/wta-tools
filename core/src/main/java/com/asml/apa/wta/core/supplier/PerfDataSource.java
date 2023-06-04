@@ -1,4 +1,4 @@
-package com.asml.apa.wta.core.datasource;
+package com.asml.apa.wta.core.supplier;
 
 import com.asml.apa.wta.core.exceptions.BashCommandExecutionException;
 import com.asml.apa.wta.core.utils.BashUtils;
