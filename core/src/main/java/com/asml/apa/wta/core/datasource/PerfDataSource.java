@@ -48,11 +48,12 @@ public class PerfDataSource {
    *
    * @return the joules used by the CPU package over the past second
    * @author Atour Mousavi Gourabi
+   * @author Pil Kyu Cho
    * @since 1.0.0
    */
   public double gatherMetrics() throws ExecutionException, InterruptedException {
     CompletableFuture<String> energyMetrics = bashUtils.executeCommand(
-        "perf stat -e power/energy-pkg/ -a sleep 1 | grep -m 1 -oE '[0-9]+(\\.[0-9]+)?'");
+          "perf stat -e power/energy-pkg/ -a sleep 1 2>&1 | grep -m 1 -oP \"^\\s+\\K[\\d,]+(?=\\s+Joules)\"");
     return Double.parseDouble(energyMetrics.get());
   }
 }
