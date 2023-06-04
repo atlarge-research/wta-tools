@@ -4,6 +4,9 @@ import com.asml.apa.wta.core.config.RuntimeConfig;
 import com.asml.apa.wta.core.model.Task;
 import org.apache.spark.SparkContext;
 import org.apache.spark.executor.TaskMetrics;
+import org.apache.spark.resource.ExecutorResourceRequest;
+import org.apache.spark.resource.ResourceProfile;
+import org.apache.spark.resource.TaskResourceRequest;
 import org.apache.spark.scheduler.SparkListenerTaskEnd;
 import org.apache.spark.scheduler.TaskInfo;
 
@@ -16,16 +19,20 @@ import org.apache.spark.scheduler.TaskInfo;
  */
 public class TaskLevelListener extends TaskStageBaseListener {
 
+  private final ExecutorLevelListener executorLevelListener;
+
   /**
    * Constructor for the task-level listener.
    *
-   * @param sparkContext The current spark context
-   * @param config Additional config specified by the user for the plugin
+   * @param sparkContext          The current spark context
+   * @param config                Additional config specified by the user for the plugin
+   * @param executorLevelListener
    * @author Henry Page
    * @since 1.0.0
    */
-  public TaskLevelListener(SparkContext sparkContext, RuntimeConfig config) {
+  public TaskLevelListener(SparkContext sparkContext, RuntimeConfig config, ExecutorLevelListener executorLevelListener) {
     super(sparkContext, config);
+    this.executorLevelListener = executorLevelListener;
   }
 
   /**
@@ -39,6 +46,8 @@ public class TaskLevelListener extends TaskStageBaseListener {
   public void onTaskEnd(SparkListenerTaskEnd taskEnd) {
     final TaskInfo curTaskInfo = taskEnd.taskInfo();
     final TaskMetrics curTaskMetrics = taskEnd.taskMetrics();
+    final int executorId = Integer.parseInt(curTaskInfo.executorId());
+    final ResourceProfile resourceProfile = sparkContext.resourceProfileManager().resourceProfileFromId(executorId);
 
     final long taskId = curTaskInfo.taskId() + 1;
     final String type = taskEnd.taskType();
@@ -47,17 +56,20 @@ public class TaskLevelListener extends TaskStageBaseListener {
     final int userId = sparkContext.sparkUser().hashCode();
     final long workflowId = stageIdsToJobs.get(taskEnd.stageId());
     final double diskSpaceRequested = (double) curTaskMetrics.diskBytesSpilled()/1048576;
-
+    String memoryString = ResourceProfile.MEMORY();
+    System.out.println(memoryString);
+    final double memoryRequested = Double.parseDouble(memoryString.substring(0,memoryString.length()-1));
+    final TaskResourceRequest resourceRequest = resourceProfile.taskResources().values().head();
+    final String resourceType = resourceRequest.resourceName();
+    final double resourceAmountRequested = resourceRequest.amount();
     // unknown
     final int submissionSite = -1;
-    final String resourceType = "N/A";
-    final double resourceAmountRequested = -1.0;
+
     final long[] parents = new long[0];
     final long[] children = new long[0];
-    final int groupId = -1;
     final String nfrs = "";
     final String params = "";
-    final double memoryRequested = -1.0;
+    final int groupId = -1;
     final long networkIoTime = -1L;
     final long diskIoTime = -1L;
     final long energyConsumption = -1L;
