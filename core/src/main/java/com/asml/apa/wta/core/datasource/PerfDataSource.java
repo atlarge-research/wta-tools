@@ -2,6 +2,8 @@ package com.asml.apa.wta.core.datasource;
 
 import com.asml.apa.wta.core.exceptions.BashCommandExecutionException;
 import com.asml.apa.wta.core.utils.BashUtils;
+import lombok.extern.slf4j.Slf4j;
+
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
@@ -11,6 +13,7 @@ import java.util.concurrent.ExecutionException;
  * @author Atour Mousavi Gourabi
  * @since 1.0.0
  */
+@Slf4j
 public class PerfDataSource {
 
   private final BashUtils bashUtils;
@@ -35,11 +38,12 @@ public class PerfDataSource {
    */
   public boolean isAvailable() {
     try {
-      return bashUtils
-          .executeCommand("perf list | grep -w 'power/energy-pkg/'")
+      return bashUtils.executeCommand("perf list | grep -w 'power/energy-pkg/' | awk '{print $1}'")
           .get()
           .equals("power/energy-pkg/");
     } catch (BashCommandExecutionException | ExecutionException | InterruptedException e) {
+      log.error("Something went wrong while trying to execute the bash command. The cause is: {}",
+          e.getCause().toString());
       return false;
     }
   }
