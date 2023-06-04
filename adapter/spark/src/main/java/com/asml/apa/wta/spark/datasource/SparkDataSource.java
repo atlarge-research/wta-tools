@@ -42,7 +42,6 @@ public class SparkDataSource implements CollectorInterface {
   public SparkDataSource(SparkContext sparkContext, RuntimeConfig config) {
     stageLevelListener = new StageLevelListener(sparkContext, config);
     taskLevelListener = new TaskLevelListener(sparkContext, config);
-    stageLevelListener = new StageLevelListener(sparkContext, config);
     if (config.isStageLevel()) {
       jobLevelListener = new JobLevelListener(sparkContext, config, stageLevelListener);
     } else {
@@ -50,6 +49,7 @@ public class SparkDataSource implements CollectorInterface {
     }
     applicationLevelListener = new ApplicationLevelListener(
         sparkContext, config, jobLevelListener, taskLevelListener, stageLevelListener);
+    runtimeConfig = config;
   }
 
   /**
