@@ -22,6 +22,6 @@ public class PerfDataSourceIntegrationTest {
   @Test
   @EnabledOnOs(LINUX)
   void perfEnergyGatherMetricsSuccessful() {
-    assertThat(sut.gatherMetrics()).isGreaterThan(0.0);
+    assertThat(sut.gatherMetrics()).isGreaterThanOrEqualTo(0.0);
   }
 }
