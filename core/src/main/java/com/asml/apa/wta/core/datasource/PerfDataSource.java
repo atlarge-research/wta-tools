@@ -58,8 +58,9 @@ public class PerfDataSource {
    */
   public double gatherMetrics() {
     try {
-      CompletableFuture<String> energyMetrics = bashUtils.executeCommand(
-          "perf stat -e power/energy-pkg/ -a sleep 1 2>&1 | grep -oP '^\\s+\\K[0-9]+[.,][0-9]+(?=\\s+Joules)' | sed 's/,/./g'");
+      CompletableFuture<String> energyMetrics =
+          bashUtils.executeCommand("perf stat -e power/energy-pkg/ -a sleep 1 2>&1 | "
+              + "grep -oP '^\\s+\\K[0-9]+[.,][0-9]+(?=\\s+Joules)' | sed 's/,/./g'");
       return Double.parseDouble(energyMetrics.get());
     } catch (NumberFormatException e) {
       throw new NumberFormatException("The captured string can not be parsed into a double.");
