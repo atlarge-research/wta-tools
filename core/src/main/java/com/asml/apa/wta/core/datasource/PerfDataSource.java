@@ -2,10 +2,9 @@ package com.asml.apa.wta.core.datasource;
 
 import com.asml.apa.wta.core.exceptions.BashCommandExecutionException;
 import com.asml.apa.wta.core.utils.BashUtils;
-import lombok.extern.slf4j.Slf4j;
-
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * PerfDataSource class.
@@ -39,7 +38,8 @@ public class PerfDataSource {
    */
   public boolean isAvailable() {
     try {
-      return bashUtils.executeCommand("perf list | grep -w 'power/energy-pkg/' | awk '{print $1}'")
+      return bashUtils
+          .executeCommand("perf list | grep -w 'power/energy-pkg/' | awk '{print $1}'")
           .get()
           .equals("power/energy-pkg/");
     } catch (BashCommandExecutionException | ExecutionException | InterruptedException e) {
@@ -63,7 +63,7 @@ public class PerfDataSource {
       return Double.parseDouble(energyMetrics.get());
     } catch (NumberFormatException e) {
       throw new NumberFormatException("The captured string can not be parsed into a double.");
-    } catch (BashCommandExecutionException | ExecutionException | InterruptedException | NullPointerException e) {
+    } catch (BashCommandExecutionException | ExecutionException | InterruptedException e) {
       log.error("Error occurred while gathering perf energy metrics");
       return 0.0;
     }

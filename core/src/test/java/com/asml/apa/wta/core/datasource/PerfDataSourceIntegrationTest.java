@@ -1,9 +1,9 @@
 package com.asml.apa.wta.core.datasource;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.asml.apa.wta.core.utils.BashUtils;
 import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 public class PerfDataSourceIntegrationTest {
 
