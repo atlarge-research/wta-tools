@@ -33,6 +33,11 @@ integration-tests-core:
     - apt-get install -y linux-tools-`uname -r`
     - sysctl -w kernel.perf_event_paranoid=0
     - "mvn -pl core jacoco:prepare-agent-integration failsafe:integration-test failsafe:verify jacoco:report-integration"
+    - "perf stat -e power/energy-pkg/ -a sleep 1 2>&1 | grep -oP '^\\s+\\K[0-9]+[,\\.][0-9]+(?=\\s+Joules)' | sed 's/,/./g'"
+    - "perf stat -e power/energy-pkg/ -a sleep 1 2>&1 | grep -oP '^\\s+\\K[0-9]+[,\\.][0-9]+(?=\\s+Joules)'"
+    - "perf stat -e power/energy-pkg/ -a sleep 1 2>&1"
+    - "perf stat -e power/energy-pkg/ -a sleep 1 | grep -oP '^\\s+\\K[0-9]+[,\\.][0-9]+(?=\\s+Joules)'"
+    - "perf stat -e power/energy-pkg/ -a sleep 1"
     - "[ -f core/target/jacoco-it.exec ] && mv -f core/target/jacoco-it.exec core/target/jacoco-integration-tests.exec || echo '0' >/dev/null"
   artifacts:
     name: integration-tests-core
