@@ -6,5 +6,7 @@
     "f1": "v1",
     "f2": "v2"
   },
-  "logLevel": "INFO"
+  "logLevel": "INFO",
+  "isStageLevel": "true",
+  "outputPath": "wta-output"
 }

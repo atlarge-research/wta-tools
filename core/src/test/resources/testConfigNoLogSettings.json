@@ -5,5 +5,7 @@
   "events": {
     "f1": "v1",
     "f2": "v2"
-  }
+  },
+  "isStageLevel": "true",
+  "outputPath": "/home/user/WTA"
 }

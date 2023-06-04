@@ -28,6 +28,7 @@ public class SparkDataSource implements CollectorInterface {
 
   private final ApplicationLevelListener applicationLevelListener;
 
+  private final RuntimeConfig runtimeConfig;
   /**
    * Constructor for the Spark data source. This requires a Spark context to ensure a Spark session
    * is available before the data source is initialized.
@@ -41,9 +42,14 @@ public class SparkDataSource implements CollectorInterface {
   public SparkDataSource(SparkContext sparkContext, RuntimeConfig config) {
     stageLevelListener = new StageLevelListener(sparkContext, config);
     taskLevelListener = new TaskLevelListener(sparkContext, config);
-    jobLevelListener = new JobLevelListener(sparkContext, config, taskLevelListener);
+    if (config.isStageLevel()) {
+      jobLevelListener = new JobLevelListener(sparkContext, config, stageLevelListener);
+    } else {
+      jobLevelListener = new JobLevelListener(sparkContext, config, taskLevelListener);
+    }
     applicationLevelListener = new ApplicationLevelListener(
         sparkContext, config, jobLevelListener, taskLevelListener, stageLevelListener);
+    runtimeConfig = config;
   }
 
   /**
@@ -116,5 +122,25 @@ public class SparkDataSource implements CollectorInterface {
    */
   public void removeApplicationListener() {
     applicationLevelListener.remove();
+  }
+
+  /**
+   * This method registers a stage listener to the Spark context.
+   *
+   * @author Lohithsai Yadala Chanchu
+   * @since 1.0.0
+   */
+  public void registerStageListener() {
+    stageLevelListener.register();
+  }
+
+  /**
+   * This method removes a stage listener from the Spark context.
+   *
+   * @author Lohithsai Yadala Chanchu
+   * @since 1.0.0
+   */
+  public void removeStageListener() {
+    stageLevelListener.remove();
   }
 }
