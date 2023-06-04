@@ -23,7 +23,7 @@ class SparkSupplierExtractionEngineTest {
     mockPluginContext = mock(PluginContext.class);
     when(mockPluginContext.executorID()).thenReturn("test-executor-id");
 
-    sutSupplierExtractionEngine = spy(new SparkSupplierExtractionEngine(mockPluginContext));
+    sutSupplierExtractionEngine = spy(new SparkSupplierExtractionEngine(1000, mockPluginContext, 2000));
   }
 
   @AfterEach

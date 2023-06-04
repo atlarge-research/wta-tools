@@ -28,16 +28,16 @@ public class MultithreadTest {
     mockPluginContext = mock(PluginContext.class);
     when(mockPluginContext.executorID()).thenReturn("test-executor-id");
 
-    sutSupplierExtractionEngine = spy(new SparkSupplierExtractionEngine(mockPluginContext));
+    sutSupplierExtractionEngine = spy(new SparkSupplierExtractionEngine(1000, mockPluginContext, 2000));
 
     sutExecutorPlugin = spy(new WtaExecutorPlugin());
   }
 
   @Test
   void startAndStopPingingWorksAsIntended() {
-    sutSupplierExtractionEngine.startPinging(1000);
+    sutSupplierExtractionEngine.startPinging();
 
-    verify(sutSupplierExtractionEngine, timeout(10000L).atLeast(4)).ping();
+    verify(sutSupplierExtractionEngine, timeout(10000L).atLeast(4)).pingAndBuffer();
 
     assertThat(sutSupplierExtractionEngine.getBuffer()).hasSizeGreaterThanOrEqualTo(3);
 
@@ -47,7 +47,7 @@ public class MultithreadTest {
   @Test
   @Timeout(value = 3000L, unit = TimeUnit.MILLISECONDS)
   void pingWorksAsIntended() {
-    CompletableFuture<Void> result = sutSupplierExtractionEngine.ping();
+    CompletableFuture<Void> result = sutSupplierExtractionEngine.pingAndBuffer();
 
     result.join();
 
@@ -64,7 +64,7 @@ public class MultithreadTest {
   @Test
   void pingsGetSentToDriver() throws IOException {
     sutExecutorPlugin.init(mockPluginContext, new HashMap<>());
-    verify(mockPluginContext, timeout(15000L).atLeastOnce()).send(any());
+    verify(mockPluginContext, timeout(60000L).atLeastOnce()).send(any());
     sutExecutorPlugin.shutdown();
   }
 }

@@ -25,19 +25,23 @@ public abstract class SupplierExtractionEngine<T extends BaseSupplierDto> {
 
   private final IostatSupplier iostatSupplier;
 
+  private final int resourcePingInterval;
+
   @Getter
   private final Collection<T> buffer = new ArrayList<>();
 
-  private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+  private final ScheduledExecutorService resourcePinger = Executors.newScheduledThreadPool(1);
 
   /**
    * Constructor for the resource extraction engine.
    * Suppliers should be injected here.
    *
+   * @param resourcePingInterval How often to ping the suppliers, in milliseconds
    * @author Henry Page
    * @since 1.0.0
    */
-  public SupplierExtractionEngine() {
+  public SupplierExtractionEngine(int resourcePingInterval) {
+    this.resourcePingInterval = resourcePingInterval;
     this.operatingSystemSupplier = new OperatingSystemSupplier();
     this.iostatSupplier = new IostatSupplier();
   }
@@ -46,33 +50,41 @@ public abstract class SupplierExtractionEngine<T extends BaseSupplierDto> {
    * Ping the suppliers and add the results to the buffer.
    * Developers are encouraged to override this to add/remove additional information.
    *
-   * @return A completablefuture that completes when the result has been resolved
+   * @return A {@link CompletableFuture} that completes when the result has been resolved
    * @author Henry Page
    * @since 1.0.0
    */
-  public CompletableFuture<Void> ping() {
+  protected CompletableFuture<T> ping() {
     CompletableFuture<OsInfoDto> osInfoDtoCompletableFuture = this.operatingSystemSupplier.getSnapshot();
     CompletableFuture<IostatDto> iostatDtoCompletableFuture = this.iostatSupplier.getSnapshot();
 
     return CompletableFuture.allOf(osInfoDtoCompletableFuture, iostatDtoCompletableFuture)
-        .thenRunAsync(() -> {
+        .thenCompose((v) -> {
           LocalDateTime timestamp = LocalDateTime.now();
           OsInfoDto osInfoDto = osInfoDtoCompletableFuture.join();
           IostatDto iostatDto = iostatDtoCompletableFuture.join();
-
-          buffer.add(transform(new BaseSupplierDto(timestamp, osInfoDto, iostatDto)));
+          return CompletableFuture.completedFuture(
+              transform(new BaseSupplierDto(timestamp, osInfoDto, iostatDto)));
         });
+  }
+
+  /**
+   * Ping the suppliers and add the results to the buffer. This is done asynchronously.
+   *
+   * @return A {@link CompletableFuture} representing the result of the ping operation
+   */
+  public CompletableFuture<Void> pingAndBuffer() {
+    return ping().thenAccept(buffer::add);
   }
 
   /**
    * Starts pinging the suppliers at a fixed rate.
    *
-   * @param resourcePingInterval How often to ping the suppliers, in milliseconds
    * @author Henry Page
    * @since 1.0.0
    */
-  public void startPinging(int resourcePingInterval) {
-    scheduler.scheduleAtFixedRate(this::ping, 0, resourcePingInterval, TimeUnit.MILLISECONDS);
+  public void startPinging() {
+    resourcePinger.scheduleAtFixedRate(this::pingAndBuffer, 0, resourcePingInterval, TimeUnit.MILLISECONDS);
   }
 
   /**
@@ -82,7 +94,7 @@ public abstract class SupplierExtractionEngine<T extends BaseSupplierDto> {
    * @since 1.0.0
    */
   public void stopPinging() {
-    scheduler.shutdown();
+    resourcePinger.shutdown();
   }
 
   /**

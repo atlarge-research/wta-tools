@@ -42,10 +42,32 @@ public class RuntimeConfig {
   private boolean isStageLevel = false;
 
   @Builder.Default
-  private int resourcePingInterval = 1000;
+  private int resourcePingInterval = defaultResourcePingInterval();
 
   @Builder.Default
-  private int executorSynchronizationInterval = 2000;
+  private int executorSynchronizationInterval = defaultExecutorSynchronizationInterval();
 
   private String outputPath;
+
+  /**
+   * Default resource ping interval, specified at 1000ms.
+   *
+   * @return 1000 as the default resource ping interval
+   * @author Henry Page
+   * @since 1.0.0
+   */
+  public static int defaultResourcePingInterval() {
+    return 1000;
+  }
+
+  /**
+   * Default executor synchronization interval, specified at 2000ms.
+   *
+   * @return 2000 as the default executor synchronization interval
+   * @author Henry Page
+   * @since 1.0.0
+   */
+  public static int defaultExecutorSynchronizationInterval() {
+    return 2000;
+  }
 }
