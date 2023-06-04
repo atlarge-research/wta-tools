@@ -39,7 +39,7 @@ The diagram above illustrates the workflow of the adapter.
     ```bash
     apt-get install linux-perf
     ```
-  
+
     On CentOS / RHEL:
 
     ```bash
