@@ -56,6 +56,14 @@ package-spark-adapter-e2e_2.12:
     expire_in: 20 minutes
     paths:
       - adapter/spark/target/*-e2e.jar
+  cache:
+    - key:
+        prefix: test
+        files:
+          - pom.xml
+          - core/pom.xml
+      paths:
+        - .m2/repository
 
 package-spark-adapter-e2e_2.13:
   stage: build
