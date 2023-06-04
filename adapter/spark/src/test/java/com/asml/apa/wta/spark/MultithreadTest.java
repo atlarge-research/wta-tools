@@ -9,8 +9,8 @@ import com.asml.apa.wta.spark.dto.SparkBaseSupplierWrapperDto;
 import com.asml.apa.wta.spark.executor.engine.SparkSupplierExtractionEngine;
 import com.asml.apa.wta.spark.executor.plugin.WtaExecutorPlugin;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import org.apache.spark.api.plugin.PluginContext;
@@ -95,7 +95,8 @@ public class MultithreadTest {
 
   @Test
   void pingsGetSentToDriver() throws IOException {
-    sutExecutorPlugin.init(mockPluginContext, new HashMap<>());
+    sutExecutorPlugin.init(
+        mockPluginContext, Map.of("executorSynchronizationInterval", "2000", "resourcePingInterval", "1000"));
     verify(mockPluginContext, timeout(10000L).atLeastOnce()).send(any());
     sutExecutorPlugin.shutdown();
   }

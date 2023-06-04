@@ -1,6 +1,5 @@
 package com.asml.apa.wta.spark.executor.plugin;
 
-import com.asml.apa.wta.core.config.RuntimeConfig;
 import com.asml.apa.wta.spark.WtaPlugin;
 import com.asml.apa.wta.spark.driver.WtaDriverPlugin;
 import com.asml.apa.wta.spark.executor.engine.SparkSupplierExtractionEngine;
@@ -39,13 +38,9 @@ public class WtaExecutorPlugin implements ExecutorPlugin {
    */
   @Override
   public void init(PluginContext pCtx, Map<String, String> extraConf) {
-    int resourcePingInterval = extraConf.get("resourcePingInterval") == null
-        ? RuntimeConfig.defaultResourcePingInterval()
-        : Integer.parseInt(extraConf.get("resourcePingInterval"));
+    int resourcePingInterval = Integer.parseInt(extraConf.get("resourcePingInterval"));
 
-    int executorSynchronizationInterval = extraConf.get("executorSynchronizationInterval") == null
-        ? RuntimeConfig.defaultExecutorSynchronizationInterval()
-        : Integer.parseInt(extraConf.get("executorSynchronizationInterval"));
+    int executorSynchronizationInterval = Integer.parseInt(extraConf.get("executorSynchronizationInterval"));
 
     this.supplierEngine =
         new SparkSupplierExtractionEngine(resourcePingInterval, pCtx, executorSynchronizationInterval);
