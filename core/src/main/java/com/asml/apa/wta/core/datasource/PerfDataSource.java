@@ -64,6 +64,7 @@ public class PerfDataSource {
     } catch (NumberFormatException e) {
       throw new NumberFormatException("The captured string can not be parsed into a double.");
     } catch (BashCommandExecutionException | ExecutionException | InterruptedException | NullPointerException e) {
+      e.printStackTrace();
       log.error("Error occurred while gathering perf energy metrics");
       return 0.0;
     }
