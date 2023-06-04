@@ -31,6 +31,7 @@ integration-tests-spark-adapter:
   script:
     - echo "Spark adapter integration tests started"
     - apt-get install -y linux-tools-`uname -r`
+    - sysctl -w kernel.perf_event_paranoid=0
     - "mvn -pl adapter/spark jacoco:prepare-agent-integration failsafe:integration-test failsafe:verify jacoco:report-integration"
     - "[ -f adapter/spark/target/jacoco-it.exec ] && mv -f adapter/spark/target/jacoco-it.exec adapter/spark/target/jacoco-integration-tests.exec || echo '0' >/dev/null"
   artifacts:
@@ -97,6 +98,7 @@ e2e-spark-adapter_2.12:
     - echo "Spark adapter end-to-end run started"
     - echo "This job does not provide coverage metrics, it just verifies the system as a whole functions to some degree"
     - apt-get install -y linux-tools-`uname -r`
+    - sysctl -w kernel.perf_event_paranoid=0
     - spark-submit --class com.asml.apa.wta.spark.EndToEnd --master local[1] adapter/spark/target/spark-1.0-SNAPSHOT-e2e.jar adapter/spark/src/test/resources/config.json wta-output adapter/spark/src/test/resources/wordcount.txt
     - if ! [ -n "$(ls -A wta-output 2>/dev/null)" ] ; then exit 1 ; fi
   artifacts:
@@ -132,6 +134,8 @@ e2e-spark-adapter_2.13:
   script:
     - echo "Spark adapter end-to-end run started"
     - echo "This job does not provide coverage metrics, it just verifies the system as a whole functions to some degree"
+    - apt-get install -y linux-tools-`uname -r`
+    - sysctl -w kernel.perf_event_paranoid=0
     - spark-submit --class com.asml.apa.wta.spark.EndToEnd --master local[1] adapter/spark/target/spark-1.0-SNAPSHOT-e2e.jar adapter/spark/src/test/resources/config.json wta-output adapter/spark/src/test/resources/wordcount.txt
     - if ! [ -n "$(ls -A wta-output 2>/dev/null)" ] ; then exit 1 ; fi
   artifacts:
