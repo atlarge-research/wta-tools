@@ -1,6 +1,8 @@
 package com.asml.apa.wta.core.datasource;
 
-import com.asml.apa.wta.core.datasource.iodependencies.BashUtils;
+import com.asml.apa.wta.core.utils.BashUtils;
+import com.asml.apa.wta.core.exceptions.BashCommandExecutionException;
+
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
@@ -38,7 +40,7 @@ public class PerfDataSource {
           .executeCommand("perf list | grep -w 'power/energy-pkg/'")
           .get()
           .equals("power/energy-pkg/");
-    } catch (ExecutionException | InterruptedException e) {
+    } catch (BashCommandExecutionException | ExecutionException | InterruptedException e) {
       return false;
     }
   }

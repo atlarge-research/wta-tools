@@ -1,9 +1,11 @@
-package com.asml.apa.wta.core.datasource.iodependencies;
+package com.asml.apa.wta.core.utils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.concurrent.CompletableFuture;
+
+import com.asml.apa.wta.core.exceptions.BashCommandExecutionException;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -32,12 +34,6 @@ public class BashUtils {
         throw new BashCommandExecutionException("Error executing bash command", e);
       }
     });
-  }
-
-  public class BashCommandExecutionException extends RuntimeException {
-    public BashCommandExecutionException(String message, Throwable cause) {
-      super(message, cause);
-    }
   }
 
   /**
