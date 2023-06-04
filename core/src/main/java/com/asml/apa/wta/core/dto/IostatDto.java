@@ -1,6 +1,5 @@
 package com.asml.apa.wta.core.dto;
 
-import java.time.Instant;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -26,8 +25,4 @@ public class IostatDto implements SupplierDto {
   private double kiloByteRead;
   private double kiloByteWrtn;
   private double kiloByteDscd;
-  private String executorId;
-
-  @Builder.Default
-  private long timestamp = Instant.now().toEpochMilli();
 }

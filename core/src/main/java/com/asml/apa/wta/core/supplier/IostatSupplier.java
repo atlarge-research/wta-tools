@@ -4,7 +4,6 @@ import com.asml.apa.wta.core.dto.IostatDto;
 import com.asml.apa.wta.core.utils.BashUtils;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -15,16 +14,33 @@ import lombok.extern.slf4j.Slf4j;
  * @since 1.0.0
  */
 @Slf4j
-@RequiredArgsConstructor
 public class IostatSupplier implements InformationSupplier<IostatDto> {
 
   private final BashUtils bashUtils;
 
+  private boolean isAvailable;
+
+  /**
+   * Constructs the supplier with a given instance of bash utils.
+   *
+   * @param bashUtils The bash utils instance to use
+   * @author Henry Page
+   * @since 1.0.0
+   */
+  public IostatSupplier(BashUtils bashUtils) {
+    this.bashUtils = bashUtils;
+    this.isAvailable = isAvailable();
+  }
+
   /**
    * Uses an arbitrary instance of bash utils.
+   *
+   * @author Henry Page
+   * @since 1.0.0
    */
   public IostatSupplier() {
     this(new BashUtils());
+    this.isAvailable = isAvailable();
   }
 
   /**
@@ -51,7 +67,7 @@ public class IostatSupplier implements InformationSupplier<IostatDto> {
   }
 
   /**
-   * Uses the Iostat dependency to get io metrics (computed asynchronously).
+   * Uses the iostat dependency to get io metrics (computed asynchronously).
    *
    * @return IostatDto object that will be sent to the driver (with the necessary information filled out)
    * @author Lohithsai Yadala Chanchu
@@ -60,7 +76,7 @@ public class IostatSupplier implements InformationSupplier<IostatDto> {
    */
   @Override
   public CompletableFuture<IostatDto> getSnapshot() {
-    if (!isAvailable()) {
+    if (!this.isAvailable) {
       return notAvailableResult();
     }
 

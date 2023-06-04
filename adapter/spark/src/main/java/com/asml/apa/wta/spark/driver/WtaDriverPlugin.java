@@ -63,10 +63,6 @@ public class WtaDriverPlugin implements DriverPlugin {
       parquetUtil = new ParquetWriterUtils(new File(runtimeConfig.getOutputPath()), "schema-1.0");
       parquetUtil.deletePreExistingFiles();
       initListeners();
-      if (runtimeConfig.getResourcePingInterval() <= 0) {
-        log.error("Resource ping interval must be greater than 0");
-        throw new IllegalArgumentException("Resource ping interval must be greater than 0");
-      }
       executorVars.put("resourcePingInterval", String.valueOf(runtimeConfig.getResourcePingInterval()));
       executorVars.put(
           "executorSynchronizationInterval",

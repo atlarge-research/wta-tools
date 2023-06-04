@@ -16,6 +16,8 @@ public class OperatingSystemSupplier implements InformationSupplier<OsInfoDto> {
 
   private final OperatingSystemMXBean bean;
 
+  private boolean isAvailable;
+
   /**
    * Constructs the Supplier.
    *
@@ -24,6 +26,7 @@ public class OperatingSystemSupplier implements InformationSupplier<OsInfoDto> {
    */
   public OperatingSystemSupplier() {
     bean = (OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
+    this.isAvailable = isAvailable();
   }
 
   /**
@@ -149,7 +152,7 @@ public class OperatingSystemSupplier implements InformationSupplier<OsInfoDto> {
    */
   @Override
   public CompletableFuture<OsInfoDto> getSnapshot() {
-    if (!isAvailable()) {
+    if (!isAvailable) {
       return notAvailableResult();
     }
 

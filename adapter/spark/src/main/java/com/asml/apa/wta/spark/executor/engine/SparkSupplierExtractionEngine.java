@@ -45,10 +45,12 @@ public class SparkSupplierExtractionEngine extends SupplierExtractionEngine<Spar
   }
 
   /**
-   * Overriden method to ping the resource and buffer the result.
+   * Overridden method to ping the resource and buffer the result.
    * If a non-positive executor synchronization interval is set, the result is sent immediately.
    *
    * @return A {@link CompletableFuture} representing the result of the ping and buffer operation
+   * @author Henry Page
+   * @since 1.0.0
    */
   @Override
   public CompletableFuture<Void> pingAndBuffer() {
@@ -99,11 +101,10 @@ public class SparkSupplierExtractionEngine extends SupplierExtractionEngine<Spar
    * @since 1.0.0
    */
   public void startSynchonizing() {
-    if (this.executorSynchronizationInterval <= 0) {
-      return;
+    if (this.executorSynchronizationInterval > 0) {
+      this.bufferSynchronizer.scheduleAtFixedRate(
+          this::sendBuffer, 0, executorSynchronizationInterval, TimeUnit.MILLISECONDS);
     }
-    this.bufferSynchronizer.scheduleAtFixedRate(
-        this::sendBuffer, 0, executorSynchronizationInterval, TimeUnit.MILLISECONDS);
   }
 
   /**
