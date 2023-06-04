@@ -1,7 +1,8 @@
-package com.asml.apa.wta.spark.executor;
+package com.asml.apa.wta.spark.executor.plugin;
 
 import com.asml.apa.wta.spark.WtaPlugin;
 import com.asml.apa.wta.spark.driver.WtaDriverPlugin;
+import com.asml.apa.wta.spark.executor.engine.SparkSupplierExtractionEngine;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.spark.SparkContext;
@@ -19,7 +20,7 @@ import org.apache.spark.api.plugin.PluginContext;
 @Slf4j
 public class WtaExecutorPlugin implements ExecutorPlugin {
 
-  private PluginContext pluginContext;
+  private SparkSupplierExtractionEngine supplierEngine;
 
   /**
    * This method is called when the plugin is initialized on the executor.
@@ -31,10 +32,20 @@ public class WtaExecutorPlugin implements ExecutorPlugin {
    *                  is directly returned from {@link WtaDriverPlugin#init(SparkContext, PluginContext)}
    * @see WtaPlugin#executorPlugin() where a new instance of the plugin is created. This gets called as soon
    * as it is loaded on to the executor.
+   *
+   * @author Henry Page
+   * @since 1.0.0
    */
   @Override
   public void init(PluginContext pCtx, Map<String, String> extraConf) {
-    pluginContext = pCtx;
+    int resourcePingInterval = Integer.parseInt(extraConf.get("resourcePingInterval"));
+
+    int executorSynchronizationInterval = Integer.parseInt(extraConf.get("executorSynchronizationInterval"));
+
+    this.supplierEngine =
+        new SparkSupplierExtractionEngine(resourcePingInterval, pCtx, executorSynchronizationInterval);
+    this.supplierEngine.startPinging();
+    this.supplierEngine.startSynchonizing();
   }
 
   /**
@@ -42,6 +53,9 @@ public class WtaExecutorPlugin implements ExecutorPlugin {
    * Developers should note that expensive operations should be avoided, since it gets called on every task.
    * Exceptions thrown here are not propagated, meaning a task won't fail if this method throws an exception.
    * <a href="https://spark.apache.org/docs/3.2.1/api/java/org/apache/spark/api/plugin/ExecutorPlugin.html#init-org.apache.spark.api.plugin.PluginContext-java.util.Map-">Refer to the docs</a> for more information.
+   *
+   * @author Henry Page
+   * @since 1.0.0
    */
   @Override
   public void onTaskStart() {}
@@ -49,6 +63,9 @@ public class WtaExecutorPlugin implements ExecutorPlugin {
   /**
    * Gets called when a task is successfully completed.
    * Gets called even if {@link #onTaskStart()} threw an exception.
+   *
+   * @author Henry Page
+   * @since 1.0.0
    */
   @Override
   public void onTaskSucceeded() {}
@@ -57,13 +74,22 @@ public class WtaExecutorPlugin implements ExecutorPlugin {
    * Gets called if a task fails.
    *
    * @param failureReason The reason the task failed, accessible through a string.
+   *
+   * @author Henry Page
+   * @since 1.0.0
    */
   @Override
   public void onTaskFailed(TaskFailedReason failureReason) {}
 
   /**
    * Gets called just before shutdown. Blocks executor shutdown until it is completed.
+   *
+   * @author Henry Page
+   * @since 1.0.0
    */
   @Override
-  public void shutdown() {}
+  public void shutdown() {
+    this.supplierEngine.stopPinging();
+    this.supplierEngine.stopSynchronizing();
+  }
 }

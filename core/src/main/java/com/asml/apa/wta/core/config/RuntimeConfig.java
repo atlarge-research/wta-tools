@@ -9,6 +9,15 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+/**
+ * Config class for the plugin.
+ *
+ * @author Henry Page
+ * @author Lohithsai Yadala Chanchu
+ * @author Pil Kyu Cho
+ * @author Atour Mousavi Gourabi
+ * @since 1.0.0
+ */
 @Getter
 @Setter
 @Builder
@@ -31,6 +40,12 @@ public class RuntimeConfig {
 
   @Builder.Default
   private boolean isStageLevel = false;
+
+  @Builder.Default
+  private int resourcePingInterval = 1000;
+
+  @Builder.Default
+  private int executorSynchronizationInterval = 2000;
 
   private String outputPath;
 }

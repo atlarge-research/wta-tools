@@ -1,4 +1,4 @@
-package com.asml.apa.wta.core.datasource.iodependencies;
+package com.asml.apa.wta.core.utils;
 
 import java.io.BufferedReader;
 import java.io.IOException;

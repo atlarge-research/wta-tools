@@ -56,6 +56,9 @@ public class WtaUtils {
       } else if (config.getOutputPath() == null) {
         log.error("The config file does not specify an output path, this field is mandatory.");
         throw new IllegalArgumentException("The config file does not specify the output path");
+      } else if (config.getResourcePingInterval() <= 0) {
+        log.error("Resource ping interval must be greater than 0");
+        throw new IllegalArgumentException("Resource ping interval must be greater than 0");
       }
       return config;
     } catch (JsonParseException e) {

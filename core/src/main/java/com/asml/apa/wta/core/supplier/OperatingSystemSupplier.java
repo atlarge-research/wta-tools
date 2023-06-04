@@ -1,37 +1,43 @@
-package com.asml.apa.wta.core.datasource;
+package com.asml.apa.wta.core.supplier;
 
-import com.asml.apa.wta.core.dto.OperatingSystemDataSourceDto;
+import com.asml.apa.wta.core.dto.OsInfoDto;
 import com.sun.management.OperatingSystemMXBean;
 import java.lang.management.ManagementFactory;
+import java.util.concurrent.CompletableFuture;
 
 /**
- * Data source that uses Java's operating system MBean to gain access to resource information.
+ * Supplier that uses Java's operating system MBean to gain access to resource information.
  *
  * @author Atour Mousavi Gourabi
+ * @author Henry Page
  * @since 1.0.0
  */
-public class OperatingSystemDataSource {
+public class OperatingSystemSupplier implements InformationSupplier<OsInfoDto> {
 
   private final OperatingSystemMXBean bean;
 
+  private boolean isAvailable;
+
   /**
-   * Constructs the data source.
+   * Constructs the Supplier.
    *
    * @author Atour Mousavi Gourabi
    * @since 1.0.0
    */
-  public OperatingSystemDataSource() {
+  public OperatingSystemSupplier() {
     bean = (OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
+    this.isAvailable = isAvailable();
   }
 
   /**
-   * Verifies the validity of the data source.
+   * Verifies that the supplier is available.
    *
-   * @return a {@code boolean} indicating the validity of this data source
+   * @return a {@code boolean} indicating the validity of this supplier
    * @author Atour Mousavi Gourabi
    * @since 1.0.0
    */
-  public boolean isValid() {
+  @Override
+  public boolean isAvailable() {
     return bean != null;
   }
 
@@ -127,21 +133,47 @@ public class OperatingSystemDataSource {
   }
 
   /**
-   * Gathers the metrics the data source provides.
+   * Retrieves the architecture abbreviation.
    *
-   * @return an {@link OperatingSystemDataSourceDto} containing the gathered metrics
+   * @return The underlying architecture e.g. amd64
+   * @author Henry Page
+   * @since 1.0.0
+   */
+  public String getArch() {
+    return bean.getArch();
+  }
+
+  /**
+   * Gathers the metrics the supplier provides (computed asynchronously).
+   *
+   * @return an {@link OsInfoDto} containing the gathered metrics
    * @author Atour Mousavi Gourabi
    * @since 1.0.0
    */
-  public OperatingSystemDataSourceDto gatherMetrics() {
-    long vMemSize = getCommittedVirtualMemorySize();
-    long freeMemSize = getFreePhysicalMemorySize();
-    double cpuLoad = getProcessCpuLoad();
-    long cpuTime = getProcessCpuTime();
-    long totalMemSize = getTotalPhysicalMemorySize();
-    int availableProc = getAvailableProcessors();
-    double systemLoadAverage = getSystemLoadAverage();
-    return new OperatingSystemDataSourceDto(
-        vMemSize, freeMemSize, cpuLoad, cpuTime, totalMemSize, availableProc, systemLoadAverage);
+  @Override
+  public CompletableFuture<OsInfoDto> getSnapshot() {
+    if (!isAvailable) {
+      return notAvailableResult();
+    }
+
+    return CompletableFuture.supplyAsync(() -> {
+      long vMemSize = getCommittedVirtualMemorySize();
+      long freeMemSize = getFreePhysicalMemorySize();
+      double cpuLoad = getProcessCpuLoad();
+      long cpuTime = getProcessCpuTime();
+      long totalMemSize = getTotalPhysicalMemorySize();
+      int availableProc = getAvailableProcessors();
+      double systemLoadAverage = getSystemLoadAverage();
+      String architecture = getArch();
+      return new OsInfoDto(
+          vMemSize,
+          freeMemSize,
+          cpuLoad,
+          cpuTime,
+          totalMemSize,
+          availableProc,
+          systemLoadAverage,
+          architecture);
+    });
   }
 }
