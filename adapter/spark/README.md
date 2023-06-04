@@ -52,7 +52,11 @@ spark-submit --class <main class path to spark application> --master local[1]
 --jars <plugin_jar_location> <Spark_jar_location>
 <optional arguments for spark application>
 ```
-- The parquet files should now be located in the `outputPath` as specified in the config file.
+- The Parquet files should now be located in the `outputPath` as specified in the config file.
+
+Note: this way, the plugin will be compiled for Scala 2.12. If you want to compile for a Scala 2.13 version of Spark,
+you will need to set the `spark.scala.version` flag to 2.13, such as in
+`mvn -pl adapter/spark -Dspark.scala.version=2.13 clean package`.
 
 ## Description
 This plugin will **not** block the main Spark application. Even if the plugin fails to initialise, the main Spark
