@@ -1,6 +1,6 @@
 package com.asml.apa.wta.core.datasource;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.condition.OS.LINUX;
 
 import com.asml.apa.wta.core.utils.BashUtils;
@@ -16,12 +16,12 @@ public class PerfDataSourceIntegrationTest {
   @Test()
   @EnabledOnOs(LINUX)
   void perfEnergyDataSourceIsAvailable() {
-    assertDoesNotThrow(sut::isAvailable);
+    assertThat(sut.isAvailable()).isTrue();
   }
 
   @Test
   @EnabledOnOs(LINUX)
   void perfEnergyGatherMetricsSuccessful() {
-    assertDoesNotThrow(sut::gatherMetrics);
+    assertThat(sut.gatherMetrics()).isGreaterThan(0.0);
   }
 }
