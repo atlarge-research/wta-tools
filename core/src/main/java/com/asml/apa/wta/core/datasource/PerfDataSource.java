@@ -42,7 +42,7 @@ public class PerfDataSource {
           .executeCommand("perf list | grep -w 'power/energy-pkg/' | awk '{print $1}'")
           .get()
           .equals("power/energy-pkg/");
-    } catch (BashCommandExecutionException | ExecutionException | InterruptedException e) {
+    } catch (BashCommandExecutionException | ExecutionException | InterruptedException | NullPointerException e) {
       log.error("Something went wrong while trying to execute the bash command.");
       return false;
     }
@@ -63,7 +63,7 @@ public class PerfDataSource {
       return Double.parseDouble(energyMetrics.get());
     } catch (NumberFormatException e) {
       throw new NumberFormatException("The captured string can not be parsed into a double.");
-    } catch (BashCommandExecutionException | ExecutionException | InterruptedException e) {
+    } catch (BashCommandExecutionException | ExecutionException | InterruptedException | NullPointerException e) {
       log.error("Error occurred while gathering perf energy metrics");
       return 0.0;
     }
