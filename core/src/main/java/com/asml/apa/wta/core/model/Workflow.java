@@ -61,8 +61,8 @@ public class Workflow implements BaseTraceObject {
 
   /**
    * Converts the POJO object into record object, enabling it to be written by Avro.
+   * It will put all fields allowed by the checker into the record.
    *
-   * @param workflow workflow
    * @param checker checker for which column to skip
    * @param schema schema
    * @return record
@@ -70,58 +70,58 @@ public class Workflow implements BaseTraceObject {
    * @author Tianchen Qu
    */
   @SuppressWarnings("CyclomaticComplexity")
-  public static GenericRecord convertWorkflowToRecord(Workflow workflow, Boolean[] checker, Schema schema) {
+  public GenericRecord convertToRecord(Boolean[] checker, Schema schema) {
     GenericData.Record record = new GenericData.Record(schema);
     if (checker[0]) {
-      record.put("id", workflow.id);
+      record.put("id", this.id);
     }
     if (checker[1]) {
-      record.put("ts_submit", workflow.submitTime);
+      record.put("ts_submit", this.submitTime);
     }
     if (checker[2]) {
-      record.put("tasks", Arrays.stream(workflow.tasks).map(Task::getId).toArray());
+      record.put("tasks", Arrays.stream(this.tasks).map(Task::getId).toArray());
     }
     if (checker[3]) {
-      record.put("task_count", workflow.numberOfTasks);
+      record.put("task_count", this.numberOfTasks);
     }
     if (checker[4]) {
-      record.put("critical_path_length", workflow.criticalPathLength);
+      record.put("critical_path_length", this.criticalPathLength);
     }
     if (checker[5]) {
-      record.put("critical_path_task_count", workflow.criticalPathTaskCount);
+      record.put("critical_path_task_count", this.criticalPathTaskCount);
     }
     if (checker[6]) {
-      record.put("max_concurrent_tasks", workflow.maxNumberOfConcurrentTasks);
+      record.put("max_concurrent_tasks", this.maxNumberOfConcurrentTasks);
     }
     if (checker[7]) {
-      record.put("nfrs", workflow.nfrs);
+      record.put("nfrs", this.nfrs);
     }
     if (checker[8]) {
-      record.put("scheduler", workflow.scheduler);
+      record.put("scheduler", this.scheduler);
     }
     if (checker[9]) {
-      record.put("domain", workflow.domain);
+      record.put("domain", this.domain);
     }
     if (checker[10]) {
-      record.put("application_name", workflow.applicationName);
+      record.put("application_name", this.applicationName);
     }
     if (checker[11]) {
-      record.put("application_field", workflow.applicationField);
+      record.put("application_field", this.applicationField);
     }
     if (checker[12]) {
-      record.put("total_resources", workflow.totalResources);
+      record.put("total_resources", this.totalResources);
     }
     if (checker[13]) {
-      record.put("total_memory_usage", workflow.totalMemoryUsage);
+      record.put("total_memory_usage", this.totalMemoryUsage);
     }
     if (checker[14]) {
-      record.put("total_network_usage", workflow.totalNetworkUsage);
+      record.put("total_network_usage", this.totalNetworkUsage);
     }
     if (checker[15]) {
-      record.put("total_disk_space_usage", workflow.totalDiskSpaceUsage);
+      record.put("total_disk_space_usage", this.totalDiskSpaceUsage);
     }
     if (checker[16]) {
-      record.put("total_energy_consumption", workflow.totalEnergyConsumption);
+      record.put("total_energy_consumption", this.totalEnergyConsumption);
     }
     return record;
   }

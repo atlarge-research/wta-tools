@@ -13,27 +13,25 @@
 
   <artifactId>spark</artifactId>
 
+  <properties>
+    <spark.scala.version>2.12</spark.scala.version>
+    <spark.support.version>3.2.4</spark.support.version>
+  </properties>
+
   <dependencies>
     <!-- https://mvnrepository.com/artifact/org.apache.spark/spark-core -->
     <dependency>
       <groupId>org.apache.spark</groupId>
-      <artifactId>spark-core_2.13</artifactId>
+      <artifactId>spark-core_${spark.scala.version}</artifactId>
       <version>${spark.support.version}</version>
       <scope>provided</scope>
     </dependency>
     <!-- https://mvnrepository.com/artifact/org.apache.spark/spark-sql -->
     <dependency>
       <groupId>org.apache.spark</groupId>
-      <artifactId>spark-sql_2.13</artifactId>
+      <artifactId>spark-sql_${spark.scala.version}</artifactId>
       <version>${spark.support.version}</version>
       <scope>test</scope>
-    </dependency>
-    <!-- https://mvnrepository.com/artifact/org.scala-lang/scala-library -->
-    <dependency>
-      <groupId>org.scala-lang</groupId>
-      <artifactId>scala-library</artifactId>
-      <version>2.13.5</version>
-      <scope>provided</scope>
     </dependency>
     <!-- internal dependency -->
     <dependency>
@@ -42,4 +40,50 @@
       <version>${project.version}</version>
     </dependency>
   </dependencies>
+
+  <profiles>
+    <profile>
+      <id>end-to-end</id>
+      <activation>
+        <property>
+          <name>e2e</name>
+          <value>true</value>
+        </property>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <version>${surefire.version}</version>
+            <configuration>
+              <excludes>
+                <exclude>**/*Test.java</exclude>
+              </excludes>
+            </configuration>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-compiler-plugin</artifactId>
+            <version>${maven.compiler.plugin.version}</version>
+            <configuration>
+              <testExcludes>
+                <exclude>**/*Test.java</exclude>
+              </testExcludes>
+            </configuration>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-assembly-plugin</artifactId>
+            <version>${maven.assembly.plugin.version}</version>
+            <configuration>
+              <descriptors>
+                <descriptor>config/assembly-e2e.xml</descriptor>
+              </descriptors>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 </project>
