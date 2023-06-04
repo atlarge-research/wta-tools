@@ -35,7 +35,7 @@ public class PerfDataSourceTest {
   }
 
   @Test
-  void perfEnergyGatherMetricsSuccessful() throws Exception {
+  void perfEnergyGatherMetricsSuccessful() {
     String energyStringDotDecimal = "12.34";
     when(bashUtils.executeCommand(anyString()))
         .thenReturn(CompletableFuture.completedFuture(energyStringDotDecimal));
@@ -44,7 +44,7 @@ public class PerfDataSourceTest {
   }
 
   @Test
-  void perfEnergyGatherMetricsCommaDecimalStringThrowsExeception() {
+  void perfEnergyGatherMetricsCommaDecimalStringThrowsException() {
     String energyStringCommaDecimal = "12,34";
     when(bashUtils.executeCommand(anyString()))
         .thenReturn(CompletableFuture.completedFuture(energyStringCommaDecimal));
