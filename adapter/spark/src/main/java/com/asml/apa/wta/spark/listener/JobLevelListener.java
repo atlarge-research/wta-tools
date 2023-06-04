@@ -6,15 +6,16 @@ import com.asml.apa.wta.core.model.Workflow;
 import com.asml.apa.wta.core.model.enums.Domain;
 
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import lombok.Getter;
 import org.apache.spark.SparkContext;
 import org.apache.spark.scheduler.SparkListenerJobEnd;
 import org.apache.spark.scheduler.SparkListenerJobStart;
+import scala.collection.JavaConverters;
 
 /**
  * This class is a job-level listener for the Spark data source.
@@ -27,22 +28,31 @@ public class JobLevelListener extends AbstractListener<Workflow> {
 
   private final AbstractListener<Task> taskListener;
 
+  private final StageLevelListener stageLevelListener;
+
   private final Map<Integer, Long> jobSubmitTimes = new ConcurrentHashMap<>();
 
   private int criticalPathTasks = -1;
 
+  private long jobStartTime = -1L;
+
+  private Collection<Object> stages;
+
   /**
    * Constructor for the job-level listener.
    *
-   * @param sparkContext The current spark context
-   * @param config Additional config specified by the user for the plugin
-   * @param taskListener The task-level listener to be used by this listener
+   * @param sparkContext       The current spark context
+   * @param config             Additional config specified by the user for the plugin
+   * @param taskListener       The task-level listener to be used by this listener
+   * @param stageLevelListener The stage-level listener
    * @author Henry Page
+   * @author Tianchen Qu
    * @since 1.0.0
    */
-  public JobLevelListener(SparkContext sparkContext, RuntimeConfig config, AbstractListener<Task> taskListener) {
+  public JobLevelListener(SparkContext sparkContext, RuntimeConfig config, AbstractListener<Task> taskListener, StageLevelListener stageLevelListener) {
     super(sparkContext, config);
     this.taskListener = taskListener;
+    this.stageLevelListener = stageLevelListener;
   }
 
   /**
@@ -55,6 +65,8 @@ public class JobLevelListener extends AbstractListener<Workflow> {
   public void onJobStart(SparkListenerJobStart jobStart) {
     jobSubmitTimes.put(jobStart.jobId() + 1, jobStart.time());
     criticalPathTasks = jobStart.stageIds().length();
+    jobStartTime = System.currentTimeMillis();
+    stages = JavaConverters.asJavaCollection(jobStart.stageIds());
   }
 
   /**
@@ -80,10 +92,12 @@ public class JobLevelListener extends AbstractListener<Workflow> {
     final double totalMemoryUsage = Arrays.stream(tasks).map(Task::getMemoryRequested).reduce(0.0, Double::sum);
     final long totalNetworkUsage = Arrays.stream(tasks).map(Task::getNetworkIoTime).reduce(0L, Long::sum);
     final double totalDiskSpaceUsage = Arrays.stream(tasks).map(Task::getDiskSpaceRequested).reduce(0.0, Double::sum);
-    final long totalEnergyConsumption = Arrays.stream(tasks).map(Task::getEnergyConsumption).reduce(0L, Long::sum);
-
+    final double totalEnergyConsumption = Arrays.stream(tasks).map(Task::getEnergyConsumption).reduce(0.0, Double::sum);
+    final long jobRunTime = System.currentTimeMillis() - jobStartTime;
+    final long driverTime = jobRunTime - stageLevelListener.processedObjects.stream().filter(x -> stages.contains(x.getId())).map(x -> x.getRuntime()).reduce(Long::sum).get();
+    final long criticalPathLength = driverTime; //wait for parent children mr
     // unknown
-    final int criticalPathLength = -1;
+
     final int maxNumberOfConcurrentTasks = -1;
     final String nfrs = "";
     final String applicationField = "ETL";

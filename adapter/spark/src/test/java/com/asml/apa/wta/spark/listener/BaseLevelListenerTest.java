@@ -4,9 +4,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.asml.apa.wta.core.config.RuntimeConfig;
-import com.asml.apa.wta.core.model.Task;
-import com.asml.apa.wta.core.model.Workflow;
-import com.asml.apa.wta.core.model.Workload;
 import com.asml.apa.wta.core.model.enums.Domain;
 import java.util.Map;
 import org.apache.spark.SparkConf;
@@ -46,7 +43,7 @@ public class BaseLevelListenerTest {
 
     fakeStageListener = new StageLevelListener(mockedSparkContext, fakeConfig);
 
-    fakeJobListener = new JobLevelListener(mockedSparkContext, fakeConfig, fakeTaskListener);
+    fakeJobListener = new JobLevelListener(mockedSparkContext, fakeConfig, fakeTaskListener, stageLevelListener);
 
     fakeApplicationListener = new ApplicationLevelListener(mockedSparkContext, fakeConfig, fakeJobListener, fakeTaskListener);
   }

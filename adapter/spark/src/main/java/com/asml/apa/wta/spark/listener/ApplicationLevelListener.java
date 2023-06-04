@@ -77,7 +77,7 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
     final List<Task> tasks = taskLevelListener.processedObjects;
 
     final long numSites = tasks.stream().filter(x -> x.getSubmissionSite()!=-1).count();
-    final long numResources = tasks.stream().map(Task::getResourceAmountRequested).reduce(Long::sum);
+    final long numResources = (long) tasks.stream().map(Task::getResourceAmountRequested).reduce(Double::sum).get();
     final long numUsers = tasks.stream().filter(x -> x.getUserId()!=-1).count();
     final long numGroups = tasks.stream().filter(x -> x.getGroupId()!=-1).count();
     final double totalResourceSeconds = tasks.stream().filter(x -> x.getGroupId()!=-1).map(x -> x.getResourceAmountRequested()*x.getRuntime()).reduce(Double::sum).orElseGet(() -> -1.0);
@@ -92,7 +92,7 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
 
      final double stdResourceTask = standardDeviation(tasks.stream().map(Task::getResourceAmountRequested), meanResourceTask);
 
-     final Double[] resourceStats = medianAndQuatiles(tasks.stream().map(Task::getResourceAmountRequested).collect(Collectors.toList()))
+     final Double[] resourceStats = medianAndQuatiles(tasks.stream().map(Task::getResourceAmountRequested).collect(Collectors.toList()));
 
      final double medianResourceTask = resourceStats[0];
 
@@ -114,59 +114,65 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
 
      final double medianMemory = memoryStats[0];
 
-     final long firstQuartileMemory = memoryStats[1];
+     final double firstQuartileMemory = memoryStats[1];
 
-     final long thirdQuartileMemory = -1L;
+     final double thirdQuartileMemory = memoryStats[2];
 
-     final double covMemory = -1.0;
+     final double covMemory = stdMemory/meanMemory;
 
-     final long minNetworkUsage = -1L;
+     final long minNetworkUsage = tasks.stream().map(Task::getNetworkIoTime).reduce(Long::min).get();
 
-     final long maxNetworkUsage = -1L;
-
-     final double stdNetworkUsage = -1.0;
+     final long maxNetworkUsage = tasks.stream().map(Task::getNetworkIoTime).reduce(Long::max).get();
 
      final double meanNetworkUsage = (double) tasks.stream().map(Task::getNetworkIoTime).reduce(Long::sum).get()/tasks.size();;
 
-     final double medianNetworkUsage = -1.0;
+     final double stdNetworkUsage = standardDeviation(tasks.stream().map(Task::getNetworkIoTime).map(Long::doubleValue), meanNetworkUsage);
 
-     final long firstQuartileNetworkUsage = -1L;
+     final Long[] networkStats = medianAndQuatiles(tasks.stream().map(Task::getNetworkIoTime).collect(Collectors.toList()));
 
-     final long thirdQuartileNetworkUsage = -1L;
+     final long medianNetworkUsage = networkStats[0];
 
-     final double covNetworkUsage = -1.0;
+     final long firstQuartileNetworkUsage = networkStats[1];
 
-     final double minDiskSpaceUsage = -1.0;
+     final long thirdQuartileNetworkUsage = networkStats[2];
 
-     final double maxDiskSpaceUsage = -1.0;
+     final double covNetworkUsage = stdNetworkUsage/meanNetworkUsage;
 
-     final double stdDiskSpaceUsage = -1.0;
+     final double minDiskSpaceUsage = tasks.stream().map(Task::getDiskSpaceRequested).reduce(Double::min).get();
+
+     final double maxDiskSpaceUsage = tasks.stream().map(Task::getDiskSpaceRequested).reduce(Double::max).get();
 
      final double meanDiskSpaceUsage = tasks.stream().map(Task::getDiskSpaceRequested).reduce(Double::sum).get()/tasks.size();
 
-     final long medianDiskSpaceUsage = -1L;
+     final double stdDiskSpaceUsage = standardDeviation(tasks.stream().map(Task::getDiskSpaceRequested), meanDiskSpaceUsage);
 
-     final long firstQuartileDiskSpaceUsage = -1L;
+     final Double[] diskSpaceStats = medianAndQuatiles(tasks.stream().map(Task::getDiskSpaceRequested).collect(Collectors.toList()));
 
-     final long thirdQuartileDiskSpaceUsage = -1L;
+     final double medianDiskSpaceUsage = diskSpaceStats[0];
 
-     final double covDiskSpaceUsage = -1.0;
+     final double firstQuartileDiskSpaceUsage = diskSpaceStats[1];
 
-     final int minEnergy = -1;
+     final double thirdQuartileDiskSpaceUsage = diskSpaceStats[2];
 
-     final int maxEnergy = -1;
+     final double covDiskSpaceUsage = stdDiskSpaceUsage/meanDiskSpaceUsage;
 
-     final double stdEnergy = -1.0;
+     final double minEnergy = tasks.stream().map(Task::getEnergyConsumption).reduce(Double::min).get();
 
-     final double meanEnergy = (double) tasks.stream().map(Task::getEnergyConsumption).reduce(Long::sum).get()/tasks.size();;
+     final double maxEnergy = tasks.stream().map(Task::getEnergyConsumption).reduce(Double::max).get();
 
-     final int medianEnergy = -1;
+     final double meanEnergy = (double) tasks.stream().map(Task::getEnergyConsumption).reduce(Double::sum).get()/tasks.size();;
 
-     final int firstQuartileEnergy = -1;
+     final double stdEnergy = standardDeviation(tasks.stream().map(Task::getEnergyConsumption), meanEnergy);
 
-     final int thirdQuartileEnergy = -1;
+      final Double[] energyStats = medianAndQuatiles(tasks.stream().map(Task::getEnergyConsumption).collect(Collectors.toList()));
 
-     final double covEnergy = -1.0;
+     final double medianEnergy = energyStats[0];
+
+     final double firstQuartileEnergy = energyStats[1];
+
+     final double thirdQuartileEnergy = energyStats[2];
+
+     final double covEnergy = stdEnergy/meanEnergy;
 
     processedObjects.add(Workload.builder()
         .totalWorkflows(numWorkflows)
@@ -181,6 +187,11 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
         .numUsers(numUsers)
         .numGroups(numGroups)
         .totalResourceSeconds(totalResourceSeconds)
+                    .meanNetworkUsage(meanNetworkUsage).covNetworkUsage(covNetworkUsage).firstQuartileNetworkUsage(firstQuartileNetworkUsage).maxNetworkUsage(maxNetworkUsage).medianNetworkUsage(medianNetworkUsage).minNetworkUsage(minNetworkUsage).stdNetworkUsage(stdNetworkUsage).thirdQuartileNetworkUsage(thirdQuartileNetworkUsage)
+                    .maxEnergy(maxEnergy).covEnergy(covEnergy).firstQuartileEnergy(firstQuartileEnergy).meanEnergy(meanEnergy).medianEnergy(medianEnergy).minEnergy(minEnergy).stdEnergy(stdEnergy).thirdQuartileEnergy(thirdQuartileEnergy)
+                    .covResourceTask(covResourceTask).meanResourceTask(meanResourceTask).stdResourceTask(stdResourceTask).maxResourceTask(maxResourceTask).minResourceTask(minResourceTask).medianResourceTask(medianResourceTask).firstQuartileResourceTask(firstQuartileResourceTask).thirdQuartileResourceTask(thirdQuartileResourceTask)
+                    .covMemory(covMemory).meanMemory(meanMemory).stdMemory(stdMemory).maxMemory(maxMemory).minMemory(minMemory).medianMemory(medianMemory).firstQuartileMemory(firstQuartileMemory).thirdQuartileMemory(thirdQuartileMemory)
+                    .covDiskSpaceUsage(covDiskSpaceUsage).stdDiskSpaceUsage(stdDiskSpaceUsage).meanDiskSpaceUsage(meanDiskSpaceUsage).firstQuartileDiskSpaceUsage(firstQuartileDiskSpaceUsage).thirdQuartileDiskSpaceUsage(thirdQuartileDiskSpaceUsage).medianDiskSpaceUsage(medianDiskSpaceUsage).maxDiskSpaceUsage(maxDiskSpaceUsage).minDiskSpaceUsage(minDiskSpaceUsage)
         .build());
   }
 

@@ -62,6 +62,7 @@ public class TaskLevelListener extends TaskStageBaseListener {
     final TaskResourceRequest resourceRequest = resourceProfile.taskResources().values().head();
     final String resourceType = resourceRequest.resourceName();
     final double resourceAmountRequested = resourceRequest.amount();
+    final long diskIoTime = curTaskMetrics.executorDeserializeTime() + curTaskMetrics.resultSerializationTime(); //unsure
     // unknown
     final int submissionSite = -1;
 
@@ -71,7 +72,7 @@ public class TaskLevelListener extends TaskStageBaseListener {
     final String params = "";
     final int groupId = -1;
     final long networkIoTime = -1L;
-    final long diskIoTime = -1L;
+
     final double energyConsumption = -1L;
     final long waitTime = -1L;
     final long resourceUsed = -1L;
