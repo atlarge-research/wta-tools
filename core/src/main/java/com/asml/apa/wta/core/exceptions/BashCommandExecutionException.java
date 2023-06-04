@@ -1,9 +1,9 @@
 package com.asml.apa.wta.core.exceptions;
 
 /**
- * Exception that is thrown when a bash command fails
+ * Exception that is thrown when a bash command fails.
  *
- * @author Pil Kyu Cho
+ * @author Lohithsai Yadala Chanchu
  * @since 1.0.0
  */
 public class BashCommandExecutionException extends RuntimeException {

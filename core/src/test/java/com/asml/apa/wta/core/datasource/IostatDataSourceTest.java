@@ -2,8 +2,8 @@ package com.asml.apa.wta.core.datasource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import com.asml.apa.wta.core.utils.BashUtils;
 import com.asml.apa.wta.core.dto.IostatDataSourceDto;
+import com.asml.apa.wta.core.utils.BashUtils;
 import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;

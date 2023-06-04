@@ -1,8 +1,7 @@
 package com.asml.apa.wta.core.datasource;
 
-import com.asml.apa.wta.core.utils.BashUtils;
 import com.asml.apa.wta.core.exceptions.BashCommandExecutionException;
-
+import com.asml.apa.wta.core.utils.BashUtils;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
@@ -56,7 +55,7 @@ public class PerfDataSource {
   public double gatherMetrics() {
     try {
       CompletableFuture<String> energyMetrics = bashUtils.executeCommand(
-              "perf stat -e power/energy-pkg/ -a sleep 1 2>&1 | grep -oP '^\\s+\\K[\\d,]+(?=\\s+Joules)' | sed 's/,/./g'");
+          "perf stat -e power/energy-pkg/ -a sleep 1 2>&1 | grep -oP '^\\s+\\K[\\d,]+(?=\\s+Joules)' | sed 's/,/./g'");
       return Double.parseDouble(energyMetrics.get());
     } catch (NumberFormatException e) {
       throw new NumberFormatException("The captured string can not be parsed into a double.");

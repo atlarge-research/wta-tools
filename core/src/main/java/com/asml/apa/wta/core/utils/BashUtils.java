@@ -1,11 +1,10 @@
 package com.asml.apa.wta.core.utils;
 
+import com.asml.apa.wta.core.exceptions.BashCommandExecutionException;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.concurrent.CompletableFuture;
-
-import com.asml.apa.wta.core.exceptions.BashCommandExecutionException;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j

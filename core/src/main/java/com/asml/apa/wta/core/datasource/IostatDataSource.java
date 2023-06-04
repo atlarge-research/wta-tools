@@ -1,10 +1,9 @@
 package com.asml.apa.wta.core.datasource;
 
 import com.asml.apa.wta.core.dto.IostatDataSourceDto;
+import com.asml.apa.wta.core.utils.BashUtils;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
-
-import com.asml.apa.wta.core.utils.BashUtils;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -15,8 +14,8 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 public class IostatDataSource {
-  private BashUtils bashUtils;
-  private boolean isIostatAvailable;
+  private final BashUtils bashUtils;
+  private final boolean isIostatAvailable;
 
   public IostatDataSource(BashUtils bashUtils) {
     this.bashUtils = bashUtils;

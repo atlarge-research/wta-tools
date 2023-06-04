@@ -1,21 +1,20 @@
 package com.asml.apa.wta.core.datasource;
 
-import com.asml.apa.wta.core.utils.BashUtils;
-import com.asml.apa.wta.core.exceptions.BashCommandExecutionException;
-import org.junit.jupiter.api.Test;
-
-import java.util.concurrent.CompletableFuture;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
+
+import com.asml.apa.wta.core.exceptions.BashCommandExecutionException;
+import com.asml.apa.wta.core.utils.BashUtils;
+import java.util.concurrent.CompletableFuture;
+import org.junit.jupiter.api.Test;
 
 public class PerfDataSourceTest {
 
   private final BashUtils bashUtils = mock(BashUtils.class);
 
   private final PerfDataSource sut = spy(new PerfDataSource(bashUtils));
-
 
   @Test
   void perfEnergyDataSourceIsAvailable() {
@@ -38,7 +37,8 @@ public class PerfDataSourceTest {
   @Test
   void perfEnergyGatherMetricsSuccessful() throws Exception {
     String energyStringDotDecimal = "12.34";
-    when(bashUtils.executeCommand(anyString())).thenReturn(CompletableFuture.completedFuture(energyStringDotDecimal));
+    when(bashUtils.executeCommand(anyString()))
+        .thenReturn(CompletableFuture.completedFuture(energyStringDotDecimal));
     double energy = 12.34;
     assertThat(sut.gatherMetrics()).isEqualTo(energy);
   }
@@ -46,7 +46,8 @@ public class PerfDataSourceTest {
   @Test
   void perfEnergyGatherMetricsCommaDecimalStringThrowsExeception() {
     String energyStringCommaDecimal = "12,34";
-    when(bashUtils.executeCommand(anyString())).thenReturn(CompletableFuture.completedFuture(energyStringCommaDecimal));
+    when(bashUtils.executeCommand(anyString()))
+        .thenReturn(CompletableFuture.completedFuture(energyStringCommaDecimal));
     assertThrows(NumberFormatException.class, sut::gatherMetrics);
   }
 
