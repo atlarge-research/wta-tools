@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.asml.apa.wta.core.model.Resource;
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.avro.Schema;
@@ -22,7 +21,7 @@ class AvroUtilsIntegrationTest {
   private File path;
 
   @BeforeEach
-  void inits() throws IOException {
+  void inits() {
     schema = SchemaBuilder.record("resource")
         .namespace("com.asml.apa.wta.core.model")
         .fields()

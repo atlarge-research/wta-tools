@@ -27,16 +27,40 @@ For the most part, since we are pre-release this will serve no real purpose, oth
 - Update WtaUtils file to parse for user logging preferences [@pcho](https://gitlab.ewi.tudelft.nl/pcho)
 - Created a logging class to log on both console and to log file [@pcho](https://gitlab.ewi.tudelft.nl/pcho)
 - Updates the Spark dependency to 3.2.4 [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
-- Utilise spark API to collect information about workflow and workload [@hpage](https://gitlab.ewi.tudelft.nl/hpage)
+- Utilise Spark API to collect information about workflow and workload [@hpage](https://gitlab.ewi.tudelft.nl/hpage)
 - Moves to using slf4j as logging facade over directly using log4j2 [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 - Add DAS configuration script to benchmark [@tqu](https://gitlab.ewi.tudelft.nl/tqu)[@pcho](https://gitlab.ewi.tudelft.nl/pcho)
 - Simplified the use of the streaming packages [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 - Created utility class for writing WTA trace to parquet files [@tqu](https://gitlab.ewi.tudelft.nl/tqu)
+- Added Java MX Bean data source for resource metrics [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
+- Created README documentation for all modules [@tqu](https://gitlab.ewi.tudelft.nl/tqu) [@hpage](https://gitlab.ewi.tudelft.nl/hpage)
+- Add maven-assembly plugin to create fat jar  [@pcho](https://gitlab.ewi.tudelft.nl/pcho) [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
+- Added license information to the project [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
+- Added iostat datasource [@lyadalachanchu](https://gitlab.ewi.tudelft.nl/lyadalachanchu)
+- Created custom images for e2e and integration testing [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
+- Wired e2e testing into the pipeline [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
+- Make the WtaPlugin class dictate the Spark adapter lifecycle [@pcho](https://gitlab.ewi.tudelft.nl/pcho)
+- Added option to choose between stage and task level metrics [@lyadalachanchu](https://gitlab.ewi.tudelft.nl/lyadalachanchu)
+- Added functionality to ping resources and syncronize with driver. [@hpage](https://gitlab.ewi.tudelft.nl/hpage)
+- Added the option to compile the plugin for Scala 2.12 and 2.13 [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
+- Extended BaseTraceObject with a new method [@tqu](https://gitlab.ewi.tudelft.nl/tqu)
 
 ### Changed
 - Refactored listeners into a generic interface to reduce code duplication and increase cc [@hpage](https://gitlab.ewi.tudelft.nl/hpage)
+- Merged the JaCoCo coverage metrics for integration and unit tests [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
+- Decreased JAR size by around 75% [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
+- Modified the config format [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
+- Modified the EndToEnd class to inject the WtaPlugin class into a Spark context rather the Spark listener interface by itself [@pcho](https://gitlab.ewi.tudelft.nl/pcho)
+
 ### Fixed
+- Fixed the slf4j logging module to allow use in testing and `adapter/spark` [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
+- Fixed the Parquet and JSON writer to use snake case to adhere to the WTA [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
+- Fixed the DAS5 framework versions to download [@pcho](https://gitlab.ewi.tudelft.nl/pcho)
+- Fixed the format of the outputted files [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
+- Fixed the type inconsistency in the field types of the WTA Objects [@tqu](https://gitlab.ewi.tudelft.nl/tqu)
 
 ### Deprecated
 
 ### Removed
+- Removed Spotbugs SAST from the pipeline [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
+- Removed mutation testing from the pipeline [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)

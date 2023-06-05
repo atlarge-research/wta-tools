@@ -1,0 +1,136 @@
+unit-tests-spark-adapter:
+  stage: test-spark-adapter
+  needs: [build-spark-adapter]
+  dependencies:
+    - build-spark-adapter
+  script:
+    - echo "Spark adapter unit tests started"
+    - "mvn -pl adapter/spark jacoco:prepare-agent surefire:test jacoco:report"
+    - "[ -f adapter/spark/target/jacoco.exec ] && mv -f adapter/spark/target/jacoco.exec adapter/spark/target/jacoco-unit-tests.exec || echo '0' > /dev/null"
+  artifacts:
+    name: unit-tests-spark-adapter
+    expire_in: 20 minutes
+    when: always
+    paths:
+      - adapter/spark/target/jacoco-unit-tests.exec
+
+integration-tests-spark-adapter:
+  stage: test-spark-adapter
+  image: $LINUX_TOOLING_IMAGE
+  needs: [build-linux-tooling-image, build-spark-adapter]
+  dependencies:
+    - build-spark-adapter
+  script:
+    - echo "Spark adapter integration tests started"
+    - "mvn -pl adapter/spark jacoco:prepare-agent-integration failsafe:integration-test failsafe:verify jacoco:report-integration"
+    - "[ -f adapter/spark/target/jacoco-it.exec ] && mv -f adapter/spark/target/jacoco-it.exec adapter/spark/target/jacoco-integration-tests.exec || echo '0' > /dev/null"
+  artifacts:
+    name: integration-tests-spark-adapter
+    expire_in: 20 minutes
+    when: always
+    paths:
+      - adapter/spark/target/jacoco-integration-tests.exec
+
+
+line-coverage-spark-adapter:
+  stage: test-spark-adapter
+  needs: [integration-tests-spark-adapter, unit-tests-spark-adapter, build-spark-adapter]
+  dependencies:
+    - integration-tests-spark-adapter
+    - unit-tests-spark-adapter
+    - build-spark-adapter
+  script:
+    - echo "Started creating Spark adapter line coverage"
+    - "mvn -pl adapter/spark jacoco:merge jacoco:report"
+    - "cat adapter/spark/reports/jacoco/index.html | grep -Po 'Total.*?([0-9]{1,3})%' || echo '0%'"
+  coverage: /([0-9]{1,3})%/
+  artifacts:
+    name: line-coverage-spark-adapter
+    expire_in: 3 hours
+    when: always
+    paths:
+      - adapter/spark/reports/jacoco/
+
+branch-coverage-spark-adapter:
+  stage: test-spark-adapter
+  needs: [line-coverage-spark-adapter]
+  dependencies:
+    - line-coverage-spark-adapter
+  script:
+    - echo "Started generating Spark adapter branch coverage"
+    - "cat adapter/spark/reports/jacoco/index.html | grep -Po '%.*?of.*?([0-9]{1,3})%' || echo '0%'"
+  coverage: /([0-9]{1,3})%/
+
+
+e2e-spark-adapter_2.12:
+  stage: test-spark-adapter
+  image: $SPARK_IMAGE_2_12
+  needs: [package-spark-adapter-e2e_2.12, build-spark-adapter-image_2_12]
+  dependencies:
+    - package-spark-adapter-e2e_2.12
+  script:
+    - echo "Spark adapter end-to-end run started"
+    - echo "This job does not provide coverage metrics, it just verifies the system as a whole functions to some degree"
+    - spark-submit --class com.asml.apa.wta.spark.EndToEnd --master local[1] adapter/spark/target/spark-1.0-SNAPSHOT-e2e.jar adapter/spark/src/test/resources/config.json wta-output adapter/spark/src/test/resources/wordcount.txt
+    - if ! [ -n "$(ls -A wta-output 2>/dev/null)" ] ; then exit 1 ; fi
+  artifacts:
+    name: e2e-output_2.12
+    expire_in: 3 hours
+    paths:
+      - wta-output
+  cache: []
+
+e2e-barebones-spark-adapter_2.12:
+  stage: test-spark-adapter
+  image: $SPARK_BAREBONES_IMAGE_2_12
+  needs: [package-spark-adapter-e2e_2.12, build-barebones-spark-adapter-image_2_12]
+  dependencies:
+    - package-spark-adapter-e2e_2.12
+  script:
+    - echo "Barebones Spark adapter end-to-end run started"
+    - echo "This job does not provide coverage metrics, it just verifies the system as a whole functions in a barebones environment"
+    - spark-submit --class com.asml.apa.wta.spark.EndToEnd --master local[1] adapter/spark/target/spark-1.0-SNAPSHOT-e2e.jar adapter/spark/src/test/resources/config.json wta-output adapter/spark/src/test/resources/wordcount.txt
+    - if ! [ -n "$(ls -A wta-output 2>/dev/null)" ] ; then exit 1 ; fi
+  artifacts:
+    name: barebones-e2e-output_2.12
+    expire_in: 3 hours
+    paths:
+      - wta-output
+  cache: []
+
+
+e2e-spark-adapter_2.13:
+  stage: test-spark-adapter
+  image: $SPARK_IMAGE_2_13
+  needs: [package-spark-adapter-e2e_2.13, build-spark-adapter-image_2_13]
+  dependencies:
+    - package-spark-adapter-e2e_2.13
+  script:
+    - echo "Spark adapter end-to-end run started"
+    - echo "This job does not provide coverage metrics, it just verifies the system as a whole functions to some degree"
+    - spark-submit --class com.asml.apa.wta.spark.EndToEnd --master local[1] adapter/spark/target/spark-1.0-SNAPSHOT-e2e.jar adapter/spark/src/test/resources/config.json wta-output adapter/spark/src/test/resources/wordcount.txt
+    - if ! [ -n "$(ls -A wta-output 2>/dev/null)" ] ; then exit 1 ; fi
+  artifacts:
+    name: e2e-output_2.13
+    expire_in: 3 hours
+    paths:
+      - wta-output
+  cache: []
+
+e2e-barebones-spark-adapter_2.13:
+  stage: test-spark-adapter
+  image: $SPARK_BAREBONES_IMAGE_2_13
+  needs: [package-spark-adapter-e2e_2.13, build-barebones-spark-adapter-image_2_13]
+  dependencies:
+    - package-spark-adapter-e2e_2.13
+  script:
+    - echo "Barebones Spark adapter end-to-end run started"
+    - echo "This job does not provide coverage metrics, it just verifies the system as a whole functions in a barebones environment"
+    - spark-submit --class com.asml.apa.wta.spark.EndToEnd --master local[1] adapter/spark/target/spark-1.0-SNAPSHOT-e2e.jar adapter/spark/src/test/resources/config.json wta-output adapter/spark/src/test/resources/wordcount.txt
+    - if ! [ -n "$(ls -A wta-output 2>/dev/null)" ] ; then exit 1 ; fi
+  artifacts:
+    name: barebones-e2e-output_2.13
+    expire_in: 3 hours
+    paths:
+      - wta-output
+  cache: []

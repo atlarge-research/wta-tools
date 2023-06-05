@@ -9,11 +9,21 @@
   <version>1.0-SNAPSHOT</version>
   <packaging>pom</packaging>
 
+  <licenses>
+    <license>
+      <name>Apache-2.0</name>
+      <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+
   <properties>
     <maven.compiler.source>11</maven.compiler.source>
     <maven.compiler.target>11</maven.compiler.target>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    <maven.assembly.plugin.version>3.6.0</maven.assembly.plugin.version>
+    <maven.compiler.plugin.version>3.11.0</maven.compiler.plugin.version>
     <spotless.version>2.36.0</spotless.version>
     <junit.version>5.9.3</junit.version>
     <surefire.version>3.1.0</surefire.version>
@@ -27,24 +37,22 @@
     <pitest.junit.version>1.1.2</pitest.junit.version>
     <checkstyle.version>3.2.2</checkstyle.version>
     <assertj.version>3.24.2</assertj.version>
-    <spark.support.version>3.2.4</spark.support.version>
     <mockito.version>5.3.1</mockito.version>
     <jqwik.version>1.7.3</jqwik.version>
+    <slf4j2-mock.version>2.3.0</slf4j2-mock.version>
+    <slf4j.version>2.0.7</slf4j.version>
+    <log4j2.version>2.20.0</log4j2.version>
+    <dependency-plugin.version>3.6.0</dependency-plugin.version>
+    <awaitility.version>4.2.0</awaitility.version>
   </properties>
 
   <modules>
     <module>core</module>
     <module>adapter/spark</module>
-    <module>benchmarking/sparkmeasure</module>
+    <module>benchmarking/spark-benchmark</module>
   </modules>
 
   <dependencies>
-    <!-- https://mvnrepository.com/artifact/com.diffplug.spotless/spotless-maven-plugin -->
-    <dependency>
-      <groupId>com.diffplug.spotless</groupId>
-      <artifactId>spotless-maven-plugin</artifactId>
-      <version>${spotless.version}</version>
-    </dependency>
     <!-- https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api -->
     <dependency>
       <groupId>org.junit.jupiter</groupId>
@@ -94,6 +102,40 @@
       <version>${jqwik.version}</version>
       <scope>test</scope>
     </dependency>
+    <!-- https://mvnrepository.com/artifact/net.jqwik/jqwik-api -->
+    <dependency>
+      <groupId>net.jqwik</groupId>
+      <artifactId>jqwik-api</artifactId>
+      <version>${jqwik.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-api -->
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <version>${slf4j.version}</version>
+    </dependency>
+    <!-- https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-slf4j2-impl -->
+    <dependency>
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-slf4j2-impl</artifactId>
+      <version>${log4j2.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <!-- https://mvnrepository.com/artifact/org.simplify4u/slf4j2-mock/2.3.0 -->
+    <dependency>
+      <groupId>org.simplify4u</groupId>
+      <artifactId>slf4j2-mock</artifactId>
+      <version>${slf4j2-mock.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <!-- https://mvnrepository.com/artifact/org.awaitility/awaitility -->
+    <dependency>
+      <groupId>org.awaitility</groupId>
+      <artifactId>awaitility</artifactId>
+      <version>${awaitility.version}</version>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
   <build>
@@ -107,6 +149,9 @@
           <includes>
             <include>**/*IntegrationTest.java</include>
           </includes>
+          <classpathDependencyExcludes>
+            <classpathDependencyExclude>org.apache.logging.log4j:log4j-slf4j2-impl</classpathDependencyExclude>
+          </classpathDependencyExcludes>
         </configuration>
       </plugin>
       <plugin>
@@ -122,6 +167,9 @@
           <excludes>
             <exclude>**/*IntegrationTest.java</exclude>
           </excludes>
+          <classpathDependencyExcludes>
+            <classpathDependencyExclude>org.apache.logging.log4j:log4j-slf4j2-impl</classpathDependencyExclude>
+          </classpathDependencyExcludes>
         </configuration>
       </plugin>
       <plugin>
@@ -196,21 +244,15 @@
             <format>HTML</format>
           </formats>
           <outputDirectory>reports/jacoco</outputDirectory>
+          <fileSets>
+            <fileSet>
+              <directory>${project.build.directory}</directory>
+              <includes>
+                <include>*.exec</include>
+              </includes>
+            </fileSet>
+          </fileSets>
         </configuration>
-        <executions>
-          <execution>
-            <goals>
-              <goal>prepare-agent</goal>
-            </goals>
-          </execution>
-          <execution>
-            <id>report</id>
-            <phase>prepare-package</phase>
-            <goals>
-              <goal>report</goal>
-            </goals>
-          </execution>
-        </executions>
       </plugin>
       <plugin>
         <groupId>org.pitest</groupId>
@@ -229,6 +271,12 @@
           <targetClasses>
             <targetClass>com.asml.apa.wta.*</targetClass>
           </targetClasses>
+          <classpathDependencyExcludes>
+            <classpathDependencyExclude>org.apache.logging.log4j:log4j-slf4j2-impl</classpathDependencyExclude>
+          </classpathDependencyExcludes>
+          <excludedTestClasses>
+            <param>com.asml.apa.wta.spark.MultithreadTest</param>
+          </excludedTestClasses>
         </configuration>
         <dependencies>
           <!-- https://mvnrepository.com/artifact/org.pitest/pitest-junit5-plugin -->
@@ -251,7 +299,31 @@
           <outputFileFormat>plain</outputFileFormat>
         </configuration>
       </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <version>${maven.assembly.plugin.version}</version>
+        <executions>
+          <execution>
+            <id>fat-jar</id>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+            <configuration>
+              <skipAssembly>${skipTests}</skipAssembly>
+              <descriptorRefs>
+                <descriptorRef>jar-with-dependencies</descriptorRef>
+              </descriptorRefs>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <version>${dependency-plugin.version}</version>
+      </plugin>
     </plugins>
   </build>
-
 </project>

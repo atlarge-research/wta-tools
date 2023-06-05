@@ -20,6 +20,7 @@ public class BaseLevelListenerTest {
   protected RuntimeConfig fakeConfig;
 
   protected AbstractListener<Task> fakeTaskListener;
+  protected AbstractListener<Task> fakeStageListener;
   protected AbstractListener<Workflow> fakeJobListener;
   protected AbstractListener<Workload> fakeApplicationListener;
 
@@ -27,8 +28,9 @@ public class BaseLevelListenerTest {
   void setupCommonListenerDependencies() {
     // setup mock spark context
     mockedSparkContext = mock(SparkContext.class);
+    SparkConf conf = new SparkConf().set("spark.app.name", "testApp");
     when(mockedSparkContext.sparkUser()).thenReturn("testUser");
-    when(mockedSparkContext.getConf()).thenReturn(new SparkConf().set("spark.app.name", "testApp"));
+    when(mockedSparkContext.getConf()).thenReturn(conf);
     when(mockedSparkContext.appName()).thenReturn("testApp");
     when(mockedSparkContext.startTime()).thenReturn(5000L);
 
@@ -41,6 +43,8 @@ public class BaseLevelListenerTest {
         .build();
 
     fakeTaskListener = new TaskLevelListener(mockedSparkContext, fakeConfig);
+
+    fakeStageListener = new StageLevelListener(mockedSparkContext, fakeConfig);
 
     fakeJobListener = new JobLevelListener(mockedSparkContext, fakeConfig, fakeTaskListener);
 

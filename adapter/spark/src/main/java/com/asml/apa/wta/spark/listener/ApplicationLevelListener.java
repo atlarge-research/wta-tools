@@ -72,12 +72,11 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
     // all statistics (stdev, mean, etc.) are unknown
 
     processedObjects.add(Workload.builder()
-        .workflows(workflows)
         .totalWorkflows(numWorkflows)
         .totalTasks(totalTasks)
         .domain(domain)
-        .startDate(startDate)
-        .endDate(endDate)
+        .dateStart(startDate)
+        .dateEnd(endDate)
         .authors(authors)
         .workloadDescription(workloadDescription)
         .numSites(numSites)

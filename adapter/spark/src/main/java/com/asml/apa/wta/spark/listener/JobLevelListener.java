@@ -46,7 +46,7 @@ public class JobLevelListener extends AbstractListener<Workflow> {
    */
   @Override
   public void onJobStart(SparkListenerJobStart jobStart) {
-    jobSubmitTimes.put(jobStart.jobId(), jobStart.time());
+    jobSubmitTimes.put(jobStart.jobId() + 1, jobStart.time());
   }
 
   /**
@@ -57,7 +57,7 @@ public class JobLevelListener extends AbstractListener<Workflow> {
    */
   @Override
   public void onJobEnd(SparkListenerJobEnd jobEnd) {
-    final int jobId = jobEnd.jobId();
+    final int jobId = jobEnd.jobId() + 1;
     final long submitTime = jobSubmitTimes.get(jobId);
     final Task[] tasks = taskListener
         .getWithCondition(task -> task.getWorkflowId() == jobId)
@@ -69,7 +69,7 @@ public class JobLevelListener extends AbstractListener<Workflow> {
     final String appName = sparkContext.appName();
 
     // unknown
-    final int criticalPathLength = -1;
+    final long criticalPathLength = -1;
     final int criticalPathTaskCount = -1;
     final int maxNumberOfConcurrentTasks = -1;
     final String nfrs = "";
@@ -77,8 +77,8 @@ public class JobLevelListener extends AbstractListener<Workflow> {
     final double totalResources = -1.0;
     final double totalMemoryUsage = -1.0;
     final long totalNetworkUsage = -1L;
-    final long totalDiskSpaceUsage = -1L;
-    final long totalEnergyConsumption = -1L;
+    final double totalDiskSpaceUsage = -1.0;
+    final double totalEnergyConsumption = -1.0;
     processedObjects.add(Workflow.builder()
         .id(jobId)
         .submitTime(submitTime)

@@ -17,17 +17,15 @@ class ApplicationLevelListenerTest extends BaseLevelListenerTest {
   }
 
   @Test
-  void applicationCollectsDesiredInformationEvenIfINcomplete() {
+  void applicationListenerCollectsDesiredInformation() {
     fakeApplicationListener.onApplicationEnd(applicationEndObj);
     assertThat(fakeApplicationListener.getProcessedObjects()).hasSize(1);
 
     Workload workload = fakeApplicationListener.getProcessedObjects().get(0);
-    assertThat(workload.getWorkflows()).hasSize(0);
-    assertThat(workload.getWorkflows().length).isEqualTo(workload.getTotalWorkflows());
     assertThat(workload.getTotalTasks()).isEqualTo(0);
     assertThat(workload.getDomain()).isEqualTo(fakeConfig.getDomain());
     long sutStartTime = mockedSparkContext.startTime();
-    assertThat(workload.getStartDate()).isEqualTo(sutStartTime);
-    assertThat(workload.getEndDate()).isEqualTo(sutStartTime + 1000L);
+    assertThat(workload.getDateStart()).isEqualTo(sutStartTime);
+    assertThat(workload.getDateEnd()).isEqualTo(sutStartTime + 1000L);
   }
 }
