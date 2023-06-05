@@ -34,7 +34,7 @@ public class DstatSupplier implements InformationSupplier<DstatDto> {
    * @since 1.0.0
    */
   @Override
-  public CompletableFuture<DstatDto> getSnapshot() throws ExecutionException, InterruptedException {
+  public CompletableFuture<DstatDto> getSnapshot() {
     if (isDstatAvailable) {
       CompletableFuture<String> allMetrics = bashUtils.executeCommand("dstat -cdngy 1 -c 1");
 

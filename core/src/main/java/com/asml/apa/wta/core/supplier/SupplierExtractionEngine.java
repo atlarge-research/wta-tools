@@ -1,6 +1,7 @@
 package com.asml.apa.wta.core.supplier;
 
 import com.asml.apa.wta.core.dto.BaseSupplierDto;
+import com.asml.apa.wta.core.dto.DstatDto;
 import com.asml.apa.wta.core.dto.IostatDto;
 import com.asml.apa.wta.core.dto.OsInfoDto;
 import com.asml.apa.wta.core.utils.BashUtils;
@@ -26,6 +27,8 @@ public abstract class SupplierExtractionEngine<T extends BaseSupplierDto> {
 
   private final IostatSupplier iostatSupplier;
 
+  private final DstatSupplier dstatSupplier;
+
   private final int resourcePingInterval;
 
   @Getter
@@ -39,12 +42,14 @@ public abstract class SupplierExtractionEngine<T extends BaseSupplierDto> {
    *
    * @param resourcePingInterval How often to ping the suppliers, in milliseconds
    * @author Henry Page
+   * @author Lohithsai Yadala Chanchu
    * @since 1.0.0
    */
   public SupplierExtractionEngine(int resourcePingInterval) {
     this.resourcePingInterval = resourcePingInterval;
     this.operatingSystemSupplier = new OperatingSystemSupplier();
     this.iostatSupplier = new IostatSupplier(new BashUtils());
+    this.dstatSupplier = new DstatSupplier(new BashUtils());
   }
 
   /**
@@ -58,14 +63,16 @@ public abstract class SupplierExtractionEngine<T extends BaseSupplierDto> {
   protected CompletableFuture<T> ping() {
     CompletableFuture<OsInfoDto> osInfoDtoCompletableFuture = this.operatingSystemSupplier.getSnapshot();
     CompletableFuture<IostatDto> iostatDtoCompletableFuture = this.iostatSupplier.getSnapshot();
+    CompletableFuture<DstatDto> dstatDtoCompletableFuture = this.dstatSupplier.getSnapshot();
 
     return CompletableFuture.allOf(osInfoDtoCompletableFuture, iostatDtoCompletableFuture)
         .thenCompose((v) -> {
           LocalDateTime timestamp = LocalDateTime.now();
           OsInfoDto osInfoDto = osInfoDtoCompletableFuture.join();
           IostatDto iostatDto = iostatDtoCompletableFuture.join();
+          DstatDto dstatDto = dstatDtoCompletableFuture.join();
           return CompletableFuture.completedFuture(
-              transform(new BaseSupplierDto(timestamp, osInfoDto, iostatDto)));
+              transform(new BaseSupplierDto(timestamp, osInfoDto, iostatDto, dstatDto)));
         });
   }
 

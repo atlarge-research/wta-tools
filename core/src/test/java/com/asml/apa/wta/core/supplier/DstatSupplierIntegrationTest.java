@@ -11,7 +11,9 @@ public class DstatSupplierIntegrationTest {
   @Test
   public void DstatSupplierSuccessfullyReturnsADtoObject() throws ExecutionException, InterruptedException {
     DstatSupplier a = new DstatSupplier(new BashUtils());
-    var actual = a.getSnapshot().get();
-    assertTrue(actual instanceof DstatDto);
+    if (a.isAvailable()) {
+      var actual = a.getSnapshot().get();
+      assertTrue(actual instanceof DstatDto);
+    }
   }
 }

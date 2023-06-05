@@ -11,7 +11,9 @@ public class IostatSupplierIntegrationTest {
   @Test
   public void IostatSupplierSuccessfullyReturnsADtoObject() throws ExecutionException, InterruptedException {
     IostatSupplier a = new IostatSupplier(new BashUtils());
-    var actual = a.getSnapshot().get();
-    assertTrue(actual instanceof IostatDto);
+    if (a.isAvailable()) {
+      var actual = a.getSnapshot().get();
+      assertTrue(actual instanceof IostatDto);
+    }
   }
 }
