@@ -7,11 +7,9 @@ import static org.mockito.Mockito.*;
 import com.asml.apa.wta.core.dto.PerfDto;
 import com.asml.apa.wta.core.exceptions.BashCommandExecutionException;
 import com.asml.apa.wta.core.utils.BashUtils;
-
 import java.time.Duration;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
-
 import org.awaitility.Awaitility;
 import org.junit.jupiter.api.Test;
 
@@ -81,9 +79,7 @@ public class PerfSupplierTest {
         .thenReturn(CompletableFuture.completedFuture("12.34"));
     sut = spy(new PerfSupplier(bashUtils));
     CompletableFuture<PerfDto> result = sut.getSnapshot();
-    Awaitility.await()
-            .atMost(Duration.ofSeconds(2))
-            .until(result::isDone);
+    Awaitility.await().atMost(Duration.ofSeconds(2)).until(result::isDone);
     assertThat(result.get().getWatt()).isEqualTo(12.34);
   }
 }
