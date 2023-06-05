@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 
 public class DstatSupplierIntegrationTest {
   @Test
-  public void DstatDataSourceSuccessfullyReturnsADtoObject() throws ExecutionException, InterruptedException {
+  public void DstatSupplierSuccessfullyReturnsADtoObject() throws ExecutionException, InterruptedException {
     DstatSupplier a = new DstatSupplier(new BashUtils());
     var actual = a.getSnapshot().get();
     assertTrue(actual instanceof DstatDto);

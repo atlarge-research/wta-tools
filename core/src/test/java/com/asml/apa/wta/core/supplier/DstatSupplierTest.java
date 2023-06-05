@@ -46,7 +46,7 @@ public class DstatSupplierTest {
   }
 
   @Test
-  void getSnapshotThrowsException() throws ExecutionException, InterruptedException {
+  void getSnapshotThrowsException() {
     BashUtils bashUtils = Mockito.mock(BashUtils.class);
     Mockito.doReturn(CompletableFuture.completedFuture(
             "----total-usage---- -dsk/total- -net/total- ---paging-- ---system--\n"
