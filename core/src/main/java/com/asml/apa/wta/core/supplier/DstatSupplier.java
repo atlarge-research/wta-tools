@@ -8,6 +8,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.asml.apa.wta.core.dto.IostatDto;
 import com.asml.apa.wta.core.utils.BashUtils;
 import lombok.extern.slf4j.Slf4j;
 
@@ -18,53 +19,55 @@ import lombok.extern.slf4j.Slf4j;
  * @since 1.0.0
  */
 @Slf4j
-public class DstatSupplier extends InformationSupplier<DstatDto>{
+public class DstatSupplier implements InformationSupplier<DstatDto>{
   private BashUtils bashUtils;
   private boolean isDstatAvailable;
 
   public DstatSupplier(BashUtils bashUtils) {
     this.bashUtils = bashUtils;
-    this.isDstatAvailable = isDstatAvailable();
+    this.isDstatAvailable = isAvailable();
   }
 
   /**
    * Uses the Dstat dependency to get io metrics.
    *
-   * @param executorId The executorId string that represents the executorId the io information is being received from.
    * @return DstatDataSourceDto object that will be sent to the driver (with the necessary information filled out)
    * @author Lohithsai Yadala Chanchu
    * @since 1.0.0
    */
-  public DstatDto getAllMetrics(String executorId) throws InterruptedException, ExecutionException {
+  @Override
+  public CompletableFuture<DstatDto> getSnapshot() throws ExecutionException, InterruptedException {
     if (isDstatAvailable) {
-      CompletableFuture<String> allMetrics = bashUtils.executeCommand("dstate -cdngy 1 -c 1");
+      CompletableFuture<String> allMetrics = bashUtils.executeCommand("dstat -cdngy 1 -c 1");
+      
 
-      List<Integer> metrics = extractNumbers(allMetrics.get());
-
-      try {
-        return DstatDto.builder()
-            .totalUsageUsr(metrics.get(0))
-            .totalUsageSys(metrics.get(1))
-            .totalUsageIdl(metrics.get(2))
-            .totalUsageWai(metrics.get(3))
-            .totalUsageStl(metrics.get(4))
-            .dskRead(metrics.get(5))
-            .dskWrite(metrics.get(6))
-            .netRecv(metrics.get(7))
-            .netSend(metrics.get(8))
-            .pagingIn(metrics.get(9))
-            .pagingOut(metrics.get(10))
-            .systemInt(metrics.get(11))
-            .systemCsw(metrics.get(12))
-            .executorId(executorId)
-            .build();
-      } catch (Exception e) {
-        log.error(
-            "Something went wrong while receiving the dstat bash command outputs. The cause is: {}",
-            e.getCause().toString());
-      }
+      return allMetrics.thenApply(result -> {
+        List<Integer> metrics = extractNumbers(result);
+        try {
+          return DstatDto.builder()
+                  .totalUsageUsr(metrics.get(0))
+                  .totalUsageSys(metrics.get(1))
+                  .totalUsageIdl(metrics.get(2))
+                  .totalUsageWai(metrics.get(3))
+                  .totalUsageStl(metrics.get(4))
+                  .dskRead(metrics.get(5))
+                  .dskWrite(metrics.get(6))
+                  .netRecv(metrics.get(7))
+                  .netSend(metrics.get(8))
+                  .pagingIn(metrics.get(9))
+                  .pagingOut(metrics.get(10))
+                  .systemInt(metrics.get(11))
+                  .systemCsw(metrics.get(12))
+                  .build();
+        } catch (Exception e) {
+          log.error(
+                  "Something went wrong while receiving the dstat bash command outputs. The cause is: {}",
+                  e.getCause().toString());
+        }
+        return null;
+      });
     }
-    return null;
+    return notAvailableResult();
   }
 
   public static List<Integer> extractNumbers(String input) {
@@ -96,7 +99,8 @@ public class DstatSupplier extends InformationSupplier<DstatDto>{
    * @author Lohithsai Yadala Chanchu
    * @since 1.0.0
    */
-  public boolean isDstatAvailable() {
+   @Override
+  public boolean isAvailable() {
     try {
       if (bashUtils.executeCommand("dstat -cdngy 1 -c 1").get() != null) {
         return true;

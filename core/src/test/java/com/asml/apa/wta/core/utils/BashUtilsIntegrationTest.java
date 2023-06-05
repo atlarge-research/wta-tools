@@ -6,16 +6,21 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class BashUtilsIntegrationTest {
     @Test
     void runExecuteCommandSuccessfully() {
         BashUtils bashUtils = new BashUtils();
         CompletableFuture<String> actual = bashUtils.executeCommand("echor hello");
-        actual.exceptionally(throwable -> {
-            System.err.println("An exception occurred: " + throwable.getMessage());
-            return null;
+
+        Throwable exception = assertThrows(BashUtils.BashCommandExecutionException.class, () -> {
+            actual.get(); // Trigger the exception by accessing the result
         });
+
+        String expectedErrorMessage = "Bash command execution failed with exit code"; // Replace with the expected error message
+
+        assertEquals(expectedErrorMessage, exception.getMessage());
     }
     @Test
     void runExecuteCommandUnsuccessfully() throws ExecutionException, InterruptedException {

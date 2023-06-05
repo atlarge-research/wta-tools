@@ -16,7 +16,9 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class DstatDto {
+public class DstatDto implements SupplierDto{
+  private static final long serialVersionUID = 4386177879327585527L;
+
   private int totalUsageUsr;
   private int totalUsageSys;
   private int totalUsageIdl;
@@ -30,9 +32,4 @@ public class DstatDto {
   private int pagingOut;
   private int systemInt;
   private int systemCsw;
-
-  private String executorId;
-
-  @Builder.Default
-  private long timestamp = Instant.now().toEpochMilli();
 }
