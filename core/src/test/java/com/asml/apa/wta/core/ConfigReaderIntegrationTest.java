@@ -29,6 +29,8 @@ class ConfigReaderIntegrationTest {
     assertThat(cr.getAuthors()).isEqualTo(new String[] {"Test Name"});
     assertThat(cr.getDomain()).isEqualTo(Domain.SCIENTIFIC);
     assertThat(cr.getDescription()).isEqualTo("Test Description");
+    assertThat(cr.getResourcePingInterval()).isEqualTo(2000);
+    assertThat(cr.getExecutorSynchronizationInterval()).isEqualTo(4000);
     assertThat(cr.isStageLevel()).isEqualTo(true);
     Map<String, String> map = new HashMap<>();
     map.put("f1", "v1");
@@ -44,6 +46,8 @@ class ConfigReaderIntegrationTest {
     assertThat(cr.getAuthors()).isEqualTo(new String[] {"Test Name"});
     assertThat(cr.getDomain()).isEqualTo(Domain.ENGINEERING);
     assertThat(cr.getDescription()).isEqualTo("");
+    assertThat(cr.getResourcePingInterval()).isEqualTo(1000);
+    assertThat(cr.getExecutorSynchronizationInterval()).isEqualTo(2000);
     assertThat(cr.isStageLevel()).isEqualTo(true);
     Map<String, String> map = new HashMap<>();
     map.put("f1", "v1");

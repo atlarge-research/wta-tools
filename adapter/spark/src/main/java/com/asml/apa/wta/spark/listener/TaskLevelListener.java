@@ -60,7 +60,7 @@ public class TaskLevelListener extends TaskStageBaseListener {
     final long networkIoTime = -1L;
     final long diskIoTime = -1L;
     final double diskSpaceRequested = -1.0;
-    final long energyConsumption = -1L;
+    final double energyConsumption = -1L;
     final long waitTime = -1L;
     final long resourceUsed = -1L;
 

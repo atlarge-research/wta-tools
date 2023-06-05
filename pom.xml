@@ -23,6 +23,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <maven.assembly.plugin.version>3.6.0</maven.assembly.plugin.version>
+    <maven.compiler.plugin.version>3.11.0</maven.compiler.plugin.version>
     <spotless.version>2.36.0</spotless.version>
     <junit.version>5.9.3</junit.version>
     <surefire.version>3.1.0</surefire.version>
@@ -36,13 +37,13 @@
     <pitest.junit.version>1.1.2</pitest.junit.version>
     <checkstyle.version>3.2.2</checkstyle.version>
     <assertj.version>3.24.2</assertj.version>
-    <spark.support.version>3.2.4</spark.support.version>
     <mockito.version>5.3.1</mockito.version>
     <jqwik.version>1.7.3</jqwik.version>
     <slf4j2-mock.version>2.3.0</slf4j2-mock.version>
     <slf4j.version>2.0.7</slf4j.version>
     <log4j2.version>2.20.0</log4j2.version>
     <dependency-plugin.version>3.6.0</dependency-plugin.version>
+    <awaitility.version>4.2.0</awaitility.version>
   </properties>
 
   <modules>
@@ -126,6 +127,13 @@
       <groupId>org.simplify4u</groupId>
       <artifactId>slf4j2-mock</artifactId>
       <version>${slf4j2-mock.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <!-- https://mvnrepository.com/artifact/org.awaitility/awaitility -->
+    <dependency>
+      <groupId>org.awaitility</groupId>
+      <artifactId>awaitility</artifactId>
+      <version>${awaitility.version}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
@@ -266,6 +274,9 @@
           <classpathDependencyExcludes>
             <classpathDependencyExclude>org.apache.logging.log4j:log4j-slf4j2-impl</classpathDependencyExclude>
           </classpathDependencyExcludes>
+          <excludedTestClasses>
+            <param>com.asml.apa.wta.spark.MultithreadTest</param>
+          </excludedTestClasses>
         </configuration>
         <dependencies>
           <!-- https://mvnrepository.com/artifact/org.pitest/pitest-junit5-plugin -->
@@ -304,18 +315,6 @@
               <descriptorRefs>
                 <descriptorRef>jar-with-dependencies</descriptorRef>
               </descriptorRefs>
-            </configuration>
-          </execution>
-          <execution>
-            <id>e2e</id>
-            <phase>none</phase>
-            <goals>
-              <goal>single</goal>
-            </goals>
-            <configuration>
-              <descriptors>
-                <descriptor>adapter/spark/config/assembly-e2e.xml</descriptor>
-              </descriptors>
             </configuration>
           </execution>
         </executions>

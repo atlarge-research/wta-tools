@@ -41,6 +41,9 @@ For the most part, since we are pre-release this will serve no real purpose, oth
 - Wired e2e testing into the pipeline [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 - Make the WtaPlugin class dictate the Spark adapter lifecycle [@pcho](https://gitlab.ewi.tudelft.nl/pcho)
 - Added option to choose between stage and task level metrics [@lyadalachanchu](https://gitlab.ewi.tudelft.nl/lyadalachanchu)
+- Added functionality to ping resources and syncronize with driver. [@hpage](https://gitlab.ewi.tudelft.nl/hpage)
+- Added the option to compile the plugin for Scala 2.12 and 2.13 [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
+- Extended BaseTraceObject with a new method [@tqu](https://gitlab.ewi.tudelft.nl/tqu)
 
 ### Changed
 - Refactored listeners into a generic interface to reduce code duplication and increase cc [@hpage](https://gitlab.ewi.tudelft.nl/hpage)
@@ -54,8 +57,10 @@ For the most part, since we are pre-release this will serve no real purpose, oth
 - Fixed the Parquet and JSON writer to use snake case to adhere to the WTA [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 - Fixed the DAS5 framework versions to download [@pcho](https://gitlab.ewi.tudelft.nl/pcho)
 - Fixed the format of the outputted files [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
+- Fixed the type inconsistency in the field types of the WTA Objects [@tqu](https://gitlab.ewi.tudelft.nl/tqu)
 
 ### Deprecated
 
 ### Removed
 - Removed Spotbugs SAST from the pipeline [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
+- Removed mutation testing from the pipeline [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)

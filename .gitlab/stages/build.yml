@@ -29,16 +29,30 @@ build-spark-adapter:
       - .m2/repository/com/asml/apa/wta
   cache: []
 
-package-spark-adapter-e2e:
+package-spark-adapter-e2e_2.12:
   stage: build
   needs: [build-spark-adapter]
   dependencies:
     - build-spark-adapter
   script:
-    - echo "Package Spark adapter started"
-    - "mvn -pl adapter/spark jar:jar assembly:single@e2e"
+    - echo "Package Spark adapter for Scala 2.12 started"
+    - "mvn -pl adapter/spark -De2e=true jar:jar assembly:single"
   artifacts:
-    name: package-spark-adapter-e2e
+    name: package-spark-adapter-e2e_2.12
+    expire_in: 20 minutes
+    paths:
+      - adapter/spark/target/*-e2e.jar
+
+package-spark-adapter-e2e_2.13:
+  stage: build
+  needs: [build-core]
+  dependencies:
+    - build-core
+  script:
+    - echo "Package Spark adapter for Scala 2.13 started"
+    - "mvn -pl adapter/spark -Dspark.scala.version=2.13 -De2e=true process-test-classes jar:jar assembly:single"
+  artifacts:
+    name: package-spark-adapter-e2e_2.13
     expire_in: 20 minutes
     paths:
       - adapter/spark/target/*-e2e.jar

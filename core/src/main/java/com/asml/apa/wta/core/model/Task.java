@@ -61,14 +61,14 @@ public class Task implements BaseTraceObject {
 
   private final double diskSpaceRequested;
 
-  private final long energyConsumption;
+  private final double energyConsumption;
 
   private final long resourceUsed;
 
   /**
    * Converts the POJO object into record object, enabling it to be written by Avro.
+   * It will put all fields allowed by the checker into the record.
    *
-   * @param task task
    * @param checker checker for which column to skip
    * @param schema schema
    * @return record
@@ -76,70 +76,70 @@ public class Task implements BaseTraceObject {
    * @author Tianchen Qu
    */
   @SuppressWarnings("CyclomaticComplexity")
-  public static GenericRecord convertTaskToRecord(Task task, Boolean[] checker, Schema schema) {
+  public GenericRecord convertToRecord(Boolean[] checker, Schema schema) {
     GenericData.Record record = new GenericData.Record(schema);
     if (checker[0]) {
-      record.put("id", task.id);
+      record.put("id", this.id);
     }
     if (checker[1]) {
-      record.put("type", task.type);
+      record.put("type", this.type);
     }
     if (checker[2]) {
-      record.put("ts_submit", task.submitTime);
+      record.put("ts_submit", this.submitTime);
     }
     if (checker[3]) {
-      record.put("submission_site", task.submissionSite);
+      record.put("submission_site", this.submissionSite);
     }
     if (checker[4]) {
-      record.put("runtime", task.runtime);
+      record.put("runtime", this.runtime);
     }
     if (checker[5]) {
-      record.put("resource_type", task.resourceType);
+      record.put("resource_type", this.resourceType);
     }
     if (checker[6]) {
-      record.put("resource_amount_requested", task.resourceAmountRequested);
+      record.put("resource_amount_requested", this.resourceAmountRequested);
     }
     if (checker[7]) {
-      record.put("parents", task.parents);
+      record.put("parents", this.parents);
     }
     if (checker[8]) {
-      record.put("children", task.children);
+      record.put("children", this.children);
     }
     if (checker[9]) {
-      record.put("user_id", task.userId);
+      record.put("user_id", this.userId);
     }
     if (checker[10]) {
-      record.put("group_id", task.groupId);
+      record.put("group_id", this.groupId);
     }
     if (checker[11]) {
-      record.put("nfrs", task.nfrs);
+      record.put("nfrs", this.nfrs);
     }
     if (checker[12]) {
-      record.put("workflow_id", task.workflowId);
+      record.put("workflow_id", this.workflowId);
     }
     if (checker[13]) {
-      record.put("wait_time", task.waitTime);
+      record.put("wait_time", this.waitTime);
     }
     if (checker[14]) {
-      record.put("params", task.params);
+      record.put("params", this.params);
     }
     if (checker[15]) {
-      record.put("memory_requested", task.memoryRequested);
+      record.put("memory_requested", this.memoryRequested);
     }
     if (checker[16]) {
-      record.put("network_io_time", task.networkIoTime);
+      record.put("network_io_time", this.networkIoTime);
     }
     if (checker[17]) {
-      record.put("disk_io_time", task.diskIoTime);
+      record.put("disk_io_time", this.diskIoTime);
     }
     if (checker[18]) {
-      record.put("disk_space_requested", task.diskSpaceRequested);
+      record.put("disk_space_requested", this.diskSpaceRequested);
     }
     if (checker[19]) {
-      record.put("energy_consumption", task.energyConsumption);
+      record.put("energy_consumption", this.energyConsumption);
     }
     if (checker[20]) {
-      record.put("resource_used", task.resourceUsed);
+      record.put("resource_used", this.resourceUsed);
     }
     return record;
   }

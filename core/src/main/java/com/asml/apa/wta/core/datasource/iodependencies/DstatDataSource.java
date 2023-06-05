@@ -7,6 +7,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import com.asml.apa.wta.core.utils.BashUtils;
 import lombok.extern.slf4j.Slf4j;
 
 /**
