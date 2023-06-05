@@ -2,9 +2,8 @@ package com.asml.apa.wta.core.supplier;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.asml.apa.wta.core.utils.BashUtils;
 import com.asml.apa.wta.core.dto.DstatDto;
-
+import com.asml.apa.wta.core.utils.BashUtils;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import org.junit.jupiter.api.Test;

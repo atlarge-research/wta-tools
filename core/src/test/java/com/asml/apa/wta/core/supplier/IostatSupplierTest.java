@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import com.asml.apa.wta.core.dto.IostatDto;
 import com.asml.apa.wta.core.utils.BashUtils;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 

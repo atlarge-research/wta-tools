@@ -1,6 +1,5 @@
 package com.asml.apa.wta.core.dto;
 
-import java.time.Instant;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,7 +15,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class DstatDto implements SupplierDto{
+public class DstatDto implements SupplierDto {
   private static final long serialVersionUID = 4386177879327585527L;
 
   private int totalUsageUsr;
