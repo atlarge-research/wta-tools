@@ -2,6 +2,8 @@ package com.asml.apa.wta.spark.listener;
 
 import com.asml.apa.wta.core.config.RuntimeConfig;
 import com.asml.apa.wta.core.model.Task;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.Getter;
@@ -10,7 +12,6 @@ import org.apache.spark.executor.TaskMetrics;
 import org.apache.spark.scheduler.SparkListenerStageCompleted;
 import org.apache.spark.scheduler.StageInfo;
 import scala.collection.JavaConverters;
-import scala.collection.mutable.ListBuffer;
 
 /**
  * This class is a stage-level listener for the Spark data source.
@@ -24,7 +25,7 @@ public class StageLevelListener extends TaskStageBaseListener {
 
   private final Map<Integer, Integer[]> stageToParents = new ConcurrentHashMap<>();
 
-  private final Map<Integer, ListBuffer<Integer>> parentToChildren = new ConcurrentHashMap<>();
+  private final Map<Integer, List<Integer>> parentToChildren = new ConcurrentHashMap<>();
 
   public StageLevelListener(SparkContext sparkContext, RuntimeConfig config) {
     super(sparkContext, config);
@@ -34,6 +35,7 @@ public class StageLevelListener extends TaskStageBaseListener {
    * This method will store the stage hierarchy information from the callback.
    * This class is a stage-level listener for the Spark data source.
    *
+   * @param stageCompleted   SparkListenerStageCompleted The object corresponding to information on stage completion
    * @author Tianchen Qu
    * @author Lohithsai Yadala Chanchu
    * @since 1.0.0
@@ -55,13 +57,13 @@ public class StageLevelListener extends TaskStageBaseListener {
         .toArray(size -> new Integer[size]);
     stageToParents.put(stageId, parentIds);
     for (Integer id : parentIds) {
-      ListBuffer<Integer> children = parentToChildren.get(id);
+      List<Integer> children = parentToChildren.get(id);
       if (children == null) {
-        children = new ListBuffer<>();
-        children.$plus$eq(stageId);
+        children = new ArrayList<>();
+        children.add(stageId);
         parentToChildren.put(id, children);
       } else {
-        children.$plus$eq(stageId);
+        children.add(stageId);
       }
     }
     // dummy values

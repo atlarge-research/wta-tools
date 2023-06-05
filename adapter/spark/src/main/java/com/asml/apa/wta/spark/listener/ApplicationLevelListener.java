@@ -13,8 +13,6 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.spark.SparkContext;
 import org.apache.spark.scheduler.SparkListenerApplicationEnd;
 import org.apache.spark.scheduler.SparkListenerApplicationStart;
-import scala.collection.Iterator;
-import scala.collection.mutable.ListBuffer;
 
 /**
  * This class is an application-level listener for the Spark data source.
@@ -94,14 +92,12 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
         task.setParents(ArrayUtils.toPrimitive(parents));
       }
 
-      ListBuffer<Integer> childrenStages =
+      List<Integer> childrenStages =
           stageLevelListener.getParentToChildren().get(stageId);
       if (childrenStages != null) {
-        Iterator<Integer> iterator = childrenStages.iterator();
         List<Long> children = new ArrayList<>();
-        while (iterator.hasNext()) {
-          children.addAll(taskLevelListener.getStageToTasks().get(iterator.next()));
-        }
+        childrenStages.forEach(
+            x -> children.addAll(taskLevelListener.getStageToTasks().get(x)));
         Long[] temp = children.toArray(new Long[0]);
         task.setChildren(ArrayUtils.toPrimitive(temp));
       }

@@ -7,6 +7,8 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
 import com.asml.apa.wta.core.model.Task;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 import java.util.stream.Collectors;
 import org.apache.spark.executor.TaskMetrics;
@@ -97,8 +99,10 @@ class StageLevelListenerTest extends BaseLevelListenerTest {
     fakeStageListener.onStageCompleted(stageEndEvent);
     assertThat(fakeStageListener.getStageToParents()).containsEntry(3, new Integer[] {1, 2});
     assertThat(fakeStageListener.getStageToParents().size()).isEqualTo(1);
-    assertThat(fakeStageListener.getParentToChildren()).containsEntry(1, new ListBuffer<Integer>().$plus$eq(3));
-    assertThat(fakeStageListener.getParentToChildren()).containsEntry(2, new ListBuffer<Integer>().$plus$eq(3));
+    List<Integer> temp = new ArrayList<>();
+    temp.add(3);
+    assertThat(fakeStageListener.getParentToChildren()).containsEntry(1, temp);
+    assertThat(fakeStageListener.getParentToChildren()).containsEntry(2, temp);
     assertThat(fakeStageListener.getParentToChildren().size()).isEqualTo(2);
   }
 }
