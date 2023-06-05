@@ -92,8 +92,9 @@ class WtaDriverPluginTest {
   void receiveAddsIntoMetricStreamCorrectly() {
     injectConfig();
     sut.init(mockedSparkContext, mockedPluginContext);
-    sut.receive(new ResourceCollectionDto(
-        List.of(new SparkBaseSupplierWrapperDto("1"), new SparkBaseSupplierWrapperDto("2"))));
+    sut.receive(new ResourceCollectionDto(List.of(
+        SparkBaseSupplierWrapperDto.builder().executorId("1").build(),
+        SparkBaseSupplierWrapperDto.builder().executorId("2").build())));
     assertThat(sut.getMetricStreamingEngine().getResourceStream().onKey("1").isEmpty())
         .isFalse();
     assertThat(sut.getMetricStreamingEngine().getResourceStream().onKey("2").isEmpty())

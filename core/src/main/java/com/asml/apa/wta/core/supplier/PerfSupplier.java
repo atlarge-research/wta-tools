@@ -15,7 +15,7 @@ import lombok.extern.slf4j.Slf4j;
  * @since 1.0.0
  */
 @Slf4j
-public class PerfSupplier implements InformationSupplier<PerfDto>{
+public class PerfSupplier implements InformationSupplier<PerfDto> {
 
   private final BashUtils bashUtils;
 
@@ -66,10 +66,8 @@ public class PerfSupplier implements InformationSupplier<PerfDto>{
     if (!isAvailable) {
       return notAvailableResult();
     }
-    return CompletableFuture.supplyAsync(() -> {
-      double watt = gatherMetrics();
-      return PerfDto.builder().watt(watt).build();
-    });
+    double watt = gatherMetrics();
+    return CompletableFuture.supplyAsync(() -> PerfDto.builder().watt(watt).build());
   }
 
   /**
