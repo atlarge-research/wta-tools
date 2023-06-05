@@ -1,10 +1,12 @@
 package com.asml.apa.wta.core.supplier;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.asml.apa.wta.core.dto.DstatDto;
 import com.asml.apa.wta.core.utils.BashUtils;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 import java.util.concurrent.ExecutionException;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -12,7 +14,7 @@ import org.mockito.Mockito;
 public class DstatSupplierTest {
 
   @Test
-  void successfullyCreateDstatDto() throws ExecutionException, InterruptedException {
+  void getSnapshotReturnsDstatDto() throws ExecutionException, InterruptedException {
     BashUtils bashUtils = Mockito.mock(BashUtils.class);
     Mockito.doReturn(CompletableFuture.completedFuture(
             "----total-usage---- -dsk/total- -net/total- ---paging-- ---system--\n"
@@ -41,5 +43,21 @@ public class DstatSupplierTest {
         .build();
 
     assertEquals(expected, actual.get());
+  }
+
+  @Test
+  void getSnapshotThrowsException() throws ExecutionException, InterruptedException {
+    BashUtils bashUtils = Mockito.mock(BashUtils.class);
+    Mockito.doReturn(CompletableFuture.completedFuture(
+            "----total-usage---- -dsk/total- -net/total- ---paging-- ---system--\n"
+                + "sys idl wai stl| read  writ| recv  send|  in   out | int   csw\n"
+                + " 1  98   0   0|   0     0 |   0     0 |   0     0 | 516  2116"))
+        .when(bashUtils)
+        .executeCommand("dstat -cdngy 1 -c 1");
+    DstatSupplier sut = Mockito.spy(new DstatSupplier(bashUtils));
+
+    assertThrows(CompletionException.class, () -> {
+      sut.getSnapshot().join();
+    });
   }
 }

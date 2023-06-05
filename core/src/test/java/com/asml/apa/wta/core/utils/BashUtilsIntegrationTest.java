@@ -10,11 +10,11 @@ import org.junit.jupiter.api.Test;
 
 public class BashUtilsIntegrationTest {
   @Test
-  void runExecuteCommandSuccessfully() {
+  void runExecuteCommandUnsuccessfully() {
     BashUtils bashUtils = new BashUtils();
     CompletableFuture<String> failedCommand = bashUtils.executeCommand("invalid_command");
     ExecutionException exception = assertThrows(ExecutionException.class, () -> {
-      failedCommand.get(); // Wait for the result and expect an exception
+      failedCommand.get();
     });
     Throwable cause = exception.getCause();
     assertTrue(cause instanceof BashUtils.BashCommandExecutionException);
@@ -22,7 +22,7 @@ public class BashUtilsIntegrationTest {
   }
 
   @Test
-  void runExecuteCommandUnsuccessfully() throws ExecutionException, InterruptedException {
+  void runExecuteCommandSuccessfully() throws ExecutionException, InterruptedException {
     BashUtils bashUtils = new BashUtils();
     CompletableFuture<String> actual = bashUtils.executeCommand("echo hello");
     assertEquals(actual.get(), "hello\n");
