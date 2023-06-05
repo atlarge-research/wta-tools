@@ -6,7 +6,6 @@ import static org.mockito.Mockito.when;
 
 import com.asml.apa.wta.core.model.Task;
 import com.asml.apa.wta.core.model.Workload;
-import java.util.Arrays;
 import java.util.Properties;
 import org.apache.spark.executor.ExecutorMetrics;
 import org.apache.spark.executor.TaskMetrics;

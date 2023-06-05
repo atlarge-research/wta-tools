@@ -37,9 +37,13 @@ public class SparkDataSource implements CollectorInterface {
    * @param config Additional config specified by the user for the plugin
    * @author Pil Kyu Cho
    * @author Henry Page
+   * @author Tianchen Qu
+   * @author Lohithsai Yadala Chanchu
    * @since 1.0.0
+   *
    */
   public SparkDataSource(SparkContext sparkContext, RuntimeConfig config) {
+
     stageLevelListener = new StageLevelListener(sparkContext, config);
     taskLevelListener = new TaskLevelListener(sparkContext, config);
     if (config.isStageLevel()) {
