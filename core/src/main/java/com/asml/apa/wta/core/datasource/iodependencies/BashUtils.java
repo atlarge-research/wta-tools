@@ -22,21 +22,25 @@ public class BashUtils {
       try {
         String[] commands = {"bash", "-c", command};
         Process process = new ProcessBuilder(commands).start();
-        process.waitFor();
+        int exitValue = process.waitFor();
+
+        if(exitValue != 0) {
+          throw new BashCommandExecutionException("Bash command execution failed with exit code: " + exitValue);
+        }
 
         return readProcessOutput(process);
       } catch (Exception e) {
         log.error(
             "Something went wrong while trying to execute the bash command. The cause is: {}",
             e.getCause().toString());
-        throw new BashCommandExecutionException("Error executing bash command", e);
+        throw new BashCommandExecutionException("Error executing bash command");
       }
     });
   }
 
-  public class BashCommandExecutionException extends RuntimeException {
-    public BashCommandExecutionException(String message, Throwable cause) {
-      super(message, cause);
+  public static class BashCommandExecutionException extends RuntimeException {
+    public BashCommandExecutionException(String message) {
+      super(message);
     }
   }
 
@@ -59,7 +63,7 @@ public class BashUtils {
       log.error(
           "Something went wrong while trying to read bash command outputs. The cause is: {}",
           e.getCause().toString());
-      throw new BashCommandExecutionException("Error reading bash output", e);
+      throw new BashCommandExecutionException("Error reading bash output");
     }
   }
 }

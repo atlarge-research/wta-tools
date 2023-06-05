@@ -35,7 +35,7 @@ public class DstatDataSource {
    */
   public DstatDataSourceDto getAllMetrics(String executorId) throws InterruptedException, ExecutionException {
     if (isDstatAvailable) {
-      CompletableFuture<String> allMetrics = bashUtils.executeCommand("dstat -cdngy 1 -c 1");
+      CompletableFuture<String> allMetrics = bashUtils.executeCommand("dstate -cdngy 1 -c 1");
 
       List<Integer> metrics = extractNumbers(allMetrics.get());
 
