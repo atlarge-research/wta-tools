@@ -1,7 +1,7 @@
 package com.asml.apa.wta.core.datasource;
 
 import com.asml.apa.wta.core.datasource.iodependencies.BashUtils;
-import com.asml.apa.wta.core.datasource.iodependencies.DstatDataSource;
+import com.asml.apa.wta.core.supplier.DstatSupplier;
 import com.asml.apa.wta.core.datasource.iodependencies.IostatDataSource;
 import com.asml.apa.wta.core.dto.DstatDataSourceDto;
 import org.junit.jupiter.api.Test;
@@ -27,7 +27,7 @@ public class DstatSupplierTest {
             "  0   1  98   0   0|   0     0 |   0     0 |   0     0 | 516  2116"))
                 .when(bashUtils)
                 .executeCommand("dstat -cdngy 1 -c 1");
-        DstatDataSource sut = Mockito.spy(new DstatDataSource(bashUtils));
+        DstatSupplier sut = Mockito.spy(new DstatSupplier(bashUtils));
 
         var actual = sut.getAllMetrics("x1");
 

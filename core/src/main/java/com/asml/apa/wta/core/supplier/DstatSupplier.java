@@ -1,4 +1,4 @@
-package com.asml.apa.wta.core.datasource.iodependencies;
+package com.asml.apa.wta.core.supplier;
 
 import com.asml.apa.wta.core.dto.DstatDataSourceDto;
 import java.util.ArrayList;
@@ -18,11 +18,11 @@ import lombok.extern.slf4j.Slf4j;
  * @since 1.0.0
  */
 @Slf4j
-public class DstatDataSource {
+public class DstatSupplier {
   private BashUtils bashUtils;
   private boolean isDstatAvailable;
 
-  public DstatDataSource(BashUtils bashUtils) {
+  public DstatSupplier(BashUtils bashUtils) {
     this.bashUtils = bashUtils;
     this.isDstatAvailable = isDstatAvailable();
   }
