@@ -1,7 +1,6 @@
 package com.asml.apa.wta.core.supplier;
 
 import com.asml.apa.wta.core.dto.IostatDto;
-import com.asml.apa.wta.core.supplier.InformationSupplier;
 import com.asml.apa.wta.core.utils.BashUtils;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
