@@ -7,19 +7,26 @@ import com.asml.apa.wta.core.dto.IostatDto;
 import com.asml.apa.wta.core.utils.BashUtils;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 public class IostatSupplierTest {
 
-  @Test
-  public void getSnapshotReturnsIostatDto() {
-    BashUtils bashUtils = Mockito.mock(BashUtils.class);
+  BashUtils bashUtils;
+  IostatSupplier sut;
+
+  @BeforeEach
+  void setup() {
+    bashUtils = Mockito.mock(BashUtils.class);
     Mockito.doReturn(CompletableFuture.completedFuture("str"))
         .when(bashUtils)
         .executeCommand("iostat");
-    IostatSupplier sut = Mockito.spy(new IostatSupplier(bashUtils));
+    sut = Mockito.spy(new IostatSupplier(bashUtils));
+  }
 
+  @Test
+  public void getSnapshotReturnsIostatDto() {
     Mockito.doReturn(CompletableFuture.completedFuture("str 1.0 2.0 3.0 4.0 5.0 6.0 7.0"))
         .when(bashUtils)
         .executeCommand("iostat -d | awk '$1 == \"sdc\"'");
@@ -41,12 +48,6 @@ public class IostatSupplierTest {
 
   @Test
   public void getSnapshotThrowsException() {
-    BashUtils bashUtils = Mockito.mock(BashUtils.class);
-    Mockito.doReturn(CompletableFuture.completedFuture("str"))
-        .when(bashUtils)
-        .executeCommand("iostat");
-    IostatSupplier sut = Mockito.spy(new IostatSupplier(bashUtils));
-
     Mockito.doReturn(CompletableFuture.completedFuture("str 1.0 2.0 3.0 4.0 5.0 6.0"))
         .when(bashUtils)
         .executeCommand("iostat -d | awk '$1 == \"sdc\"'");
