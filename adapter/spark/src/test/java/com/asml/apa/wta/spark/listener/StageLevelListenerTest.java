@@ -1,17 +1,6 @@
 package com.asml.apa.wta.spark.listener;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
-import org.apache.spark.executor.TaskMetrics;
-import org.apache.spark.scheduler.SparkListenerStageCompleted;
-import org.apache.spark.scheduler.StageInfo;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import scala.collection.JavaConverters;
-import scala.collection.mutable.ListBuffer;
-
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
@@ -20,22 +9,17 @@ import static org.mockito.Mockito.when;
 import com.asml.apa.wta.core.model.Task;
 import java.util.Properties;
 import java.util.stream.Collectors;
-
 import org.apache.spark.executor.TaskMetrics;
 import org.apache.spark.scheduler.SparkListenerJobStart;
 import org.apache.spark.scheduler.SparkListenerStageCompleted;
 import org.apache.spark.scheduler.StageInfo;
-import org.apache.spark.scheduler.TaskLocation;
-import org.apache.spark.storage.RDDInfo;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import scala.Option;
-import scala.collection.Seq;
+import scala.collection.JavaConverters;
 import scala.collection.mutable.ListBuffer;
 
 class StageLevelListenerTest extends BaseLevelListenerTest {
-
-  SparkListenerStageCompleted stageCompleted;
 
   SparkListenerStageCompleted stageEndEvent;
 
@@ -52,15 +36,28 @@ class StageLevelListenerTest extends BaseLevelListenerTest {
     parents.$plus$eq(1);
     parents.$plus$eq(2);
 
-
     testStageInfo = new StageInfo(
-        3, 0, "test", 50, null, JavaConverters.collectionAsScalaIterable(JavaConverters.asJavaCollection(parents).stream().map(x -> (Object) x).collect(Collectors.toList())).toList(), "None", mockedMetrics, null, null, 100);
+        3,
+        0,
+        "test",
+        50,
+        null,
+        JavaConverters.collectionAsScalaIterable(JavaConverters.asJavaCollection(parents).stream()
+                .map(x -> (Object) x)
+                .collect(Collectors.toList()))
+            .toList(),
+        "None",
+        mockedMetrics,
+        null,
+        null,
+        100);
 
     spyStageInfo = spy(testStageInfo);
     Option<Object> submissionTimeOption = Option.apply(10L);
     when(spyStageInfo.submissionTime()).thenReturn(submissionTimeOption);
     stageEndEvent = new SparkListenerStageCompleted(spyStageInfo);
   }
+
   @Test
   void testStageEndMetricExtraction() {
     ListBuffer<StageInfo> stageBuffer = new ListBuffer<>();
@@ -70,7 +67,7 @@ class StageLevelListenerTest extends BaseLevelListenerTest {
     fakeStageListener.onStageCompleted(stageEndEvent);
     assertEquals(1, fakeStageListener.getProcessedObjects().size());
     Task curStage = fakeStageListener.getProcessedObjects().get(0);
-    assertEquals(1, curStage.getId());
+    assertEquals(3, curStage.getId());
     assertEquals("", curStage.getType());
     assertEquals(10L, curStage.getSubmitTime());
     assertEquals(100L, curStage.getRuntime());
@@ -93,7 +90,11 @@ class StageLevelListenerTest extends BaseLevelListenerTest {
 
   @Test
   void onStageCompletedTest() {
-    fakeStageListener.onStageCompleted(stageCompleted);
+    ListBuffer<StageInfo> stageBuffer = new ListBuffer<>();
+    stageBuffer.$plus$eq(spyStageInfo);
+
+    fakeStageListener.onJobStart(new SparkListenerJobStart(1, 2L, stageBuffer.toList(), new Properties()));
+    fakeStageListener.onStageCompleted(stageEndEvent);
     assertThat(fakeStageListener.getStageToParents()).containsEntry(3, new Integer[] {1, 2});
     assertThat(fakeStageListener.getStageToParents().size()).isEqualTo(1);
     assertThat(fakeStageListener.getParentToChildren()).containsEntry(1, new ListBuffer<Integer>().$plus$eq(3));

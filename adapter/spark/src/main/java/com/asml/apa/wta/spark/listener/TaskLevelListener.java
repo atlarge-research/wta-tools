@@ -23,8 +23,6 @@ import org.apache.spark.scheduler.TaskInfo;
 @Getter
 public class TaskLevelListener extends TaskStageBaseListener {
 
-  private final Map<Integer, Integer> stageIdsToJobs = new ConcurrentHashMap<>();
-
   private final Map<Integer, List<Long>> stageToTasks = new ConcurrentHashMap<>();
 
   private final Map<Long, Integer> taskToStage = new ConcurrentHashMap<>();

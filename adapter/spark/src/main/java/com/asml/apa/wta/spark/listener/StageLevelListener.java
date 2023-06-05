@@ -2,24 +2,21 @@ package com.asml.apa.wta.spark.listener;
 
 import com.asml.apa.wta.core.config.RuntimeConfig;
 import com.asml.apa.wta.core.model.Task;
-
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.Getter;
-import org.apache.spark.executor.TaskMetrics;
 import org.apache.spark.SparkContext;
+import org.apache.spark.executor.TaskMetrics;
 import org.apache.spark.scheduler.SparkListenerStageCompleted;
 import org.apache.spark.scheduler.StageInfo;
-
 import scala.collection.JavaConverters;
-
 import scala.collection.mutable.ListBuffer;
 
 /**
  * This class is a stage-level listener for the Spark data source.
  *
  * @author Tianchen Qu
+ * @author Lohithsai Yadala Chanchu
  * @since 1.0.0
  */
 @Getter
@@ -35,20 +32,14 @@ public class StageLevelListener extends TaskStageBaseListener {
 
   /**
    * This method will store the stage hierarchy information from the callback.
- * This class is a stage-level listener for the Spark data source.
- *
+   * This class is a stage-level listener for the Spark data source.
+   *
    * @author Tianchen Qu
+   * @author Lohithsai Yadala Chanchu
    * @since 1.0.0
    */
   @Override
   public void onStageCompleted(SparkListenerStageCompleted stageCompleted) {
-
-
-
-
-
-
-    super.onStageCompleted(stageCompleted);
     final StageInfo curStageInfo = stageCompleted.stageInfo();
     final int stageId = curStageInfo.stageId();
     final TaskMetrics curStageMetrics = curStageInfo.taskMetrics();
@@ -57,8 +48,11 @@ public class StageLevelListener extends TaskStageBaseListener {
     final int userId = sparkContext.sparkUser().hashCode();
     final long workflowId = stageIdsToJobs.get(stageId);
 
-    final Integer[] parentIds = JavaConverters.seqAsJavaList(curStageInfo.parentIds().toList())
-            .stream().map(x -> (Integer) x).toArray(size -> new Integer[size]);
+    final Integer[] parentIds = JavaConverters.seqAsJavaList(
+            curStageInfo.parentIds().toList())
+        .stream()
+        .map(x -> (Integer) x)
+        .toArray(size -> new Integer[size]);
     stageToParents.put(stageId, parentIds);
     for (Integer id : parentIds) {
       ListBuffer<Integer> children = parentToChildren.get(id);

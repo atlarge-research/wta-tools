@@ -7,11 +7,9 @@ import static org.mockito.Mockito.when;
 
 import com.asml.apa.wta.core.model.Task;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 import java.util.stream.Collectors;
-
 import org.apache.spark.executor.ExecutorMetrics;
 import org.apache.spark.executor.TaskMetrics;
 import org.apache.spark.scheduler.SparkListenerJobStart;
@@ -23,7 +21,6 @@ import org.apache.spark.scheduler.TaskLocality;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import scala.collection.JavaConverters;
-import scala.collection.Seq;
 import scala.collection.mutable.ListBuffer;
 
 class TaskLevelListenerTest extends BaseLevelListenerTest {
@@ -53,7 +50,20 @@ class TaskLevelListenerTest extends BaseLevelListenerTest {
     when(mockedMetrics.executorRunTime()).thenReturn(100L);
 
     testStageInfo = new StageInfo(
-        3, 0, "test", 50, null, JavaConverters.collectionAsScalaIterable(JavaConverters.asJavaCollection(parents).stream().map(x -> (Object) x).collect(Collectors.toList())).toList(), "None", mockedMetrics, null, null, 100);
+        3,
+        0,
+        "test",
+        50,
+        null,
+        JavaConverters.collectionAsScalaIterable(JavaConverters.asJavaCollection(parents).stream()
+                .map(x -> (Object) x)
+                .collect(Collectors.toList()))
+            .toList(),
+        "None",
+        mockedMetrics,
+        null,
+        null,
+        100);
     parents.$plus$eq(3);
     taskEndEvent = new SparkListenerTaskEnd(
         3, 1, "testTaskType", null, testTaskInfo, new ExecutorMetrics(), mockedMetrics);
