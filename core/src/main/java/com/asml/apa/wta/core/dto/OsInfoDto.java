@@ -1,17 +1,23 @@
 package com.asml.apa.wta.core.dto;
 
+import com.asml.apa.wta.core.supplier.OperatingSystemSupplier;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
- * Data transfer object for the {@link com.asml.apa.wta.core.datasource.OperatingSystemDataSource}.
+ * Data transfer object for the {@link OperatingSystemSupplier}.
  *
  * @author Atour Mousavi Gourabi
+ * @author Henry Page
  * @since 1.0.0
  */
 @Data
 @AllArgsConstructor
-public class OperatingSystemDataSourceDto {
+@NoArgsConstructor
+@Builder
+public class OsInfoDto implements SupplierDto {
 
   private static final long serialVersionUID = 4386177879327585527L;
 
@@ -28,4 +34,6 @@ public class OperatingSystemDataSourceDto {
   private int availableProcessors;
 
   private double systemLoadAverage;
+
+  private String architecture;
 }

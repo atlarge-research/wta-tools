@@ -1,7 +1,6 @@
 package com.asml.apa.wta.spark;
 
 import java.util.Arrays;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.spark.SparkConf;
 import org.apache.spark.SparkContext;
 import org.apache.spark.api.java.JavaRDD;
@@ -16,7 +15,6 @@ import scala.Tuple2;
  * @author Pil Kyu Cho
  * @since 1.0.0
  */
-@Slf4j
 public class EndToEnd {
 
   private static JavaRDD<String> testFile;

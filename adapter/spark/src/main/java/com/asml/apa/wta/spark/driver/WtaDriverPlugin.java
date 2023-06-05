@@ -7,6 +7,8 @@ import com.asml.apa.wta.core.model.Workload;
 import com.asml.apa.wta.core.utils.ParquetWriterUtils;
 import com.asml.apa.wta.core.utils.WtaUtils;
 import com.asml.apa.wta.spark.datasource.SparkDataSource;
+import com.asml.apa.wta.spark.dto.ResourceCollectionDto;
+import com.asml.apa.wta.spark.streams.MetricStreamingEngine;
 import java.io.File;
 import java.util.HashMap;
 import java.util.List;
@@ -30,6 +32,8 @@ import org.apache.spark.api.plugin.PluginContext;
 @Slf4j
 public class WtaDriverPlugin implements DriverPlugin {
 
+  private MetricStreamingEngine metricStreamingEngine;
+
   private SparkDataSource sparkDataSource;
 
   private ParquetWriterUtils parquetUtil;
@@ -51,17 +55,23 @@ public class WtaDriverPlugin implements DriverPlugin {
    */
   @Override
   public Map<String, String> init(SparkContext sparkCtx, PluginContext pluginCtx) {
+    Map<String, String> executorVars = new HashMap<>();
     try {
       RuntimeConfig runtimeConfig = WtaUtils.readConfig(System.getProperty("configFile"));
       sparkDataSource = new SparkDataSource(sparkCtx, runtimeConfig);
+      metricStreamingEngine = new MetricStreamingEngine();
       parquetUtil = new ParquetWriterUtils(new File(runtimeConfig.getOutputPath()), "schema-1.0");
       parquetUtil.deletePreExistingFiles();
       initListeners();
+      executorVars.put("resourcePingInterval", String.valueOf(runtimeConfig.getResourcePingInterval()));
+      executorVars.put(
+          "executorSynchronizationInterval",
+          String.valueOf(runtimeConfig.getExecutorSynchronizationInterval()));
     } catch (Exception e) {
       error = true;
       shutdown();
     }
-    return new HashMap<>();
+    return executorVars;
   }
 
   /**
@@ -73,6 +83,11 @@ public class WtaDriverPlugin implements DriverPlugin {
    */
   @Override
   public Object receive(Object message) {
+    if (message instanceof ResourceCollectionDto) {
+      ((ResourceCollectionDto) message)
+          .getResourceCollection()
+          .forEach(r -> metricStreamingEngine.addToResourceStream(r.getExecutorId(), r));
+    }
     return null;
   }
 
