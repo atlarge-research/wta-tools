@@ -7,11 +7,11 @@ import com.asml.apa.wta.core.utils.BashUtils;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledOnOs;
 
-public class PerfDataSourceIntegrationTest {
+public class PerfSupplierIntegrationTest {
 
   private final BashUtils bashUtils = new BashUtils();
 
-  private final PerfDataSource sut = new PerfDataSource(bashUtils);
+  private final PerfSupplier sut = new PerfSupplier(bashUtils);
 
   @Test()
   @EnabledOnOs(LINUX)

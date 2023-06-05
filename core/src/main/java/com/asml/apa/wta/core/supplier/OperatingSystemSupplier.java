@@ -16,7 +16,7 @@ public class OperatingSystemSupplier implements InformationSupplier<OsInfoDto> {
 
   private final OperatingSystemMXBean bean;
 
-  private boolean isAvailable;
+  private final boolean isAvailable;
 
   /**
    * Constructs the Supplier.

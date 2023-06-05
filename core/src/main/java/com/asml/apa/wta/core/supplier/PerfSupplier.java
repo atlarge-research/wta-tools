@@ -1,5 +1,6 @@
 package com.asml.apa.wta.core.supplier;
 
+import com.asml.apa.wta.core.dto.PerfDto;
 import com.asml.apa.wta.core.exceptions.BashCommandExecutionException;
 import com.asml.apa.wta.core.utils.BashUtils;
 import java.util.concurrent.CompletableFuture;
@@ -10,12 +11,15 @@ import lombok.extern.slf4j.Slf4j;
  * PerfDataSource class.
  *
  * @author Atour Mousavi Gourabi
+ * @author Pil Kyu Cho
  * @since 1.0.0
  */
 @Slf4j
-public class PerfDataSource {
+public class PerfSupplier implements InformationSupplier<PerfDto>{
 
   private final BashUtils bashUtils;
+
+  private final boolean isAvailable;
 
   /**
    * Constructs a {@code perf} data source.
@@ -24,8 +28,9 @@ public class PerfDataSource {
    * @author Atour Mousavi Gourabi
    * @since 1.0.0
    */
-  public PerfDataSource(BashUtils bashUtils) {
+  public PerfSupplier(BashUtils bashUtils) {
     this.bashUtils = bashUtils;
+    this.isAvailable = isAvailable();
   }
 
   /**
@@ -36,6 +41,7 @@ public class PerfDataSource {
    * @author Pil Kyu Cho
    * @since 1.0.0
    */
+  @Override
   public boolean isAvailable() {
     try {
       return bashUtils
@@ -49,7 +55,25 @@ public class PerfDataSource {
   }
 
   /**
-   * Gather the perf energy metrics.
+   * Uses the Perf dependency to get energy metrics (computed asynchronously).
+   *
+   * @return PerfDto object that will be sent to the driver (with the necessary information filled out)
+   * @author Pil Kyu Cho
+   * @since 1.0.0
+   */
+  @Override
+  public CompletableFuture<PerfDto> getSnapshot() {
+    if (!isAvailable) {
+      return notAvailableResult();
+    }
+    return CompletableFuture.supplyAsync(() -> {
+      double watt = gatherMetrics();
+      return PerfDto.builder().watt(watt).build();
+    });
+  }
+
+  /**
+   * Gather the perf energy metrics. Returns the total joules in a second, which is equivalent to watt.
    *
    * @return the joules used by the CPU package over the past second
    * @author Atour Mousavi Gourabi

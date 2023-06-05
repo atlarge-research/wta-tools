@@ -10,11 +10,11 @@ import com.asml.apa.wta.core.utils.BashUtils;
 import java.util.concurrent.CompletableFuture;
 import org.junit.jupiter.api.Test;
 
-public class PerfDataSourceTest {
+public class PerfSupplierTest {
 
   private final BashUtils bashUtils = mock(BashUtils.class);
 
-  private final PerfDataSource sut = spy(new PerfDataSource(bashUtils));
+  private final PerfSupplier sut = spy(new PerfSupplier(bashUtils));
 
   @Test
   void perfEnergyDataSourceIsAvailable() {

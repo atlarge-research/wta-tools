@@ -123,6 +123,7 @@ public class SparkSupplierExtractionEngine extends SupplierExtractionEngine<Spar
    * @param record The {@link BaseSupplierDto} to transform
    * @return A {@link SparkBaseSupplierWrapperDto} containing information pertaining to Spark
    * @author Henry Page
+   * @author Pil Kyu Cho
    * @since 1.0.0
    */
   @Override
@@ -132,6 +133,7 @@ public class SparkSupplierExtractionEngine extends SupplierExtractionEngine<Spar
         .timestamp(record.getTimestamp())
         .osInfoDto(record.getOsInfoDto())
         .iostatDto(record.getIostatDto())
+        .perfDto(record.getPerfDto())
         .build();
   }
 }

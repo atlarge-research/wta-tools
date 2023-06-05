@@ -18,7 +18,7 @@ public class IostatSupplier implements InformationSupplier<IostatDto> {
 
   private final BashUtils bashUtils;
 
-  private boolean isAvailable;
+  private final boolean isAvailable;
 
   /**
    * Constructs the supplier with a given instance of bash utils.
