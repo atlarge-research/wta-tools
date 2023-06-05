@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
 import com.asml.apa.wta.core.dto.BaseSupplierDto;
+import com.asml.apa.wta.core.dto.DstatDto;
 import com.asml.apa.wta.core.dto.IostatDto;
 import com.asml.apa.wta.core.dto.OsInfoDto;
 import com.asml.apa.wta.spark.dto.SparkBaseSupplierWrapperDto;
@@ -35,10 +36,11 @@ class SparkSupplierExtractionEngineTest {
   void correctDtoGetsReturnedWhenBaseInformationIsTransformed() {
     OsInfoDto fakeOsInfo = OsInfoDto.builder().availableProcessors(1).build();
     IostatDto fakeIoStatDto = IostatDto.builder().kiloByteRead(40).build();
+    DstatDto fakeDstatDto = DstatDto.builder().netSend(1).build();
 
     LocalDateTime fakeTime = LocalDateTime.of(2000, 1, 1, 0, 0);
 
-    BaseSupplierDto baseSupplierDto = new BaseSupplierDto(fakeTime, fakeOsInfo, fakeIoStatDto);
+    BaseSupplierDto baseSupplierDto = new BaseSupplierDto(fakeTime, fakeOsInfo, fakeIoStatDto, fakeDstatDto);
 
     SparkBaseSupplierWrapperDto result = sutSupplierExtractionEngine.transform(baseSupplierDto);
 
@@ -47,6 +49,7 @@ class SparkSupplierExtractionEngineTest {
             .timestamp(fakeTime)
             .osInfoDto(fakeOsInfo)
             .iostatDto(fakeIoStatDto)
+            .dstatDto(fakeDstatDto)
             .executorId("test-executor-id")
             .build());
   }
