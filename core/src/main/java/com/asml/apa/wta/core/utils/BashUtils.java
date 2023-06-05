@@ -1,5 +1,6 @@
 package com.asml.apa.wta.core.utils;
 
+import com.asml.apa.wta.core.exceptions.BashCommandExecutionException;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -39,12 +40,6 @@ public class BashUtils {
         throw new BashCommandExecutionException("Error executing bash command");
       }
     });
-  }
-
-  public static class BashCommandExecutionException extends RuntimeException {
-    public BashCommandExecutionException(String message) {
-      super(message);
-    }
   }
 
   /**

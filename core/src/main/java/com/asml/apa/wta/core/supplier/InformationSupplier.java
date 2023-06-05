@@ -2,7 +2,6 @@ package com.asml.apa.wta.core.supplier;
 
 import com.asml.apa.wta.core.dto.SupplierDto;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 
 public interface InformationSupplier<T extends SupplierDto> {
 
@@ -19,7 +18,7 @@ public interface InformationSupplier<T extends SupplierDto> {
    *
    * @return A {@link CompletableFuture} containing the snapshot of the information
    */
-  CompletableFuture<T> getSnapshot() throws ExecutionException, InterruptedException;
+  CompletableFuture<T> getSnapshot();
 
   /**
    * Provides a dummy value when the supplier is not available.

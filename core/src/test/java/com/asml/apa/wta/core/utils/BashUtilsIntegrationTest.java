@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.asml.apa.wta.core.exceptions.BashCommandExecutionException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import org.junit.jupiter.api.Test;
@@ -17,7 +18,7 @@ public class BashUtilsIntegrationTest {
       failedCommand.get();
     });
     Throwable cause = exception.getCause();
-    assertTrue(cause instanceof BashUtils.BashCommandExecutionException);
+    assertTrue(cause instanceof BashCommandExecutionException);
     assertEquals("Bash command execution failed with exit code: 127", cause.getMessage());
   }
 
