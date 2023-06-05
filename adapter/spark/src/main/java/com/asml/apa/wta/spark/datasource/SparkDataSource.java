@@ -29,6 +29,7 @@ public class SparkDataSource implements CollectorInterface {
   private final ApplicationLevelListener applicationLevelListener;
 
   private final RuntimeConfig runtimeConfig;
+  
   /**
    * Constructor for the Spark data source. This requires a Spark context to ensure a Spark session
    * is available before the data source is initialized.
