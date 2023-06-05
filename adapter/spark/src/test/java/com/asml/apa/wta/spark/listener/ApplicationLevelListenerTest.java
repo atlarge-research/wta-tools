@@ -94,7 +94,6 @@ class ApplicationLevelListenerTest extends BaseLevelListenerTest {
     fakeStageListener.onStageCompleted(stageCompleted2);
     fakeApplicationListener.onApplicationEnd(applicationEndObj);
     Task task = fakeTaskListener.processedObjects.get(0);
-    System.out.println(Arrays.toString(task.getParents()));
     assertThat(task.getParents().length).isEqualTo(0);
     assertThat(task.getChildren().length).isEqualTo(2);
     assertThat(task.getChildren()).contains(4, 5);
