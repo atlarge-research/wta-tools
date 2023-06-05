@@ -39,7 +39,7 @@ public class DstatSupplier implements InformationSupplier<DstatDto>{
   public CompletableFuture<DstatDto> getSnapshot() throws ExecutionException, InterruptedException {
     if (isDstatAvailable) {
       CompletableFuture<String> allMetrics = bashUtils.executeCommand("dstat -cdngy 1 -c 1");
-      
+
 
       return allMetrics.thenApply(result -> {
         List<Integer> metrics = extractNumbers(result);

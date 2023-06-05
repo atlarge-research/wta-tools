@@ -7,20 +7,19 @@ import java.util.concurrent.ExecutionException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class BashUtilsIntegrationTest {
     @Test
     void runExecuteCommandSuccessfully() {
         BashUtils bashUtils = new BashUtils();
-        CompletableFuture<String> actual = bashUtils.executeCommand("echor hello");
-
-        Throwable exception = assertThrows(BashUtils.BashCommandExecutionException.class, () -> {
-            actual.get(); // Trigger the exception by accessing the result
+        CompletableFuture<String> failedCommand = bashUtils.executeCommand("invalid_command");
+        ExecutionException exception = assertThrows(ExecutionException.class, () -> {
+            failedCommand.get(); // Wait for the result and expect an exception
         });
-
-        String expectedErrorMessage = "Bash command execution failed with exit code"; // Replace with the expected error message
-
-        assertEquals(expectedErrorMessage, exception.getMessage());
+        Throwable cause = exception.getCause();
+        assertTrue(cause instanceof BashUtils.BashCommandExecutionException);
+        assertEquals("Bash command execution failed with exit code: 127", cause.getMessage());
     }
     @Test
     void runExecuteCommandUnsuccessfully() throws ExecutionException, InterruptedException {

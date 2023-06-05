@@ -29,7 +29,11 @@ public class BashUtils {
         }
 
         return readProcessOutput(process);
-      } catch (Exception e) {
+      }
+      catch (BashCommandExecutionException e) {
+        throw e;
+      }
+      catch (Exception e) {
         log.error(
             "Something went wrong while trying to execute the bash command. The cause is: {}",
             e.getCause().toString());

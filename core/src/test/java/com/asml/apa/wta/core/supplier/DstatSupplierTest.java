@@ -33,6 +33,6 @@ public class DstatSupplierTest {
         .totalUsageIdl(98).totalUsageWai(0).totalUsageStl(0)
         .dskRead(0).dskWrite(0).netRecv(0).netSend(0).pagingIn(0).pagingOut(0).systemInt(516).systemCsw(2116).build();
 
-        assertEquals(expected, actual);
+        assertEquals(expected, actual.get());
     }
 }
