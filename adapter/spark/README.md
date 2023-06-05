@@ -17,11 +17,15 @@ The diagram above illustrates the workflow of the adapter.
 
 ## Installation and Usage
 - Clone the repository
-- Optional (if more I/O metrics are needed): Install sysstat by running the following bash command:
-
-```bash
-sudo apt install sysstat
-```
+- Optional (if more I/O metrics are needed):
+  - Install sysstat by running the following bash command:
+  ```bash
+  sudo apt install sysstat
+  ```
+  - Install dstat by running the following bash command:
+  ```bash
+  sudo apt install dstat
+  ```
 
 There are two ways to make use of the plugin
 1. Integrate the plugin into the Spark application source code
