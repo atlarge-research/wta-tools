@@ -31,7 +31,6 @@ public class IostatSupplierTest {
         .kiloByteRead(5.0)
         .kiloByteWrtn(6.0)
         .kiloByteDscd(7.0)
-        .executorId("driver")
         .build();
 
     IostatDto result = sut.getSnapshot().join();

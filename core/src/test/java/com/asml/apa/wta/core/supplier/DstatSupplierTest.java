@@ -1,18 +1,14 @@
-package com.asml.apa.wta.core.datasource;
+package com.asml.apa.wta.core.supplier;
 
-import com.asml.apa.wta.core.datasource.iodependencies.BashUtils;
-import com.asml.apa.wta.core.supplier.DstatSupplier;
-import com.asml.apa.wta.core.datasource.iodependencies.IostatDataSource;
-import com.asml.apa.wta.core.dto.DstatDataSourceDto;
+import com.asml.apa.wta.core.dto.DstatDto;
+import com.asml.apa.wta.core.utils.BashUtils;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.spy;
 
 public class DstatSupplierTest {
 
@@ -31,7 +27,7 @@ public class DstatSupplierTest {
 
         var actual = sut.getAllMetrics("x1");
 
-        DstatDataSourceDto expected = DstatDataSourceDto.builder()
+        DstatDto expected = DstatDto.builder()
         .totalUsageUsr(0)
         .totalUsageSys(1)
         .totalUsageIdl(98).totalUsageWai(0).totalUsageStl(0)

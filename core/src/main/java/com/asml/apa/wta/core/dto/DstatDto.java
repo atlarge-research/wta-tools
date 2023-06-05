@@ -16,7 +16,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class DstatDataSourceDto {
+public class DstatDto {
   private int totalUsageUsr;
   private int totalUsageSys;
   private int totalUsageIdl;

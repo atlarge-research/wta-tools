@@ -1,6 +1,6 @@
 package com.asml.apa.wta.core.supplier;
 
-import com.asml.apa.wta.core.dto.DstatDataSourceDto;
+import com.asml.apa.wta.core.dto.DstatDto;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -18,7 +18,7 @@ import lombok.extern.slf4j.Slf4j;
  * @since 1.0.0
  */
 @Slf4j
-public class DstatSupplier {
+public class DstatSupplier extends InformationSupplier<DstatDto>{
   private BashUtils bashUtils;
   private boolean isDstatAvailable;
 
@@ -35,14 +35,14 @@ public class DstatSupplier {
    * @author Lohithsai Yadala Chanchu
    * @since 1.0.0
    */
-  public DstatDataSourceDto getAllMetrics(String executorId) throws InterruptedException, ExecutionException {
+  public DstatDto getAllMetrics(String executorId) throws InterruptedException, ExecutionException {
     if (isDstatAvailable) {
       CompletableFuture<String> allMetrics = bashUtils.executeCommand("dstate -cdngy 1 -c 1");
 
       List<Integer> metrics = extractNumbers(allMetrics.get());
 
       try {
-        return DstatDataSourceDto.builder()
+        return DstatDto.builder()
             .totalUsageUsr(metrics.get(0))
             .totalUsageSys(metrics.get(1))
             .totalUsageIdl(metrics.get(2))
