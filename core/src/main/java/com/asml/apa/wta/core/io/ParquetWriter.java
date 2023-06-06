@@ -10,7 +10,7 @@ public interface ParquetWriter<T> {
 
   /**
    * Writes the record.
-   * Provides no guarantees that the file is directly flushed.
+   * Provides no guarantee that the file is directly flushed.
    *
    * @param record the record to write
    * @author Atour Mousavi Gourabi

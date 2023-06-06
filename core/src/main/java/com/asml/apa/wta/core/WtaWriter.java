@@ -22,8 +22,6 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class WtaWriter {
 
-  private final String schemaVersion;
-
   private Workload workloadToWrite = null;
   private final Collection<Workflow> workflowsToWrite = new ArrayList<>();
   private final Collection<Resource> resourcesToWrite = new ArrayList<>();
@@ -43,8 +41,6 @@ public class WtaWriter {
    * @since 1.0.0
    */
   public WtaWriter(Path path, String version) {
-    schemaVersion = version;
-
     workloadWriter =
         new DiskJsonWriter<>(path.resolve("workload").resolve(version).resolve("generic_information.json"));
     taskWriter =
