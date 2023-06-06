@@ -8,6 +8,7 @@ import com.asml.apa.wta.core.model.enums.Domain;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import com.asml.apa.wta.core.streams.Stream;
@@ -77,100 +78,100 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
     final List<Task> tasks = taskLevelListener.processedObjects;
 
     final long numSites = tasks.stream().filter(x -> x.getSubmissionSite()!=-1).count();
-    final long numResources = (long) tasks.stream().map(Task::getResourceAmountRequested).reduce(Double::sum).get();
+    final long numResources = tasks.stream().map(Task::getResourceAmountRequested).filter(x -> x>0.0).reduce(Double::sum).orElseGet(() -> -1.0).longValue();
     final long numUsers = tasks.stream().filter(x -> x.getUserId()!=-1).count();
     final long numGroups = tasks.stream().filter(x -> x.getGroupId()!=-1).count();
-    final double totalResourceSeconds = tasks.stream().filter(x -> x.getGroupId()!=-1).map(x -> x.getResourceAmountRequested()*x.getRuntime()).reduce(Double::sum).orElseGet(() -> -1.0);
+    final double totalResourceSeconds = tasks.stream().filter(x -> x.getGroupId()!=-1).filter(x -> x.getRuntime()>0&&x.getResourceAmountRequested()>0).map(x -> x.getResourceAmountRequested()*x.getRuntime()).reduce(Double::sum).orElseGet(() -> -1.0);
     // unknown
 
     // all statistics (stdev, mean, etc.) are unknown
-     final double minResourceTask = tasks.stream().map(Task::getResourceAmountRequested).reduce(Double::min).get();
+     final double minResourceTask = tasks.stream().map(Task::getResourceAmountRequested).filter(x -> x>0.0).reduce(Double::min).orElseGet(() -> -1.0);
 
-     final double maxResourceTask = tasks.stream().map(Task::getResourceAmountRequested).reduce(Double::max).get();
+     final double maxResourceTask = tasks.stream().map(Task::getResourceAmountRequested).filter(x -> x>0.0).reduce(Double::max).orElseGet(() -> -1.0);
 
-     final double meanResourceTask = tasks.stream().map(Task::getResourceAmountRequested).reduce(Double::sum).get()/tasks.size();;
+     final double meanResourceTask = tasks.stream().map(Task::getResourceAmountRequested).filter(x -> x>0.0).reduce(Double::sum).orElseGet(() -> (double) -tasks.size())/tasks.size();;
 
-     final double stdResourceTask = standardDeviation(tasks.stream().map(Task::getResourceAmountRequested), meanResourceTask);
+     final double stdResourceTask = standardDeviation(tasks.stream().map(Task::getResourceAmountRequested).filter(x -> x>0.0), meanResourceTask);
 
-     final Double[] resourceStats = medianAndQuatiles(tasks.stream().map(Task::getResourceAmountRequested).collect(Collectors.toList()));
+     final Optional<Double[]> resourceStats = medianAndQuatiles(tasks.stream().map(Task::getResourceAmountRequested).filter(x -> x>0.0).collect(Collectors.toList()));
 
-     final double medianResourceTask = resourceStats[0];
+     final double medianResourceTask = resourceStats.orElseGet(() -> new Double[]{-1.0,-1.0,-1.0})[0];
 
-     final double firstQuartileResourceTask = resourceStats[1];
+     final double firstQuartileResourceTask = resourceStats.orElseGet(() -> new Double[]{-1.0,-1.0,-1.0})[1];
 
-     final double thirdQuartileResourceTask = resourceStats[2];
+     final double thirdQuartileResourceTask = resourceStats.orElseGet(() -> new Double[]{-1.0,-1.0,-1.0})[2];
 
      final double covResourceTask = stdResourceTask/meanResourceTask;
 
-     final double minMemory = tasks.stream().map(Task::getMemoryRequested).reduce(Double::min).get();
+     final double minMemory = tasks.stream().map(Task::getMemoryRequested).filter(x -> x>0.0).reduce(Double::min).orElseGet(() -> -1.0);
 
-     final double maxMemory = tasks.stream().map(Task::getMemoryRequested).reduce(Double::max).get();
+     final double maxMemory = tasks.stream().map(Task::getMemoryRequested).filter(x -> x>0.0).reduce(Double::max).orElseGet(() -> -1.0);
 
-     final double meanMemory = tasks.stream().map(Task::getMemoryRequested).reduce(Double::sum).get()/tasks.size();
+     final double meanMemory = tasks.stream().map(Task::getMemoryRequested).filter(x -> x>0.0).reduce(Double::sum).orElseGet(() -> (double) -tasks.size())/tasks.size();
 
-     final double stdMemory = standardDeviation(tasks.stream().map(Task::getMemoryRequested), meanMemory);
+     final double stdMemory = standardDeviation(tasks.stream().map(Task::getMemoryRequested).filter(x -> x>0.0), meanMemory);
 
-     final Double[] memoryStats = medianAndQuatiles(tasks.stream().map(Task::getMemoryRequested).collect(Collectors.toList()));
+     final Optional<Double[]> memoryStats = medianAndQuatiles(tasks.stream().map(Task::getMemoryRequested).filter(x -> x>0.0).collect(Collectors.toList()));
 
-     final double medianMemory = memoryStats[0];
+     final double medianMemory = memoryStats.orElseGet(() -> new Double[]{-1.0,-1.0,-1.0})[0];
 
-     final double firstQuartileMemory = memoryStats[1];
+     final double firstQuartileMemory = memoryStats.orElseGet(() -> new Double[]{-1.0,-1.0,-1.0})[1];
 
-     final double thirdQuartileMemory = memoryStats[2];
+     final double thirdQuartileMemory = memoryStats.orElseGet(() -> new Double[]{-1.0,-1.0,-1.0})[2];
 
      final double covMemory = stdMemory/meanMemory;
 
-     final long minNetworkUsage = tasks.stream().map(Task::getNetworkIoTime).reduce(Long::min).get();
+     final long minNetworkUsage = tasks.stream().map(Task::getNetworkIoTime).filter(x -> x>0).reduce(Long::min).orElseGet(() -> -1L);
 
-     final long maxNetworkUsage = tasks.stream().map(Task::getNetworkIoTime).reduce(Long::max).get();
+     final long maxNetworkUsage = tasks.stream().map(Task::getNetworkIoTime).filter(x -> x>0).reduce(Long::max).orElseGet(() -> -1L);
 
-     final double meanNetworkUsage = (double) tasks.stream().map(Task::getNetworkIoTime).reduce(Long::sum).get()/tasks.size();;
+     final double meanNetworkUsage = (double) tasks.stream().map(Task::getNetworkIoTime).reduce(Long::sum).orElseGet(() -> (long) -tasks.size())/tasks.size();;
 
      final double stdNetworkUsage = standardDeviation(tasks.stream().map(Task::getNetworkIoTime).map(Long::doubleValue), meanNetworkUsage);
 
-     final Long[] networkStats = medianAndQuatiles(tasks.stream().map(Task::getNetworkIoTime).collect(Collectors.toList()));
+     final Optional<Long[]> networkStats = medianAndQuatiles(tasks.stream().map(Task::getNetworkIoTime).filter(x -> x>0).collect(Collectors.toList()));
 
-     final long medianNetworkUsage = networkStats[0];
+     final long medianNetworkUsage = networkStats.orElseGet(() -> new Long[]{-1L,-1L,-1L})[0];
 
-     final long firstQuartileNetworkUsage = networkStats[1];
+     final long firstQuartileNetworkUsage = networkStats.orElseGet(() -> new Long[]{-1L,-1L,-1L})[1];
 
-     final long thirdQuartileNetworkUsage = networkStats[2];
+     final long thirdQuartileNetworkUsage = networkStats.orElseGet(() -> new Long[]{-1L,-1L,-1L})[2];
 
      final double covNetworkUsage = stdNetworkUsage/meanNetworkUsage;
 
-     final double minDiskSpaceUsage = tasks.stream().map(Task::getDiskSpaceRequested).reduce(Double::min).get();
+     final double minDiskSpaceUsage = tasks.stream().map(Task::getDiskSpaceRequested).filter(x -> x>0.0).reduce(Double::min).orElseGet(() -> -1.0);
 
-     final double maxDiskSpaceUsage = tasks.stream().map(Task::getDiskSpaceRequested).reduce(Double::max).get();
+     final double maxDiskSpaceUsage = tasks.stream().map(Task::getDiskSpaceRequested).filter(x -> x>0.0).reduce(Double::max).orElseGet(() -> -1.0);
 
-     final double meanDiskSpaceUsage = tasks.stream().map(Task::getDiskSpaceRequested).reduce(Double::sum).get()/tasks.size();
+     final double meanDiskSpaceUsage = tasks.stream().map(Task::getDiskSpaceRequested).filter(x -> x>0.0).reduce(Double::sum).orElseGet(() -> (double) -tasks.size())/tasks.size();
 
-     final double stdDiskSpaceUsage = standardDeviation(tasks.stream().map(Task::getDiskSpaceRequested), meanDiskSpaceUsage);
+     final double stdDiskSpaceUsage = standardDeviation(tasks.stream().map(Task::getDiskSpaceRequested).filter(x -> x>0.0), meanDiskSpaceUsage);
 
-     final Double[] diskSpaceStats = medianAndQuatiles(tasks.stream().map(Task::getDiskSpaceRequested).collect(Collectors.toList()));
+     final Optional<Double[]> diskSpaceStats = medianAndQuatiles(tasks.stream().map(Task::getDiskSpaceRequested).filter(x -> x>0.0).collect(Collectors.toList()));
 
-     final double medianDiskSpaceUsage = diskSpaceStats[0];
+     final double medianDiskSpaceUsage = diskSpaceStats.orElseGet(() -> new Double[]{-1.0,-1.0,-1.0})[0];
 
-     final double firstQuartileDiskSpaceUsage = diskSpaceStats[1];
+     final double firstQuartileDiskSpaceUsage = diskSpaceStats.orElseGet(() -> new Double[]{-1.0,-1.0,-1.0})[1];
 
-     final double thirdQuartileDiskSpaceUsage = diskSpaceStats[2];
+     final double thirdQuartileDiskSpaceUsage = diskSpaceStats.orElseGet(() -> new Double[]{-1.0,-1.0,-1.0})[2];
 
      final double covDiskSpaceUsage = stdDiskSpaceUsage/meanDiskSpaceUsage;
 
-     final double minEnergy = tasks.stream().map(Task::getEnergyConsumption).reduce(Double::min).get();
+     final double minEnergy = tasks.stream().map(Task::getEnergyConsumption).filter(x -> x>0.0).reduce(Double::min).orElseGet(() -> -1.0);
 
-     final double maxEnergy = tasks.stream().map(Task::getEnergyConsumption).reduce(Double::max).get();
+     final double maxEnergy = tasks.stream().map(Task::getEnergyConsumption).filter(x -> x>0.0).reduce(Double::max).orElseGet(() -> -1.0);
 
-     final double meanEnergy = (double) tasks.stream().map(Task::getEnergyConsumption).reduce(Double::sum).get()/tasks.size();;
+     final double meanEnergy = tasks.stream().map(Task::getEnergyConsumption).filter(x -> x>0.0).reduce(Double::sum).orElseGet(() -> (double) -tasks.size()) /tasks.size();;
 
-     final double stdEnergy = standardDeviation(tasks.stream().map(Task::getEnergyConsumption), meanEnergy);
+     final double stdEnergy = standardDeviation(tasks.stream().map(Task::getEnergyConsumption).filter(x -> x>0.0), meanEnergy);
 
-      final Double[] energyStats = medianAndQuatiles(tasks.stream().map(Task::getEnergyConsumption).collect(Collectors.toList()));
+      final Optional<Double[]> energyStats = medianAndQuatiles(tasks.stream().map(Task::getEnergyConsumption).filter(x -> x>0.0).collect(Collectors.toList()));
 
-     final double medianEnergy = energyStats[0];
+     final double medianEnergy = energyStats.orElseGet(() -> new Double[]{-1.0,-1.0,-1.0})[0];
 
-     final double firstQuartileEnergy = energyStats[1];
+     final double firstQuartileEnergy = energyStats.orElseGet(() -> new Double[]{-1.0,-1.0,-1.0})[1];
 
-     final double thirdQuartileEnergy = energyStats[2];
+     final double thirdQuartileEnergy = energyStats.orElseGet(() -> new Double[]{-1.0,-1.0,-1.0})[2];
 
      final double covEnergy = stdEnergy/meanEnergy;
 
@@ -204,12 +205,15 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
     }
   }
 
-  private <T extends Comparable> T[] medianAndQuatiles(List<T> data){
+  private <T extends Comparable> Optional<T[]> medianAndQuatiles(List<T> data){
+      if(data==null||data.size()==0){
+          return Optional.empty();
+      }
     Collections.sort(data);
     T[] triple = (T[]) new Object[3];
     triple[0] = data.get(data.size()/2);
     triple[1] = data.get(data.size()/4);
     triple[2] = data.get(data.size()*3/4);
-    return triple;
+    return Optional.of(triple);
   }
 }

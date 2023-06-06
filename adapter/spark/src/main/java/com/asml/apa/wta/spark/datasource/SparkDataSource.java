@@ -6,11 +6,7 @@ import com.asml.apa.wta.core.model.Workflow;
 import com.asml.apa.wta.core.model.Workload;
 import com.asml.apa.wta.core.utils.CollectorInterface;
 import com.asml.apa.wta.core.utils.WtaUtils;
-import com.asml.apa.wta.spark.listener.AbstractListener;
-import com.asml.apa.wta.spark.listener.ApplicationLevelListener;
-import com.asml.apa.wta.spark.listener.JobLevelListener;
-import com.asml.apa.wta.spark.listener.StageLevelListener;
-import com.asml.apa.wta.spark.listener.TaskLevelListener;
+import com.asml.apa.wta.spark.listener.*;
 import lombok.Getter;
 import org.apache.spark.SparkContext;
 
@@ -45,12 +41,12 @@ public class SparkDataSource implements CollectorInterface {
    * @since 1.0.0
    */
   public SparkDataSource(SparkContext sparkContext, RuntimeConfig config) {
-    taskLevelListener = new TaskLevelListener(sparkContext, config, executorLevelListener);
+    taskLevelListener = new TaskLevelListener(sparkContext, config);
     stageLevelListener = new StageLevelListener(sparkContext, config);
     if (config.isStageLevel()) {
-      jobLevelListener = new JobLevelListener(sparkContext, config, stageLevelListener);
+      jobLevelListener = new JobLevelListener(sparkContext, config, stageLevelListener, stageLevelListener);
     } else {
-      jobLevelListener = new JobLevelListener(sparkContext, config, taskLevelListener);
+      jobLevelListener = new JobLevelListener(sparkContext, config, taskLevelListener, stageLevelListener);
     }
     applicationLevelListener = new ApplicationLevelListener(sparkContext, config, jobLevelListener, taskLevelListener);
     runtimeConfig = config;
@@ -147,4 +143,6 @@ public class SparkDataSource implements CollectorInterface {
   public void removeStageListener() {
     stageLevelListener.remove();
   }
+
+
 }

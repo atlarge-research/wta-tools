@@ -4,11 +4,14 @@ import com.asml.apa.wta.core.config.RuntimeConfig;
 import com.asml.apa.wta.core.model.Task;
 import org.apache.spark.SparkContext;
 import org.apache.spark.executor.TaskMetrics;
-import org.apache.spark.resource.ExecutorResourceRequest;
 import org.apache.spark.resource.ResourceProfile;
 import org.apache.spark.resource.TaskResourceRequest;
+import org.apache.spark.scheduler.SparkListenerExecutorAdded;
 import org.apache.spark.scheduler.SparkListenerTaskEnd;
 import org.apache.spark.scheduler.TaskInfo;
+
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * This class is a task-level listener for the Spark data source.
@@ -19,20 +22,24 @@ import org.apache.spark.scheduler.TaskInfo;
  */
 public class TaskLevelListener extends TaskStageBaseListener {
 
-  private final ExecutorLevelListener executorLevelListener;
+  private final Map<String, Integer> executorResources = new ConcurrentHashMap<>();
 
   /**
    * Constructor for the task-level listener.
    *
    * @param sparkContext          The current spark context
    * @param config                Additional config specified by the user for the plugin
-   * @param executorLevelListener
    * @author Henry Page
    * @since 1.0.0
    */
-  public TaskLevelListener(SparkContext sparkContext, RuntimeConfig config, ExecutorLevelListener executorLevelListener) {
+  public TaskLevelListener(SparkContext sparkContext, RuntimeConfig config) {
     super(sparkContext, config);
-    this.executorLevelListener = executorLevelListener;
+  }
+
+  @Override
+  public void onExecutorAdded(SparkListenerExecutorAdded executorAdded) {
+    super.onExecutorAdded(executorAdded);
+    executorResources.put(executorAdded.executorId(),executorAdded.executorInfo().resourceProfileId());
   }
 
   /**
@@ -46,8 +53,9 @@ public class TaskLevelListener extends TaskStageBaseListener {
   public void onTaskEnd(SparkListenerTaskEnd taskEnd) {
     final TaskInfo curTaskInfo = taskEnd.taskInfo();
     final TaskMetrics curTaskMetrics = taskEnd.taskMetrics();
-    final int executorId = Integer.parseInt(curTaskInfo.executorId());
-    final ResourceProfile resourceProfile = sparkContext.resourceProfileManager().resourceProfileFromId(executorId);
+    final String executorId = curTaskInfo.executorId();
+    final ResourceProfile resourceProfile = sparkContext.resourceProfileManager()
+            .resourceProfileFromId(executorResources.get(executorId));
 
     final long taskId = curTaskInfo.taskId() + 1;
     final String type = taskEnd.taskType();
@@ -103,4 +111,6 @@ public class TaskLevelListener extends TaskStageBaseListener {
         .resourceUsed(resourceUsed)
         .build());
   }
+
+
 }

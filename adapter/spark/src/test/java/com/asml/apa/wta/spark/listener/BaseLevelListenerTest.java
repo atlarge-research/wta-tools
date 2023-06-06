@@ -39,11 +39,11 @@ public class BaseLevelListenerTest {
         .events(Map.of("event1", "Desc of event1", "event2", "Desc of event2"))
         .build();
 
-    fakeTaskListener = new TaskLevelListener(mockedSparkContext, fakeConfig, executorLevelListener);
+    fakeTaskListener = new TaskLevelListener(mockedSparkContext, fakeConfig);
 
     fakeStageListener = new StageLevelListener(mockedSparkContext, fakeConfig);
 
-    fakeJobListener = new JobLevelListener(mockedSparkContext, fakeConfig, fakeTaskListener, stageLevelListener);
+    fakeJobListener = new JobLevelListener(mockedSparkContext, fakeConfig, fakeTaskListener, fakeStageListener);
 
     fakeApplicationListener = new ApplicationLevelListener(mockedSparkContext, fakeConfig, fakeJobListener, fakeTaskListener);
   }

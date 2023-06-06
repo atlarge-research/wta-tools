@@ -88,11 +88,11 @@ public class JobLevelListener extends AbstractListener<Workflow> {
     final Domain domain = config.getDomain();
     final String appName = sparkContext.appName();
     final int criticalPathTaskCount = criticalPathTasks;
-    final double totalResources = Arrays.stream(tasks).map(Task::getResourceAmountRequested).reduce(0.0, Double::sum);
-    final double totalMemoryUsage = Arrays.stream(tasks).map(Task::getMemoryRequested).reduce(0.0, Double::sum);
-    final long totalNetworkUsage = Arrays.stream(tasks).map(Task::getNetworkIoTime).reduce(0L, Long::sum);
-    final double totalDiskSpaceUsage = Arrays.stream(tasks).map(Task::getDiskSpaceRequested).reduce(0.0, Double::sum);
-    final double totalEnergyConsumption = Arrays.stream(tasks).map(Task::getEnergyConsumption).reduce(0.0, Double::sum);
+    final double totalResources = Arrays.stream(tasks).map(Task::getResourceAmountRequested).filter(x -> x>0.0).reduce(Double::sum).orElseGet(() -> -1.0);
+    final double totalMemoryUsage = Arrays.stream(tasks).map(Task::getMemoryRequested).filter(x -> x>0.0).reduce(Double::sum).orElseGet(() -> -1.0);
+    final long totalNetworkUsage = Arrays.stream(tasks).map(Task::getNetworkIoTime).filter(x -> x>0).reduce(Long::sum).orElseGet(() -> -1L);
+    final double totalDiskSpaceUsage = Arrays.stream(tasks).map(Task::getDiskSpaceRequested).filter(x -> x>0.0).reduce(Double::sum).orElseGet(() -> -1.0);
+    final double totalEnergyConsumption = Arrays.stream(tasks).map(Task::getEnergyConsumption).filter(x -> x>0.0).reduce(Double::sum).orElseGet(() -> -1.0);
     final long jobRunTime = System.currentTimeMillis() - jobStartTime;
     final long driverTime = jobRunTime - stageLevelListener.processedObjects.stream().filter(x -> stages.contains(x.getId())).map(x -> x.getRuntime()).reduce(Long::sum).get();
     final long criticalPathLength = driverTime; //wait for parent children mr
@@ -115,11 +115,11 @@ public class JobLevelListener extends AbstractListener<Workflow> {
         .domain(domain)
         .applicationName(appName)
         .applicationField(applicationField)
-        .totalResources(totalResources)
-        .totalMemoryUsage(totalMemoryUsage)
-        .totalNetworkUsage(totalNetworkUsage)
-        .totalDiskSpaceUsage(totalDiskSpaceUsage)
-        .totalEnergyConsumption(totalEnergyConsumption)
+        .totalResources((totalResources>0.0)? totalResources : -1.0)
+        .totalMemoryUsage((totalMemoryUsage>0.0)? totalMemoryUsage : -1.0)
+        .totalNetworkUsage((totalNetworkUsage>0)? totalNetworkUsage : -1)
+        .totalDiskSpaceUsage((totalDiskSpaceUsage>0.0)? totalDiskSpaceUsage : -1.0)
+        .totalEnergyConsumption((totalEnergyConsumption>0.0)? totalEnergyConsumption : -1.0)
         .build());
 
     jobSubmitTimes.remove(jobId);
