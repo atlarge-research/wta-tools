@@ -1,12 +1,28 @@
 package com.asml.apa.wta.core.io;
 
+import java.io.Flushable;
+import java.io.IOException;
+
 /**
  * Interface to write files to Parquet.
  *
  * @author Atour Mousavi Gourabi
  * @since 1.0.0
  */
-public interface ParquetWriter<T> {
+public class ParquetWriter<T> implements AutoCloseable, Flushable {
+
+  private final OutputFile outputPath;
+
+  /**
+   * Constructs a writer to write records as Parquet.
+   *
+   * @param path the {@link OutputFile} to write to
+   * @author Atour Mousavi Gourabi
+   * @since 1.0.0
+   */
+  public ParquetWriter(OutputFile path) {
+    outputPath = path;
+  }
 
   /**
    * Writes the record.
@@ -16,13 +32,13 @@ public interface ParquetWriter<T> {
    * @author Atour Mousavi Gourabi
    * @since 1.0.0
    */
-  void write(T record);
+  public void write(T record) throws Exception {}
 
-  /**
-   * Flushes the written records.
-   *
-   * @author Atour Mousavi Gourabi
-   * @since 1.0.0
-   */
-  void flush();
+  @Override
+  public void close() throws Exception {}
+
+  @Override
+  public void flush() throws IOException {
+    outputPath.flush();
+  }
 }

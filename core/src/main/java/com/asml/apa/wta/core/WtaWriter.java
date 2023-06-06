@@ -1,16 +1,14 @@
 package com.asml.apa.wta.core;
 
-import com.asml.apa.wta.core.io.DiskJsonWriter;
-import com.asml.apa.wta.core.io.DiskParquetWriter;
 import com.asml.apa.wta.core.io.JsonWriter;
+import com.asml.apa.wta.core.io.OutputFile;
 import com.asml.apa.wta.core.io.ParquetWriter;
 import com.asml.apa.wta.core.model.Resource;
 import com.asml.apa.wta.core.model.Task;
 import com.asml.apa.wta.core.model.Workflow;
 import com.asml.apa.wta.core.model.Workload;
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Collection;
+import java.io.Flushable;
+import java.io.IOException;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -20,12 +18,7 @@ import lombok.extern.slf4j.Slf4j;
  * @since 1.0.0
  */
 @Slf4j
-public class WtaWriter {
-
-  private Workload workloadToWrite = null;
-  private final Collection<Workflow> workflowsToWrite = new ArrayList<>();
-  private final Collection<Resource> resourcesToWrite = new ArrayList<>();
-  private final Collection<Task> tasksToWrite = new ArrayList<>();
+public class WtaWriter implements Flushable, AutoCloseable {
 
   private final JsonWriter<Workload> workloadWriter;
   private final ParquetWriter<Task> taskWriter;
@@ -40,53 +33,61 @@ public class WtaWriter {
    * @author Atour Mousavi Gourabi
    * @since 1.0.0
    */
-  public WtaWriter(Path path, String version) {
+  public WtaWriter(OutputFile path, String version) throws Exception {
+    setupDirectories(path, version);
     workloadWriter =
-        new DiskJsonWriter<>(path.resolve("workload").resolve(version).resolve("generic_information.json"));
-    taskWriter =
-        new DiskParquetWriter<>(path.resolve("tasks").resolve(version).resolve("tasks.parquet"));
-    resourceWriter = new DiskParquetWriter<>(
-        path.resolve("resources").resolve(version).resolve("resources.parquet"));
-    workflowWriter = new DiskParquetWriter<>(
-        path.resolve("workflows").resolve(version).resolve("workflows.parquet"));
+        new JsonWriter<>(path.resolve("workflow").resolve(version).open());
+    taskWriter = new ParquetWriter<>(path.resolve("tasks").resolve(version).open());
+    resourceWriter =
+        new ParquetWriter<>(path.resolve("resources").resolve(version).open());
+    workflowWriter =
+        new ParquetWriter<>(path.resolve("workflows").resolve(version).open());
   }
 
-  public void add(Workload workload) {
-    workloadToWrite = workload;
+  public void write(Workload workload) {
+    try {
+      workloadWriter.write(workload);
+    } catch (Exception e) {
+      log.error("Could not write workload {}.", workload);
+    }
   }
 
-  public void add(Workflow workflow) {
-    workflowsToWrite.add(workflow);
+  public void write(Workflow workflow) {
+    try {
+      workflowWriter.write(workflow);
+    } catch (Exception e) {
+      log.error("Could not write workflow {}.", workflow);
+    }
   }
 
-  public void add(Resource resource) {
-    resourcesToWrite.add(resource);
+  public void write(Resource resource) {
+    try {
+      resourceWriter.write(resource);
+    } catch (Exception e) {
+      log.error("Could not write resource {}.", resource);
+    }
   }
 
-  public void add(Task task) {
-    tasksToWrite.add(task);
+  public void write(Task task) {
+    try {
+      taskWriter.write(task);
+    } catch (Exception e) {
+      log.error("Could not write task {}.", task);
+    }
   }
 
   /**
-   * Writes the objects to file.
+   * Flushes the objects to file.
    *
    * @author Atour Mousavi Gourabi
    * @since 1.0.0
    */
-  public void writeToFile() {
-    writeWorkload();
-    writeWorkflows();
-    writeResources();
-    writeTasks();
+  public void flush() throws IOException {
+    taskWriter.flush();
+    workloadWriter.flush();
+    workflowWriter.flush();
+    resourceWriter.flush();
   }
-
-  private void writeWorkload() {}
-
-  private void writeWorkflows() {}
-
-  private void writeResources() {}
-
-  private void writeTasks() {}
 
   /**
    * Prepares the system for writing.
@@ -95,5 +96,22 @@ public class WtaWriter {
    * @author Atour Mousavi Gourabi
    * @since 1.0.0
    */
-  public void prepareForWrite() {}
+  private void setupDirectories(OutputFile path, String version) {
+    try {
+      path.resolve("workflow").resolve(version).clearDirectory();
+      path.resolve("workloads").resolve(version).clearDirectory();
+      path.resolve("tasks").resolve(version).clearDirectory();
+      path.resolve("resources").resolve(version).clearDirectory();
+    } catch (IOException e) {
+      log.error("Could not create directory structure for the output.");
+    }
+  }
+
+  @Override
+  public void close() throws Exception {
+    taskWriter.close();
+    workloadWriter.close();
+    workflowWriter.close();
+    resourceWriter.close();
+  }
 }
