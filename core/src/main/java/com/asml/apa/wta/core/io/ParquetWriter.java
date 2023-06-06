@@ -11,7 +11,7 @@ import java.io.IOException;
  */
 public class ParquetWriter<T> implements AutoCloseable, Flushable {
 
-  private final OutputFile outputPath;
+  private final OutputFile outputFile;
 
   /**
    * Constructs a writer to write records as Parquet.
@@ -21,7 +21,7 @@ public class ParquetWriter<T> implements AutoCloseable, Flushable {
    * @since 1.0.0
    */
   public ParquetWriter(OutputFile path) {
-    outputPath = path;
+    outputFile = path;
   }
 
   /**
@@ -35,10 +35,12 @@ public class ParquetWriter<T> implements AutoCloseable, Flushable {
   public void write(T record) throws Exception {}
 
   @Override
-  public void close() throws Exception {}
+  public void close() throws Exception {
+    outputFile.close();
+  }
 
   @Override
   public void flush() throws IOException {
-    outputPath.flush();
+    outputFile.flush();
   }
 }
