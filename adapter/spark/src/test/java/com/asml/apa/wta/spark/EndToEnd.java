@@ -45,9 +45,9 @@ public class EndToEnd {
   public static void main(String[] args) {
     SparkConf conf = new SparkConf().setAppName("SystemTest");
     conf.set("spark.plugins", "com.asml.apa.wta.spark.WtaPlugin");
-    System.setProperty("configFile", args[0]);
+    System.setProperty("configFile", "adapter/spark/src/test/resources/config.json");
     try (JavaSparkContext sc = new JavaSparkContext(conf)) {
-      testFile = sc.textFile(args[2]);
+      testFile = sc.textFile("adapter/spark/src/test/resources/wordcount.txt");
     } catch (Exception e) {
       log.error("Error occurred while creating spark context", e);
       log.info("Invoking Spark application without plugin");
