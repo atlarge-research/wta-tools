@@ -116,7 +116,7 @@ public class WtaDriverPlugin implements DriverPlugin {
             .get(0);
         parquetUtil.getTasks().addAll(tasks);
         parquetUtil.getWorkflows().addAll(workFlow);
-        parquetUtil.readWorkload(workLoad);
+        parquetUtil.write(workLoad);
         parquetUtil.writeToFile("resource", "task", "workflow", "generic_information");
       } catch (Exception e) {
         log.error("Error while writing to Parquet file");

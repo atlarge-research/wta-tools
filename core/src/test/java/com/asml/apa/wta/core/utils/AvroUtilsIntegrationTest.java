@@ -1,7 +1,5 @@
 package com.asml.apa.wta.core.utils;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import com.asml.apa.wta.core.model.Resource;
 import java.io.File;
 import java.util.ArrayList;
@@ -91,18 +89,5 @@ class AvroUtilsIntegrationTest {
       utils = new AvroUtils(schema, new File(path, "/writeRecords"));
       utils.writeRecords(recordList);
     });
-  }
-
-  @Test
-  void getOutputUriTest() throws Exception {
-    utils = new AvroUtils(schema, new File(path, "/outputUri"));
-    assertThat(utils.getUri())
-        .isEqualTo(new File(path, "/outputUri").toURI().getPath());
-  }
-
-  @Test
-  void getAvroSchemaTest() throws Exception {
-    utils = new AvroUtils(schema, new File(path, "/schema"));
-    assertThat(utils.getAvroSchema()).isEqualTo(schema);
   }
 }

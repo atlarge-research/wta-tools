@@ -26,79 +26,74 @@ import org.apache.avro.generic.GenericRecord;
  * @since 1.0.0
  * @author Tianchen Qu
  */
-@SuppressWarnings({"CyclomaticComplexity", "HiddenField"})
-@Getter
 @Slf4j
+@Getter
 public class ParquetWriterUtils {
 
   private final String version;
 
   private final File path;
 
-  private final List<Resource> resources;
+  private final List<Resource> resources = new ArrayList<>();
 
-  private final List<Task> tasks;
+  private final List<Task> tasks = new ArrayList<>();
 
-  private final List<Workflow> workflows;
+  private final List<Workflow> workflows = new ArrayList<>();
 
   private Workload workload = null;
 
-  private final Map<String, String> files;
+  private final Map<String, String> files = Map.of(
+      "resources", "resource.parquet",
+      "tasks", "task.parquet",
+      "workflows", "workflow.parquet",
+      "workload", "generic_information.json");
 
   public ParquetWriterUtils(File path, String version) {
-    resources = new ArrayList<>();
-    tasks = new ArrayList<>();
-    workflows = new ArrayList<>();
     this.path = path;
     this.version = version;
-    files = Map.of(
-        "resources", "resource.parquet",
-        "tasks", "task.parquet",
-        "workflows", "workflow.parquet",
-        "workload", "generic_information.json");
   }
 
   /**
-   * Reads the resource object from kafka stream and feed into the writer.
+   * Adds a resource to the writer queue.
    *
    * @param resource the resource
    * @since 1.0.0
    * @author Tianchen Qu
    */
-  public void readResource(Resource resource) {
+  public void write(Resource resource) {
     resources.add(resource);
   }
 
   /**
-   * Reads the task object from kafka.
+   * Adds a task to the writer queue.
    *
    * @param task the task
    * @since 1.0.0
    * @author Tianchen Qu
    */
-  public void readTask(Task task) {
+  public void write(Task task) {
     tasks.add(task);
   }
 
   /**
-   * Reads the workflow object from kafka.
+   * Adds a workflow to the writer queue.
    *
    * @param workflow the workflow
    * @since 1.0.0
    * @author Tianchen Qu
    */
-  public void readWorkflow(Workflow workflow) {
+  public void write(Workflow workflow) {
     workflows.add(workflow);
   }
 
   /**
-   * Reads the workload object from kafka.
+   * Adds a workload to the writer queue.
    *
    * @param workload the workload
    * @since 1.0.0
    * @author Tianchen Qu
    */
-  public void readWorkload(Workload workload) {
+  public void write(Workload workload) {
     this.workload = workload;
   }
 
@@ -629,8 +624,7 @@ public class ParquetWriterUtils {
    * @since 1.0.0
    */
   public void deletePreExistingFiles() {
-    files.entrySet().stream().forEach(e -> new File(Paths.get(path.getPath(), e.getKey(), version, e.getValue())
-            .toString())
-        .delete());
+    files.forEach((key, value) ->
+        new File(Paths.get(path.getPath(), key, version, value).toString()).delete());
   }
 }

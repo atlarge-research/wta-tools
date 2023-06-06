@@ -1,7 +1,6 @@
 package com.asml.apa.wta.core.utils;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 import com.asml.apa.wta.core.model.Resource;
 import com.asml.apa.wta.core.model.Task;
@@ -52,54 +51,54 @@ class ParquetWriterUtilsTest {
   @Test
   void readResourceTest() {
     resources.add(resource);
-    utils.readResource(resource);
+    utils.write(resource);
     assertThat(resources).isEqualTo(utils.getResources());
   }
 
   @Test
   void readTaskTest() {
     tasks.add(task);
-    utils.readTask(task);
+    utils.write(task);
     assertThat(tasks).isEqualTo(utils.getTasks());
   }
 
   @Test
   void readWorkflow() {
     workflows.add(workflow);
-    utils.readWorkflow(workflow);
+    utils.write(workflow);
     assertThat(workflows).isEqualTo(utils.getWorkflows());
   }
 
   @Test
   void readWorkload() {
-    utils.readWorkload(workload);
+    utils.write(workload);
     assertThat(workload).isEqualTo(utils.getWorkload());
   }
 
   @Test
   void getResources() {
     resources.add(resource);
-    utils.readResource(resource);
+    utils.write(resource);
     assertThat(resources).isEqualTo(utils.getResources());
   }
 
   @Test
   void getTasks() {
     tasks.add(task);
-    utils.readTask(task);
+    utils.write(task);
     assertThat(tasks).isEqualTo(utils.getTasks());
   }
 
   @Test
   void getWorkflows() {
     workflows.add(workflow);
-    utils.readWorkflow(workflow);
+    utils.write(workflow);
     assertThat(workflows).isEqualTo(utils.getWorkflows());
   }
 
   @Test
   void getWorkloads() {
-    utils.readWorkload(workload);
+    utils.write(workload);
     assertThat(workload).isEqualTo(utils.getWorkload());
   }
 }

@@ -80,11 +80,11 @@ class ParquetWriterUtilsIntegrationTest {
     Workload.WorkloadBuilder workloadBuilder = Workload.builder();
     workload = workloadBuilder.build();
     for (int i = 1; i < 1000; i++) {
-      utils.readResource(resource);
+      utils.write(resource);
     }
-    utils.readTask(task);
-    utils.readWorkflow(workflow);
-    utils.readWorkload(workload);
+    utils.write(task);
+    utils.write(workflow);
+    utils.write(workload);
     Assertions.assertDoesNotThrow(() -> utils.writeToFile("test1", "test2", "test3", "test4"));
   }
 
@@ -124,11 +124,11 @@ class ParquetWriterUtilsIntegrationTest {
     Workload.WorkloadBuilder workloadBuilder = Workload.builder();
     workload = workloadBuilder.build();
     for (int i = 1; i < 1000; i++) {
-      utils.readResource(resourceAlt);
+      utils.write(resourceAlt);
     }
-    utils.readTask(taskAlt);
-    utils.readWorkflow(workflowAlt);
-    utils.readWorkload(workload);
+    utils.write(taskAlt);
+    utils.write(workflowAlt);
+    utils.write(workload);
     Assertions.assertDoesNotThrow(() -> utils.writeToFile("test1", "test2", "test3", "test4"));
   }
 }
