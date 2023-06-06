@@ -51,18 +51,6 @@ public class EndToEnd {
     System.setProperty("configFile", args[0]);
     try (JavaSparkContext sc = new JavaSparkContext(conf)) {
       testFile = sc.textFile(args[1]);
-      sc.sc().addSparkListener(new SparkListener() {
-        @Override
-        public void onExecutorAdded(SparkListenerExecutorAdded event) {
-          log.info("Executor added: {}", event.executorId());
-        }
-
-        @Override
-        public void onTaskStart(SparkListenerTaskStart event) {
-          log.info("Task started on executor: {}", event.taskInfo().executorId());
-          log.info("Host: {}", event.taskInfo().host());
-        }
-      });
     } catch (Exception e) {
       log.error("Error occurred while creating spark context", e);
       log.info("Invoking Spark application without plugin");
