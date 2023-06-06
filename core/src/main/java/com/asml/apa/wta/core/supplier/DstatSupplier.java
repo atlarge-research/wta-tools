@@ -83,13 +83,10 @@ public class DstatSupplier implements InformationSupplier<DstatDto> {
       String match = matcher.group(1);
       boolean isKilo = matcher.group(2) != null;
 
-      int number;
+      int number = Integer.parseInt(match);
       if (isKilo) {
-        number = Integer.parseInt(match) * 1000;
-      } else {
-        number = Integer.parseInt(match);
+        number *= 1000;
       }
-
       numbers.add(number);
     }
 
