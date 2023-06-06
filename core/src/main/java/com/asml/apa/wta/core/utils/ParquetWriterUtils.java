@@ -616,15 +616,4 @@ public class ParquetWriterUtils {
     }
     return flg;
   }
-
-  /**
-   * Deletes any potentially pre-existing parquet files. If files already exist, parquet writer
-   * will throw an exception.
-   * @author Pil Kyu Cho
-   * @since 1.0.0
-   */
-  public void deletePreExistingFiles() {
-    files.forEach((key, value) ->
-        new File(Paths.get(path.getPath(), key, version, value).toString()).delete());
-  }
 }

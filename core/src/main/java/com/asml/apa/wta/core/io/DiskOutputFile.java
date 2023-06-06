@@ -10,6 +10,12 @@ import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * Disk {@link Path} implementation of the {@link OutputFile} abstraction.
+ *
+ * @author Atour Mousavi Gourabi
+ * @since 1.0.0
+ */
 @Slf4j
 @AllArgsConstructor
 @RequiredArgsConstructor
@@ -18,15 +24,24 @@ public class DiskOutputFile implements OutputFile {
   private final Path file;
   private BufferedWriter writer;
 
+  @Override
   public OutputFile resolve(String path) {
     return new DiskOutputFile(file.resolve(path), null);
   }
 
+  @Override
   public OutputFile open() throws IOException {
     writer = Files.newBufferedWriter(file);
     return this;
   }
 
+  /**
+   * Helper to delete files.
+   *
+   * @param path a {@link Path} pointing to the file to delete
+   * @author Atour Mousavi Gourabi
+   * @since 1.0.0
+   */
   private void deleteFile(Path path) {
     try {
       Files.delete(path);

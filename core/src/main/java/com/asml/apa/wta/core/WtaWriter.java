@@ -12,7 +12,7 @@ import java.io.IOException;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * Persists the WTA files.
+ * Facade over the specific writers to persists all the WTA files.
  *
  * @author Atour Mousavi Gourabi
  * @since 1.0.0
