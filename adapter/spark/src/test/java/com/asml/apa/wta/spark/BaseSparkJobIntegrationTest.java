@@ -45,6 +45,13 @@ public class BaseSparkJobIntegrationTest {
     testFile = JavaSparkContext.fromSparkContext(spark.sparkContext()).textFile(resourcePath);
   }
 
+  /**
+   * Need to invoke this method to call the Application end callbacks before everything ends (so that the callback is called before the assertions)
+   */
+  protected void stopJob() {
+    spark.sparkContext().stop();
+  }
+
   protected void invokeJob() {
     testFile.flatMap(s -> Arrays.asList(s.split(" ")).iterator())
         .mapToPair(word -> new Tuple2<>(word, 1))

@@ -66,6 +66,7 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
 
     // we should enver enter this branch, this is a guard since an application
     // only terminates once.
+    List<Workload> processedObjects = this.getProcessedObjects();
     if (!processedObjects.isEmpty()) {
       return;
     }
@@ -79,7 +80,7 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
     final long endDate = applicationEnd.time();
     final String[] authors = config.getAuthors();
     final String workloadDescription = config.getDescription();
-    for (Task task : taskLevelListener.processedObjects) {
+    for (Task task : taskLevelListener.getProcessedObjects()) {
       final int stageId = taskLevelListener.getTaskToStage().get(task.getId());
       final Integer[] parentStages =
           stageLevelListener.getStageToParents().get(stageId);
