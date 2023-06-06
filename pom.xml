@@ -50,6 +50,7 @@
     <module>core</module>
     <module>adapter/spark</module>
     <module>benchmarking/spark-benchmark</module>
+    <module>connector/hadoop</module>
   </modules>
 
   <dependencies>
