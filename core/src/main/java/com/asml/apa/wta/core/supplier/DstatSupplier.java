@@ -39,27 +39,27 @@ public class DstatSupplier implements InformationSupplier<DstatDto> {
       CompletableFuture<String> allMetrics = bashUtils.executeCommand("dstat -cdngy 1 -c 1");
 
       return allMetrics.thenApply(result -> {
-        List<Integer> metrics = extractNumbers(result);
-        try {
-          return DstatDto.builder()
-              .totalUsageUsr(metrics.get(0))
-              .totalUsageSys(metrics.get(1))
-              .totalUsageIdl(metrics.get(2))
-              .totalUsageWai(metrics.get(3))
-              .totalUsageStl(metrics.get(4))
-              .dskRead(metrics.get(5))
-              .dskWrite(metrics.get(6))
-              .netRecv(metrics.get(7))
-              .netSend(metrics.get(8))
-              .pagingIn(metrics.get(9))
-              .pagingOut(metrics.get(10))
-              .systemInt(metrics.get(11))
-              .systemCsw(metrics.get(12))
-              .build();
-        } catch (Exception e) {
-          log.error(
-              "Something went wrong while receiving the dstat bash command outputs. The cause is: {}",
-              e.getCause().toString());
+        if (result != null) {
+          List<Integer> metrics = extractNumbers(result);
+          try {
+            return DstatDto.builder()
+                .totalUsageUsr(metrics.get(0))
+                .totalUsageSys(metrics.get(1))
+                .totalUsageIdl(metrics.get(2))
+                .totalUsageWai(metrics.get(3))
+                .totalUsageStl(metrics.get(4))
+                .dskRead(metrics.get(5))
+                .dskWrite(metrics.get(6))
+                .netRecv(metrics.get(7))
+                .netSend(metrics.get(8))
+                .pagingIn(metrics.get(9))
+                .pagingOut(metrics.get(10))
+                .systemInt(metrics.get(11))
+                .systemCsw(metrics.get(12))
+                .build();
+          } catch (Exception e) {
+            log.error("Something went wrong while receiving the dstat bash command outputs.");
+          }
         }
         return null;
       });
@@ -67,7 +67,14 @@ public class DstatSupplier implements InformationSupplier<DstatDto> {
     return notAvailableResult();
   }
 
-  public static List<Integer> extractNumbers(String input) {
+  /**
+   * Parse dstat terminal output.
+   *
+   * @return List of the parsed numbers from the dstat terminal output
+   * @author Lohithsai Yadala Chanchu
+   * @since 1.0.0
+   */
+  private static List<Integer> extractNumbers(String input) {
     List<Integer> numbers = new ArrayList<>();
     Pattern pattern = Pattern.compile("\\b(\\d+)(k)?\\b");
     Matcher matcher = pattern.matcher(input);
@@ -103,9 +110,7 @@ public class DstatSupplier implements InformationSupplier<DstatDto> {
         return true;
       }
     } catch (InterruptedException | ExecutionException e) {
-      log.error(
-          "Something went wrong while receiving the dstat bash command outputs. The cause is: {}",
-          e.getCause().toString());
+      log.error("Something went wrong while receiving the dstat bash command outputs.");
       return false;
     }
     log.info("System does not have the necessary dependencies (sysstat) to run dstat.");

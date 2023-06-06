@@ -1,5 +1,6 @@
 package com.asml.apa.wta.core.supplier;
 
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.asml.apa.wta.core.dto.DstatDto;
@@ -11,9 +12,11 @@ public class DstatSupplierIntegrationTest {
   @Test
   public void DstatSupplierSuccessfullyReturnsADtoObject() throws ExecutionException, InterruptedException {
     DstatSupplier a = new DstatSupplier(new BashUtils());
+    var actual = a.getSnapshot().get();
     if (a.isAvailable()) {
-      var actual = a.getSnapshot().get();
       assertTrue(actual instanceof DstatDto);
+    } else {
+      assertNull(actual);
     }
   }
 }

@@ -46,9 +46,7 @@ public class IostatSupplier implements InformationSupplier<IostatDto> {
         return true;
       }
     } catch (InterruptedException | ExecutionException e) {
-      log.error(
-          "Something went wrong while receiving the iostat bash command outputs. The cause is: {}",
-          e.getCause().toString());
+      log.error("Something went wrong while receiving the iostat bash command outputs.");
       return false;
     }
     log.info("System does not have the necessary dependencies (sysstat) to run iostat.");
@@ -72,22 +70,22 @@ public class IostatSupplier implements InformationSupplier<IostatDto> {
     CompletableFuture<String> allMetrics = bashUtils.executeCommand("iostat -d | awk '$1 == \"sdc\"'");
 
     return allMetrics.thenApply(result -> {
-      String[] metrics = result.trim().split("\\s+");
+      if (result != null) {
+        String[] metrics = result.trim().split("\\s+");
 
-      try {
-        return IostatDto.builder()
-            .tps(Double.parseDouble(metrics[1]))
-            .kiloByteReadPerSec(Double.parseDouble(metrics[2]))
-            .kiloByteWrtnPerSec(Double.parseDouble(metrics[3]))
-            .kiloByteDscdPerSec(Double.parseDouble(metrics[4]))
-            .kiloByteRead(Double.parseDouble(metrics[5]))
-            .kiloByteWrtn(Double.parseDouble(metrics[6]))
-            .kiloByteDscd(Double.parseDouble(metrics[7]))
-            .build();
-      } catch (Exception e) {
-        log.error(
-            "Something went wrong while receiving the iostat bash command outputs. The cause is: {}",
-            e.getCause().toString());
+        try {
+          return IostatDto.builder()
+              .tps(Double.parseDouble(metrics[1]))
+              .kiloByteReadPerSec(Double.parseDouble(metrics[2]))
+              .kiloByteWrtnPerSec(Double.parseDouble(metrics[3]))
+              .kiloByteDscdPerSec(Double.parseDouble(metrics[4]))
+              .kiloByteRead(Double.parseDouble(metrics[5]))
+              .kiloByteWrtn(Double.parseDouble(metrics[6]))
+              .kiloByteDscd(Double.parseDouble(metrics[7]))
+              .build();
+        } catch (Exception e) {
+          log.error("Something went wrong while receiving the iostat bash command outputs.");
+        }
       }
       return null;
     });

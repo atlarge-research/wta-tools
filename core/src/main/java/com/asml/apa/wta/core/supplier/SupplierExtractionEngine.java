@@ -46,10 +46,11 @@ public abstract class SupplierExtractionEngine<T extends BaseSupplierDto> {
    * @since 1.0.0
    */
   public SupplierExtractionEngine(int resourcePingInterval) {
+    BashUtils bashUtils = new BashUtils();
     this.resourcePingInterval = resourcePingInterval;
     this.operatingSystemSupplier = new OperatingSystemSupplier();
-    this.iostatSupplier = new IostatSupplier(new BashUtils());
-    this.dstatSupplier = new DstatSupplier(new BashUtils());
+    this.iostatSupplier = new IostatSupplier(bashUtils);
+    this.dstatSupplier = new DstatSupplier(bashUtils);
   }
 
   /**

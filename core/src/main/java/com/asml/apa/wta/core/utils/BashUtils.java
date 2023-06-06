@@ -1,6 +1,5 @@
 package com.asml.apa.wta.core.utils;
 
-import com.asml.apa.wta.core.exceptions.BashCommandExecutionException;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -26,18 +25,14 @@ public class BashUtils {
         int exitValue = process.waitFor();
 
         if (exitValue != 0) {
-          throw new BashCommandExecutionException(
-              "Bash command execution failed with exit code: " + exitValue);
+          log.error("Bash command execution failed with exit code: {}", exitValue);
+          return null;
         }
 
         return readProcessOutput(process);
-      } catch (BashCommandExecutionException e) {
-        throw e;
       } catch (Exception e) {
-        log.error(
-            "Something went wrong while trying to execute the bash command. The cause is: {}",
-            e.getCause().toString());
-        throw new BashCommandExecutionException("Error executing bash command");
+        log.error("Something went wrong while trying to execute the bash command.");
+        return null;
       }
     });
   }
@@ -58,10 +53,8 @@ public class BashUtils {
       }
       return output.toString();
     } catch (IOException e) {
-      log.error(
-          "Something went wrong while trying to read bash command outputs. The cause is: {}",
-          e.getCause().toString());
-      throw new BashCommandExecutionException("Error reading bash output");
+      log.error("Something went wrong while trying to read bash command outputs.");
+      return null;
     }
   }
 }
