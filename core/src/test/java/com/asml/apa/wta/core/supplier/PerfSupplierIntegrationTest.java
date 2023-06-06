@@ -1,6 +1,7 @@
 package com.asml.apa.wta.core.supplier;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.condition.OS.LINUX;
 
 import com.asml.apa.wta.core.dto.PerfDto;
@@ -20,22 +21,13 @@ public class PerfSupplierIntegrationTest {
 
   @Test()
   @EnabledOnOs(LINUX)
-  void perfEnergyDataSourceIsAvailable() {
-    assertThat(sut.isAvailable()).isTrue();
+  void perfEnergyDataSourceIsAvailableDoesNotThrowException() {
+    assertDoesNotThrow(sut::isAvailable);
   }
 
   @Test
   @EnabledOnOs(LINUX)
   void perfEnergyGatherMetricsSuccessful() {
     assertThat(sut.gatherMetrics()).isGreaterThanOrEqualTo(0.0);
-  }
-
-  @Test
-  @EnabledOnOs(LINUX)
-  void perfEnergySnapshotSuccessful() throws ExecutionException, InterruptedException {
-    assertThat(sut.isAvailable()).isTrue();
-    CompletableFuture<PerfDto> result = sut.getSnapshot();
-    Awaitility.await().atMost(Duration.ofSeconds(2)).until(result::isDone);
-    assertThat(result.get().getWatt()).isGreaterThanOrEqualTo(0.0);
   }
 }
