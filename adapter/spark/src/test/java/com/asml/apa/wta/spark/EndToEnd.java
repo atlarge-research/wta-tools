@@ -47,7 +47,7 @@ public class EndToEnd {
     conf.set("spark.plugins", "com.asml.apa.wta.spark.WtaPlugin");
     System.setProperty("configFile", args[0]);
     try (JavaSparkContext sc = new JavaSparkContext(conf)) {
-      testFile = sc.textFile(args[1]);
+      testFile = sc.textFile(args[2]);
     } catch (Exception e) {
       log.error("Error occurred while creating spark context", e);
       log.info("Invoking Spark application without plugin");
