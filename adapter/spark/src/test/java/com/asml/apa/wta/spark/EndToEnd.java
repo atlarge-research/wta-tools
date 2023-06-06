@@ -3,8 +3,10 @@ package com.asml.apa.wta.spark;
 import java.util.Arrays;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.spark.SparkConf;
+import org.apache.spark.SparkContext;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.sql.SparkSession;
 import scala.Tuple2;
 
 /**
@@ -36,24 +38,21 @@ public class EndToEnd {
    * Entry point for the e2e test. This method will create a spark session along with the plugin.
    * The 'configFile' environment variable must be specified. Even if an error occurs on the plugin,
    * it will not shut down the entire Spark job.
-   *
-   * @param args The first argument must be the path to the config file. The second argument must
-   *             be the path to the resource file.
+   * @param args First argument must be filepath to config file. Second argument must be filepath to
+   *             resources file.
    * @author Pil Kyu Cho
    * @since 1.0.0
    */
   public static void main(String[] args) {
-    SparkConf conf = new SparkConf().setAppName("SystemTest");
+    SparkConf conf = new SparkConf().setAppName("SystemTest").setMaster("local[1]");
     conf.set("spark.plugins", "com.asml.apa.wta.spark.WtaPlugin");
-    System.setProperty("configFile", "adapter/spark/src/test/resources/config.json");
-    try (JavaSparkContext sc = new JavaSparkContext(conf)) {
-      testFile = sc.textFile("adapter/spark/src/test/resources/wordcount.txt");
-    } catch (Exception e) {
-      log.error("Error occurred while creating spark context", e);
-      log.info("Invoking Spark application without plugin");
-    }
+    System.setProperty("configFile", args[0]);
+    SparkSession spark = SparkSession.builder().config(conf).getOrCreate();
+    SparkContext sc = spark.sparkContext();
+    testFile = JavaSparkContext.fromSparkContext(sc).textFile(args[1]);
     for (int i = 0; i < 10; i++) {
       invokeJob();
     }
+    sc.stop();
   }
 }
