@@ -17,7 +17,6 @@ import lombok.extern.slf4j.Slf4j;
  * @author Atour Mousavi Gourabi
  * @since 1.0.0
  */
-@SuppressWarnings("CyclomaticComplexity")
 @Slf4j
 public class WtaUtils {
 
