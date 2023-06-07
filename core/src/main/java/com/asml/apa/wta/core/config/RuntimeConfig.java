@@ -1,13 +1,12 @@
 package com.asml.apa.wta.core.config;
 
 import com.asml.apa.wta.core.model.enums.Domain;
-import java.util.HashMap;
-import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Config class for the plugin.
@@ -23,6 +22,7 @@ import lombok.Setter;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@Slf4j
 public class RuntimeConfig {
 
   private String[] authors;
@@ -31,9 +31,6 @@ public class RuntimeConfig {
 
   @Builder.Default
   private String description = "";
-
-  @Builder.Default
-  private Map<String, String> events = new HashMap<>();
 
   @Builder.Default
   private String logLevel = "ERROR";

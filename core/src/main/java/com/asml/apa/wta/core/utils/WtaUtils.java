@@ -21,8 +21,6 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class WtaUtils {
 
-  private static final String CONFIG_DIR = "config.json";
-
   /**
    * Utility classes should not have a public or default constructor.
    *
@@ -78,11 +76,13 @@ public class WtaUtils {
   }
 
   /**
-   * Reads the config file at the specified directory.
+   * Reads the config file specified at the path of the system property "configFile".
    *
-   * @return The config file
+   * @return The config file object representing the user config
+   * @author Henry Page
+   * @since 1.0.0
    */
   public static RuntimeConfig readConfig() {
-    return readConfig(CONFIG_DIR);
+    return readConfig(System.getProperty("configFile"));
   }
 }
