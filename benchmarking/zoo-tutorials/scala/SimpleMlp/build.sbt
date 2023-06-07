@@ -17,7 +17,7 @@ resolvers ++= Seq(
 lazy val commonSettings = Seq(
   version := "0.1.0",
   organization := "com.github.qiuxin2012",
-  scalaVersion := "2.11.8"
+  scalaVersion := "2.12.1"
 )
 
 lazy val app = (project in file(".")).
