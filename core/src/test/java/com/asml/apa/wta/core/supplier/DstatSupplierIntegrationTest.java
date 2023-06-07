@@ -5,14 +5,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.asml.apa.wta.core.dto.DstatDto;
 import com.asml.apa.wta.core.utils.BashUtils;
-import java.util.concurrent.ExecutionException;
 import org.junit.jupiter.api.Test;
 
 public class DstatSupplierIntegrationTest {
   @Test
-  public void DstatSupplierSuccessfullyReturnsADtoObject() throws ExecutionException, InterruptedException {
+  public void DstatSupplierSuccessfullyReturnsADtoObject() {
     DstatSupplier a = new DstatSupplier(new BashUtils());
-    var actual = a.getSnapshot().get();
+    var actual = a.getSnapshot().join();
     if (a.isAvailable()) {
       assertTrue(actual instanceof DstatDto);
     } else {
