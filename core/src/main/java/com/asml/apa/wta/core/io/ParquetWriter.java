@@ -7,7 +7,7 @@ import java.nio.charset.StandardCharsets;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * Interface to write files to Parquet.
+ * Writes records to a Parquet file.
  *
  * @author Atour Mousavi Gourabi
  * @since 1.0.0
@@ -31,7 +31,7 @@ public class ParquetWriter<T> implements AutoCloseable, Flushable {
   }
 
   /**
-   * Constructs a writer to write records as Parquet.
+   * Constructs a writer to write records to Parquet.
    *
    * @param path the {@link OutputFile} to write to
    * @author Atour Mousavi Gourabi
@@ -49,16 +49,17 @@ public class ParquetWriter<T> implements AutoCloseable, Flushable {
    * Provides no guarantee that the file is directly flushed.
    *
    * @param record the record to write
+   * @throws IOException when something goes wrong when writing
    * @author Atour Mousavi Gourabi
    * @since 1.0.0
    */
-  public void write(T record) throws Exception {
+  public void write(T record) throws IOException {
     outputStream.write(1);
     // todo
   }
 
   @Override
-  public void close() throws Exception {
+  public void close() throws IOException {
     outputStream.close();
   }
 

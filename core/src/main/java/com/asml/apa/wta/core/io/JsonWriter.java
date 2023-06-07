@@ -3,13 +3,12 @@ package com.asml.apa.wta.core.io;
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-
 import java.io.BufferedOutputStream;
 import java.io.Flushable;
 import java.io.IOException;
 
 /**
- * Interface to write files to JSON.
+ * Writes records to a JSON file.
  *
  * @author Atour Mousavi Gourabi
  * @since 1.0.0
@@ -32,12 +31,12 @@ public class JsonWriter<T> implements AutoCloseable, Flushable {
   /**
    * Writes object as JSON.
    *
-   * @param record the record to write as JSON
-   * @throws IOException when something goes wrong during writing
+   * @param record the record to write
+   * @throws IOException when something goes wrong when writing
    * @author Atour Mousavi Gourabi
    * @since 1.0.0
    */
-  public void write(T record) throws Exception {
+  public void write(T record) throws IOException {
     Gson gson = new GsonBuilder()
         .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
         .create();
@@ -45,7 +44,7 @@ public class JsonWriter<T> implements AutoCloseable, Flushable {
   }
 
   @Override
-  public void close() throws Exception {
+  public void close() throws IOException {
     outputStream.close();
   }
 
