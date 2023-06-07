@@ -9,6 +9,8 @@ import com.asml.apa.wta.core.model.Workflow;
 import com.asml.apa.wta.core.model.Workload;
 import java.io.Flushable;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -24,6 +26,11 @@ public class WtaWriter implements Flushable, AutoCloseable {
   private final ParquetWriter<Task> taskWriter;
   private final ParquetWriter<Resource> resourceWriter;
   private final ParquetWriter<Workflow> workflowWriter;
+
+  private Workload workloadToWrite;
+  private final List<Workflow> workflowsToWrite = new ArrayList<>();
+  private final List<Resource> resourcesToWrite = new ArrayList<>();
+  private final List<Task> tasksToWrite = new ArrayList<>();
 
   /**
    * Sets up a WTA writer for the specified output path and version.
@@ -44,35 +51,37 @@ public class WtaWriter implements Flushable, AutoCloseable {
         new ParquetWriter<>(path.resolve("workflows").resolve(version).open());
   }
 
-  public void write(Workload workload) {
-    try {
-      workloadWriter.write(workload);
-    } catch (Exception e) {
-      log.error("Could not write workload {}.", workload);
-    }
+  public void add(Workload workload) {
+    workloadToWrite = workload;
   }
 
-  public void write(Workflow workflow) {
-    try {
-      workflowWriter.write(workflow);
-    } catch (Exception e) {
-      log.error("Could not write workflow {}.", workflow);
-    }
+  public void add(Workflow workflow) {
+    workflowsToWrite.add(workflow);
   }
 
-  public void write(Resource resource) {
-    try {
-      resourceWriter.write(resource);
-    } catch (Exception e) {
-      log.error("Could not write resource {}.", resource);
-    }
+  public void add(Resource resource) {
+    resourcesToWrite.add(resource);
   }
 
-  public void write(Task task) {
+  public void add(Task task) {
+    tasksToWrite.add(task);
+  }
+
+  public void write() {
     try {
-      taskWriter.write(task);
+      workloadWriter.write(workloadToWrite);
+      for (Workflow workflow : workflowsToWrite) {
+        workflowWriter.write(workflow);
+      }
+      for (Resource resource : resourcesToWrite) {
+        resourceWriter.write(resource);
+      }
+      for (Task task : tasksToWrite) {
+        taskWriter.write(task);
+      }
+      flush();
     } catch (Exception e) {
-      log.error("Could not write task {}.", task);
+      log.error("Could not write all WTA files.");
     }
   }
 
