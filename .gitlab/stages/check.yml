@@ -8,10 +8,18 @@ include:
 spotless:
   stage: check
   dependencies: []
-  needs: []
+  needs: [build-base-image]
   script:
     - echo "Spotless check started"
     - "mvn spotless:check"
+  cache:
+    - key:
+        prefix: spotless
+        files:
+          - pom.xml
+          - core/pom.xml
+      paths:
+        - .m2/repository
 
 pmd:
   stage: check
@@ -27,11 +35,19 @@ pmd:
     paths:
       - core/reports/pmd
       - adapter/spark/reports/pmd
+  cache:
+    - key:
+        prefix: test
+        files:
+          - pom.xml
+          - core/pom.xml
+      paths:
+        - .m2/repository
 
 checkstyle:
   stage: check
   dependencies: []
-  needs: []
+  needs: [build-base-image]
   script:
     - echo "Checkstyle checks started"
     - "mvn checkstyle:check"
@@ -42,6 +58,14 @@ checkstyle:
     paths:
       - core/reports/checkstyle/violations.txt
       - adapter/spark/reports/checkstyle/violations.txt
+  cache:
+    - key:
+        prefix: checkstyle
+        files:
+          - pom.xml
+          - core/pom.xml
+      paths:
+        - .m2/repository
 
 
 sast:
