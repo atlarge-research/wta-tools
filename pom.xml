@@ -49,7 +49,6 @@
   <modules>
     <module>core</module>
     <module>adapter/spark</module>
-    <module>benchmarking/spark-benchmark</module>
   </modules>
 
   <dependencies>
