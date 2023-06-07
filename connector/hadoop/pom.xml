@@ -12,6 +12,7 @@
   </parent>
 
   <artifactId>hadoop-connector</artifactId>
+  <packaging>jar</packaging>
 
   <properties>
     <hadoop.version>3.3.5</hadoop.version>
