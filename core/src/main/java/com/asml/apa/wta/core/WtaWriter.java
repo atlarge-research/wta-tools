@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -47,7 +48,7 @@ public class WtaWriter implements Flushable, AutoCloseable {
    * @author Atour Mousavi Gourabi
    * @since 1.0.0
    */
-  public WtaWriter(OutputFile path, String version) throws IOException {
+  public WtaWriter(@NonNull OutputFile path, String version) throws IOException {
     setupDirectories(path, version);
     workloadWriter = new JsonWriter<>(path.resolve("workflow").resolve(version));
     taskWriter = new ParquetWriter<>(path.resolve("tasks").resolve(version));

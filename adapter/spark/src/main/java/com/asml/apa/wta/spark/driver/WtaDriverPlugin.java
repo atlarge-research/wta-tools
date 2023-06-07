@@ -107,8 +107,8 @@ public class WtaDriverPlugin implements DriverPlugin {
     if (error) {
       log.error("Error initialising WTA plugin. Shutting down plugin");
     } else {
+      removeListeners();
       try (WtaWriter wtaWriter = new WtaWriter(outputFile, "schema-1.0")) {
-        removeListeners();
         List<Task> tasks = sparkDataSource.getTaskLevelListener().getProcessedObjects();
         List<Workflow> workFlow = sparkDataSource.getJobLevelListener().getProcessedObjects();
         Workload workLoad = sparkDataSource
@@ -133,12 +133,12 @@ public class WtaDriverPlugin implements DriverPlugin {
    */
   public void initListeners() {
     if (sparkDataSource.getRuntimeConfig().isStageLevel()) {
-      this.sparkDataSource.registerStageListener();
+      sparkDataSource.registerStageListener();
     } else {
-      this.sparkDataSource.registerTaskListener();
+      sparkDataSource.registerTaskListener();
     }
-    this.sparkDataSource.registerJobListener();
-    this.sparkDataSource.registerApplicationListener();
+    sparkDataSource.registerJobListener();
+    sparkDataSource.registerApplicationListener();
   }
   /**
    * Removes the listeners.
@@ -147,8 +147,8 @@ public class WtaDriverPlugin implements DriverPlugin {
    * @since 1.0.0
    */
   public void removeListeners() {
-    this.sparkDataSource.removeTaskListener();
-    this.sparkDataSource.removeTaskListener();
-    this.sparkDataSource.removeApplicationListener();
+    sparkDataSource.removeTaskListener();
+    sparkDataSource.removeTaskListener();
+    sparkDataSource.removeApplicationListener();
   }
 }

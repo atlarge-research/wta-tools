@@ -72,6 +72,8 @@ class WtaDriverPluginTest {
 
   @Test
   void wtaDriverPluginShutdown() {
+    injectConfig();
+    sut.init(mock(SparkContext.class), null);
     assertThat(sut.isError()).isFalse();
     sut.shutdown();
     verify(sut, times(1)).removeListeners();
