@@ -50,7 +50,7 @@ public class WtaWriter implements Flushable, AutoCloseable {
    */
   public WtaWriter(@NonNull OutputFile path, String version) throws IOException {
     setupDirectories(path, version);
-    workloadWriter = new JsonWriter<>(path.resolve("workflow").resolve(version));
+    workloadWriter = new JsonWriter<>(path.resolve("workload").resolve(version));
     taskWriter = new ParquetWriter<>(path.resolve("tasks").resolve(version));
     resourceWriter = new ParquetWriter<>(path.resolve("resources").resolve(version));
     workflowWriter = new ParquetWriter<>(path.resolve("workflows").resolve(version));
@@ -112,10 +112,10 @@ public class WtaWriter implements Flushable, AutoCloseable {
    */
   private void setupDirectories(OutputFile path, String version) {
     try {
-      path.resolve("workflow").resolve(version).clearDirectory();
-      path.resolve("workloads").resolve(version).clearDirectory();
-      path.resolve("tasks").resolve(version).clearDirectory();
-      path.resolve("resources").resolve(version).clearDirectory();
+      path.resolve("workload").resolve(version).resolve(".temp").clearDirectory();
+      path.resolve("workflows").resolve(version).resolve(".temp").clearDirectory();
+      path.resolve("tasks").resolve(version).resolve(".temp").clearDirectory();
+      path.resolve("resources").resolve(version).resolve(".temp").clearDirectory();
     } catch (IOException e) {
       log.error("Could not create directory structure for the output.");
     }
