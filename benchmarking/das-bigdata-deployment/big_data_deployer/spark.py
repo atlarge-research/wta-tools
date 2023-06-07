@@ -109,7 +109,16 @@ class SparkFramework(Framework):
 get_framework_registry().register_framework(SparkFramework())
 get_framework_registry().framework("spark").add_version(
     SparkFrameworkVersion(
-        "3.2.4", 
+        "3.2.4_2.12", 
+        "https://dlcdn.apache.org/spark/spark-3.2.4/spark-3.2.4-bin-hadoop3.2.tgz",
+        "tgz", 
+        "spark-3.2.4-bin-hadoop3.2", 
+        "3.2.x",
+    )
+)
+get_framework_registry().framework("spark").add_version(
+    SparkFrameworkVersion(
+        "3.2.4_2.13", 
         "https://dlcdn.apache.org/spark/spark-3.2.4/spark-3.2.4-bin-hadoop3.2-scala2.13.tgz",
         "tgz", 
         "spark-3.2.4-bin-hadoop3.2-scala2.13", 

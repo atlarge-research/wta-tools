@@ -80,7 +80,7 @@ logs
 
 # DAS config files
 *.pyc
-benchmarking/das-config-scripts/frameworks
+benchmarking/das-bigdata-deployment/frameworks
 
 # test output
 core/src/test/resources/WTA
