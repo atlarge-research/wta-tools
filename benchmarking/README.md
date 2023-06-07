@@ -1,5 +1,5 @@
 # Benchmarking
-This directory provides all the tools we use for benchmarking the Spark plugin. These tools are independent of the Spark plugin itself, and can be used to benchmark any Spark application.
+This directory provides all the tools we use for benchmarking the Spark plugin. These tools are independent of the Spark plugin itself, and can be used to benchmark any Spark application. Furthermore these will *not* be packaged with the Spark plugin.
 
 ## Directory structure
 This directory contains the following tools/module:
