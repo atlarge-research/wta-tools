@@ -22,7 +22,7 @@ The diagram above illustrates the workflow of the adapter.
      ```bash
      sudo apt install sysstat
      ```
-     
+
    - Install dstat by running the following bash command:
     ```bash
     sudo apt install dstat

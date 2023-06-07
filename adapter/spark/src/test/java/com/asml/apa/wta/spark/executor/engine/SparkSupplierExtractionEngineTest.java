@@ -42,7 +42,8 @@ class SparkSupplierExtractionEngineTest {
 
     LocalDateTime fakeTime = LocalDateTime.of(2000, 1, 1, 0, 0);
 
-    BaseSupplierDto baseSupplierDto = new BaseSupplierDto(fakeTime, fakeOsInfo, fakeIoStatDto, fakeDstatDto, fakePerfDto);
+    BaseSupplierDto baseSupplierDto =
+        new BaseSupplierDto(fakeTime, fakeOsInfo, fakeIoStatDto, fakeDstatDto, fakePerfDto);
 
     SparkBaseSupplierWrapperDto result = sutSupplierExtractionEngine.transform(baseSupplierDto);
 
