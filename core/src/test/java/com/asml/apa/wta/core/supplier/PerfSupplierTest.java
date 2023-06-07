@@ -33,7 +33,7 @@ public class PerfSupplierTest {
 
   @Test
   void perfIsAvailableThrowsNullPointerException() {
-    when(bashUtils.executeCommand(isAvailableBashCommand)).thenThrow(NullPointerException.class);
+    when(bashUtils.executeCommand(isAvailableBashCommand)).thenReturn(nullCompletableFuture);
     assertThat(sut.isAvailable()).isFalse();
   }
 
