@@ -1,6 +1,5 @@
 package com.asml.apa.wta.core.supplier;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.asml.apa.wta.core.utils.BashUtils;
