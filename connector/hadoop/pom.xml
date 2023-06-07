@@ -19,10 +19,10 @@
   </properties>
 
   <dependencies>
-    <!-- https://mvnrepository.com/artifact/org.apache.hadoop/hadoop-hdfs-client -->
+    <!-- https://mvnrepository.com/artifact/org.apache.hadoop/hadoop-common -->
     <dependency>
       <groupId>org.apache.hadoop</groupId>
-      <artifactId>hadoop-hdfs-client</artifactId>
+      <artifactId>hadoop-common</artifactId>
       <version>${hadoop.version}</version>
     </dependency>
     <!-- internal dependency -->

@@ -43,7 +43,6 @@ class WtaDriverPluginTest {
     assertThat(sut.init(mockedSparkContext, mockedPluginContext))
         .containsKeys("executorSynchronizationInterval", "resourcePingInterval");
     assertThat(sut.getSparkDataSource()).isNotNull();
-    assertThat(sut.getParquetUtil()).isNotNull();
     assertThat(sut.isError()).isFalse();
     verify(sut, times(0)).shutdown();
     verify(sut, times(1)).initListeners();
@@ -56,7 +55,6 @@ class WtaDriverPluginTest {
     assertThat(sut.isError()).isFalse();
     sut.init(mockedSparkContext, mockedPluginContext);
     assertThat(sut.getSparkDataSource()).isNull();
-    assertThat(sut.getParquetUtil()).isNull();
     assertThat(sut.isError()).isTrue();
     verify(sut, times(1)).shutdown();
     verify(sut, times(0)).initListeners();

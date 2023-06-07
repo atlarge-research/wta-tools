@@ -1,15 +1,17 @@
 package com.asml.apa.wta.spark.driver;
 
+import com.asml.apa.wta.core.WtaWriter;
 import com.asml.apa.wta.core.config.RuntimeConfig;
+import com.asml.apa.wta.core.io.DiskOutputFile;
+import com.asml.apa.wta.core.io.OutputFile;
 import com.asml.apa.wta.core.model.Task;
 import com.asml.apa.wta.core.model.Workflow;
 import com.asml.apa.wta.core.model.Workload;
-import com.asml.apa.wta.core.utils.ParquetWriterUtils;
 import com.asml.apa.wta.core.utils.WtaUtils;
 import com.asml.apa.wta.spark.datasource.SparkDataSource;
 import com.asml.apa.wta.spark.dto.ResourceCollectionDto;
 import com.asml.apa.wta.spark.streams.MetricStreamingEngine;
-import java.io.File;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,7 +38,7 @@ public class WtaDriverPlugin implements DriverPlugin {
 
   private SparkDataSource sparkDataSource;
 
-  private ParquetWriterUtils parquetUtil;
+  private OutputFile outputFile;
 
   private boolean error = false;
 
@@ -60,8 +62,7 @@ public class WtaDriverPlugin implements DriverPlugin {
       RuntimeConfig runtimeConfig = WtaUtils.readConfig(System.getProperty("configFile"));
       sparkDataSource = new SparkDataSource(sparkCtx, runtimeConfig);
       metricStreamingEngine = new MetricStreamingEngine();
-      parquetUtil = new ParquetWriterUtils(new File(runtimeConfig.getOutputPath()), "schema-1.0");
-      parquetUtil.deletePreExistingFiles();
+      outputFile = new DiskOutputFile(Path.of(runtimeConfig.getOutputPath()));
       initListeners();
       executorVars.put("resourcePingInterval", String.valueOf(runtimeConfig.getResourcePingInterval()));
       executorVars.put(
@@ -106,7 +107,7 @@ public class WtaDriverPlugin implements DriverPlugin {
     if (error) {
       log.error("Error initialising WTA plugin. Shutting down plugin");
     } else {
-      try {
+      try (WtaWriter wtaWriter = new WtaWriter(outputFile, "schema-1.0")) {
         removeListeners();
         List<Task> tasks = sparkDataSource.getTaskLevelListener().getProcessedObjects();
         List<Workflow> workFlow = sparkDataSource.getJobLevelListener().getProcessedObjects();
@@ -114,12 +115,12 @@ public class WtaDriverPlugin implements DriverPlugin {
             .getApplicationLevelListener()
             .getProcessedObjects()
             .get(0);
-        parquetUtil.getTasks().addAll(tasks);
-        parquetUtil.getWorkflows().addAll(workFlow);
-        parquetUtil.write(workLoad);
-        parquetUtil.writeToFile("resource", "task", "workflow", "generic_information");
+        wtaWriter.getTasksToWrite().addAll(tasks);
+        wtaWriter.getWorkflowsToWrite().addAll(workFlow);
+        wtaWriter.add(workLoad);
+        wtaWriter.write();
       } catch (Exception e) {
-        log.error("Error while writing to Parquet file");
+        log.error("Error while writing to the generated files.");
       }
     }
   }

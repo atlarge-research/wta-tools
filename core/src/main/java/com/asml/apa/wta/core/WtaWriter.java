@@ -11,6 +11,7 @@ import java.io.Flushable;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -28,8 +29,14 @@ public class WtaWriter implements Flushable, AutoCloseable {
   private final ParquetWriter<Workflow> workflowWriter;
 
   private Workload workloadToWrite;
+
+  @Getter
   private final List<Workflow> workflowsToWrite = new ArrayList<>();
+
+  @Getter
   private final List<Resource> resourcesToWrite = new ArrayList<>();
+
+  @Getter
   private final List<Task> tasksToWrite = new ArrayList<>();
 
   /**
