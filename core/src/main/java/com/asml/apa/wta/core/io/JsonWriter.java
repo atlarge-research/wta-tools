@@ -3,6 +3,8 @@ package com.asml.apa.wta.core.io;
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+
+import java.io.BufferedOutputStream;
 import java.io.Flushable;
 import java.io.IOException;
 
@@ -14,7 +16,7 @@ import java.io.IOException;
  */
 public class JsonWriter<T> implements AutoCloseable, Flushable {
 
-  private final OutputFile outputFile;
+  private final BufferedOutputStream outputStream;
 
   /**
    * Constructs a writer to write records as JSON.
@@ -23,8 +25,8 @@ public class JsonWriter<T> implements AutoCloseable, Flushable {
    * @author Atour Mousavi Gourabi
    * @since 1.0.0
    */
-  public JsonWriter(OutputFile path) {
-    outputFile = path;
+  public JsonWriter(OutputFile path) throws IOException {
+    outputStream = path.open();
   }
 
   /**
@@ -39,16 +41,16 @@ public class JsonWriter<T> implements AutoCloseable, Flushable {
     Gson gson = new GsonBuilder()
         .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
         .create();
-    gson.toJson(record, outputFile);
+    outputStream.write(gson.toJson(record).getBytes());
   }
 
   @Override
   public void close() throws Exception {
-    outputFile.close();
+    outputStream.close();
   }
 
   @Override
   public void flush() throws IOException {
-    outputFile.flush();
+    outputStream.flush();
   }
 }

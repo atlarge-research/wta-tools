@@ -1,5 +1,6 @@
 package com.asml.apa.wta.core.io;
 
+import java.io.BufferedOutputStream;
 import java.io.Flushable;
 import java.io.IOException;
 
@@ -11,7 +12,7 @@ import java.io.IOException;
  */
 public class ParquetWriter<T> implements AutoCloseable, Flushable {
 
-  private final OutputFile outputFile;
+  private final BufferedOutputStream outputStream;
 
   /**
    * Constructs a writer to write records as Parquet.
@@ -20,8 +21,8 @@ public class ParquetWriter<T> implements AutoCloseable, Flushable {
    * @author Atour Mousavi Gourabi
    * @since 1.0.0
    */
-  public ParquetWriter(OutputFile path) {
-    outputFile = path;
+  public ParquetWriter(OutputFile path) throws IOException {
+    outputStream = path.open();
   }
 
   /**
@@ -32,15 +33,18 @@ public class ParquetWriter<T> implements AutoCloseable, Flushable {
    * @author Atour Mousavi Gourabi
    * @since 1.0.0
    */
-  public void write(T record) throws Exception {}
+  public void write(T record) throws Exception {
+    outputStream.write(1);
+    // todo
+  }
 
   @Override
   public void close() throws Exception {
-    outputFile.close();
+    outputStream.close();
   }
 
   @Override
   public void flush() throws IOException {
-    outputFile.flush();
+    outputStream.flush();
   }
 }

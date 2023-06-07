@@ -1,6 +1,6 @@
 package com.asml.apa.wta.core.io;
 
-import java.io.Flushable;
+import java.io.BufferedOutputStream;
 import java.io.IOException;
 
 /**
@@ -9,7 +9,7 @@ import java.io.IOException;
  * @author Atour Mousavi Gourabi
  * @since 1.0.0
  */
-public interface OutputFile extends Appendable, AutoCloseable, Flushable {
+public interface OutputFile {
 
   /**
    * Resolves a path in the current location.
@@ -29,7 +29,7 @@ public interface OutputFile extends Appendable, AutoCloseable, Flushable {
    * @author Atour Mousavi Gourabi
    * @since 1.0.0
    */
-  OutputFile open() throws IOException;
+  BufferedOutputStream open() throws IOException;
 
   /**
    * Clear the current directory if this {@link OutputFile} points to a folder.

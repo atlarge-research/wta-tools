@@ -40,15 +40,15 @@ public class WtaWriter implements Flushable, AutoCloseable {
    * @author Atour Mousavi Gourabi
    * @since 1.0.0
    */
-  public WtaWriter(OutputFile path, String version) throws Exception {
+  public WtaWriter(OutputFile path, String version) throws IOException {
     setupDirectories(path, version);
     workloadWriter =
-        new JsonWriter<>(path.resolve("workflow").resolve(version).open());
-    taskWriter = new ParquetWriter<>(path.resolve("tasks").resolve(version).open());
+        new JsonWriter<>(path.resolve("workflow").resolve(version));
+    taskWriter = new ParquetWriter<>(path.resolve("tasks").resolve(version));
     resourceWriter =
-        new ParquetWriter<>(path.resolve("resources").resolve(version).open());
+        new ParquetWriter<>(path.resolve("resources").resolve(version));
     workflowWriter =
-        new ParquetWriter<>(path.resolve("workflows").resolve(version).open());
+        new ParquetWriter<>(path.resolve("workflows").resolve(version));
   }
 
   public void add(Workload workload) {
