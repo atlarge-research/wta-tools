@@ -8,7 +8,7 @@ import com.asml.apa.wta.core.utils.CollectorInterface;
 import com.asml.apa.wta.spark.listener.AbstractListener;
 import com.asml.apa.wta.spark.listener.ApplicationLevelListener;
 import com.asml.apa.wta.spark.listener.JobLevelListener;
-import com.asml.apa.wta.spark.listener.ResourceLeveListener;
+import com.asml.apa.wta.spark.listener.ExecutorResourceListener;
 import com.asml.apa.wta.spark.listener.StageLevelListener;
 import com.asml.apa.wta.spark.listener.TaskLevelListener;
 import com.asml.apa.wta.spark.streams.MetricStreamingEngine;
@@ -33,7 +33,7 @@ public class SparkDataSource implements CollectorInterface {
 
   private final AbstractListener<Task> stageLevelListener;
 
-  private final ResourceLeveListener resourceLeveListener;
+  private final ExecutorResourceListener executorResourceListener;
 
   private final RuntimeConfig runtimeConfig;
 
@@ -52,7 +52,7 @@ public class SparkDataSource implements CollectorInterface {
       SparkContext sparkContext, RuntimeConfig config, MetricStreamingEngine metricStreamingEngine) {
     taskLevelListener = new TaskLevelListener(sparkContext, config);
     stageLevelListener = new StageLevelListener(sparkContext, config);
-    resourceLeveListener = new ResourceLeveListener(sparkContext, config, metricStreamingEngine);
+    executorResourceListener = new ExecutorResourceListener(sparkContext, config, metricStreamingEngine);
     if (config.isStageLevel()) {
       jobLevelListener = new JobLevelListener(sparkContext, config, stageLevelListener);
     } else {

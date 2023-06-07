@@ -156,11 +156,6 @@ public class OperatingSystemSupplier implements InformationSupplier<OsInfoDto> {
   }
 
 
-
-  public String getAvailableSpace() {
-    Arrays.stream(File.listRoots()).forEach(File::getFreeSpace);
-  }
-
   /**
    * Gathers the metrics the supplier provides (computed asynchronously).
    *
