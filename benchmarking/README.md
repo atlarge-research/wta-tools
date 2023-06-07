@@ -1,14 +1,16 @@
 # Benchmarking Module
+This module provides all the tools we use for benchmarking the Spark plugin. 
 
-This module provides all the tools we use for benchmarking the plugin. The documentation for this module is still very incomplete as it is still under active experimentation. These tools are also potentially useful for
-anyone who wants to use this plugin as a way to evaluate its performance. Currently, it includes of:
+This module consists of:
+- **das-bigdata-deployment**
+- **zoo-tutorials** 
 
-### DAS scripts
+All the repositories are forked from the originals and modified to suit our needs. All rights and credits go to the original authors.
 
-We used the Distributed ASCI Supercomputer (DAS) system to benchmark our plugin. Supplementary information can be found [here](https://asci.tudelft.nl/project-das/).
+## das-bigdata-deployment
+Script to download, configure, and deploy Hadoop HDFS, YARN, and Spark on the Distributed ASCII Supercomputer (DAS-5)
 
-The DAS scripts are Python scripts that submit a slot allocation request on the DAS, whilst configuring the Spark environment.
+## zoo-tutorials
+This module contains the code for running TPC-DS benchmarks on Spark. To run TPC-DS benchmarks on Spark, we only need the **tpcds-spark** submodule within **zoo-tutorials**, but it is necessary to clone the entire repo in order to properly package it using sbt.
 
-It is based on the work of Tim Hegeman, Chris Lemaire, and Laurens Versluis. You can find the forked source repo [here](https://github.com/lfdversluis/das-bigdata-deployment).
-
-### tpcd
+The current instructions specified in the **tpcds-spark/README.md** file is meant for running it locally. In order to run it on DAS-5, make use of the **das-bigdata-deployment** module and modify accordingly.
