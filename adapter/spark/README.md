@@ -17,10 +17,15 @@ The diagram above illustrates the workflow of the adapter.
 
 ## Installation and Usage
 1.  Clone the repository
-2.  Optional (if more I/O metrics are needed): Install `sysstat` by running the following bash command:
-
+2.  Optional (if more I/O metrics are needed):
+   - Install sysstat by running the following bash command:
+     ```bash
+     sudo apt install sysstat
+     ```
+     
+   - Install dstat by running the following bash command:
     ```bash
-    sudo apt-get install sysstat
+    sudo apt install dstat
     ```
 
 3.  To allow advanced performance metrics to be gathered, you can opt to make the `perf` utility available.

@@ -45,6 +45,7 @@ For the most part, since we are pre-release this will serve no real purpose, oth
 - Added the option to compile the plugin for Scala 2.12 and 2.13 [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 - Extended BaseTraceObject with a new method [@tqu](https://gitlab.ewi.tudelft.nl/tqu)
 - Added energy consumption metrics data source [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab) [@pcho](https://gitlab.ewi.tudelft.nl/pcho)
+- Added dstat datasource and wrote integration tests for all io datasources [@lyadalachanchu](https://gitlab.ewi.tudelft.nl/lyadalachanchu)
 
 ### Changed
 - Refactored listeners into a generic interface to reduce code duplication and increase cc [@hpage](https://gitlab.ewi.tudelft.nl/hpage)
