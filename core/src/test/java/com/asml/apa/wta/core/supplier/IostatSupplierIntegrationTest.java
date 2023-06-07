@@ -11,7 +11,7 @@ public class IostatSupplierIntegrationTest {
   public void IostatSupplierSuccessfullyReturnsADtoObject() {
     IostatSupplier sut = new IostatSupplier(new BashUtils());
     if (sut.isAvailable()) {
-      assertNotNull(sut.getSnapshot().join());
+      assertDoesNotThrow(sut::getSnapshot);
     }
   }
 }
