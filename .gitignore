@@ -64,10 +64,6 @@ reports
 # application configuration
 config.json
 
-# big files for benchmarking
-benchmarking/spark-benchmark/src/main/resources/sql_files
-benchmarking/spark-benchmark/src/main/resources/tpcds_parquet_data
-
 # serialization files
 *.ser
 tmp
@@ -79,17 +75,17 @@ tmp
 logs
 *.log
 
-# DAS config files
-*.pyc
-benchmarking/das-bigdata-deployment/frameworks
-
 # test output
 core/src/test/resources/WTA
 core/src/test/resources/AvroOutput
 adapter/spark/src/test/resources/WTA
 wta-output
 
-# sbt specific
+# das-bigdata-deployment specific
+*.pyc
+benchmarking/das-bigdata-deployment/frameworks
+
+# zoo-tutorial specific
 .cache
 .history
 .lib/
@@ -106,13 +102,15 @@ benchmarking/zoo-tutorials/project/plugins/project/
 
 # tpcds-spark specific
 benchmarking/zoo-tutorials/tpcds-spark/target
+benchmarking/zoo-tutorials/tpcds-spark/spark-warehouse
+benchmarking/zoo-tutorials/tpcds-spark/metastore_db
+benchmarking/zoo-tutorials/tpcds-spark/spark-sql-perf/target
 
 # tpch dbgen specific
 benchmarking/zoo-tutorials/tpch-spark/dbgen/*.tbl
 benchmarking/zoo-tutorials/tpch-spark/dbgen/*.o
 benchmarking/zoo-tutorials/tpch-spark/dbgen/dbgen
 benchmarking/zoo-tutorials/tpch-spark/dbgen/qgen
-
 
 # OS X
 .DS_Store
@@ -131,7 +129,6 @@ benchmarking/zoo-tutorials/tpch-spark/dbgen/qgen
 *.dylib
 
 # Executables
-*.exe
 *.out
 *.app
 
@@ -155,5 +152,4 @@ tags
 
 # Flat files
 *.dat
-
 /.idea/*
