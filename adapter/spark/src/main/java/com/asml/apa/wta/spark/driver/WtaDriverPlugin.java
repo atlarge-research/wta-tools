@@ -68,6 +68,7 @@ public class WtaDriverPlugin implements DriverPlugin {
           "executorSynchronizationInterval",
           String.valueOf(runtimeConfig.getExecutorSynchronizationInterval()));
     } catch (Exception e) {
+      log.error(String.valueOf(e));
       error = true;
       shutdown();
     }
@@ -95,7 +96,7 @@ public class WtaDriverPlugin implements DriverPlugin {
    * Gets called just before shutdown. If no prior error occurred, it collects all the
    * tasks, workflows, and workloads from the Spark job and writes them to a parquet file.
    * Otherwise, logs the error and just shuts down.
-   * Recommended that no spark functions are used here.
+   * Recommended that no Spark functions are used here.
    *
    * @author Pil Kyu Cho
    * @author Henry Page
@@ -108,7 +109,9 @@ public class WtaDriverPlugin implements DriverPlugin {
     } else {
       try {
         removeListeners();
-        List<Task> tasks = sparkDataSource.getTaskLevelListener().getProcessedObjects();
+        List<Task> tasks = sparkDataSource.getRuntimeConfig().isStageLevel()
+            ? sparkDataSource.getStageLevelListener().getProcessedObjects()
+            : sparkDataSource.getTaskLevelListener().getProcessedObjects();
         List<Workflow> workFlow = sparkDataSource.getJobLevelListener().getProcessedObjects();
         Workload workLoad = sparkDataSource
             .getApplicationLevelListener()
