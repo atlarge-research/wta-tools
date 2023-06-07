@@ -67,3 +67,4 @@ For the most part, since we are pre-release this will serve no real purpose, oth
 - Removed mutation testing from the pipeline [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 - Removed jqwik testing [@hpage](https://gitlab.ewi.tudelft.nl/hpage)
 - Removed all instances of events [@hpage](https://gitlab.ewi.tudelft.nl/hpage)
+- Removed WtaUtils

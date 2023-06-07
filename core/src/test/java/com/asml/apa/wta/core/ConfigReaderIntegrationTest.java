@@ -5,25 +5,24 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.asml.apa.wta.core.config.RuntimeConfig;
 import com.asml.apa.wta.core.model.enums.Domain;
-import com.asml.apa.wta.core.utils.WtaUtils;
 import org.junit.jupiter.api.Test;
 
 class ConfigReaderIntegrationTest {
 
   @Test
   void readsConfigNullArg() {
-    assertThatThrownBy(() -> WtaUtils.readConfig(null)).isInstanceOf(IllegalArgumentException.class);
+    assertThatThrownBy(() -> RuntimeConfig.readConfig(null)).isInstanceOf(IllegalArgumentException.class);
   }
 
   @Test
   void readsConfigNoFileInFilepath() {
-    assertThatThrownBy(() -> WtaUtils.readConfig("nonExistentFile.json"))
+    assertThatThrownBy(() -> RuntimeConfig.readConfig("nonExistentFile.json"))
         .isInstanceOf(IllegalArgumentException.class);
   }
 
   @Test
   void readsConfigFileCorrectly() {
-    RuntimeConfig cr = WtaUtils.readConfig("src/test/resources/testConfig.json");
+    RuntimeConfig cr = RuntimeConfig.readConfig("src/test/resources/testConfig.json");
     assertThat(cr.getAuthors()).isEqualTo(new String[] {"Test Name"});
     assertThat(cr.getDomain()).isEqualTo(Domain.SCIENTIFIC);
     assertThat(cr.getDescription()).isEqualTo("Test Description");
@@ -36,7 +35,7 @@ class ConfigReaderIntegrationTest {
 
   @Test
   void readsConfigFileWhereTheDescriptionIsNotThere() {
-    RuntimeConfig cr = WtaUtils.readConfig("src/test/resources/testConfigNoDesc.json");
+    RuntimeConfig cr = RuntimeConfig.readConfig("src/test/resources/testConfigNoDesc.json");
     assertThat(cr.getAuthors()).isEqualTo(new String[] {"Test Name"});
     assertThat(cr.getDomain()).isEqualTo(Domain.ENGINEERING);
     assertThat(cr.getDescription()).isEqualTo("");
@@ -49,7 +48,7 @@ class ConfigReaderIntegrationTest {
 
   @Test
   void readsConfigFileWhereTheEventsAreNotThere() {
-    RuntimeConfig cr = WtaUtils.readConfig("src/test/resources/testConfigNoEvents.json");
+    RuntimeConfig cr = RuntimeConfig.readConfig("src/test/resources/testConfigNoEvents.json");
     assertThat(cr.getAuthors()).isEqualTo(new String[] {"Test Name"});
     assertThat(cr.getDomain()).isEqualTo(Domain.INDUSTRIAL);
     assertThat(cr.getDescription()).isEqualTo("Test Description");
@@ -59,19 +58,19 @@ class ConfigReaderIntegrationTest {
 
   @Test
   void readsConfigFileWhereNoAuthorsAreGiven() {
-    assertThatThrownBy(() -> WtaUtils.readConfig("src/test/resources/testConfigNoAuthor.json"))
+    assertThatThrownBy(() -> RuntimeConfig.readConfig("src/test/resources/testConfigNoAuthor.json"))
         .isInstanceOf(IllegalArgumentException.class);
   }
 
   @Test
   void readsConfigFileWhereAuthorFieldNotThere() {
-    assertThatThrownBy(() -> WtaUtils.readConfig("src/test/resources/testConfigInvalidAuthor.json"))
+    assertThatThrownBy(() -> RuntimeConfig.readConfig("src/test/resources/testConfigInvalidAuthor.json"))
         .isInstanceOf(IllegalArgumentException.class);
   }
 
   @Test
   void readsConfigFileWhereLogSettingIsNotThere() {
-    RuntimeConfig cr = WtaUtils.readConfig("src/test/resources/testConfigNoLogSettings.json");
+    RuntimeConfig cr = RuntimeConfig.readConfig("src/test/resources/testConfigNoLogSettings.json");
     assertThat(cr.getAuthors()).isEqualTo(new String[] {"Test Name"});
     assertThat(cr.getDomain()).isEqualTo(Domain.INDUSTRIAL);
     assertThat(cr.getDescription()).isEqualTo("Test Description");
@@ -82,19 +81,19 @@ class ConfigReaderIntegrationTest {
 
   @Test
   void readsConfigFileWithInvalidDomain() {
-    assertThatThrownBy(() -> WtaUtils.readConfig("src/test/resources/testConfigInvalidDomain.json"))
+    assertThatThrownBy(() -> RuntimeConfig.readConfig("src/test/resources/testConfigInvalidDomain.json"))
         .isInstanceOf(IllegalArgumentException.class);
   }
 
   @Test
   void readsConfigFileWhereOutputPathIsNotThere() {
-    assertThatThrownBy(() -> WtaUtils.readConfig("src/test/resources/testConfigNoOutputPath.json"))
+    assertThatThrownBy(() -> RuntimeConfig.readConfig("src/test/resources/testConfigNoOutputPath.json"))
         .isInstanceOf(IllegalArgumentException.class);
   }
 
   @Test
   void readsConfigFileWhereIsStageLevelIsNotThere() {
-    RuntimeConfig cr = WtaUtils.readConfig("src/test/resources/testConfigNoIsStageLevel.json");
+    RuntimeConfig cr = RuntimeConfig.readConfig("src/test/resources/testConfigNoIsStageLevel.json");
     assertThat(cr.getAuthors()).isEqualTo(new String[] {"Test Name"});
     assertThat(cr.getDomain()).isEqualTo(Domain.SCIENTIFIC);
     assertThat(cr.getDescription()).isEqualTo("Test Description");
