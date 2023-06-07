@@ -44,6 +44,7 @@ For the most part, since we are pre-release this will serve no real purpose, oth
 - Added functionality to ping resources and syncronize with driver. [@hpage](https://gitlab.ewi.tudelft.nl/hpage)
 - Added the option to compile the plugin for Scala 2.12 and 2.13 [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 - Extended BaseTraceObject with a new method [@tqu](https://gitlab.ewi.tudelft.nl/tqu)
+- Added dstat datasource and wrote integration tests for all io datasources [@lyadalachanchu](https://gitlab.ewi.tudelft.nl/lyadalachanchu)
 - Implemented Parent Children fields for Task [@tqu](https://gitlab.ewi.tudelft.nl/tqu)
 
 ### Changed
