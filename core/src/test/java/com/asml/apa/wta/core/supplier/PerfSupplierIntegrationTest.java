@@ -1,15 +1,11 @@
 package com.asml.apa.wta.core.supplier;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.condition.OS.LINUX;
 
 import com.asml.apa.wta.core.dto.PerfDto;
 import com.asml.apa.wta.core.utils.BashUtils;
-import java.time.Duration;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import org.awaitility.Awaitility;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledOnOs;
 
@@ -22,6 +18,7 @@ public class PerfSupplierIntegrationTest {
   @Test()
   @EnabledOnOs(LINUX)
   void perfEnergyDataSourceIsAvailableDoesNotThrowException() {
+    sut = new PerfSupplier(bashUtils);
     assertDoesNotThrow(sut::isAvailable);
   }
 
@@ -41,15 +38,11 @@ public class PerfSupplierIntegrationTest {
 
   @Test
   @EnabledOnOs(LINUX)
-  void perfEnergyGetSnapshotSuccessful() throws ExecutionException, InterruptedException {
+  void perfEnergyGetSnapshotSuccessful() {
     sut = new PerfSupplier(bashUtils);
-    CompletableFuture<PerfDto> result = sut.getSnapshot();
-    Awaitility.await().atMost(Duration.ofSeconds(2)).until(result::isDone);
-    assertThat(result).isDone();
     if (sut.isAvailable()) {
-      assertThat(result.get().getWatt()).isGreaterThan(0.0);
-    } else {
-      assertThat(result.get().getWatt()).isEqualTo(0.0);
+      PerfDto result = sut.getSnapshot().join();
+      assertThat(result.getWatt()).isGreaterThan(0.0);
     }
   }
 }

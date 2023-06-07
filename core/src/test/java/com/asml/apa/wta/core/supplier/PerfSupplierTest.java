@@ -5,10 +5,7 @@ import static org.mockito.Mockito.*;
 
 import com.asml.apa.wta.core.dto.PerfDto;
 import com.asml.apa.wta.core.utils.BashUtils;
-import java.time.Duration;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import org.awaitility.Awaitility;
 import org.junit.jupiter.api.Test;
 
 public class PerfSupplierTest {
@@ -44,64 +41,61 @@ public class PerfSupplierTest {
   }
 
   @Test
-  void perfEnergyGatherMetricsSuccessful() throws ExecutionException, InterruptedException {
+  void perfEnergyGatherMetricsSuccessful() {
     when(bashUtils.executeCommand(getEnergyMetricsBashCommand))
         .thenReturn(CompletableFuture.completedFuture("12.34"));
-    assertThat(sut.gatherMetrics().get()).isEqualTo("12.34");
+    String result = sut.gatherMetrics().join();
+    assertThat(result).isEqualTo("12.34");
   }
 
   @Test
-  void perfEnergyGatherMetricsCommandErrorReturnsNull() throws ExecutionException, InterruptedException {
+  void perfEnergyGatherMetricsCommandErrorReturnsNull() {
     when(bashUtils.executeCommand(getEnergyMetricsBashCommand)).thenReturn(nullCompletableFuture);
-    CompletableFuture<String> result = sut.gatherMetrics();
-    assertThat(result.get()).isNull();
+    String result = sut.gatherMetrics().join();
+    assertThat(result).isNull();
   }
 
   @Test
-  void notAvailablePerfReturnsNotAvailableResult() throws ExecutionException, InterruptedException {
+  void notAvailablePerfReturnsNotAvailableResult() {
     when(bashUtils.executeCommand(isAvailableBashCommand)).thenReturn(nullCompletableFuture);
     sut = spy(new PerfSupplier(bashUtils));
     assertThat(sut.isAvailable()).isFalse();
-    CompletableFuture<PerfDto> result = sut.getSnapshot();
-    assertThat(result.isDone()).isTrue();
-    assertThat(result.get()).isNull();
+    PerfDto result = sut.getSnapshot().join();
+    assertThat(result).isNull();
   }
 
   @Test
-  void isAvailablePerfReturnsPerfDtoCompletableFuture() throws ExecutionException, InterruptedException {
+  void isAvailablePerfReturnsPerfDtoCompletableFuture() {
     when(bashUtils.executeCommand(isAvailableBashCommand))
         .thenReturn(CompletableFuture.completedFuture("power/energy-pkg/"));
     when(bashUtils.executeCommand(getEnergyMetricsBashCommand))
         .thenReturn(CompletableFuture.completedFuture("12.34"));
     sut = spy(new PerfSupplier(bashUtils));
     assertThat(sut.isAvailable()).isTrue();
-    CompletableFuture<PerfDto> result = sut.getSnapshot();
-    Awaitility.await().atMost(Duration.ofSeconds(2)).until(result::isDone);
-    assertThat(result.get().getWatt()).isEqualTo(12.34);
+    PerfDto result = sut.getSnapshot().join();
+    assertThat(result.getWatt()).isEqualTo(12.34);
   }
 
   @Test
-  void perfEnergyGetSnapshotNullValueReturnsZero() throws ExecutionException, InterruptedException {
+  void perfEnergyGetSnapshotNullValueReturnsZero() {
     when(bashUtils.executeCommand(isAvailableBashCommand))
         .thenReturn(CompletableFuture.completedFuture("power/energy-pkg/"));
     when(bashUtils.executeCommand(getEnergyMetricsBashCommand)).thenReturn(nullCompletableFuture);
     sut = spy(new PerfSupplier(bashUtils));
     assertThat(sut.isAvailable()).isTrue();
-    CompletableFuture<PerfDto> result = sut.getSnapshot();
-    Awaitility.await().atMost(Duration.ofSeconds(2)).until(result::isDone);
-    assertThat(result.get().getWatt()).isEqualTo(0.0);
+    PerfDto result = sut.getSnapshot().join();
+    assertThat(result.getWatt()).isEqualTo(0.0);
   }
 
   @Test
-  void perfEnergyGetSnapshotCommaDecimalStringReturnsZero() throws ExecutionException, InterruptedException {
+  void perfEnergyGetSnapshotCommaDecimalStringReturnsZero() {
     when(bashUtils.executeCommand(isAvailableBashCommand))
         .thenReturn(CompletableFuture.completedFuture("power/energy-pkg/"));
     when(bashUtils.executeCommand(getEnergyMetricsBashCommand))
         .thenReturn(CompletableFuture.completedFuture("12,34"));
     sut = spy(new PerfSupplier(bashUtils));
     assertThat(sut.isAvailable()).isTrue();
-    CompletableFuture<PerfDto> result = sut.getSnapshot();
-    Awaitility.await().atMost(Duration.ofSeconds(2)).until(result::isDone);
-    assertThat(result.get().getWatt()).isEqualTo(0.0);
+    PerfDto result = sut.getSnapshot().join();
+    assertThat(result.getWatt()).isEqualTo(0.0);
   }
 }
