@@ -118,9 +118,9 @@ public class WtaWriter implements Flushable, AutoCloseable {
 
   @Override
   public void close() throws Exception {
-    taskWriter.close();
-    workloadWriter.close();
-    workflowWriter.close();
     resourceWriter.close();
+    taskWriter.close();
+    workflowWriter.close();
+    workloadWriter.close();
   }
 }

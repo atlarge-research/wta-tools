@@ -53,4 +53,9 @@ public class DiskOutputFile implements OutputFile {
       paths.sorted(Comparator.reverseOrder()).forEach(this::deleteFile);
     }
   }
+
+  @Override
+  public String toString() {
+    return file.toString();
+  }
 }
