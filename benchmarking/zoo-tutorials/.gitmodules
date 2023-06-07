@@ -1,3 +1,0 @@
-[submodule "tpcds-spark/spark-sql-perf"]
-	path = tpcds-spark/spark-sql-perf
-	url = https://github.com/databricks/spark-sql-perf.git

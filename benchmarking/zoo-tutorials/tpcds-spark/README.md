@@ -13,12 +13,7 @@ cd tpcds-kit/tools
 make OS=LINUX
 ```
 ### Generate test data ###
-If `zoo-tutorials` is not cloned with `--recursive` option, firstly clone submodule `spark-sql-perf` into directory with
-```bash
-cd /path/to/zoo-tutorials
-git submodule update --init
-```
-Then generate TPC-DS data
+Generate TPC-DS data
 ```bash
 cd tpcds-spark/spark-sql-perf
 sbt "test:runMain com.databricks.spark.sql.perf.tpcds.GenTPCDSData -d <dsdgenDir> -s <scaleFactor> -l <dataDir> -f parquet"
