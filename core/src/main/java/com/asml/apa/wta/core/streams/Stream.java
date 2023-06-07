@@ -11,6 +11,7 @@ import java.io.Serializable;
 import java.time.Instant;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Queue;
@@ -364,5 +365,20 @@ public class Stream<V extends Serializable> {
     head = null;
     tail = null;
     return acc;
+  }
+
+  /**
+   * Converts the stream to a list, and consumes the stream.
+   *
+   * @return A list with the stream elements
+   * @author Henry Page
+   * @since 1.0.0
+   */
+  public synchronized List<V> toList() {
+    List<V> ret = new LinkedList<>();
+    while (!isEmpty()) {
+      ret.add(head());
+    }
+    return ret;
   }
 }

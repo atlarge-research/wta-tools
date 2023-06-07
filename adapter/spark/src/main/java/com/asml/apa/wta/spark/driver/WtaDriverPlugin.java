@@ -58,8 +58,8 @@ public class WtaDriverPlugin implements DriverPlugin {
     Map<String, String> executorVars = new HashMap<>();
     try {
       RuntimeConfig runtimeConfig = WtaUtils.readConfig(System.getProperty("configFile"));
-      sparkDataSource = new SparkDataSource(sparkCtx, runtimeConfig);
       metricStreamingEngine = new MetricStreamingEngine();
+      sparkDataSource = new SparkDataSource(sparkCtx, runtimeConfig, metricStreamingEngine);
       parquetUtil = new ParquetWriterUtils(new File(runtimeConfig.getOutputPath()), "schema-1.0");
       parquetUtil.deletePreExistingFiles();
       initListeners();

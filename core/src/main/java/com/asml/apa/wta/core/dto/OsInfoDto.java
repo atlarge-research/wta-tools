@@ -36,4 +36,6 @@ public class OsInfoDto implements SupplierDto {
   private double systemLoadAverage;
 
   private String architecture;
+
+  private String os;
 }
