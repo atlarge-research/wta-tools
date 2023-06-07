@@ -5,6 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.condition.OS.LINUX;
 
 import com.asml.apa.wta.core.utils.BashUtils;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledOnOs;
 
@@ -22,7 +24,9 @@ public class PerfSupplierIntegrationTest {
 
   @Test
   @EnabledOnOs(LINUX)
-  void perfEnergyGatherMetricsSuccessful() {
-    assertThat(sut.gatherMetrics()).isGreaterThanOrEqualTo(0.0);
+  void perfEnergyGatherMetricsSuccessful() throws ExecutionException, InterruptedException {
+    CompletableFuture<String> result = sut.gatherMetrics();
+    assertThat(result).isDone();
+    assertThat(Double.parseDouble(result.get())).isGreaterThanOrEqualTo(0.0);
   }
 }

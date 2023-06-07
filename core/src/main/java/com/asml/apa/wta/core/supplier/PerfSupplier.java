@@ -66,29 +66,33 @@ public class PerfSupplier implements InformationSupplier<PerfDto> {
     if (!isAvailable) {
       return notAvailableResult();
     }
-    double watt = gatherMetrics();
-    return CompletableFuture.supplyAsync(() -> PerfDto.builder().watt(watt).build());
+    return gatherMetrics()
+        .thenApply(result -> {
+          try {
+            return PerfDto.builder().watt(Double.parseDouble(result)).build();
+          } catch (NumberFormatException e) {
+            log.error("Error occurred while parsing perf energy metrics");
+            return PerfDto.builder().watt(0.0).build();
+          }
+        });
   }
 
   /**
-   * Gather the perf energy metrics. Returns the total joules in a second, which is equivalent to watt.
+   * Gather the perf energy metrics. Returns a completable future string of total joules in a second,
+   * which is equivalent to watt.
    *
-   * @return the joules used by the CPU package over the past second
+   * @return Completable future string of joules used by the CPU package over the past second
    * @author Atour Mousavi Gourabi
    * @author Pil Kyu Cho
    * @since 1.0.0
    */
-  public double gatherMetrics() {
+  public CompletableFuture<String> gatherMetrics() {
     try {
-      CompletableFuture<String> energyMetrics =
-          bashUtils.executeCommand("perf stat -e power/energy-pkg/ -a sleep 1 2>&1 | "
-              + "grep -oP '^\\s+\\K[0-9]+[,\\.][0-9]+(?=\\s+Joules)' | sed 's/,/./g'");
-      return Double.parseDouble(energyMetrics.get());
-    } catch (NumberFormatException e) {
-      throw new NumberFormatException("The captured string can not be parsed into a double.");
-    } catch (BashCommandExecutionException | NullPointerException | InterruptedException | ExecutionException e) {
+      return bashUtils.executeCommand("perf stat -e power/energy-pkg/ -a sleep 1 2>&1 | "
+          + "grep -oP '^\\s+\\K[0-9]+[,\\.][0-9]+(?=\\s+Joules)' | sed 's/,/./g'");
+    } catch (BashCommandExecutionException | NullPointerException e) {
       log.error("Error occurred while gathering perf energy metrics");
-      return 0.0;
+      return CompletableFuture.completedFuture("0.0");
     }
   }
 }

@@ -44,23 +44,16 @@ public class PerfSupplierTest {
   }
 
   @Test
-  void perfEnergyGatherMetricsSuccessful() {
+  void perfEnergyGatherMetricsSuccessful() throws ExecutionException, InterruptedException {
     when(bashUtils.executeCommand(getEnergyMetricsBashCommand))
         .thenReturn(CompletableFuture.completedFuture("12.34"));
-    assertThat(sut.gatherMetrics()).isEqualTo(12.34);
+    assertThat(sut.gatherMetrics().get()).isEqualTo("12.34");
   }
 
   @Test
-  void perfEnergyGatherMetricsCommaDecimalStringThrowsException() {
-    when(bashUtils.executeCommand(getEnergyMetricsBashCommand))
-        .thenReturn(CompletableFuture.completedFuture("12,34"));
-    assertThrows(NumberFormatException.class, sut::gatherMetrics);
-  }
-
-  @Test
-  void perfEnergyGatherMetricsCommandErrorReturnsDefaultValue() {
+  void perfEnergyGatherMetricsCommandErrorReturnsDefaultValue() throws ExecutionException, InterruptedException {
     when(bashUtils.executeCommand(getEnergyMetricsBashCommand)).thenThrow(BashCommandExecutionException.class);
-    assertThat(sut.gatherMetrics()).isEqualTo(0.0);
+    assertThat(sut.gatherMetrics().get()).isEqualTo("0.0");
   }
 
   @Test
@@ -81,5 +74,17 @@ public class PerfSupplierTest {
     CompletableFuture<PerfDto> result = sut.getSnapshot();
     Awaitility.await().atMost(Duration.ofSeconds(2)).until(result::isDone);
     assertThat(result.get().getWatt()).isEqualTo(12.34);
+  }
+
+  @Test
+  void perfEnergyGetSnapshotCommaDecimalStringReturnsZero() throws ExecutionException, InterruptedException {
+    when(bashUtils.executeCommand(isAvailableBashCommand))
+            .thenReturn(CompletableFuture.completedFuture("power/energy-pkg/"));
+    when(bashUtils.executeCommand(getEnergyMetricsBashCommand))
+            .thenReturn(CompletableFuture.completedFuture("12,34"));
+    sut = spy(new PerfSupplier(bashUtils));
+    CompletableFuture<PerfDto> result = sut.getSnapshot();
+    Awaitility.await().atMost(Duration.ofSeconds(2)).until(result::isDone);
+    assertThat(result.get().getWatt()).isEqualTo(0.0);
   }
 }
