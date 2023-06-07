@@ -45,6 +45,7 @@ For the most part, since we are pre-release this will serve no real purpose, oth
 - Added the option to compile the plugin for Scala 2.12 and 2.13 [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 - Extended BaseTraceObject with a new method [@tqu](https://gitlab.ewi.tudelft.nl/tqu)
 - Added dstat datasource and wrote integration tests for all io datasources [@lyadalachanchu](https://gitlab.ewi.tudelft.nl/lyadalachanchu)
+- Added the zoo-tutorials script in the benchmarking directory [@pcho](https://gitlab.ewi.tudelft.nl/pcho)
 
 ### Changed
 - Refactored listeners into a generic interface to reduce code duplication and increase cc [@hpage](https://gitlab.ewi.tudelft.nl/hpage)
@@ -65,3 +66,4 @@ For the most part, since we are pre-release this will serve no real purpose, oth
 ### Removed
 - Removed Spotbugs SAST from the pipeline [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 - Removed mutation testing from the pipeline [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
+- Removed the depreciated spark-benchmarking module [@pcho](https://gitlab.ewi.tudelft.nl/pcho)
