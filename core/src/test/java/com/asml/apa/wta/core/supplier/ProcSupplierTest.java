@@ -44,6 +44,10 @@ public class ProcSupplierTest {
             + "cpuid level     : 21"))
         .when(bashUtils)
         .executeCommand("cat /proc/cpuinfo");
+
+    doReturn(CompletableFuture.completedFuture("0.62 1.23 1.02 1/479 278339"))
+        .when(bashUtils)
+        .executeCommand("cat /proc/loadavg");
     ProcSupplier sut = new ProcSupplier(bashUtils);
 
     ProcDto expected = ProcDto.builder()
@@ -56,6 +60,12 @@ public class ProcSupplierTest {
         .memAvailable(Optional.of(5470300L))
         .buffers(Optional.of(239068L))
         .cpuModel(Optional.of("Intel(R) Core(TM) i7-10750H CPU @ 2.60GHz"))
+        .loadAvgOneMinute(Optional.of(0.62))
+        .loadAvgFiveMinutes(Optional.of(1.23))
+        .loadAvgFifteenMinutes(Optional.of(1.02))
+        .numberOfExecutingKernelSchedulingEntities(Optional.of(1.0))
+        .numberOfExistingKernelSchedulingEntities(Optional.of(479.0))
+        .pIdOfMostRecentlyCreatedProcess(Optional.of(278339.0))
         .build();
 
     assertEquals(expected, sut.getSnapshot().join());

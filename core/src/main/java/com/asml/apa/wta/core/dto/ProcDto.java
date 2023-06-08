@@ -224,4 +224,22 @@ public class ProcDto implements SupplierDto {
 
   @Builder.Default
   private Optional<String> cpuModel = Optional.empty();
+
+  @Builder.Default
+  private Optional<Double> loadAvgOneMinute = Optional.empty();
+
+  @Builder.Default
+  private Optional<Double> loadAvgFiveMinutes = Optional.empty();
+
+  @Builder.Default
+  private Optional<Double> loadAvgFifteenMinutes = Optional.empty();
+
+  @Builder.Default
+  private Optional<Double> numberOfExecutingKernelSchedulingEntities = Optional.empty();
+
+  @Builder.Default
+  private Optional<Double> numberOfExistingKernelSchedulingEntities = Optional.empty();
+
+  @Builder.Default
+  private Optional<Double> pIdOfMostRecentlyCreatedProcess = Optional.empty();
 }
