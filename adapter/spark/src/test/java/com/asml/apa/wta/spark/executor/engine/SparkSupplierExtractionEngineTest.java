@@ -12,8 +12,6 @@ import com.asml.apa.wta.core.dto.ProcDto;
 import com.asml.apa.wta.spark.dto.SparkBaseSupplierWrapperDto;
 import java.time.LocalDateTime;
 import java.util.Optional;
-import java.util.function.Predicate;
-
 import org.apache.spark.api.plugin.PluginContext;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
