@@ -39,7 +39,7 @@ public class ProcSupplier implements InformationSupplier<ProcDto> {
    */
   @Override
   public boolean isAvailable() {
-    return SystemUtils.IS_OS_LINUX;
+    return true;
   }
 
   /**
