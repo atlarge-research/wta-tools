@@ -4,10 +4,10 @@ import com.asml.apa.wta.core.WtaWriter;
 import com.asml.apa.wta.core.config.RuntimeConfig;
 import com.asml.apa.wta.core.io.DiskOutputFile;
 import com.asml.apa.wta.core.io.OutputFile;
+import com.asml.apa.wta.core.logger.Log4j2Configuration;
 import com.asml.apa.wta.core.model.Task;
 import com.asml.apa.wta.core.model.Workflow;
 import com.asml.apa.wta.core.model.Workload;
-import com.asml.apa.wta.core.utils.WtaUtils;
 import com.asml.apa.wta.spark.datasource.SparkDataSource;
 import com.asml.apa.wta.spark.dto.ResourceCollectionDto;
 import com.asml.apa.wta.spark.streams.MetricStreamingEngine;
@@ -59,7 +59,8 @@ public class WtaDriverPlugin implements DriverPlugin {
   public Map<String, String> init(SparkContext sparkCtx, PluginContext pluginCtx) {
     Map<String, String> executorVars = new HashMap<>();
     try {
-      RuntimeConfig runtimeConfig = WtaUtils.readConfig(System.getProperty("configFile"));
+      RuntimeConfig runtimeConfig = RuntimeConfig.readConfig();
+      Log4j2Configuration.setUpLoggingConfig(runtimeConfig);
       sparkDataSource = new SparkDataSource(sparkCtx, runtimeConfig);
       metricStreamingEngine = new MetricStreamingEngine();
       outputFile = new DiskOutputFile(Path.of(runtimeConfig.getOutputPath()));
@@ -69,6 +70,7 @@ public class WtaDriverPlugin implements DriverPlugin {
           "executorSynchronizationInterval",
           String.valueOf(runtimeConfig.getExecutorSynchronizationInterval()));
     } catch (Exception e) {
+      log.error(String.valueOf(e));
       error = true;
       shutdown();
     }
@@ -96,7 +98,7 @@ public class WtaDriverPlugin implements DriverPlugin {
    * Gets called just before shutdown. If no prior error occurred, it collects all the
    * tasks, workflows, and workloads from the Spark job and writes them to a parquet file.
    * Otherwise, logs the error and just shuts down.
-   * Recommended that no spark functions are used here.
+   * Recommended that no Spark functions are used here.
    *
    * @author Pil Kyu Cho
    * @author Henry Page
@@ -109,7 +111,9 @@ public class WtaDriverPlugin implements DriverPlugin {
     } else {
       removeListeners();
       try (WtaWriter wtaWriter = new WtaWriter(outputFile, "schema-1.0")) {
-        List<Task> tasks = sparkDataSource.getTaskLevelListener().getProcessedObjects();
+        List<Task> tasks = sparkDataSource.getRuntimeConfig().isStageLevel()
+            ? sparkDataSource.getStageLevelListener().getProcessedObjects()
+            : sparkDataSource.getTaskLevelListener().getProcessedObjects();
         List<Workflow> workFlow = sparkDataSource.getJobLevelListener().getProcessedObjects();
         Workload workLoad = sparkDataSource
             .getApplicationLevelListener()
@@ -132,13 +136,12 @@ public class WtaDriverPlugin implements DriverPlugin {
    * @since 1.0.0
    */
   public void initListeners() {
-    if (sparkDataSource.getRuntimeConfig().isStageLevel()) {
-      sparkDataSource.registerStageListener();
-    } else {
-      sparkDataSource.registerTaskListener();
+    if (!sparkDataSource.getRuntimeConfig().isStageLevel()) {
+      this.sparkDataSource.registerTaskListener();
     }
-    sparkDataSource.registerJobListener();
-    sparkDataSource.registerApplicationListener();
+    this.sparkDataSource.registerStageListener();
+    this.sparkDataSource.registerJobListener();
+    this.sparkDataSource.registerApplicationListener();
   }
   /**
    * Removes the listeners.

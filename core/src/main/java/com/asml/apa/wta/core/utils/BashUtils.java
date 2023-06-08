@@ -22,22 +22,19 @@ public class BashUtils {
       try {
         String[] commands = {"bash", "-c", command};
         Process process = new ProcessBuilder(commands).start();
-        process.waitFor();
+        int exitValue = process.waitFor();
+
+        if (exitValue != 0) {
+          log.error("Bash command execution failed with exit code: {}", exitValue);
+          return null;
+        }
 
         return readProcessOutput(process);
       } catch (Exception e) {
-        log.error(
-            "Something went wrong while trying to execute the bash command. The cause is: {}",
-            e.getCause().toString());
-        throw new BashCommandExecutionException("Error executing bash command", e);
+        log.error("Something went wrong while trying to execute the bash command.");
+        return null;
       }
     });
-  }
-
-  public class BashCommandExecutionException extends RuntimeException {
-    public BashCommandExecutionException(String message, Throwable cause) {
-      super(message, cause);
-    }
   }
 
   /**
@@ -49,12 +46,15 @@ public class BashUtils {
    */
   private String readProcessOutput(Process process) {
     try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
-      return reader.readLine();
+      StringBuilder output = new StringBuilder();
+      String line;
+      while ((line = reader.readLine()) != null) {
+        output.append(line).append(System.lineSeparator());
+      }
+      return output.toString();
     } catch (IOException e) {
-      log.error(
-          "Something went wrong while trying to read bash command outputs. The cause is: {}",
-          e.getCause().toString());
-      throw new BashCommandExecutionException("Error reading bash output", e);
+      log.error("Something went wrong while trying to read bash command outputs.");
+      return null;
     }
   }
 }
