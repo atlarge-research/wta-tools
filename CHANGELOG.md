@@ -70,4 +70,4 @@ For the most part, since we are pre-release this will serve no real purpose, oth
 ### Removed
 - Removed Spotbugs SAST from the pipeline [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 - Removed mutation testing from the pipeline [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
-- Removed the depreciated spark-benchmarking module [@pcho](https://gitlab.ewi.tudelft.nl/pcho)
+- Removed the outdated spark-benchmarking module [@pcho](https://gitlab.ewi.tudelft.nl/pcho)
