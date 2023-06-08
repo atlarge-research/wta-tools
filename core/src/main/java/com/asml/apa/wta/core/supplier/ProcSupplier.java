@@ -151,11 +151,11 @@ public class ProcSupplier implements InformationSupplier<ProcDto> {
     CompletableFuture<String> memMetrics = bashUtils.executeCommand("cat /proc/meminfo");
 
     return memMetrics.thenApply(result -> {
-      Optional<Long>[] agg = (Optional<Long>[]) new Optional<?>[50];
+      Optional<Long>[] agg = (Optional<Long>[]) new Optional<?>[60];
       Arrays.fill(agg, Optional.empty());
       if (result != null) {
         List<Long> parsedList = parseMemMetrics(result);
-        for (int i = 0; i < agg.length; i++) {
+        for (int i = 0; i < parsedList.size(); i++) {
           agg[i] = Optional.of(parsedList.get(i));
         }
       }
