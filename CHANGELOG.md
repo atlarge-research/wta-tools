@@ -46,7 +46,7 @@ For the most part, since we are pre-release this will serve no real purpose, oth
 - Extended BaseTraceObject with a new method [@tqu](https://gitlab.ewi.tudelft.nl/tqu)
 - Added energy consumption metrics data source [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab) [@pcho](https://gitlab.ewi.tudelft.nl/pcho)
 - Added dstat datasource and wrote integration tests for all io datasources [@lyadalachanchu](https://gitlab.ewi.tudelft.nl/lyadalachanchu)
-- Added the zoo-tutorials script in the benchmarking directory [@pcho](https://gitlab.ewi.tudelft.nl/pcho)
+- Added tutorials to running TPC-DS benchmark using zoo-tutorials and tpcds-kit [@pcho](https://gitlab.ewi.tudelft.nl/pcho)
 
 ### Changed
 - Refactored listeners into a generic interface to reduce code duplication and increase cc [@hpage](https://gitlab.ewi.tudelft.nl/hpage)
