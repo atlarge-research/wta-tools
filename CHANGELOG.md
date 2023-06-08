@@ -46,6 +46,7 @@ For the most part, since we are pre-release this will serve no real purpose, oth
 - Extended BaseTraceObject with a new method [@tqu](https://gitlab.ewi.tudelft.nl/tqu)
 - Added energy consumption metrics data source [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab) [@pcho](https://gitlab.ewi.tudelft.nl/pcho)
 - Added dstat datasource and wrote integration tests for all io datasources [@lyadalachanchu](https://gitlab.ewi.tudelft.nl/lyadalachanchu)
+- Added tutorials to running TPC-DS benchmark using zoo-tutorials and tpcds-kit [@pcho](https://gitlab.ewi.tudelft.nl/pcho)
 
 ### Changed
 - Refactored listeners into a generic interface to reduce code duplication and increase cc [@hpage](https://gitlab.ewi.tudelft.nl/hpage)
@@ -55,6 +56,7 @@ For the most part, since we are pre-release this will serve no real purpose, oth
 - Modified the EndToEnd class to inject the WtaPlugin class into a Spark context rather the Spark listener interface by itself [@pcho](https://gitlab.ewi.tudelft.nl/pcho)
 - Reworked the Docker images from the ground up to use Ubuntu Focal [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 - Refactor energy consumption metrics data source to be synchronized with driver [@pcho](https://gitlab.ewi.tudelft.nl/pcho)
+- Update the DAS-5 script for Spark with Scala 2.12.x and 2.13.x [@pcho](https://gitlab.ewi.tudelft.nl/pcho)
 
 ### Fixed
 - Fixed the slf4j logging module to allow use in testing and `adapter/spark` [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
@@ -71,3 +73,4 @@ For the most part, since we are pre-release this will serve no real purpose, oth
 - Removed jqwik testing [@hpage](https://gitlab.ewi.tudelft.nl/hpage)
 - Removed all instances of events [@hpage](https://gitlab.ewi.tudelft.nl/hpage)
 - Removed WtaUtils [@hpage](https://gitlab.ewi.tudelft.nl/hpage)
+- Removed the outdated spark-benchmarking module [@pcho](https://gitlab.ewi.tudelft.nl/pcho)

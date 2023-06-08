@@ -204,18 +204,19 @@ class FrameworkManager:
         try:
             extract_dir = os.path.join(extract_tmp_dir, framework_version.archive_root_dir)
             with tarfile.open(self.__archive_file(framework, framework_version)) as archive_tar:
+                tar_dir = os.path.commonprefix(archive_tar.getnames())
                 archive_tar.extractall(extract_dir)
             log_fn(2, "Extraction to temporary directory complete. Moving to framework directory...")
-            shutil.move(
-                extract_dir,
-                target_dir,
-            )
+            source_dir = os.path.join(extract_dir, tar_dir)
+            file_names = os.listdir(source_dir)
+            os.makedirs(target_dir)
+            for file_name in file_names:
+                shutil.move(os.path.join(source_dir, file_name), target_dir)
             log_fn(3, "Move complete.")
         except Exception as e:
             raise InstallFailedError("Failed to extract %s archive \"%s\" with unknown error: %s." % (framework.name, self.__archive_file(framework, framework_version), e))
         finally:
             shutil.rmtree(extract_tmp_dir)
-
         log_fn(1, "%s version %s is now available at \"%s\"." % (framework.name, version, target_dir))
 
     def deploy(self, framework_identifier, version, machines, settings, log_fn=util.log):

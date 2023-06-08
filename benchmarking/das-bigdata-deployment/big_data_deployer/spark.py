@@ -1,6 +1,7 @@
 #!/usr/bin/env python2
 # This script (The DAS configuration script) is based on the work of Tim Hegeman, Chris Lemaire, and Laurens Versluis 
 # The github repo for the original script: https://github.com/lfdversluis/das-bigdata-deployment
+
 from __future__ import print_function
 from .frameworkmanager import Framework, FrameworkVersion, FrameworkRegistry, get_framework_registry
 from . import util
@@ -107,12 +108,22 @@ class SparkFramework(Framework):
         log_fn(1, "Spark cluster deployed.")
 
 get_framework_registry().register_framework(SparkFramework())
+get_framework_registry().register_framework(SparkFramework())
 get_framework_registry().framework("spark").add_version(
     SparkFrameworkVersion(
-        "3.2.4", 
+        "3.2.4_2.12",
+        "https://dlcdn.apache.org/spark/spark-3.2.4/spark-3.2.4-bin-hadoop3.2.tgz",
+        "tgz",
+        "spark-3.2.4-bin-hadoop3.2",
+        "3.2.x",
+    )
+)
+get_framework_registry().framework("spark").add_version(
+    SparkFrameworkVersion(
+        "3.2.4_2.13",
         "https://dlcdn.apache.org/spark/spark-3.2.4/spark-3.2.4-bin-hadoop3.2-scala2.13.tgz",
-        "tgz", 
-        "spark-3.2.4-bin-hadoop3.2-scala2.13", 
+        "tgz",
+        "spark-3.2.4-bin-hadoop3.2-scala2.13",
         "3.2.x",
     )
 )
