@@ -58,7 +58,7 @@ public class TaskLevelListener extends TaskStageBaseListener {
     final long runTime = curTaskMetrics.executorRunTime();
     final int userId = sparkContext.sparkUser().hashCode();
     final int stageId = taskEnd.stageId();
-    final long workflowId = stageIdsToJobs.get(taskEnd.stageId()+1);
+    final long workflowId = stageIdsToJobs.get(taskEnd.stageId() + 1);
 
     final List<Long> tasks = stageToTasks.get(stageId);
     if (tasks == null) {

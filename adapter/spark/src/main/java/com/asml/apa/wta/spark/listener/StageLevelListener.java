@@ -49,7 +49,7 @@ public class StageLevelListener extends TaskStageBaseListener {
     final Long submitTime = curStageInfo.submissionTime().getOrElse(() -> -1L);
     final long runTime = curStageMetrics.executorRunTime();
     final int userId = sparkContext.sparkUser().hashCode();
-    final long workflowId = stageIdsToJobs.get(stageId+1);
+    final long workflowId = stageIdsToJobs.get(stageId + 1);
 
     final Integer[] parentIds = JavaConverters.seqAsJavaList(
             curStageInfo.parentIds().toList())
@@ -111,6 +111,6 @@ public class StageLevelListener extends TaskStageBaseListener {
             .energyConsumption(energyConsumption)
             .resourceUsed(resourceUsed)
             .build());
-    stageIdsToJobs.remove(stageCompleted.stageInfo().stageId());
+    stageIdsToJobs.remove(stageCompleted.stageInfo().stageId() + 1);
   }
 }
