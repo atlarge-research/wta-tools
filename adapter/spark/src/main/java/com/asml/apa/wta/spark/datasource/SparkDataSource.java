@@ -4,8 +4,6 @@ import com.asml.apa.wta.core.config.RuntimeConfig;
 import com.asml.apa.wta.core.model.Task;
 import com.asml.apa.wta.core.model.Workflow;
 import com.asml.apa.wta.core.model.Workload;
-import com.asml.apa.wta.core.utils.CollectorInterface;
-import com.asml.apa.wta.core.utils.WtaUtils;
 import com.asml.apa.wta.spark.listener.AbstractListener;
 import com.asml.apa.wta.spark.listener.ApplicationLevelListener;
 import com.asml.apa.wta.spark.listener.JobLevelListener;
@@ -22,7 +20,7 @@ import org.apache.spark.SparkContext;
  * @since 1.0.0
  */
 @Getter
-public class SparkDataSource implements CollectorInterface {
+public class SparkDataSource {
 
   private final AbstractListener<Task> taskLevelListener;
 
@@ -54,18 +52,6 @@ public class SparkDataSource implements CollectorInterface {
     }
     applicationLevelListener = new ApplicationLevelListener(sparkContext, config, jobLevelListener);
     runtimeConfig = config;
-  }
-
-  /**
-   * Alternate constructor which requires the context and gets the config from
-   * the default directory.
-   *
-   * @param sparkContext The current spark context
-   * @author Henry Page
-   * @since 1.0.0
-   */
-  public SparkDataSource(SparkContext sparkContext) {
-    this(sparkContext, WtaUtils.readConfig());
   }
 
   /**

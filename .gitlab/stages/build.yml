@@ -1,7 +1,7 @@
 build-core:
   stage: build
   dependencies: []
-  needs: []
+  needs: [build-base-image]
   script:
     - echo "Build core started"
     - "mvn -pl core install -DskipTests -am"
@@ -11,7 +11,14 @@ build-core:
     paths:
       - core/target
       - .m2/repository/com/asml/apa/wta
-  cache: []
+  cache:
+    - key:
+        prefix: test
+        files:
+          - pom.xml
+          - core/pom.xml
+      paths:
+        - .m2/repository
 
 build-spark-adapter:
   stage: build
@@ -27,7 +34,14 @@ build-spark-adapter:
     paths:
       - adapter/spark/target
       - .m2/repository/com/asml/apa/wta
-  cache: []
+  cache:
+    - key:
+        prefix: test
+        files:
+          - pom.xml
+          - core/pom.xml
+      paths:
+        - .m2/repository
 
 package-spark-adapter-e2e_2.12:
   stage: build
@@ -42,6 +56,14 @@ package-spark-adapter-e2e_2.12:
     expire_in: 20 minutes
     paths:
       - adapter/spark/target/*-e2e.jar
+  cache:
+    - key:
+        prefix: test
+        files:
+          - pom.xml
+          - core/pom.xml
+      paths:
+        - .m2/repository
 
 package-spark-adapter-e2e_2.13:
   stage: build
@@ -56,3 +78,11 @@ package-spark-adapter-e2e_2.13:
     expire_in: 20 minutes
     paths:
       - adapter/spark/target/*-e2e.jar
+  cache:
+    - key:
+        prefix: test
+        files:
+          - pom.xml
+          - core/pom.xml
+      paths:
+        - .m2/repository
