@@ -25,25 +25,9 @@ public class ProcSupplierTest {
         .when(bashUtils)
         .executeCommand("cat /proc/meminfo");
 
-    doReturn(CompletableFuture.completedFuture("processor       : 0\n" + "vendor_id       : GenuineIntel\n"
-            + "cpu family      : 6\n"
-            + "model           : 165\n"
-            + "model name      : Intel(R) Core(TM) i7-10750H CPU @ 2.60GHz\n"
-            + "stepping        : 2\n"
-            + "microcode       : 0xffffffff\n"
-            + "cpu MHz         : 2591.999\n"
-            + "cache size      : 12288 KB\n"
-            + "physical id     : 0\n"
-            + "siblings        : 12\n"
-            + "core id         : 0\n"
-            + "cpu cores       : 6\n"
-            + "apicid          : 0\n"
-            + "initial apicid  : 0\n"
-            + "fpu             : yes\n"
-            + "fpu_exception   : yes\n"
-            + "cpuid level     : 21"))
+    doReturn(CompletableFuture.completedFuture("Intel(R) Core(TM) i7-10750H CPU @ 2.60GHz"))
         .when(bashUtils)
-        .executeCommand("cat /proc/cpuinfo");
+        .executeCommand("grep -m 1 \"model name\" /proc/cpuinfo | awk -F: '{print $2}' | sed 's/^[ \\t]*//'");
 
     doReturn(CompletableFuture.completedFuture("0.62 1.23 1.02 1/479 278339"))
         .when(bashUtils)

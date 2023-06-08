@@ -208,34 +208,11 @@ public class ProcSupplier implements InformationSupplier<ProcDto> {
    * @since 1.0.0
    */
   private CompletableFuture<Optional<String>> getCpuModel() {
-    //    CompletableFuture<String> cpuMetrics = bashUtils.executeCommand("cat /proc/cpuinfo");
-    String str = "processor       : 0\n" + "vendor_id       : GenuineIntel\n"
-        + "cpu family      : 6\n"
-        + "model           : 165\n"
-        + "model name      : Intel(R) Core(TM) i7-10750H CPU @ 2.60GHz\n"
-        + "stepping        : 2\n"
-        + "microcode       : 0xffffffff\n"
-        + "cpu MHz         : 2591.999\n"
-        + "cache size      : 12288 KB\n"
-        + "physical id     : 0\n"
-        + "siblings        : 12\n"
-        + "core id         : 0\n"
-        + "cpu cores       : 6\n"
-        + "apicid          : 0\n"
-        + "initial apicid  : 0\n"
-        + "fpu             : yes\n"
-        + "fpu_exception   : yes\n"
-        + "cpuid level     : 21";
-    CompletableFuture<String> cpuMetrics = CompletableFuture.completedFuture(str);
-    Pattern pattern = Pattern.compile("model name\\s+:\\s+([^\\n]+)");
-    log.info("getting cpu metrics");
+    CompletableFuture<String> cpuMetrics = bashUtils.executeCommand(
+        "grep -m 1 \"model name\" /proc/cpuinfo | awk -F: '{print $2}' | sed 's/^[ \\t]*//'");
     return cpuMetrics.thenApply(result -> {
-      if (result != null) {
-        Matcher matcher = pattern.matcher(result);
-
-        if (matcher.find()) {
-          return Optional.of(matcher.group(1));
-        }
+      if (result != null && !result.equals("")) {
+        return Optional.of(result);
       }
       return Optional.empty();
     });
