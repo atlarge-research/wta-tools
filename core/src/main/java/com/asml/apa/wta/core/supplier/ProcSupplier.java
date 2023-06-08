@@ -179,10 +179,10 @@ public class ProcSupplier implements InformationSupplier<ProcDto> {
    * @since 1.0.0
    */
   private CompletableFuture<Optional<Long>[]> getDiskMetrics() {
-    //    CompletableFuture<String> diskMetrics = bashUtils.executeCommand("cat /proc/diskstats");
-    String str = "8       0 sda 1114 437 141266 153\n" + "8      16 sdb 103 0 4712 174\n"
-        + "8      32 sdc 77636 10312 5307586 5345";
-    CompletableFuture<String> diskMetrics = CompletableFuture.completedFuture(str);
+    CompletableFuture<String> diskMetrics = bashUtils.executeCommand("cat /proc/diskstats");
+    //    String str = "8       0 sda 1114 437 141266 153\n" + "8      16 sdb 103 0 4712 174\n"
+    //        + "8      32 sdc 77636 10312 5307586 5345";
+    //    CompletableFuture<String> diskMetrics = CompletableFuture.completedFuture(str);
 
     return diskMetrics.thenApply(result -> {
       Optional<Long>[] agg = (Optional<Long>[]) new Optional<?>[17];
