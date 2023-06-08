@@ -152,11 +152,11 @@ public class ProcSupplier implements InformationSupplier<ProcDto> {
    * @since 1.0.0
    */
   private CompletableFuture<Optional<Long>[]> getMemMetrics() {
-    //    CompletableFuture<String> memMetrics = bashUtils.executeCommand("cat /proc/meminfo");
-    String str = "MemTotal:       10118252 kB\n" + "MemFree:         1921196 kB\n"
-        + "MemAvailable:    5470300 kB\n"
-        + "Buffers:          239068 kB\n";
-    CompletableFuture<String> memMetrics = CompletableFuture.completedFuture(str);
+    CompletableFuture<String> memMetrics = bashUtils.executeCommand("cat /proc/meminfo");
+    //    String str = "MemTotal:       10118252 kB\n" + "MemFree:         1921196 kB\n"
+    //        + "MemAvailable:    5470300 kB\n"
+    //        + "Buffers:          239068 kB\n";
+    //    CompletableFuture<String> memMetrics = CompletableFuture.completedFuture(str);
     log.info("getting mem metrics");
     return memMetrics.thenApply(result -> {
       Optional<Long>[] agg = (Optional<Long>[]) new Optional<?>[60];
