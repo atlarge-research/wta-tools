@@ -10,7 +10,7 @@ This directory contains the following tools/module or instructions to download t
 ## DAS-5
 DAS-5 or Distributed ASCII Supercomputer 5 (DAS-5) is a cluster of distributed high-end servers. This will be the production environment setting on which Spark and the Spark plugin will be running.
 
-Supplementary information can be found [here](https://asci.tudelft.nl/project-das/).
+Supplementary information can be found [on the ASCI website](https://asci.tudelft.nl/project-das/).
 
 ### das-bigdata-deployment
 This is the script to download, configure, and deploy Hadoop HDFS, YARN, and Spark on the Distributed ASCII Supercomputer (DAS-5). The DAS scripts are Python scripts that submit a slot allocation request on the DAS, whilst configuring the Spark environment. It is based on the work of Tim Hegeman, Chris Lemaire, and Laurens Versluis. You can find the forked source repo [here](https://github.com/lfdversluis/das-bigdata-deployment).
