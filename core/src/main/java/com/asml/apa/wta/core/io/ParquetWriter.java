@@ -38,12 +38,11 @@ public class ParquetWriter<T> implements AutoCloseable {
    */
   public ParquetWriter(OutputFile path, Class<T> clazz) throws IOException {
     avroSchema = ReflectData.get().getSchema(clazz);
-    writer = AvroParquetWriter
-            .<GenericData.Record>builder(path.wrap())
-            .withSchema(avroSchema)
-            .withCompressionCodec(CompressionCodecName.SNAPPY)
-            .withWriteMode(ParquetFileWriter.Mode.OVERWRITE)
-            .build();
+    writer = AvroParquetWriter.<GenericData.Record>builder(path.wrap())
+        .withSchema(avroSchema)
+        .withCompressionCodec(CompressionCodecName.SNAPPY)
+        .withWriteMode(ParquetFileWriter.Mode.OVERWRITE)
+        .build();
   }
 
   /**

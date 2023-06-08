@@ -1,12 +1,11 @@
 package com.asml.apa.wta.core.io;
 
-import org.apache.parquet.io.OutputFile;
-import org.apache.parquet.io.PositionOutputStream;
-
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import org.apache.parquet.io.OutputFile;
+import org.apache.parquet.io.PositionOutputStream;
 
 public class DiskParquetOutputFile implements OutputFile {
 
