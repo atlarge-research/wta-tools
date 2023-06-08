@@ -152,7 +152,11 @@ public class ProcSupplier implements InformationSupplier<ProcDto> {
    * @since 1.0.0
    */
   private CompletableFuture<Optional<Long>[]> getMemMetrics() {
-    CompletableFuture<String> memMetrics = bashUtils.executeCommand("cat /proc/meminfo");
+    //    CompletableFuture<String> memMetrics = bashUtils.executeCommand("cat /proc/meminfo");
+    String str = "MemTotal:       10118252 kB\n" + "MemFree:         1921196 kB\n"
+        + "MemAvailable:    5470300 kB\n"
+        + "Buffers:          239068 kB\n";
+    CompletableFuture<String> memMetrics = CompletableFuture.completedFuture(str);
     log.info("getting mem metrics");
     return memMetrics.thenApply(result -> {
       Optional<Long>[] agg = (Optional<Long>[]) new Optional<?>[60];
@@ -175,8 +179,10 @@ public class ProcSupplier implements InformationSupplier<ProcDto> {
    * @since 1.0.0
    */
   private CompletableFuture<Optional<Long>[]> getDiskMetrics() {
-    CompletableFuture<String> diskMetrics = bashUtils.executeCommand("cat /proc/diskstats");
-    log.info("getting disk metrics");
+    //    CompletableFuture<String> diskMetrics = bashUtils.executeCommand("cat /proc/diskstats");
+    String str = "8       0 sda 1114 437 141266 153\n" + "8      16 sdb 103 0 4712 174\n"
+        + "8      32 sdc 77636 10312 5307586 5345";
+    CompletableFuture<String> diskMetrics = CompletableFuture.completedFuture(str);
 
     return diskMetrics.thenApply(result -> {
       Optional<Long>[] agg = (Optional<Long>[]) new Optional<?>[17];
@@ -202,7 +208,25 @@ public class ProcSupplier implements InformationSupplier<ProcDto> {
    * @since 1.0.0
    */
   private CompletableFuture<Optional<String>> getCpuModel() {
-    CompletableFuture<String> cpuMetrics = bashUtils.executeCommand("cat /proc/cpuinfo");
+    //    CompletableFuture<String> cpuMetrics = bashUtils.executeCommand("cat /proc/cpuinfo");
+    String str = "processor       : 0\n" + "vendor_id       : GenuineIntel\n"
+        + "cpu family      : 6\n"
+        + "model           : 165\n"
+        + "model name      : Intel(R) Core(TM) i7-10750H CPU @ 2.60GHz\n"
+        + "stepping        : 2\n"
+        + "microcode       : 0xffffffff\n"
+        + "cpu MHz         : 2591.999\n"
+        + "cache size      : 12288 KB\n"
+        + "physical id     : 0\n"
+        + "siblings        : 12\n"
+        + "core id         : 0\n"
+        + "cpu cores       : 6\n"
+        + "apicid          : 0\n"
+        + "initial apicid  : 0\n"
+        + "fpu             : yes\n"
+        + "fpu_exception   : yes\n"
+        + "cpuid level     : 21";
+    CompletableFuture<String> cpuMetrics = CompletableFuture.completedFuture(str);
     Pattern pattern = Pattern.compile("model name\\s+:\\s+([^\\n]+)");
     log.info("getting cpu metrics");
     return cpuMetrics.thenApply(result -> {
@@ -225,8 +249,11 @@ public class ProcSupplier implements InformationSupplier<ProcDto> {
    * @since 1.0.0
    */
   private CompletableFuture<Optional<Double>[]> getLoadAvgMetrics() {
-    CompletableFuture<String> loadAvgMetrics = bashUtils.executeCommand("cat /proc/loadavg");
-    log.info("getting load metrics");
+    //    CompletableFuture<String> loadAvgMetrics = bashUtils.executeCommand("cat /proc/loadavg");
+
+    String str = "0.62 1.23 1.02 1/479 278339";
+    CompletableFuture<String> loadAvgMetrics = CompletableFuture.completedFuture(str);
+
     Pattern pattern = Pattern.compile("\\d+(?:\\.\\d+)?");
 
     return loadAvgMetrics.thenApply(result -> {
