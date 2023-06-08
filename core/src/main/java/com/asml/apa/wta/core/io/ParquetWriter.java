@@ -55,6 +55,7 @@ public class ParquetWriter<T> implements AutoCloseable {
    * @since 1.0.0
    */
   public void write(T record) throws IOException {
+    log.error("record written {}", record);
     ByteArrayOutputStream out = new ByteArrayOutputStream();
     Encoder encoder = EncoderFactory.get().binaryEncoder(out, null);
 
