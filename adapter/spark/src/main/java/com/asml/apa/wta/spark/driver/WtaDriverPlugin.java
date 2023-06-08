@@ -1,11 +1,11 @@
 package com.asml.apa.wta.spark.driver;
 
 import com.asml.apa.wta.core.config.RuntimeConfig;
+import com.asml.apa.wta.core.logger.Log4j2Configuration;
 import com.asml.apa.wta.core.model.Task;
 import com.asml.apa.wta.core.model.Workflow;
 import com.asml.apa.wta.core.model.Workload;
 import com.asml.apa.wta.core.utils.ParquetWriterUtils;
-import com.asml.apa.wta.core.utils.WtaUtils;
 import com.asml.apa.wta.spark.datasource.SparkDataSource;
 import com.asml.apa.wta.spark.dto.ResourceCollectionDto;
 import com.asml.apa.wta.spark.streams.MetricStreamingEngine;
@@ -57,7 +57,8 @@ public class WtaDriverPlugin implements DriverPlugin {
   public Map<String, String> init(SparkContext sparkCtx, PluginContext pluginCtx) {
     Map<String, String> executorVars = new HashMap<>();
     try {
-      RuntimeConfig runtimeConfig = WtaUtils.readConfig(System.getProperty("configFile"));
+      RuntimeConfig runtimeConfig = RuntimeConfig.readConfig();
+      Log4j2Configuration.setUpLoggingConfig(runtimeConfig);
       sparkDataSource = new SparkDataSource(sparkCtx, runtimeConfig);
       metricStreamingEngine = new MetricStreamingEngine();
       parquetUtil = new ParquetWriterUtils(new File(runtimeConfig.getOutputPath()), "schema-1.0");
