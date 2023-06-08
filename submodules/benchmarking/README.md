@@ -15,7 +15,7 @@ Supplementary information can be found [on the ASCI website](https://asci.tudelf
 ### das-bigdata-deployment
 This is the script to download, configure, and deploy Hadoop HDFS, YARN, and Spark on the Distributed ASCII Supercomputer (DAS-5). The DAS scripts are Python scripts that submit a slot allocation request on the DAS, whilst configuring the Spark environment. It is based on the work of Tim Hegeman, Chris Lemaire, and Laurens Versluis. You can find the forked source repo [here](https://github.com/lfdversluis/das-bigdata-deployment).
 
-For more detailed information on how to use this script, go to the [README](das-bigdata-deployment/README.md) in the **das-bigdata-deployment** directory.
+For more detailed information on how to use this script, go to the [README](benchmarking/das-bigdata-deployment/README.md) in the **das-bigdata-deployment** directory.
 
 ## Running TPC-DS benchmark
 The instructions below are meant for running the TPC-DS benchmark locally. In order to run it on DAS-5, make use of the **das-bigdata-deployment** module and modify accordingly.
@@ -115,33 +115,3 @@ target/scala-2.12/tpcds-benchmark_2.12-0.1.jar <outputDir> [query]
 `outputDir` is the path of results, optional argument `query`  is the query number to run. Multiple query numbers should be separated by space, e.g. `1 2 3`. If no query number is specified, all 1-99 queries would be executed.
 
 After benchmark is finished, the performance result is saved as `part-*.csv` file under `<outputDir>/performance` directory.
-
-## Downloading the modules
-As these modules are independent tools from the Spark plugin, they are not packaged with the plugin. To download subdirectories separately and not the entire repository, follow the instructions below:
-
-Create a new directory for the repository and navigate into it:
-```bash
-mkdir my_project
-cd my_project
-```
-
-Initialize an empty git repository and add the URL of this remote repository:
-```bash
-git init
-git remote add -f origin https://github.com/user/repo.git
-```
-
-Enable sparse checkout:
-```bash
-git config core.sparseCheckout true
-```
-
-Specify the subdirectory you want to checkout. In this example, assume you want to download the `big_data_deployment` subdirectory:
-```bash
-echo "big_data_deployment/*" > .git/info/sparse-checkout
-```
-
-Finally, pull content from remote repo:
-```bash
-git pull origin main
-```

@@ -1,3 +1,6 @@
+# This script (wta-tools) is based on the work of Laurens Versluis [@lfdversluis](https://github.com/lfdversluis) and [@JaroAmsterdam](https://github.com/JaroAmsterdam)
+# The github repo for the original script: https://github.com/atlarge-research/wta-tools
+
 """
 Created on Tue Oct  2 19:26:18 2018
 
