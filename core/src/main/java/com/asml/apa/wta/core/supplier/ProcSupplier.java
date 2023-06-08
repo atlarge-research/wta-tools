@@ -155,7 +155,7 @@ public class ProcSupplier implements InformationSupplier<ProcDto> {
       Arrays.fill(agg, Optional.empty());
       if (result != null) {
         List<Long> parsedList = parseMemMetrics(result);
-        for (int i = 0; i < parsedList.size(); i++) {
+        for (int i = 0; i < agg.length; i++) {
           agg[i] = Optional.of(parsedList.get(i));
         }
       }
