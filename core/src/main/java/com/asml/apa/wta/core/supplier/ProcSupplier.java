@@ -249,10 +249,10 @@ public class ProcSupplier implements InformationSupplier<ProcDto> {
    * @since 1.0.0
    */
   private CompletableFuture<Optional<Double>[]> getLoadAvgMetrics() {
-    //    CompletableFuture<String> loadAvgMetrics = bashUtils.executeCommand("cat /proc/loadavg");
+    CompletableFuture<String> loadAvgMetrics = bashUtils.executeCommand("cat /proc/loadavg");
 
-    String str = "0.62 1.23 1.02 1/479 278339";
-    CompletableFuture<String> loadAvgMetrics = CompletableFuture.completedFuture(str);
+    //    String str = "0.62 1.23 1.02 1/479 278339";
+    //    CompletableFuture<String> loadAvgMetrics = CompletableFuture.completedFuture(str);
 
     Pattern pattern = Pattern.compile("\\d+(?:\\.\\d+)?");
 
