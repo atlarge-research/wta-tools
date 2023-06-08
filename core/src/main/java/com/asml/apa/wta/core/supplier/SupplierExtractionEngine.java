@@ -4,6 +4,7 @@ import com.asml.apa.wta.core.dto.BaseSupplierDto;
 import com.asml.apa.wta.core.dto.DstatDto;
 import com.asml.apa.wta.core.dto.IostatDto;
 import com.asml.apa.wta.core.dto.OsInfoDto;
+import com.asml.apa.wta.core.dto.ProcDto;
 import com.asml.apa.wta.core.utils.BashUtils;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -29,6 +30,8 @@ public abstract class SupplierExtractionEngine<T extends BaseSupplierDto> {
 
   private final DstatSupplier dstatSupplier;
 
+  private final ProcSupplier procSupplier;
+
   private final int resourcePingInterval;
 
   @Getter
@@ -51,6 +54,7 @@ public abstract class SupplierExtractionEngine<T extends BaseSupplierDto> {
     this.operatingSystemSupplier = new OperatingSystemSupplier();
     this.iostatSupplier = new IostatSupplier(bashUtils);
     this.dstatSupplier = new DstatSupplier(bashUtils);
+    this.procSupplier = new ProcSupplier(bashUtils);
   }
 
   /**
@@ -65,6 +69,7 @@ public abstract class SupplierExtractionEngine<T extends BaseSupplierDto> {
     CompletableFuture<OsInfoDto> osInfoDtoCompletableFuture = this.operatingSystemSupplier.getSnapshot();
     CompletableFuture<IostatDto> iostatDtoCompletableFuture = this.iostatSupplier.getSnapshot();
     CompletableFuture<DstatDto> dstatDtoCompletableFuture = this.dstatSupplier.getSnapshot();
+    CompletableFuture<ProcDto> procDtoCompletableFuture = this.procSupplier.getSnapshot();
 
     return CompletableFuture.allOf(osInfoDtoCompletableFuture, iostatDtoCompletableFuture)
         .thenCompose((v) -> {
@@ -72,8 +77,9 @@ public abstract class SupplierExtractionEngine<T extends BaseSupplierDto> {
           OsInfoDto osInfoDto = osInfoDtoCompletableFuture.join();
           IostatDto iostatDto = iostatDtoCompletableFuture.join();
           DstatDto dstatDto = dstatDtoCompletableFuture.join();
+          ProcDto procDto = procDtoCompletableFuture.join();
           return CompletableFuture.completedFuture(
-              transform(new BaseSupplierDto(timestamp, osInfoDto, iostatDto, dstatDto)));
+              transform(new BaseSupplierDto(timestamp, osInfoDto, iostatDto, dstatDto, procDto)));
         });
   }
 
