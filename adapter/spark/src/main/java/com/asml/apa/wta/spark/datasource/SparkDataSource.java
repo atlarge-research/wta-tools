@@ -1,10 +1,6 @@
 package com.asml.apa.wta.spark.datasource;
 
 import com.asml.apa.wta.core.config.RuntimeConfig;
-import com.asml.apa.wta.core.model.Task;
-import com.asml.apa.wta.core.model.Workflow;
-import com.asml.apa.wta.core.model.Workload;
-import com.asml.apa.wta.spark.listener.AbstractListener;
 import com.asml.apa.wta.spark.listener.ApplicationLevelListener;
 import com.asml.apa.wta.spark.listener.JobLevelListener;
 import com.asml.apa.wta.spark.listener.StageLevelListener;
@@ -22,13 +18,13 @@ import org.apache.spark.SparkContext;
 @Getter
 public class SparkDataSource {
 
-  private final AbstractListener<Task> taskLevelListener;
+  private final TaskLevelListener taskLevelListener;
 
-  private final AbstractListener<Workflow> jobLevelListener;
+  private final StageLevelListener stageLevelListener;
 
-  private final AbstractListener<Workload> applicationLevelListener;
+  private final JobLevelListener jobLevelListener;
 
-  private final AbstractListener<Task> stageLevelListener;
+  private final ApplicationLevelListener applicationLevelListener;
 
   private final RuntimeConfig runtimeConfig;
 
@@ -40,17 +36,20 @@ public class SparkDataSource {
    * @param config Additional config specified by the user for the plugin
    * @author Pil Kyu Cho
    * @author Henry Page
+   * @author Tianchen Qu
+   * @author Lohithsai Yadala Chanchu
    * @since 1.0.0
    */
   public SparkDataSource(SparkContext sparkContext, RuntimeConfig config) {
-    taskLevelListener = new TaskLevelListener(sparkContext, config);
     stageLevelListener = new StageLevelListener(sparkContext, config);
+    taskLevelListener = new TaskLevelListener(sparkContext, config);
     if (config.isStageLevel()) {
       jobLevelListener = new JobLevelListener(sparkContext, config, stageLevelListener);
     } else {
       jobLevelListener = new JobLevelListener(sparkContext, config, taskLevelListener);
     }
-    applicationLevelListener = new ApplicationLevelListener(sparkContext, config, jobLevelListener);
+    applicationLevelListener = new ApplicationLevelListener(
+        sparkContext, config, jobLevelListener, taskLevelListener, stageLevelListener);
     runtimeConfig = config;
   }
 
