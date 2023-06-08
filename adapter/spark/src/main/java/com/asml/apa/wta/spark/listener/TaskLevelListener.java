@@ -2,6 +2,11 @@ package com.asml.apa.wta.spark.listener;
 
 import com.asml.apa.wta.core.config.RuntimeConfig;
 import com.asml.apa.wta.core.model.Task;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import lombok.Getter;
 import org.apache.spark.SparkContext;
 import org.apache.spark.executor.TaskMetrics;
 import org.apache.spark.resource.ResourceProfile;
@@ -18,17 +23,23 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  * @author Pil Kyu Cho
  * @author Henry Page
+ * @author Tianchen Qu
  * @since 1.0.0
  */
+@Getter
 public class TaskLevelListener extends TaskStageBaseListener {
+
+  private final Map<Integer, List<Long>> stageToTasks = new ConcurrentHashMap<>();
+
+  private final Map<Long, Integer> taskToStage = new ConcurrentHashMap<>();
 
   private final Map<String, Integer> executorResources = new ConcurrentHashMap<>();
 
   /**
    * Constructor for the task-level listener.
    *
-   * @param sparkContext          The current spark context
-   * @param config                Additional config specified by the user for the plugin
+   * @param sparkContext       The current spark context
+   * @param config             Additional config specified by the user for the plugin
    * @author Henry Page
    * @since 1.0.0
    */
@@ -47,6 +58,7 @@ public class TaskLevelListener extends TaskStageBaseListener {
    *
    * @param taskEnd   SparkListenerTaskEnd The object corresponding to information on task end
    * @author Henry Page
+   * @author Tianchen Qu
    * @since 1.0.0
    */
   @Override
@@ -62,8 +74,20 @@ public class TaskLevelListener extends TaskStageBaseListener {
     final long submitTime = curTaskInfo.launchTime();
     final long runTime = curTaskMetrics.executorRunTime();
     final int userId = sparkContext.sparkUser().hashCode();
+    final int stageId = taskEnd.stageId();
     final long workflowId = stageIdsToJobs.get(taskEnd.stageId() + 1);
 
+    final List<Long> tasks = stageToTasks.get(stageId);
+    if (tasks == null) {
+      List<Long> newTasks = new ArrayList<>();
+      newTasks.add(taskId);
+      stageToTasks.put(stageId, newTasks);
+    } else {
+      tasks.add(taskId);
+    }
+    final long[] parents = new long[0];
+    final long[] children = new long[0];
+    taskToStage.put(taskId, stageId);
     final double diskSpaceRequested = (double) curTaskMetrics.diskBytesSpilled()/1048576;
     String memoryString = ResourceProfile.MEMORY();
     System.out.println(memoryString);
@@ -74,9 +98,11 @@ public class TaskLevelListener extends TaskStageBaseListener {
     final long diskIoTime = curTaskMetrics.executorDeserializeTime() + curTaskMetrics.resultSerializationTime(); //unsure
     // unknown
     final int submissionSite = -1;
-
+    final String resourceType = "N/A";
+    final double resourceAmountRequested = -1.0;
     final long[] parents = new long[0];
     final long[] children = new long[0];
+    final int groupId = -1;
     final String nfrs = "";
     final String params = "";
     final int groupId = -1;
@@ -88,29 +114,30 @@ public class TaskLevelListener extends TaskStageBaseListener {
 
     // TODO(#61): CALL EXTERNAL DEPENDENCIES
 
-    processedObjects.add(Task.builder()
-        .id(taskId)
-        .type(type)
-        .submissionSite(submissionSite)
-        .submitTime(submitTime)
-        .runtime(runTime)
-        .resourceType(resourceType)
-        .resourceAmountRequested(resourceAmountRequested)
-        .parents(parents)
-        .children(children)
-        .userId(userId)
-        .groupId(groupId)
-        .nfrs(nfrs)
-        .workflowId(workflowId)
-        .waitTime(waitTime)
-        .params(params)
-        .memoryRequested(memoryRequested)
-        .networkIoTime(networkIoTime)
-        .diskIoTime(diskIoTime)
-        .diskSpaceRequested(diskSpaceRequested)
-        .energyConsumption(energyConsumption)
-        .resourceUsed(resourceUsed)
-        .build());
+    this.getProcessedObjects()
+        .add(Task.builder()
+            .id(taskId)
+            .type(type)
+            .submissionSite(submissionSite)
+            .submitTime(submitTime)
+            .runtime(runTime)
+            .resourceType(resourceType)
+            .resourceAmountRequested(resourceAmountRequested)
+            .parents(parents)
+            .children(children)
+            .userId(userId)
+            .groupId(groupId)
+            .nfrs(nfrs)
+            .workflowId(workflowId)
+            .waitTime(waitTime)
+            .params(params)
+            .memoryRequested(memoryRequested)
+            .networkIoTime(networkIoTime)
+            .diskIoTime(diskIoTime)
+            .diskSpaceRequested(diskSpaceRequested)
+            .energyConsumption(energyConsumption)
+            .resourceUsed(resourceUsed)
+            .build());
   }
 
 

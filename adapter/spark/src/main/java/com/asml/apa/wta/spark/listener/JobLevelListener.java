@@ -101,26 +101,32 @@ public class JobLevelListener extends AbstractListener<Workflow> {
     final int maxNumberOfConcurrentTasks = -1;
     final String nfrs = "";
     final String applicationField = "ETL";
+    final double totalResources = -1.0;
+    final double totalMemoryUsage = -1.0;
+    final long totalNetworkUsage = -1L;
+    final double totalDiskSpaceUsage = -1.0;
+    final double totalEnergyConsumption = -1.0;
+    this.getProcessedObjects()
+        .add(Workflow.builder()
+            .id(jobId)
+            .submitTime(submitTime)
+            .tasks(tasks)
+            .numberOfTasks(numTasks)
+            .criticalPathLength(criticalPathLength)
+            .criticalPathTaskCount(criticalPathTaskCount)
+            .maxNumberOfConcurrentTasks(maxNumberOfConcurrentTasks)
+            .nfrs(nfrs)
+            .scheduler(scheduler)
+            .domain(domain)
+            .applicationName(appName)
+            .applicationField(applicationField)
+            .totalResources(totalResources)
+            .totalMemoryUsage(totalMemoryUsage)
+            .totalNetworkUsage(totalNetworkUsage)
+            .totalDiskSpaceUsage(totalDiskSpaceUsage)
+            .totalEnergyConsumption(totalEnergyConsumption)
+            .build());
 
-    processedObjects.add(Workflow.builder()
-        .id(jobId)
-        .submitTime(submitTime)
-        .tasks(tasks)
-        .numberOfTasks(numTasks)
-        .criticalPathLength(criticalPathLength)
-        .criticalPathTaskCount(criticalPathTaskCount)
-        .maxNumberOfConcurrentTasks(maxNumberOfConcurrentTasks)
-        .nfrs(nfrs)
-        .scheduler(scheduler)
-        .domain(domain)
-        .applicationName(appName)
-        .applicationField(applicationField)
-        .totalResources((totalResources>0.0)? totalResources : -1.0)
-        .totalMemoryUsage((totalMemoryUsage>0.0)? totalMemoryUsage : -1.0)
-        .totalNetworkUsage((totalNetworkUsage>0)? totalNetworkUsage : -1)
-        .totalDiskSpaceUsage((totalDiskSpaceUsage>0.0)? totalDiskSpaceUsage : -1.0)
-        .totalEnergyConsumption((totalEnergyConsumption>0.0)? totalEnergyConsumption : -1.0)
-        .build());
     jobSubmitTimes.remove(jobId);
   }
 }

@@ -35,7 +35,7 @@ public class AbstractListener<T extends BaseTraceObject> extends SparkListener {
    * A list of processed domain objects.
    */
   @Getter
-  protected final List<T> processedObjects = new LinkedList<>();
+  private final List<T> processedObjects = new LinkedList<>();
 
   /**
    * Filters the list of processed objects by the given condition.

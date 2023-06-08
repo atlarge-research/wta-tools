@@ -36,6 +36,7 @@ public class BaseLevelListenerTest {
         .domain(Domain.SCIENTIFIC)
         .description("Yer a wizard harry")
         .build();
+    fakeStageListener = new StageLevelListener(mockedSparkContext, fakeConfig);
 
     fakeTaskListener = new TaskLevelListener(mockedSparkContext, fakeConfig);
 
@@ -43,6 +44,7 @@ public class BaseLevelListenerTest {
 
     fakeJobListener = new JobLevelListener(mockedSparkContext, fakeConfig, fakeTaskListener, fakeStageListener);
 
-    fakeApplicationListener = new ApplicationLevelListener(mockedSparkContext, fakeConfig, fakeJobListener, fakeTaskListener);
+    fakeApplicationListener = new ApplicationLevelListener(
+        mockedSparkContext, fakeConfig, fakeJobListener, fakeTaskListener, fakeStageListener);
   }
 }
