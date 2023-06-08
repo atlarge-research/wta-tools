@@ -6,6 +6,12 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * ProcDto class.
+ *
+ * @author Lohithsai Yadala Chanchu
+ * @since 1.0.0
+ */
 @Data
 @Builder
 @AllArgsConstructor
@@ -215,4 +221,7 @@ public class ProcDto implements SupplierDto {
 
   @Builder.Default
   private Optional<Long> directMap1G = Optional.empty();
+
+  @Builder.Default
+  private Optional<String> cpuModel = Optional.empty();
 }

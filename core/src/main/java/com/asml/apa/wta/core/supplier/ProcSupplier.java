@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Scanner;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.commons.lang3.SystemUtils;
@@ -51,76 +52,82 @@ public class ProcSupplier implements InformationSupplier<ProcDto> {
     if (isProcAvailable) {
       CompletableFuture<Optional<Long>[]> diskStats = getDiskMetrics();
       CompletableFuture<Optional<Long>[]> memStats = getMemMetrics();
+      CompletableFuture<Optional<String>> cpuModel = getCpuModel();
 
-      return diskStats.thenCombine(memStats, (diskResult, memResult) -> ProcDto.builder()
-          .readsCompleted(diskResult[0])
-          .readsMerged(diskResult[1])
-          .sectorsRead(diskResult[2])
-          .timeSpentReading(diskResult[3])
-          .writesCompleted(diskResult[4])
-          .writesMerged(diskResult[5])
-          .sectorsWritten(diskResult[6])
-          .timeSpentWriting(diskResult[7])
-          .iosInProgress(diskResult[8])
-          .timeSpentDoingIos(diskResult[9])
-          .weightedTimeSpentDoingIos(diskResult[9])
-          .discardsCompleted(diskResult[10])
-          .discardsMerged(diskResult[11])
-          .sectorsDiscarded(diskResult[12])
-          .timeSpentDiscarding(diskResult[13])
-          .flushReqCompleted(diskResult[14])
-          .timeSpentFlushing(diskResult[15])
-          .memTotal(memResult[0])
-          .memFree(memResult[1])
-          .memAvailable(memResult[2])
-          .buffers(memResult[3])
-          .cached(memResult[4])
-          .swapCached(memResult[5])
-          .active(memResult[6])
-          .inactive(memResult[7])
-          .activeAnon(memResult[8])
-          .inactiveAnon(memResult[9])
-          .activeFile(memResult[10])
-          .inactiveFile(memResult[11])
-          .unevictable(memResult[12])
-          .mLocked(memResult[13])
-          .swapTotal(memResult[14])
-          .swapFree(memResult[15])
-          .dirty(memResult[16])
-          .writeback(memResult[17])
-          .anonPages(memResult[18])
-          .mapped(memResult[19])
-          .shmem(memResult[20])
-          .kReclaimable(memResult[21])
-          .slab(memResult[22])
-          .sReclaimable(memResult[23])
-          .sUnreclaim(memResult[24])
-          .kernelStack(memResult[25])
-          .pageTables(memResult[26])
-          .nfsUnstable(memResult[27])
-          .bounce(memResult[28])
-          .writebackTmp(memResult[29])
-          .commitLimit(memResult[30])
-          .committedAs(memResult[31])
-          .vMallocTotal(memResult[32])
-          .vMallocUsed(memResult[33])
-          .vMallocChunk(memResult[34])
-          .percpu(memResult[35])
-          .anonHugePages(memResult[36])
-          .shmemHugePages(memResult[37])
-          .shmemPmdMapped(memResult[38])
-          .fileHugePages(memResult[39])
-          .filePmdMapped(memResult[40])
-          .hugePagesTotal(memResult[41])
-          .hugePagesFree(memResult[42])
-          .hugePagesRsvd(memResult[43])
-          .hugePagesSurp(memResult[44])
-          .hugePageSize(memResult[45])
-          .hugetlb(memResult[46])
-          .directMap4k(memResult[47])
-          .directMap2M(memResult[48])
-          .directMap1G(memResult[49])
-          .build());
+      return diskStats
+          .thenCombine(
+              memStats,
+              (diskResult, memResult) -> cpuModel.thenApply(cpuModelResult -> ProcDto.builder()
+                  .readsCompleted(diskResult[0])
+                  .readsMerged(diskResult[1])
+                  .sectorsRead(diskResult[2])
+                  .timeSpentReading(diskResult[3])
+                  .writesCompleted(diskResult[4])
+                  .writesMerged(diskResult[5])
+                  .sectorsWritten(diskResult[6])
+                  .timeSpentWriting(diskResult[7])
+                  .iosInProgress(diskResult[8])
+                  .timeSpentDoingIos(diskResult[9])
+                  .weightedTimeSpentDoingIos(diskResult[9])
+                  .discardsCompleted(diskResult[10])
+                  .discardsMerged(diskResult[11])
+                  .sectorsDiscarded(diskResult[12])
+                  .timeSpentDiscarding(diskResult[13])
+                  .flushReqCompleted(diskResult[14])
+                  .timeSpentFlushing(diskResult[15])
+                  .memTotal(memResult[0])
+                  .memFree(memResult[1])
+                  .memAvailable(memResult[2])
+                  .buffers(memResult[3])
+                  .cached(memResult[4])
+                  .swapCached(memResult[5])
+                  .active(memResult[6])
+                  .inactive(memResult[7])
+                  .activeAnon(memResult[8])
+                  .inactiveAnon(memResult[9])
+                  .activeFile(memResult[10])
+                  .inactiveFile(memResult[11])
+                  .unevictable(memResult[12])
+                  .mLocked(memResult[13])
+                  .swapTotal(memResult[14])
+                  .swapFree(memResult[15])
+                  .dirty(memResult[16])
+                  .writeback(memResult[17])
+                  .anonPages(memResult[18])
+                  .mapped(memResult[19])
+                  .shmem(memResult[20])
+                  .kReclaimable(memResult[21])
+                  .slab(memResult[22])
+                  .sReclaimable(memResult[23])
+                  .sUnreclaim(memResult[24])
+                  .kernelStack(memResult[25])
+                  .pageTables(memResult[26])
+                  .nfsUnstable(memResult[27])
+                  .bounce(memResult[28])
+                  .writebackTmp(memResult[29])
+                  .commitLimit(memResult[30])
+                  .committedAs(memResult[31])
+                  .vMallocTotal(memResult[32])
+                  .vMallocUsed(memResult[33])
+                  .vMallocChunk(memResult[34])
+                  .percpu(memResult[35])
+                  .anonHugePages(memResult[36])
+                  .shmemHugePages(memResult[37])
+                  .shmemPmdMapped(memResult[38])
+                  .fileHugePages(memResult[39])
+                  .filePmdMapped(memResult[40])
+                  .hugePagesTotal(memResult[41])
+                  .hugePagesFree(memResult[42])
+                  .hugePagesRsvd(memResult[43])
+                  .hugePagesSurp(memResult[44])
+                  .hugePageSize(memResult[45])
+                  .hugetlb(memResult[46])
+                  .directMap4k(memResult[47])
+                  .directMap2M(memResult[48])
+                  .directMap1G(memResult[49])
+                  .cpuModel(cpuModelResult)
+                  .build()))
+          .thenCompose(Function.identity());
     }
     return notAvailableResult();
   }
@@ -171,6 +178,29 @@ public class ProcSupplier implements InformationSupplier<ProcDto> {
         }
       }
       return agg;
+    });
+  }
+
+  /**
+   * Get cpu model from /proc/cpuinfo.
+   *
+   * @return CompletableFuture&lt;Optional&lt;Long&gt;&gt; of the parsed cpu model from the /proc/cpuinfo file
+   * @author Lohithsai Yadala Chanchu
+   * @since 1.0.0
+   */
+  private CompletableFuture<Optional<String>> getCpuModel() {
+    CompletableFuture<String> cpuMetrics = bashUtils.executeCommand("cat /proc/cpuinfo");
+    Pattern pattern = Pattern.compile("model name\\s+:\\s+([^\\n]+)");
+
+    return cpuMetrics.thenApply(result -> {
+      if (result != null) {
+        Matcher matcher = pattern.matcher(result);
+
+        if (matcher.find()) {
+          return Optional.of(matcher.group(1));
+        }
+      }
+      return Optional.empty();
     });
   }
 
