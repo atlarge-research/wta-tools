@@ -70,7 +70,7 @@ To deploy a framework, use the `deployer deploy -h` command for help, or use one
 Before deploying hadoop, add the following environment path variables:
 
 ```bash
-export HADOOP_HOME=`<path_to_installe_hadoop>`
+export HADOOP_HOME=`<path_to_installed_hadoop>`
 export HADOOP_CONF_DIR=$HADOOP_HOME/etc/hadoop
 export YARN_CONF_DIR=$HADOOP_HOME/etc/hadoop
 ```
