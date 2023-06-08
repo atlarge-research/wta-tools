@@ -89,7 +89,11 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
 
      final double maxResourceTask = tasks.stream().map(Task::getResourceAmountRequested).filter(x -> x>0.0).reduce(Double::max).orElseGet(() -> -1.0);
 
-     final double meanResourceTask = tasks.stream().map(Task::getResourceAmountRequested).filter(x -> x>0.0).reduce(Double::sum).orElseGet(() -> (double) -tasks.size())/tasks.size();;
+     double meanResourceTask = -1.0;
+     double resourceTaskSize = (int) tasks.stream().filter(x -> x.getResourceAmountRequested() > 0.0).count();
+     if (resourceTaskSize != 0){
+         meanResourceTask = tasks.stream().map(Task::getResourceAmountRequested).filter(x -> x>0.0).reduce(Double::sum).get()/resourceTaskSize;
+     }
 
      final double stdResourceTask = standardDeviation(tasks.stream().map(Task::getResourceAmountRequested).filter(x -> x>0.0), meanResourceTask);
 
@@ -101,13 +105,20 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
 
      final double thirdQuartileResourceTask = resourceStats.orElseGet(() -> new Double[]{-1.0,-1.0,-1.0})[2];
 
-     final double covResourceTask = stdResourceTask/meanResourceTask;
+     double covResourceTask = -1.0;
+     if (meanResourceTask != 0 && medianResourceTask != -1.0){
+         covResourceTask = stdResourceTask/meanResourceTask;
+     }
 
      final double minMemory = tasks.stream().map(Task::getMemoryRequested).filter(x -> x>0.0).reduce(Double::min).orElseGet(() -> -1.0);
 
      final double maxMemory = tasks.stream().map(Task::getMemoryRequested).filter(x -> x>0.0).reduce(Double::max).orElseGet(() -> -1.0);
 
-     final double meanMemory = tasks.stream().map(Task::getMemoryRequested).filter(x -> x>0.0).reduce(Double::sum).orElseGet(() -> (double) -tasks.size())/tasks.size();
+     double meanMemory = -1.0;
+     double memorySize = tasks.stream().map(Task::getMemoryRequested).filter(x -> x>0.0).count();
+     if (memorySize!=0){
+         meanMemory = tasks.stream().map(Task::getMemoryRequested).filter(x -> x>0.0).reduce(Double::sum).get()/memorySize;
+     }
 
      final double stdMemory = standardDeviation(tasks.stream().map(Task::getMemoryRequested).filter(x -> x>0.0), meanMemory);
 
@@ -119,13 +130,20 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
 
      final double thirdQuartileMemory = memoryStats.orElseGet(() -> new Double[]{-1.0,-1.0,-1.0})[2];
 
-     final double covMemory = stdMemory/meanMemory;
+     double covMemory = -1.0;
+     if (meanMemory!=0&&meanMemory!=-1.0){
+         covMemory = stdMemory/meanMemory;
+     }
 
      final long minNetworkUsage = tasks.stream().map(Task::getNetworkIoTime).filter(x -> x>0).reduce(Long::min).orElseGet(() -> -1L);
 
      final long maxNetworkUsage = tasks.stream().map(Task::getNetworkIoTime).filter(x -> x>0).reduce(Long::max).orElseGet(() -> -1L);
 
-     final double meanNetworkUsage = (double) tasks.stream().map(Task::getNetworkIoTime).reduce(Long::sum).orElseGet(() -> (long) -tasks.size())/tasks.size();;
+     double meanNetworkUsage = -1.0;
+     double networkUsageSize = tasks.stream().map(Task::getNetworkIoTime).filter(x -> x>0).count();
+     if (networkUsageSize != 0 ){
+         meanNetworkUsage = (double) tasks.stream().map(Task::getNetworkIoTime).filter(x -> x>0).reduce(Long::sum).get()/networkUsageSize;
+     }
 
      final double stdNetworkUsage = standardDeviation(tasks.stream().map(Task::getNetworkIoTime).map(Long::doubleValue), meanNetworkUsage);
 
@@ -137,13 +155,20 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
 
      final long thirdQuartileNetworkUsage = networkStats.orElseGet(() -> new Long[]{-1L,-1L,-1L})[2];
 
-     final double covNetworkUsage = stdNetworkUsage/meanNetworkUsage;
+     double covNetworkUsage = -1.0;
+     if (meanNetworkUsage!=0&&meanNetworkUsage!=-1.0){
+         covNetworkUsage = stdNetworkUsage/meanNetworkUsage;
+     }
 
      final double minDiskSpaceUsage = tasks.stream().map(Task::getDiskSpaceRequested).filter(x -> x>0.0).reduce(Double::min).orElseGet(() -> -1.0);
 
      final double maxDiskSpaceUsage = tasks.stream().map(Task::getDiskSpaceRequested).filter(x -> x>0.0).reduce(Double::max).orElseGet(() -> -1.0);
 
-     final double meanDiskSpaceUsage = tasks.stream().map(Task::getDiskSpaceRequested).filter(x -> x>0.0).reduce(Double::sum).orElseGet(() -> (double) -tasks.size())/tasks.size();
+     double meanDiskSpaceUsage = -1.0;
+     double diskSpaceSize = tasks.stream().map(Task::getDiskSpaceRequested).filter(x -> x>0.0).count();
+     if(diskSpaceSize!=0){
+         meanDiskSpaceUsage = tasks.stream().map(Task::getDiskSpaceRequested).filter(x -> x>0.0).reduce(Double::sum).get()/diskSpaceSize;
+     }
 
      final double stdDiskSpaceUsage = standardDeviation(tasks.stream().map(Task::getDiskSpaceRequested).filter(x -> x>0.0), meanDiskSpaceUsage);
 
@@ -155,13 +180,20 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
 
      final double thirdQuartileDiskSpaceUsage = diskSpaceStats.orElseGet(() -> new Double[]{-1.0,-1.0,-1.0})[2];
 
-     final double covDiskSpaceUsage = stdDiskSpaceUsage/meanDiskSpaceUsage;
+     double covDiskSpaceUsage = -1.0;
+     if(meanDiskSpaceUsage!=0&&meanNetworkUsage!=-1.0){
+         covDiskSpaceUsage =stdDiskSpaceUsage/meanDiskSpaceUsage;
+     }
 
      final double minEnergy = tasks.stream().map(Task::getEnergyConsumption).filter(x -> x>0.0).reduce(Double::min).orElseGet(() -> -1.0);
 
      final double maxEnergy = tasks.stream().map(Task::getEnergyConsumption).filter(x -> x>0.0).reduce(Double::max).orElseGet(() -> -1.0);
 
-     final double meanEnergy = tasks.stream().map(Task::getEnergyConsumption).filter(x -> x>0.0).reduce(Double::sum).orElseGet(() -> (double) -tasks.size()) /tasks.size();;
+     double meanEnergy = -1.0;
+     double energySize =tasks.stream().map(Task::getEnergyConsumption).filter(x -> x>0.0).count();
+     if (energySize!=0){
+         meanEnergy = tasks.stream().map(Task::getEnergyConsumption).filter(x -> x>0.0).reduce(Double::sum).get()/energySize;
+     }
 
      final double stdEnergy = standardDeviation(tasks.stream().map(Task::getEnergyConsumption).filter(x -> x>0.0), meanEnergy);
 
@@ -173,7 +205,10 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
 
      final double thirdQuartileEnergy = energyStats.orElseGet(() -> new Double[]{-1.0,-1.0,-1.0})[2];
 
-     final double covEnergy = stdEnergy/meanEnergy;
+     double covEnergy = -1.0;
+     if (meanEnergy!=0&&meanEnergy!=-1.0){
+         covEnergy = stdEnergy/meanEnergy;
+     }
 
     processedObjects.add(Workload.builder()
         .totalWorkflows(numWorkflows)
