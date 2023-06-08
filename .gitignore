@@ -84,3 +84,11 @@ core/src/test/resources/WTA
 core/src/test/resources/AvroOutput
 adapter/spark/src/test/resources/WTA
 wta-output
+
+# validator
+venv
+__pycache__
+*.cfg
+include
+lib
+bin

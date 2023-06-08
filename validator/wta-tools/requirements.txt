@@ -1,0 +1,5 @@
+numpy>=1.24.3
+pandas>=2.0.1
+pyarrow>=12.0.0
+pyspark==3.2.4
+toposort>=1.10
