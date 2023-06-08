@@ -41,6 +41,7 @@ public class DiskOutputFile implements OutputFile {
   private void deleteFile(Path path) {
     try {
       Files.delete(path);
+      log.debug("Deleted file {}.", path);
     } catch (IOException e) {
       log.error("Could not delete file {}.", path);
     }
@@ -52,6 +53,7 @@ public class DiskOutputFile implements OutputFile {
     try (Stream<Path> paths = Files.walk(file)) {
       paths.sorted(Comparator.reverseOrder()).forEach(this::deleteFile);
     }
+    log.debug("Cleared the directory at {}.", file);
   }
 
   @Override
