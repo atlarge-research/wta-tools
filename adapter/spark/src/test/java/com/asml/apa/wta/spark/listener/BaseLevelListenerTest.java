@@ -5,7 +5,6 @@ import static org.mockito.Mockito.when;
 
 import com.asml.apa.wta.core.config.RuntimeConfig;
 import com.asml.apa.wta.core.model.enums.Domain;
-import java.util.Map;
 import org.apache.spark.SparkConf;
 import org.apache.spark.SparkContext;
 import org.junit.jupiter.api.BeforeEach;
@@ -36,7 +35,6 @@ public class BaseLevelListenerTest {
         .authors(new String[] {"Harry Potter"})
         .domain(Domain.SCIENTIFIC)
         .description("Yer a wizard harry")
-        .events(Map.of("event1", "Desc of event1", "event2", "Desc of event2"))
         .build();
 
     fakeTaskListener = new TaskLevelListener(mockedSparkContext, fakeConfig);

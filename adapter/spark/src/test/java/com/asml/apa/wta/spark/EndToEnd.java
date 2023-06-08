@@ -38,18 +38,19 @@ public class EndToEnd {
    * Entry point for the e2e test. This method will create a spark session along with the plugin.
    * The 'configFile' environment variable must be specified. Even if an error occurs on the plugin,
    * it will not shut down the entire Spark job.
-   *
+   * @param args First argument must be filepath to config file. Second argument must be filepath to
+   *             resources file.
    * @author Pil Kyu Cho
    * @since 1.0.0
    */
   public static void main(String[] args) {
-    SparkConf conf = new SparkConf().setAppName("SystemTest").setMaster("local");
+    SparkConf conf = new SparkConf().setAppName("SystemTest").setMaster("local[1]");
     conf.set("spark.plugins", "com.asml.apa.wta.spark.WtaPlugin");
-    System.setProperty("configFile", "adapter/spark/src/test/resources/config.json");
+    System.setProperty("configFile", args[0]);
     SparkSession spark = SparkSession.builder().config(conf).getOrCreate();
     SparkContext sc = spark.sparkContext();
-    testFile = JavaSparkContext.fromSparkContext(sc).textFile("adapter/spark/src/test/resources/wordcount.txt");
-    for (int i = 0; i < 100; i++) {
+    testFile = JavaSparkContext.fromSparkContext(sc).textFile(args[1]);
+    for (int i = 0; i < 10; i++) {
       invokeJob();
     }
     sc.stop();

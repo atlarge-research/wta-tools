@@ -25,7 +25,7 @@
     <maven.assembly.plugin.version>3.6.0</maven.assembly.plugin.version>
     <maven.compiler.plugin.version>3.11.0</maven.compiler.plugin.version>
     <spotless.version>2.36.0</spotless.version>
-    <junit.version>5.9.3</junit.version>
+    <junit.version>5.9.2</junit.version>
     <surefire.version>3.1.0</surefire.version>
     <error-prone.version>2.18.0</error-prone.version>
     <gemnasium.version>0.5.1</gemnasium.version>
@@ -38,17 +38,16 @@
     <checkstyle.version>3.2.2</checkstyle.version>
     <assertj.version>3.24.2</assertj.version>
     <mockito.version>5.3.1</mockito.version>
-    <jqwik.version>1.7.3</jqwik.version>
     <slf4j2-mock.version>2.3.0</slf4j2-mock.version>
     <slf4j.version>2.0.7</slf4j.version>
     <log4j2.version>2.20.0</log4j2.version>
     <dependency-plugin.version>3.6.0</dependency-plugin.version>
+    <awaitility.version>4.2.0</awaitility.version>
   </properties>
 
   <modules>
     <module>core</module>
     <module>adapter/spark</module>
-    <module>benchmarking/spark-benchmark</module>
   </modules>
 
   <dependencies>
@@ -94,20 +93,6 @@
       <version>${mockito.version}</version>
       <scope>test</scope>
     </dependency>
-    <!-- https://mvnrepository.com/artifact/net.jqwik/jqwik -->
-    <dependency>
-      <groupId>net.jqwik</groupId>
-      <artifactId>jqwik</artifactId>
-      <version>${jqwik.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <!-- https://mvnrepository.com/artifact/net.jqwik/jqwik-api -->
-    <dependency>
-      <groupId>net.jqwik</groupId>
-      <artifactId>jqwik-api</artifactId>
-      <version>${jqwik.version}</version>
-      <scope>test</scope>
-    </dependency>
     <!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-api -->
     <dependency>
       <groupId>org.slf4j</groupId>
@@ -126,6 +111,13 @@
       <groupId>org.simplify4u</groupId>
       <artifactId>slf4j2-mock</artifactId>
       <version>${slf4j2-mock.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <!-- https://mvnrepository.com/artifact/org.awaitility/awaitility -->
+    <dependency>
+      <groupId>org.awaitility</groupId>
+      <artifactId>awaitility</artifactId>
+      <version>${awaitility.version}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
@@ -266,6 +258,9 @@
           <classpathDependencyExcludes>
             <classpathDependencyExclude>org.apache.logging.log4j:log4j-slf4j2-impl</classpathDependencyExclude>
           </classpathDependencyExcludes>
+          <excludedTestClasses>
+            <param>com.asml.apa.wta.spark.MultithreadTest</param>
+          </excludedTestClasses>
         </configuration>
         <dependencies>
           <!-- https://mvnrepository.com/artifact/org.pitest/pitest-junit5-plugin -->

@@ -4,7 +4,6 @@ import com.asml.apa.wta.core.config.RuntimeConfig;
 import com.asml.apa.wta.core.model.enums.Domain;
 import com.asml.apa.wta.spark.datasource.SparkDataSource;
 import java.util.Arrays;
-import java.util.Map;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
@@ -28,7 +27,6 @@ public class BaseSparkJobIntegrationTest {
         .authors(new String[] {"Harry Potter"})
         .domain(Domain.SCIENTIFIC)
         .description("Yer a wizard harry")
-        .events(Map.of("event1", "Desc of event1", "event2", "Desc of event2"))
         .outputPath("src/test/resources/WTA")
         .build();
 

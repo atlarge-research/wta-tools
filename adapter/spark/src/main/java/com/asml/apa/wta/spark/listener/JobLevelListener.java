@@ -121,7 +121,6 @@ public class JobLevelListener extends AbstractListener<Workflow> {
         .totalDiskSpaceUsage((totalDiskSpaceUsage>0.0)? totalDiskSpaceUsage : -1.0)
         .totalEnergyConsumption((totalEnergyConsumption>0.0)? totalEnergyConsumption : -1.0)
         .build());
-
     jobSubmitTimes.remove(jobId);
   }
 }
