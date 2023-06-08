@@ -40,4 +40,6 @@ public interface OutputFile {
    * @since 1.0.0
    */
   void clearDirectory() throws IOException;
+
+  org.apache.parquet.io.OutputFile wrap() throws IOException;
 }

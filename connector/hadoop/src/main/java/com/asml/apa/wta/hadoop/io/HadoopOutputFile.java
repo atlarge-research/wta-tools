@@ -18,10 +18,12 @@ import org.apache.hadoop.fs.Path;
 public class HadoopOutputFile implements OutputFile {
 
   private final Path file;
+  private final Configuration conf;
   private final FileSystem fs;
 
-  public HadoopOutputFile(Path path) {
+  public HadoopOutputFile(Path path, Configuration configuration) {
     file = path;
+    conf = configuration;
     try {
       fs = path.getFileSystem(new Configuration());
     } catch (IOException e) {
@@ -29,14 +31,15 @@ public class HadoopOutputFile implements OutputFile {
     }
   }
 
-  public HadoopOutputFile(Path path, FileSystem fileSystem) {
+  public HadoopOutputFile(Path path, Configuration configuration, FileSystem fileSystem) {
     file = path;
+    conf = configuration;
     fs = fileSystem;
   }
 
   @Override
   public OutputFile resolve(String path) {
-    return new HadoopOutputFile(new Path(file, path), fs);
+    return new HadoopOutputFile(new Path(file, path), conf, fs);
   }
 
   @Override
@@ -48,5 +51,18 @@ public class HadoopOutputFile implements OutputFile {
   public void clearDirectory() throws IOException {
     fs.delete(file, true);
     fs.mkdirs(file);
+  }
+
+  /**
+   * @return
+   */
+  @Override
+  public org.apache.parquet.io.OutputFile wrap() throws IOException {
+    return org.apache.parquet.hadoop.util.HadoopOutputFile.fromPath(file, conf);
+  }
+
+  @Override
+  public String toString() {
+    return file.toString();
   }
 }

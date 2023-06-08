@@ -1,10 +1,21 @@
 package com.asml.apa.wta.core.io;
 
-import java.io.BufferedOutputStream;
-import java.io.Flushable;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.avro.Schema;
+import org.apache.avro.generic.GenericData;
+import org.apache.avro.generic.GenericDatumReader;
+import org.apache.avro.generic.GenericRecord;
+import org.apache.avro.io.DatumWriter;
+import org.apache.avro.io.Decoder;
+import org.apache.avro.io.DecoderFactory;
+import org.apache.avro.io.Encoder;
+import org.apache.avro.io.EncoderFactory;
+import org.apache.avro.reflect.ReflectData;
+import org.apache.parquet.avro.AvroParquetWriter;
+import org.apache.parquet.hadoop.ParquetFileWriter;
+import org.apache.parquet.hadoop.metadata.CompressionCodecName;
 
 /**
  * Writes records to a Parquet file.
@@ -13,22 +24,10 @@ import lombok.extern.slf4j.Slf4j;
  * @since 1.0.0
  */
 @Slf4j
-public class ParquetWriter<T> implements AutoCloseable, Flushable {
+public class ParquetWriter<T> implements AutoCloseable {
 
-  private final BufferedOutputStream outputStream;
-
-  private final String MAGIC_STR = "PAR1";
-  private final byte[] MAGIC = MAGIC_STR.getBytes(StandardCharsets.US_ASCII);
-
-  private State state;
-
-  private enum State {
-    STARTED,
-    NOT_STARTED,
-    BLOCK,
-    COLUMN,
-    ENDED
-  }
+  private final org.apache.parquet.hadoop.ParquetWriter<GenericData.Record> writer;
+  private final Schema avroSchema;
 
   /**
    * Constructs a writer to write records to Parquet.
@@ -37,11 +36,14 @@ public class ParquetWriter<T> implements AutoCloseable, Flushable {
    * @author Atour Mousavi Gourabi
    * @since 1.0.0
    */
-  public ParquetWriter(OutputFile path) throws IOException {
-    outputStream = path.open();
-    log.debug("Started writing a Parquet file at {}.", path);
-    state = State.STARTED;
-    outputStream.write(MAGIC);
+  public ParquetWriter(OutputFile path, Class<T> clazz) throws IOException {
+    avroSchema = ReflectData.get().getSchema(clazz);
+    writer = AvroParquetWriter
+            .<GenericData.Record>builder(path.wrap())
+            .withSchema(avroSchema)
+            .withCompressionCodec(CompressionCodecName.SNAPPY)
+            .withWriteMode(ParquetFileWriter.Mode.OVERWRITE)
+            .build();
   }
 
   /**
@@ -54,17 +56,21 @@ public class ParquetWriter<T> implements AutoCloseable, Flushable {
    * @since 1.0.0
    */
   public void write(T record) throws IOException {
-    outputStream.write(1);
-    // todo
+    ByteArrayOutputStream out = new ByteArrayOutputStream();
+    Encoder encoder = EncoderFactory.get().binaryEncoder(out, null);
+
+    DatumWriter datumWriter = ReflectData.get().createDatumWriter(avroSchema);
+    datumWriter.write(record, encoder);
+    encoder.flush();
+
+    GenericDatumReader<GenericRecord> datumReader = new GenericDatumReader<>(avroSchema);
+    Decoder decoder = DecoderFactory.get().binaryDecoder(out.toByteArray(), null);
+
+    writer.write((GenericData.Record) datumReader.read(null, decoder));
   }
 
   @Override
   public void close() throws IOException {
-    outputStream.close();
-  }
-
-  @Override
-  public void flush() throws IOException {
-    outputStream.flush();
+    writer.close();
   }
 }

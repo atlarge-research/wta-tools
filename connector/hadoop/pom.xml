@@ -16,6 +16,7 @@
 
   <properties>
     <hadoop.version>3.3.5</hadoop.version>
+    <parquet.version>1.12.2</parquet.version>
   </properties>
 
   <dependencies>
@@ -24,6 +25,12 @@
       <groupId>org.apache.hadoop</groupId>
       <artifactId>hadoop-common</artifactId>
       <version>${hadoop.version}</version>
+    </dependency>
+    <!-- https://mvnrepository.com/artifact/org.apache.hadoop/hadoop-common -->
+    <dependency>
+      <groupId>org.apache.parquet</groupId>
+      <artifactId>parquet-hadoop</artifactId>
+      <version>${parquet.version}</version>
     </dependency>
     <!-- internal dependency -->
     <dependency>

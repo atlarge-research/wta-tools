@@ -56,6 +56,14 @@ public class DiskOutputFile implements OutputFile {
     log.debug("Cleared the directory at {}.", file);
   }
 
+  /**
+   * @return
+   */
+  @Override
+  public org.apache.parquet.io.OutputFile wrap() {
+    return new DiskParquetOutputFile(file);
+  }
+
   @Override
   public String toString() {
     return file.toString();
