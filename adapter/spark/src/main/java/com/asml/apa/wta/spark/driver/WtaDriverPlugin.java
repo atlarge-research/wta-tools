@@ -124,7 +124,7 @@ public class WtaDriverPlugin implements DriverPlugin {
         wtaWriter.add(workLoad);
         wtaWriter.write();
       } catch (Exception e) {
-        log.error("Error while writing to the generated files.");
+        log.error("Error while writing to the generated files, {} : {}.", e.getClass(), e.getMessage());
       }
     }
   }
