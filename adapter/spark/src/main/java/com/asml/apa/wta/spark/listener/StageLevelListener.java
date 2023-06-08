@@ -45,6 +45,8 @@ public class StageLevelListener extends TaskStageBaseListener {
     final StageInfo curStageInfo = stageCompleted.stageInfo();
     final int stageId = curStageInfo.stageId();
     final TaskMetrics curStageMetrics = curStageInfo.taskMetrics();
+
+    final int stageId = curStageInfo.stageId() + 1;
     final Long submitTime = curStageInfo.submissionTime().getOrElse(() -> -1L);
     final long runTime = curStageMetrics.executorRunTime();
     final int userId = sparkContext.sparkUser().hashCode();

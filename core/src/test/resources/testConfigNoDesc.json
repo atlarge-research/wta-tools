@@ -1,10 +1,6 @@
 {
   "authors": ["Test Name"],
   "domain": "Engineering",
-  "events": {
-    "f1": "v1",
-    "f2": "v2"
-  },
   "logLevel": "INFO",
   "outputPath": "/home/user/WTA",
   "isStageLevel": "true"
