@@ -35,15 +35,6 @@ class WtaDriverPluginIntegrationTest {
     conf = new SparkConf().setAppName("DriverTest").setMaster("local");
   }
 
-  private void invokeWithRegularConfig() throws IOException {
-    System.setProperty("configFile", configPath);
-    conf.set("spark.plugins", pluginClass);
-    SparkContext sc = SparkSession.builder().config(conf).getOrCreate().sparkContext();
-
-    testFile = JavaSparkContext.fromSparkContext(sc).textFile(resourcePath);
-    invokeJob();
-  }
-
   @AfterEach
   void teardown() throws IOException {
     Files.walk(directoryPath)

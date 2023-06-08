@@ -43,7 +43,7 @@ public abstract class TaskStageBaseListener extends AbstractListener<Task> {
   @Override
   public void onJobStart(SparkListenerJobStart jobStart) {
     // stage ids are always unique
-    jobStart.stageInfos().foreach(stageInfo -> stageIdsToJobs.put(stageInfo.stageId(), jobStart.jobId() + 1));
+    jobStart.stageInfos().foreach(stageInfo -> stageIdsToJobs.put(stageInfo.stageId() + 1, jobStart.jobId() + 1));
   }
 
   /**
@@ -56,6 +56,6 @@ public abstract class TaskStageBaseListener extends AbstractListener<Task> {
   @Override
   public void onStageCompleted(SparkListenerStageCompleted stageCompleted) {
     // all tasks are guaranteed to be completed, so we can remove the stage id to reduce memory usage.
-    stageIdsToJobs.remove(stageCompleted.stageInfo().stageId());
+    stageIdsToJobs.remove(stageCompleted.stageInfo().stageId() + 1);
   }
 }
