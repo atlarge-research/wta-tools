@@ -29,4 +29,6 @@ public class BaseSupplierDto implements Serializable {
   private IostatDto iostatDto;
 
   private DstatDto dstatDto;
+
+  private PerfDto perfDto;
 }

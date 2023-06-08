@@ -16,16 +16,48 @@ The diagram above illustrates the workflow of the adapter.
 - **Label 4:** Once the job has ended, all objects will be serialised into parquet format.
 
 ## Installation and Usage
-- Clone the repository
-- Optional (if more I/O metrics are needed):
-  - Install sysstat by running the following bash command:
-  ```bash
-  sudo apt install sysstat
-  ```
-  - Install dstat by running the following bash command:
-  ```bash
-  sudo apt install dstat
-  ```
+1.  Clone the repository
+2.  Optional (if more I/O metrics are needed):
+   - Install sysstat by running the following bash command:
+     ```bash
+     sudo apt install sysstat
+     ```
+
+   - Install dstat by running the following bash command:
+    ```bash
+    sudo apt install dstat
+    ```
+
+3.  To allow advanced performance metrics to be gathered, you can opt to make the `perf` utility available.
+    To do this, you need to do the following:
+
+    On Ubuntu:
+
+    ```bash
+    apt-get install linux-tools-common
+    apt-get install linux-tools-generic
+    apt-get install linux-tools-`uname -r`
+    ```
+
+    On Debian:
+
+    ```bash
+    apt-get install linux-perf
+    ```
+
+    On CentOS / RHEL:
+
+    ```bash
+    yum install perf
+    ```
+
+    Followed by setting `perf_event_paranoid` to 0:
+
+    ```bash
+    sysctl -w kernel.perf_event_paranoid=0
+    ```
+
+    It is important to note that the installed version of `perf` must be compatible with the kernel. Especially for containerised environments, this could be an issue.
 
 There are two ways to make use of the plugin
 1. Integrate the plugin into the Spark application source code

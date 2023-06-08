@@ -6,13 +6,21 @@ unit-tests-spark-adapter:
   script:
     - echo "Spark adapter unit tests started"
     - "mvn -pl adapter/spark jacoco:prepare-agent surefire:test jacoco:report"
-    - "[ -f adapter/spark/target/jacoco.exec ] && mv -f adapter/spark/target/jacoco.exec adapter/spark/target/jacoco-unit-tests.exec || echo '0' > /dev/null"
+    - "[ -f adapter/spark/target/jacoco.exec ] && mv -f adapter/spark/target/jacoco.exec adapter/spark/target/jacoco-unit-tests.exec || echo '0' >/dev/null"
   artifacts:
     name: unit-tests-spark-adapter
     expire_in: 20 minutes
     when: always
     paths:
       - adapter/spark/target/jacoco-unit-tests.exec
+  cache:
+    - key:
+        prefix: test
+        files:
+          - pom.xml
+          - core/pom.xml
+      paths:
+        - .m2/repository
 
 integration-tests-spark-adapter:
   stage: test-spark-adapter
@@ -22,14 +30,24 @@ integration-tests-spark-adapter:
     - build-spark-adapter
   script:
     - echo "Spark adapter integration tests started"
+    - apt-get install -y linux-tools-`uname -r`
+    - sysctl -w kernel.perf_event_paranoid=0
     - "mvn -pl adapter/spark jacoco:prepare-agent-integration failsafe:integration-test failsafe:verify jacoco:report-integration"
-    - "[ -f adapter/spark/target/jacoco-it.exec ] && mv -f adapter/spark/target/jacoco-it.exec adapter/spark/target/jacoco-integration-tests.exec || echo '0' > /dev/null"
+    - "[ -f adapter/spark/target/jacoco-it.exec ] && mv -f adapter/spark/target/jacoco-it.exec adapter/spark/target/jacoco-integration-tests.exec || echo '0' >/dev/null"
   artifacts:
     name: integration-tests-spark-adapter
     expire_in: 20 minutes
     when: always
     paths:
       - adapter/spark/target/jacoco-integration-tests.exec
+  cache:
+    - key:
+        prefix: test
+        files:
+          - pom.xml
+          - core/pom.xml
+      paths:
+        - .m2/repository
 
 
 line-coverage-spark-adapter:
@@ -50,6 +68,14 @@ line-coverage-spark-adapter:
     when: always
     paths:
       - adapter/spark/reports/jacoco/
+  cache:
+    - key:
+        prefix: maven
+        files:
+          - pom.xml
+          - core/pom.xml
+      paths:
+        - .m2/repository
 
 branch-coverage-spark-adapter:
   stage: test-spark-adapter
@@ -71,14 +97,15 @@ e2e-spark-adapter_2.12:
   script:
     - echo "Spark adapter end-to-end run started"
     - echo "This job does not provide coverage metrics, it just verifies the system as a whole functions to some degree"
-    - spark-submit --class com.asml.apa.wta.spark.EndToEnd --master local[1] adapter/spark/target/spark-1.0-SNAPSHOT-e2e.jar adapter/spark/src/test/resources/config.json wta-output adapter/spark/src/test/resources/wordcount.txt
+    - apt-get install -y linux-tools-`uname -r`
+    - sysctl -w kernel.perf_event_paranoid=0
+    - spark-submit --class com.asml.apa.wta.spark.EndToEnd --master local[1] adapter/spark/target/spark-1.0-SNAPSHOT-e2e.jar adapter/spark/src/test/resources/config.json adapter/spark/src/test/resources/wordcount.txt
     - if ! [ -n "$(ls -A wta-output 2>/dev/null)" ] ; then exit 1 ; fi
   artifacts:
     name: e2e-output_2.12
     expire_in: 3 hours
     paths:
       - wta-output
-  cache: []
 
 e2e-barebones-spark-adapter_2.12:
   stage: test-spark-adapter
@@ -89,14 +116,13 @@ e2e-barebones-spark-adapter_2.12:
   script:
     - echo "Barebones Spark adapter end-to-end run started"
     - echo "This job does not provide coverage metrics, it just verifies the system as a whole functions in a barebones environment"
-    - spark-submit --class com.asml.apa.wta.spark.EndToEnd --master local[1] adapter/spark/target/spark-1.0-SNAPSHOT-e2e.jar adapter/spark/src/test/resources/config.json wta-output adapter/spark/src/test/resources/wordcount.txt
+    - spark-submit --class com.asml.apa.wta.spark.EndToEnd --master local[1] adapter/spark/target/spark-1.0-SNAPSHOT-e2e.jar adapter/spark/src/test/resources/config.json adapter/spark/src/test/resources/wordcount.txt
     - if ! [ -n "$(ls -A wta-output 2>/dev/null)" ] ; then exit 1 ; fi
   artifacts:
     name: barebones-e2e-output_2.12
     expire_in: 3 hours
     paths:
       - wta-output
-  cache: []
 
 
 e2e-spark-adapter_2.13:
@@ -108,14 +134,15 @@ e2e-spark-adapter_2.13:
   script:
     - echo "Spark adapter end-to-end run started"
     - echo "This job does not provide coverage metrics, it just verifies the system as a whole functions to some degree"
-    - spark-submit --class com.asml.apa.wta.spark.EndToEnd --master local[1] adapter/spark/target/spark-1.0-SNAPSHOT-e2e.jar adapter/spark/src/test/resources/config.json wta-output adapter/spark/src/test/resources/wordcount.txt
+    - apt-get install -y linux-tools-`uname -r`
+    - sysctl -w kernel.perf_event_paranoid=0
+    - spark-submit --class com.asml.apa.wta.spark.EndToEnd --master local[1] adapter/spark/target/spark-1.0-SNAPSHOT-e2e.jar adapter/spark/src/test/resources/config.json adapter/spark/src/test/resources/wordcount.txt
     - if ! [ -n "$(ls -A wta-output 2>/dev/null)" ] ; then exit 1 ; fi
   artifacts:
     name: e2e-output_2.13
     expire_in: 3 hours
     paths:
       - wta-output
-  cache: []
 
 e2e-barebones-spark-adapter_2.13:
   stage: test-spark-adapter
@@ -126,11 +153,10 @@ e2e-barebones-spark-adapter_2.13:
   script:
     - echo "Barebones Spark adapter end-to-end run started"
     - echo "This job does not provide coverage metrics, it just verifies the system as a whole functions in a barebones environment"
-    - spark-submit --class com.asml.apa.wta.spark.EndToEnd --master local[1] adapter/spark/target/spark-1.0-SNAPSHOT-e2e.jar adapter/spark/src/test/resources/config.json wta-output adapter/spark/src/test/resources/wordcount.txt
+    - spark-submit --class com.asml.apa.wta.spark.EndToEnd --master local[1] adapter/spark/target/spark-1.0-SNAPSHOT-e2e.jar adapter/spark/src/test/resources/config.json adapter/spark/src/test/resources/wordcount.txt
     - if ! [ -n "$(ls -A wta-output 2>/dev/null)" ] ; then exit 1 ; fi
   artifacts:
     name: barebones-e2e-output_2.13
     expire_in: 3 hours
     paths:
       - wta-output
-  cache: []
