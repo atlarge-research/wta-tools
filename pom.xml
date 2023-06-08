@@ -38,7 +38,6 @@
     <checkstyle.version>3.2.2</checkstyle.version>
     <assertj.version>3.24.2</assertj.version>
     <mockito.version>5.3.1</mockito.version>
-    <jqwik.version>1.7.3</jqwik.version>
     <slf4j2-mock.version>2.3.0</slf4j2-mock.version>
     <slf4j.version>2.0.7</slf4j.version>
     <log4j2.version>2.20.0</log4j2.version>
@@ -92,20 +91,6 @@
       <groupId>org.mockito</groupId>
       <artifactId>mockito-junit-jupiter</artifactId>
       <version>${mockito.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <!-- https://mvnrepository.com/artifact/net.jqwik/jqwik -->
-    <dependency>
-      <groupId>net.jqwik</groupId>
-      <artifactId>jqwik</artifactId>
-      <version>${jqwik.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <!-- https://mvnrepository.com/artifact/net.jqwik/jqwik-api -->
-    <dependency>
-      <groupId>net.jqwik</groupId>
-      <artifactId>jqwik-api</artifactId>
-      <version>${jqwik.version}</version>
       <scope>test</scope>
     </dependency>
     <!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-api -->
