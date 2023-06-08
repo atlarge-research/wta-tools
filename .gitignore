@@ -64,10 +64,6 @@ reports
 # application configuration
 config.json
 
-# big files for benchmarking
-benchmarking/spark-benchmark/src/main/resources/sql_files
-benchmarking/spark-benchmark/src/main/resources/tpcds_parquet_data
-
 # serialization files
 *.ser
 tmp
@@ -88,72 +84,3 @@ core/src/test/resources/WTA
 core/src/test/resources/AvroOutput
 adapter/spark/src/test/resources/WTA
 wta-output
-
-# sbt specific
-.cache
-.history
-.lib/
-dist/*
-benchmarking/zoo-tutorials/target/
-benchmarking/zoo-tutorials/lib_managed/
-benchmarking/zoo-tutorials/src_managed/
-benchmarking/zoo-tutorials/project/boot/
-benchmarking/zoo-tutorials/project/plugins/project/
-
-# Scala-IDE specific
-.scala_dependencies
-.worksheet
-
-# tpcds-spark specific
-benchmarking/zoo-tutorials/tpcds-spark/target
-
-# tpch dbgen specific
-benchmarking/zoo-tutorials/tpch-spark/dbgen/*.tbl
-benchmarking/zoo-tutorials/tpch-spark/dbgen/*.o
-benchmarking/zoo-tutorials/tpch-spark/dbgen/dbgen
-benchmarking/zoo-tutorials/tpch-spark/dbgen/qgen
-
-
-# OS X
-.DS_Store
-
-# Object files
-*.o
-
-# Libraries
-*.lib
-*.a
-
-# Shared objects (inc. Windows DLLs)
-*.dll
-*.so
-*.so.*
-*.dylib
-
-# Executables
-*.exe
-*.out
-*.app
-
-# Generated files
-tables.h
-streams.h
-mkheader
-columns.h
-tpcds.idx.h
-tpcds.idx
-distcomp
-y.tab.h
-y.tab.c
-y.output
-tokenizer.c
-dsqgen
-dsdgen
-checksum
-.ctags_updated
-tags
-
-# Flat files
-*.dat
-
-/.idea/*

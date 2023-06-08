@@ -1,6 +1,0 @@
-#!/bin/bash
-
-# runs spark-sql-perf from the current directory
-
-ARGS="runBenchmark $@"
-build/sbt "$ARGS"
