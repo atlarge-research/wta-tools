@@ -1,5 +1,6 @@
 package com.asml.apa.wta.core.model;
 
+import com.asml.apa.wta.core.io.ParquetSchema;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Data;
@@ -82,5 +83,17 @@ public class Resource implements BaseTraceObject {
       record.put("details", this.getDetails());
     }
     return record;
+  }
+
+  /**
+   * All WTA objects that are stored as Parquet files rely on this method to convert the object to a record.
+   * It should build the record object based on the checker and the schema provided.
+   *
+   * @param schema schema for the output object
+   * @return record of the object
+   */
+  @Override
+  public GenericRecord convertToRecord(ParquetSchema schema) {
+    return schema.convertFromPojo(this, Resource.class);
   }
 }

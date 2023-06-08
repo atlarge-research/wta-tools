@@ -110,18 +110,15 @@ public class WtaDriverPlugin implements DriverPlugin {
       log.error("Error initialising WTA plugin. Shutting down plugin");
     } else {
       removeListeners();
-      try (WtaWriter wtaWriter = new WtaWriter(outputFile, "schema-1.0")) {
-        List<Task> tasks = sparkDataSource.getRuntimeConfig().isStageLevel()
-            ? sparkDataSource.getStageLevelListener().getProcessedObjects()
-            : sparkDataSource.getTaskLevelListener().getProcessedObjects();
-        List<Workflow> workFlow = sparkDataSource.getJobLevelListener().getProcessedObjects();
-        Workload workLoad = sparkDataSource
-            .getApplicationLevelListener()
-            .getProcessedObjects()
-            .get(0);
-        wtaWriter.getTasksToWrite().addAll(tasks);
-        wtaWriter.getWorkflowsToWrite().addAll(workFlow);
-        wtaWriter.add(workLoad);
+      List<Task> tasks = sparkDataSource.getRuntimeConfig().isStageLevel()
+              ? sparkDataSource.getStageLevelListener().getProcessedObjects()
+              : sparkDataSource.getTaskLevelListener().getProcessedObjects();
+      List<Workflow> workFlow = sparkDataSource.getJobLevelListener().getProcessedObjects();
+      Workload workLoad = sparkDataSource
+              .getApplicationLevelListener()
+              .getProcessedObjects()
+              .get(0);
+      try (WtaWriter wtaWriter = new WtaWriter(outputFile, "schema-1.0", workLoad, workFlow, List.of(), tasks)) {
         wtaWriter.write();
       } catch (Exception e) {
         log.error("Error while writing to the generated files, {} : {}.", e.getClass(), e.getMessage());

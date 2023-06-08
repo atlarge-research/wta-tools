@@ -1,13 +1,11 @@
 package com.asml.apa.wta.core.model;
 
+import com.asml.apa.wta.core.io.ParquetSchema;
 import com.asml.apa.wta.core.model.enums.Domain;
-import java.util.Arrays;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
-import org.apache.avro.Schema;
-import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.GenericRecord;
 
 /**
@@ -63,66 +61,13 @@ public class Workflow implements BaseTraceObject {
    * Converts the POJO object into record object, enabling it to be written by Avro.
    * It will put all fields allowed by the checker into the record.
    *
-   * @param checker checker for which column to skip
    * @param schema schema
    * @return record
    * @since 1.0.0
    * @author Tianchen Qu
    */
-  @SuppressWarnings("CyclomaticComplexity")
-  public GenericRecord convertToRecord(Boolean[] checker, Schema schema) {
-    GenericData.Record record = new GenericData.Record(schema);
-    if (checker[0]) {
-      record.put("id", this.id);
-    }
-    if (checker[1]) {
-      record.put("ts_submit", this.submitTime);
-    }
-    if (checker[2]) {
-      record.put("tasks", Arrays.stream(this.tasks).map(Task::getId).toArray());
-    }
-    if (checker[3]) {
-      record.put("task_count", this.numberOfTasks);
-    }
-    if (checker[4]) {
-      record.put("critical_path_length", this.criticalPathLength);
-    }
-    if (checker[5]) {
-      record.put("critical_path_task_count", this.criticalPathTaskCount);
-    }
-    if (checker[6]) {
-      record.put("max_concurrent_tasks", this.maxNumberOfConcurrentTasks);
-    }
-    if (checker[7]) {
-      record.put("nfrs", this.nfrs);
-    }
-    if (checker[8]) {
-      record.put("scheduler", this.scheduler);
-    }
-    if (checker[9]) {
-      record.put("domain", this.domain);
-    }
-    if (checker[10]) {
-      record.put("application_name", this.applicationName);
-    }
-    if (checker[11]) {
-      record.put("application_field", this.applicationField);
-    }
-    if (checker[12]) {
-      record.put("total_resources", this.totalResources);
-    }
-    if (checker[13]) {
-      record.put("total_memory_usage", this.totalMemoryUsage);
-    }
-    if (checker[14]) {
-      record.put("total_network_usage", this.totalNetworkUsage);
-    }
-    if (checker[15]) {
-      record.put("total_disk_space_usage", this.totalDiskSpaceUsage);
-    }
-    if (checker[16]) {
-      record.put("total_energy_consumption", this.totalEnergyConsumption);
-    }
-    return record;
+  @Override
+  public GenericRecord convertToRecord(ParquetSchema schema) {
+    return schema.convertFromPojo(this, Workflow.class);
   }
 }

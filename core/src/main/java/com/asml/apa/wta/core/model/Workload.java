@@ -1,5 +1,6 @@
 package com.asml.apa.wta.core.model;
 
+import com.asml.apa.wta.core.io.ParquetSchema;
 import com.asml.apa.wta.core.model.enums.Domain;
 import lombok.Builder;
 import lombok.Data;
@@ -164,12 +165,12 @@ public class Workload implements BaseTraceObject {
 
   /**
    * This method shouldn't be called as it will be output into json file that doesn't require conversion to Record.
-   * @param checker checker
+   *
    * @param schema schema
    * @throws RuntimeException exception since this shouldn't be called
    */
   @Override
-  public GenericRecord convertToRecord(Boolean[] checker, Schema schema) {
+  public GenericRecord convertToRecord(ParquetSchema schema) {
     throw new RuntimeException("Something went wrong, this method shouldn't be called!");
   }
 }

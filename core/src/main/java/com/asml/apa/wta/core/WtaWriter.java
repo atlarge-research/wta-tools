@@ -2,6 +2,7 @@ package com.asml.apa.wta.core;
 
 import com.asml.apa.wta.core.io.JsonWriter;
 import com.asml.apa.wta.core.io.OutputFile;
+import com.asml.apa.wta.core.io.ParquetSchema;
 import com.asml.apa.wta.core.io.ParquetWriter;
 import com.asml.apa.wta.core.model.Resource;
 import com.asml.apa.wta.core.model.Task;
@@ -9,9 +10,7 @@ import com.asml.apa.wta.core.model.Workflow;
 import com.asml.apa.wta.core.model.Workload;
 import java.io.Flushable;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
-import lombok.Getter;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 
@@ -29,16 +28,13 @@ public class WtaWriter implements Flushable, AutoCloseable {
   private final ParquetWriter<Resource> resourceWriter;
   private final ParquetWriter<Workflow> workflowWriter;
 
-  private Workload workloadToWrite;
+  private final Workload workloadToWrite;
 
-  @Getter
-  private final List<Workflow> workflowsToWrite = new ArrayList<>();
+  private final List<Workflow> workflowsToWrite;
 
-  @Getter
-  private final List<Resource> resourcesToWrite = new ArrayList<>();
+  private final List<Resource> resourcesToWrite;
 
-  @Getter
-  private final List<Task> tasksToWrite = new ArrayList<>();
+  private final List<Task> tasksToWrite;
 
   /**
    * Sets up a WTA writer for the specified output path and version.
@@ -48,31 +44,19 @@ public class WtaWriter implements Flushable, AutoCloseable {
    * @author Atour Mousavi Gourabi
    * @since 1.0.0
    */
-  public WtaWriter(@NonNull OutputFile path, String version) throws IOException {
+  public WtaWriter(@NonNull OutputFile path, String version, Workload workload, List<Workflow> workflows, List<Resource> resources, List<Task> tasks) throws IOException {
     setupDirectories(path, version);
+    workloadToWrite = workload;
+    workflowsToWrite = workflows;
+    resourcesToWrite = resources;
+    tasksToWrite = tasks;
     workloadWriter =
         new JsonWriter<>(path.resolve("workload").resolve(version).resolve("generic_information.json"));
-    taskWriter = new ParquetWriter<>(path.resolve("tasks").resolve(version).resolve("task.parquet"), Task.class);
+    taskWriter = new ParquetWriter<>(path.resolve("tasks").resolve(version).resolve("task.parquet"), new ParquetSchema(Task.class, tasks, "tasks"));
     resourceWriter = new ParquetWriter<>(
-        path.resolve("resources").resolve(version).resolve("resource.parquet"), Resource.class);
+        path.resolve("resources").resolve(version).resolve("resource.parquet"), new ParquetSchema(Resource.class, resources, "resources"));
     workflowWriter = new ParquetWriter<>(
-        path.resolve("workflows").resolve(version).resolve("workflow.parquet"), Workflow.class);
-  }
-
-  public void add(Workload workload) {
-    workloadToWrite = workload;
-  }
-
-  public void add(Workflow workflow) {
-    workflowsToWrite.add(workflow);
-  }
-
-  public void add(Resource resource) {
-    resourcesToWrite.add(resource);
-  }
-
-  public void add(Task task) {
-    tasksToWrite.add(task);
+        path.resolve("workflows").resolve(version).resolve("workflow.parquet"), new ParquetSchema(Workflow.class, workflows, "workflows"));
   }
 
   public void write() {

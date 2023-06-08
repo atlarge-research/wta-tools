@@ -2,6 +2,8 @@ package com.asml.apa.wta.core.io;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+
+import com.asml.apa.wta.core.model.BaseTraceObject;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericData;
@@ -13,6 +15,7 @@ import org.apache.avro.io.DecoderFactory;
 import org.apache.avro.io.Encoder;
 import org.apache.avro.io.EncoderFactory;
 import org.apache.avro.reflect.ReflectData;
+import org.apache.avro.specific.SpecificData;
 import org.apache.parquet.avro.AvroParquetWriter;
 import org.apache.parquet.hadoop.ParquetFileWriter;
 import org.apache.parquet.hadoop.metadata.CompressionCodecName;
@@ -24,10 +27,10 @@ import org.apache.parquet.hadoop.metadata.CompressionCodecName;
  * @since 1.0.0
  */
 @Slf4j
-public class ParquetWriter<T> implements AutoCloseable {
+public class ParquetWriter<T extends BaseTraceObject> implements AutoCloseable {
 
-  private final org.apache.parquet.hadoop.ParquetWriter<GenericData.Record> writer;
-  private final Schema avroSchema;
+  private final org.apache.parquet.hadoop.ParquetWriter<GenericRecord> writer;
+  private final ParquetSchema parquetSchema;
 
   /**
    * Constructs a writer to write records to Parquet.
@@ -36,10 +39,10 @@ public class ParquetWriter<T> implements AutoCloseable {
    * @author Atour Mousavi Gourabi
    * @since 1.0.0
    */
-  public ParquetWriter(OutputFile path, Class<T> clazz) throws IOException {
-    avroSchema = ReflectData.get().getSchema(clazz);
-    writer = AvroParquetWriter.<GenericData.Record>builder(path.wrap())
-        .withSchema(avroSchema)
+  public ParquetWriter(OutputFile path, ParquetSchema schema) throws IOException {
+    parquetSchema = schema;
+    writer = AvroParquetWriter.<GenericRecord>builder(path.wrap())
+        .withSchema(schema.getAvroSchema())
         .withCompressionCodec(CompressionCodecName.SNAPPY)
         .withWriteMode(ParquetFileWriter.Mode.OVERWRITE)
         .build();
@@ -55,18 +58,7 @@ public class ParquetWriter<T> implements AutoCloseable {
    * @since 1.0.0
    */
   public void write(T record) throws IOException {
-    log.error("record written {}", record);
-    ByteArrayOutputStream out = new ByteArrayOutputStream();
-    Encoder encoder = EncoderFactory.get().binaryEncoder(out, null);
-
-    DatumWriter datumWriter = ReflectData.get().createDatumWriter(avroSchema);
-    datumWriter.write(record, encoder);
-    encoder.flush();
-
-    GenericDatumReader<GenericRecord> datumReader = new GenericDatumReader<>(avroSchema);
-    Decoder decoder = DecoderFactory.get().binaryDecoder(out.toByteArray(), null);
-
-    writer.write((GenericData.Record) datumReader.read(null, decoder));
+    writer.write(record.convertToRecord(parquetSchema));
   }
 
   @Override
