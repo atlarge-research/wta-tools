@@ -1,9 +1,7 @@
 package com.asml.apa.wta.core.model;
 
-import java.io.Serializable;
-
 import com.asml.apa.wta.core.io.ParquetSchema;
-import org.apache.avro.Schema;
+import java.io.Serializable;
 import org.apache.avro.generic.GenericRecord;
 
 /**

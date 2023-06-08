@@ -73,7 +73,8 @@ class WtaDriverPluginTest {
     assertThat(sut.isError()).isFalse();
     try {
       sut.shutdown();
-    } catch (Exception ignored) {}
+    } catch (Exception ignored) {
+    }
     verify(sut, times(1)).removeListeners();
   }
 

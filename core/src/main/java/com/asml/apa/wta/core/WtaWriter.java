@@ -44,7 +44,14 @@ public class WtaWriter implements Flushable, AutoCloseable {
    * @author Atour Mousavi Gourabi
    * @since 1.0.0
    */
-  public WtaWriter(@NonNull OutputFile path, String version, Workload workload, List<Workflow> workflows, List<Resource> resources, List<Task> tasks) throws IOException {
+  public WtaWriter(
+      @NonNull OutputFile path,
+      String version,
+      Workload workload,
+      List<Workflow> workflows,
+      List<Resource> resources,
+      List<Task> tasks)
+      throws IOException {
     setupDirectories(path, version);
     workloadToWrite = workload;
     workflowsToWrite = workflows;
@@ -52,11 +59,15 @@ public class WtaWriter implements Flushable, AutoCloseable {
     tasksToWrite = tasks;
     workloadWriter =
         new JsonWriter<>(path.resolve("workload").resolve(version).resolve("generic_information.json"));
-    taskWriter = new ParquetWriter<>(path.resolve("tasks").resolve(version).resolve("task.parquet"), new ParquetSchema(Task.class, tasks, "tasks"));
+    taskWriter = new ParquetWriter<>(
+        path.resolve("tasks").resolve(version).resolve("task.parquet"),
+        new ParquetSchema(Task.class, tasks, "tasks"));
     resourceWriter = new ParquetWriter<>(
-        path.resolve("resources").resolve(version).resolve("resource.parquet"), new ParquetSchema(Resource.class, resources, "resources"));
+        path.resolve("resources").resolve(version).resolve("resource.parquet"),
+        new ParquetSchema(Resource.class, resources, "resources"));
     workflowWriter = new ParquetWriter<>(
-        path.resolve("workflows").resolve(version).resolve("workflow.parquet"), new ParquetSchema(Workflow.class, workflows, "workflows"));
+        path.resolve("workflows").resolve(version).resolve("workflow.parquet"),
+        new ParquetSchema(Workflow.class, workflows, "workflows"));
   }
 
   public void write() {

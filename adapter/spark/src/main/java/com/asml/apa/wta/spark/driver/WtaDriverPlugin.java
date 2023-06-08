@@ -111,13 +111,13 @@ public class WtaDriverPlugin implements DriverPlugin {
     } else {
       removeListeners();
       List<Task> tasks = sparkDataSource.getRuntimeConfig().isStageLevel()
-              ? sparkDataSource.getStageLevelListener().getProcessedObjects()
-              : sparkDataSource.getTaskLevelListener().getProcessedObjects();
+          ? sparkDataSource.getStageLevelListener().getProcessedObjects()
+          : sparkDataSource.getTaskLevelListener().getProcessedObjects();
       List<Workflow> workFlow = sparkDataSource.getJobLevelListener().getProcessedObjects();
       Workload workLoad = sparkDataSource
-              .getApplicationLevelListener()
-              .getProcessedObjects()
-              .get(0);
+          .getApplicationLevelListener()
+          .getProcessedObjects()
+          .get(0);
       try (WtaWriter wtaWriter = new WtaWriter(outputFile, "schema-1.0", workLoad, workFlow, List.of(), tasks)) {
         wtaWriter.write();
       } catch (Exception e) {

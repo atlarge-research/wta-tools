@@ -1,6 +1,9 @@
 package com.asml.apa.wta.core.io;
 
-import com.asml.apa.wta.core.model.BaseTraceObject;
+import java.lang.reflect.Field;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.avro.Schema;
@@ -8,25 +11,21 @@ import org.apache.avro.SchemaBuilder;
 import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.GenericRecord;
 
-import java.lang.reflect.Field;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-
 @Slf4j
 public class ParquetSchema {
 
   @Getter
-  final private Schema avroSchema;
-  final private Map<String, String> fieldsToSchema = new HashMap<>();
+  private final Schema avroSchema;
+
+  private final Map<String, String> fieldsToSchema = new HashMap<>();
 
   public <T> ParquetSchema(Class<T> clazz, Collection<T> objects, String name) {
     String regex = "([a-z])([A-Z]+)";
     String replacement = "$1_$2";
     Field[] fields = clazz.getDeclaredFields();
     SchemaBuilder.FieldAssembler<Schema> schemaBuilder = SchemaBuilder.record(name)
-            .namespace("com.asml.apa.wta.core.model")
-            .fields();
+        .namespace("com.asml.apa.wta.core.model")
+        .fields();
     try {
       for (Field field : fields) {
         boolean sparseField = false;
@@ -38,7 +37,8 @@ public class ParquetSchema {
         }
         if (!sparseField) {
           Class<?> fieldType = field.getType();
-          String fieldName = field.getName().replaceAll(regex, replacement).toLowerCase();
+          String fieldName =
+              field.getName().replaceAll(regex, replacement).toLowerCase();
           if (String.class.isAssignableFrom(fieldType)) {
             schemaBuilder = schemaBuilder.requiredString(fieldName);
           } else if (Long.class.isAssignableFrom(fieldType)) {
@@ -52,7 +52,13 @@ public class ParquetSchema {
           } else if (Boolean.class.isAssignableFrom(fieldType)) {
             schemaBuilder = schemaBuilder.requiredBoolean(fieldName);
           } else if (long[].class.isAssignableFrom(fieldType)) {
-            schemaBuilder = schemaBuilder.name(fieldName).type().array().items().longType().noDefault();
+            schemaBuilder = schemaBuilder
+                .name(fieldName)
+                .type()
+                .array()
+                .items()
+                .longType()
+                .noDefault();
           } else {
             throw new IllegalAccessException();
           }

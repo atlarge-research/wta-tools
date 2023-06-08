@@ -1,21 +1,9 @@
 package com.asml.apa.wta.core.io;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-
 import com.asml.apa.wta.core.model.BaseTraceObject;
+import java.io.IOException;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.avro.Schema;
-import org.apache.avro.generic.GenericData;
-import org.apache.avro.generic.GenericDatumReader;
 import org.apache.avro.generic.GenericRecord;
-import org.apache.avro.io.DatumWriter;
-import org.apache.avro.io.Decoder;
-import org.apache.avro.io.DecoderFactory;
-import org.apache.avro.io.Encoder;
-import org.apache.avro.io.EncoderFactory;
-import org.apache.avro.reflect.ReflectData;
-import org.apache.avro.specific.SpecificData;
 import org.apache.parquet.avro.AvroParquetWriter;
 import org.apache.parquet.hadoop.ParquetFileWriter;
 import org.apache.parquet.hadoop.metadata.CompressionCodecName;
