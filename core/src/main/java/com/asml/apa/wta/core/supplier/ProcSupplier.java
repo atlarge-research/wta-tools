@@ -11,6 +11,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.SystemUtils;
 
 /**
@@ -19,6 +20,7 @@ import org.apache.commons.lang3.SystemUtils;
  * @author Lohithsai Yadala Chanchu
  * @since 1.0.0
  */
+@Slf4j
 public class ProcSupplier implements InformationSupplier<ProcDto> {
   private BashUtils bashUtils;
   private boolean isProcAvailable;
@@ -50,6 +52,8 @@ public class ProcSupplier implements InformationSupplier<ProcDto> {
   @Override
   public CompletableFuture<ProcDto> getSnapshot() {
     if (isProcAvailable) {
+      log.info("running snapshot");
+      log.info(SystemUtils.OS_NAME);
       CompletableFuture<Optional<Long>[]> diskStats = getDiskMetrics();
       CompletableFuture<Optional<Long>[]> memStats = getMemMetrics();
       CompletableFuture<Optional<String>> cpuModel = getCpuModel();
@@ -149,7 +153,7 @@ public class ProcSupplier implements InformationSupplier<ProcDto> {
    */
   private CompletableFuture<Optional<Long>[]> getMemMetrics() {
     CompletableFuture<String> memMetrics = bashUtils.executeCommand("cat /proc/meminfo");
-
+    log.info("getting mem metrics");
     return memMetrics.thenApply(result -> {
       Optional<Long>[] agg = (Optional<Long>[]) new Optional<?>[60];
       Arrays.fill(agg, Optional.empty());
@@ -172,6 +176,7 @@ public class ProcSupplier implements InformationSupplier<ProcDto> {
    */
   private CompletableFuture<Optional<Long>[]> getDiskMetrics() {
     CompletableFuture<String> diskMetrics = bashUtils.executeCommand("cat /proc/diskstats");
+    log.info("getting disk metrics");
 
     return diskMetrics.thenApply(result -> {
       Optional<Long>[] agg = (Optional<Long>[]) new Optional<?>[17];
@@ -199,7 +204,7 @@ public class ProcSupplier implements InformationSupplier<ProcDto> {
   private CompletableFuture<Optional<String>> getCpuModel() {
     CompletableFuture<String> cpuMetrics = bashUtils.executeCommand("cat /proc/cpuinfo");
     Pattern pattern = Pattern.compile("model name\\s+:\\s+([^\\n]+)");
-
+    log.info("getting cpu metrics");
     return cpuMetrics.thenApply(result -> {
       if (result != null) {
         Matcher matcher = pattern.matcher(result);
@@ -221,7 +226,7 @@ public class ProcSupplier implements InformationSupplier<ProcDto> {
    */
   private CompletableFuture<Optional<Double>[]> getLoadAvgMetrics() {
     CompletableFuture<String> loadAvgMetrics = bashUtils.executeCommand("cat /proc/loadavg");
-
+    log.info("getting load metrics");
     Pattern pattern = Pattern.compile("\\d+(?:\\.\\d+)?");
 
     return loadAvgMetrics.thenApply(result -> {
