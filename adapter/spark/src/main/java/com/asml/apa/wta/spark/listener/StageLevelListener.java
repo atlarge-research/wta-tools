@@ -43,14 +43,13 @@ public class StageLevelListener extends TaskStageBaseListener {
   @Override
   public void onStageCompleted(SparkListenerStageCompleted stageCompleted) {
     final StageInfo curStageInfo = stageCompleted.stageInfo();
-    final int stageId = curStageInfo.stageId();
     final TaskMetrics curStageMetrics = curStageInfo.taskMetrics();
 
-    final int stageId = curStageInfo.stageId() + 1;
+    final int stageId = curStageInfo.stageId();
     final Long submitTime = curStageInfo.submissionTime().getOrElse(() -> -1L);
     final long runTime = curStageMetrics.executorRunTime();
     final int userId = sparkContext.sparkUser().hashCode();
-    final long workflowId = stageIdsToJobs.get(stageId);
+    final long workflowId = stageIdsToJobs.get(stageId+1);
 
     final Integer[] parentIds = JavaConverters.seqAsJavaList(
             curStageInfo.parentIds().toList())
