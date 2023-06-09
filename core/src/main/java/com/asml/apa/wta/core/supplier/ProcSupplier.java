@@ -11,6 +11,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.SystemUtils;
 
@@ -280,18 +282,9 @@ public class ProcSupplier implements InformationSupplier<ProcDto> {
    * @since 1.0.0
    */
   private List<Long> parseMemMetrics(String input) {
-    List<Long> numbersList = new ArrayList<>();
-
     String[] lines = input.split("\n");
     Pattern pattern = Pattern.compile("\\b\\d+\\b");
-    for (String line : lines) {
-      Matcher matcher = pattern.matcher(line);
-      while (matcher.find()) {
-        try {
-          long number = Long.parseLong(matcher.group());
-          numbersList.add(number);
-        } catch (NumberFormatException e) {
-          log.error("There was an error parsing the contents of the /proc/meminfo file");
+
     List<Long> numbersList = Arrays.stream(lines)
             .flatMap(line -> pattern.matcher(line).results())
             .map(matchResult -> {
@@ -303,8 +296,6 @@ public class ProcSupplier implements InformationSupplier<ProcDto> {
               }
             })
             .collect(Collectors.toList());
-      }
-    }
     return numbersList;
   }
 }
