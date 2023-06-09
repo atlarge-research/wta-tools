@@ -184,8 +184,12 @@ public class ProcSupplier implements InformationSupplier<ProcDto> {
         List<List<String>> parsedList = parseDiskMetrics(result);
         for (int outer = 0; outer < parsedList.size(); outer++) {
           for (int inner = 3; inner < parsedList.get(0).size(); inner++) {
-            agg[inner - 3] = Optional.of(agg[inner - 3].orElse(0L)
-                + Long.parseLong(parsedList.get(outer).get(inner)));
+            try {
+              agg[inner - 3] = Optional.of(agg[inner - 3].orElse(0L)
+                  + Long.parseLong(parsedList.get(outer).get(inner)));
+            } catch (NumberFormatException e) {
+              log.error("There was an error parsing the contents of the /proc/diskstats file");
+            }
           }
         }
       }
@@ -221,7 +225,7 @@ public class ProcSupplier implements InformationSupplier<ProcDto> {
   private CompletableFuture<Optional<Double>[]> getLoadAvgMetrics() {
     CompletableFuture<String> loadAvgMetrics = bashUtils.executeCommand("cat /proc/loadavg");
 
-    Pattern pattern = Pattern.compile("\\d+(?:\\.\\d+)?");
+    Pattern pattern = Pattern.compile("\\d+(?:[.,]\\d+)?");
 
     return loadAvgMetrics.thenApply(result -> {
       Optional<Double>[] agg = (Optional<Double>[]) new Optional<?>[6];
@@ -230,8 +234,13 @@ public class ProcSupplier implements InformationSupplier<ProcDto> {
         Matcher matcher = pattern.matcher(result);
         int index = 0;
         while (matcher.find()) {
-          agg[index] = Optional.of(Double.parseDouble(matcher.group()));
-          index++;
+          try {
+            agg[index] =
+                Optional.of(Double.parseDouble(matcher.group().replace(',', '.')));
+            index++;
+          } catch (NumberFormatException e) {
+            log.error("There was an error parsing the contents of the /proc/loadavg file");
+          }
         }
       }
       return agg;
@@ -278,8 +287,12 @@ public class ProcSupplier implements InformationSupplier<ProcDto> {
     for (String line : lines) {
       Matcher matcher = pattern.matcher(line);
       while (matcher.find()) {
-        long number = Long.parseLong(matcher.group());
-        numbersList.add(number);
+        try {
+          long number = Long.parseLong(matcher.group());
+          numbersList.add(number);
+        } catch (NumberFormatException e) {
+          log.error("There was an error parsing the contents of the /proc/meminfo file");
+        }
       }
     }
     return numbersList;

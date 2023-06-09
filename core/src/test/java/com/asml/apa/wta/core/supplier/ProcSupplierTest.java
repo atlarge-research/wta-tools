@@ -29,7 +29,7 @@ public class ProcSupplierTest {
         .when(bashUtils)
         .executeCommand("grep -m 1 \"model name\" /proc/cpuinfo | awk -F: '{print $2}' | sed 's/^[ \\t]*//'");
 
-    doReturn(CompletableFuture.completedFuture("0.62 1.23 1.02 1/479 278339"))
+    doReturn(CompletableFuture.completedFuture("0,62 1.23 1.02 1/479 278339"))
         .when(bashUtils)
         .executeCommand("cat /proc/loadavg");
     ProcSupplier sut = new ProcSupplier(bashUtils);
