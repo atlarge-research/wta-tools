@@ -11,6 +11,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.SystemUtils;
 
@@ -157,13 +159,11 @@ public class ProcSupplier implements InformationSupplier<ProcDto> {
     CompletableFuture<String> memMetrics = bashUtils.executeCommand("cat /proc/meminfo");
 
     return memMetrics.thenApply(result -> {
-      Optional<Long>[] agg = (Optional<Long>[]) new Optional<?>[60];
-      Arrays.fill(agg, Optional.empty());
+      Optional<Long>[] agg = Stream.generate(Optional::empty).limit(60).toArray(Optional[]::new);
+
       if (result != null) {
         List<Long> parsedList = parseMemMetrics(result);
-        for (int i = 0; i < parsedList.size(); i++) {
-          agg[i] = Optional.of(parsedList.get(i));
-        }
+        IntStream.range(0, parsedList.size()).forEach(i -> agg[i] = Optional.of(parsedList.get(i)));
       }
       return agg;
     });
@@ -184,8 +184,9 @@ public class ProcSupplier implements InformationSupplier<ProcDto> {
       Arrays.fill(agg, Optional.empty());
       if (result != null) {
         List<List<String>> parsedList = parseDiskMetrics(result);
+        int rowLength = parsedList.get(0).size();
         for (int outer = 0; outer < parsedList.size(); outer++) {
-          for (int inner = 3; inner < parsedList.get(0).size(); inner++) {
+          for (int inner = 3; inner < rowLength; inner++) {
             try {
               agg[inner - 3] = Optional.of(agg[inner - 3].orElse(0L)
                   + Long.parseLong(parsedList.get(outer).get(inner)));
@@ -210,7 +211,7 @@ public class ProcSupplier implements InformationSupplier<ProcDto> {
     CompletableFuture<String> cpuMetrics = bashUtils.executeCommand(
         "grep -m 1 \"model name\" /proc/cpuinfo | awk -F: '{print $2}' | sed 's/^[ \\t]*//'");
     return cpuMetrics.thenApply(result -> {
-      if (result != null && !result.equals("")) {
+      if (result != null && !result.isEmpty()) {
         return Optional.of(result);
       }
       return Optional.empty();
