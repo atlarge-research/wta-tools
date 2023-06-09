@@ -3,7 +3,6 @@ package com.asml.apa.wta.spark.listener;
 import com.asml.apa.wta.core.config.RuntimeConfig;
 import com.asml.apa.wta.core.model.Task;
 import com.asml.apa.wta.core.model.Workflow;
-import com.asml.apa.wta.core.model.enums.Domain;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.Getter;
@@ -65,7 +64,6 @@ public class JobLevelListener extends AbstractListener<Workflow> {
     final int numTasks = tasks.length;
     // we can also get the mode from the config, if that's what the user wants?
     final String scheduler = "DAGScheduler";
-    final Domain domain = config.getDomain();
     final String appName = sparkContext.appName();
 
     // unknown
@@ -90,7 +88,6 @@ public class JobLevelListener extends AbstractListener<Workflow> {
             .maxNumberOfConcurrentTasks(maxNumberOfConcurrentTasks)
             .nfrs(nfrs)
             .scheduler(scheduler)
-            .domain(domain)
             .applicationName(appName)
             .applicationField(applicationField)
             .totalResources(totalResources)
