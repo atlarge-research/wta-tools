@@ -28,8 +28,7 @@ public class EndToEnd {
    * @author Pil Kyu Cho
    * @since 1.0.0
    */
-  private static void invokeJob() {
-    System.out.println("Starting Spark job...");
+  private static void sparkOperations() {
     JavaRDD<String> words =
         testFile.flatMap(line -> Arrays.asList(line.split(" ")).iterator());
     JavaRDD<String> wordsWithSpark = words.filter(word -> word.contains("the"));
@@ -62,7 +61,7 @@ public class EndToEnd {
     SparkContext sc = spark.sparkContext();
     testFile = JavaSparkContext.fromSparkContext(sc).textFile(args[1]);
     for (int i = 0; i < 100; i++) {
-      invokeJob();
+      sparkOperations();
     }
     sc.stop();
   }
