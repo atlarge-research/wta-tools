@@ -4,7 +4,6 @@ import com.asml.apa.wta.core.WtaWriter;
 import com.asml.apa.wta.core.config.RuntimeConfig;
 import com.asml.apa.wta.core.io.DiskOutputFile;
 import com.asml.apa.wta.core.io.OutputFile;
-import com.asml.apa.wta.core.logger.Log4j2Configuration;
 import com.asml.apa.wta.core.model.Task;
 import com.asml.apa.wta.core.model.Workflow;
 import com.asml.apa.wta.core.model.Workload;
@@ -60,7 +59,6 @@ public class WtaDriverPlugin implements DriverPlugin {
     Map<String, String> executorVars = new HashMap<>();
     try {
       RuntimeConfig runtimeConfig = RuntimeConfig.readConfig();
-      Log4j2Configuration.setUpLoggingConfig(runtimeConfig);
       sparkDataSource = new SparkDataSource(sparkCtx, runtimeConfig);
       metricStreamingEngine = new MetricStreamingEngine();
       outputFile = new DiskOutputFile(Path.of(runtimeConfig.getOutputPath()));
