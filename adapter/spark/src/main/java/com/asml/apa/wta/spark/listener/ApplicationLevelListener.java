@@ -1,11 +1,15 @@
 package com.asml.apa.wta.spark.listener;
 
 import com.asml.apa.wta.core.config.RuntimeConfig;
+import com.asml.apa.wta.core.model.Task;
 import com.asml.apa.wta.core.model.Workflow;
 import com.asml.apa.wta.core.model.Workload;
 import com.asml.apa.wta.core.model.enums.Domain;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import lombok.Getter;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.spark.SparkContext;
 import org.apache.spark.scheduler.SparkListenerApplicationEnd;
 import org.apache.spark.scheduler.SparkListenerApplicationStart;
@@ -17,12 +21,17 @@ import org.apache.spark.scheduler.SparkListenerApplicationStart;
  *
  * @author Pil Kyu Cho
  * @author Henry Page
+ * @author Tianchen Qu
  * @since 1.0.0
  */
 @Getter
 public class ApplicationLevelListener extends AbstractListener<Workload> {
 
-  private final AbstractListener<Workflow> jobLevelListener;
+  private final JobLevelListener jobLevelListener;
+
+  private final TaskLevelListener taskLevelListener;
+
+  private final StageLevelListener stageLevelListener;
 
   /**
    * Constructor for the application-level listener.
@@ -30,13 +39,21 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
    * @param sparkContext The current spark context
    * @param config Additional config specified by the user for the plugin
    * @param jobLevelListener The job-level listener to be used by this listener
+   * @param taskLevelListener The task-level listener to be used by this listener
+   * @param stageLevelListener The stage-level listener to be used by this listener
    * @author Henry Page
    * @since 1.0.0
    */
   public ApplicationLevelListener(
-      SparkContext sparkContext, RuntimeConfig config, AbstractListener<Workflow> jobLevelListener) {
+      SparkContext sparkContext,
+      RuntimeConfig config,
+      JobLevelListener jobLevelListener,
+      TaskLevelListener taskLevelListener,
+      StageLevelListener stageLevelListener) {
     super(sparkContext, config);
     this.jobLevelListener = jobLevelListener;
+    this.taskLevelListener = taskLevelListener;
+    this.stageLevelListener = stageLevelListener;
   }
 
   /**
@@ -49,6 +66,7 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
 
     // we should enver enter this branch, this is a guard since an application
     // only terminates once.
+    List<Workload> processedObjects = this.getProcessedObjects();
     if (!processedObjects.isEmpty()) {
       return;
     }
@@ -62,6 +80,28 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
     final long endDate = applicationEnd.time();
     final String[] authors = config.getAuthors();
     final String workloadDescription = config.getDescription();
+    for (Task task : taskLevelListener.getProcessedObjects()) {
+      final int stageId = taskLevelListener.getTaskToStage().get(task.getId());
+      final Integer[] parentStages =
+          stageLevelListener.getStageToParents().get(stageId);
+      if (parentStages != null) {
+        final Long[] parents = Arrays.stream(parentStages)
+            .flatMap(x -> Arrays.stream(
+                taskLevelListener.getStageToTasks().get(x).toArray(new Long[0])))
+            .toArray(size -> new Long[size]);
+        task.setParents(ArrayUtils.toPrimitive(parents));
+      }
+
+      List<Integer> childrenStages =
+          stageLevelListener.getParentToChildren().get(stageId);
+      if (childrenStages != null) {
+        List<Long> children = new ArrayList<>();
+        childrenStages.forEach(
+            x -> children.addAll(taskLevelListener.getStageToTasks().get(x)));
+        Long[] temp = children.toArray(new Long[0]);
+        task.setChildren(ArrayUtils.toPrimitive(temp));
+      }
+    }
 
     // unknown
     final long numSites = -1L;

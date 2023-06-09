@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
+import lombok.Setter;
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.GenericRecord;
@@ -37,9 +38,11 @@ public class Task implements BaseTraceObject {
 
   private final double resourceAmountRequested;
 
-  private final long[] parents;
+  @Setter
+  private long[] parents;
 
-  private final long[] children;
+  @Setter
+  private long[] children;
 
   private final int userId;
 
