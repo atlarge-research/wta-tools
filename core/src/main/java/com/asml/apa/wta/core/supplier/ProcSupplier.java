@@ -13,6 +13,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.SystemUtils;
 
@@ -180,17 +181,15 @@ public class ProcSupplier implements InformationSupplier<ProcDto> {
     CompletableFuture<String> diskMetrics = bashUtils.executeCommand("cat /proc/diskstats");
 
     return diskMetrics.thenApply(result -> {
-      Optional<Long>[] agg = Stream.generate(Optional::empty)
-              .limit(17)
-              .toArray(Optional[]::new);
+      Optional<Long>[] agg = Stream.generate(Optional::empty).limit(17).toArray(Optional[]::new);
       if (result != null) {
-        List<List<String>> parsedList = parseDiskMetrics(result);
-        int rowLength = parsedList.get(0).size();
-        for (List<String> strings : parsedList) {
+        NestedList parsedList = parseDiskMetrics(result);
+        int rowLength = parsedList.getNestedList().get(0).size();
+        for (List<String> strings : parsedList.getNestedList()) {
           for (int inner = 3; inner < rowLength; inner++) {
             try {
-              agg[inner - 3] = Optional.of(agg[inner - 3].orElse(0L)
-                      + Long.parseLong(strings.get(inner)));
+              agg[inner - 3] =
+                  Optional.of(agg[inner - 3].orElse(0L) + Long.parseLong(strings.get(inner)));
             } catch (NumberFormatException e) {
               log.error("There was an error parsing the contents of the /proc/diskstats file");
             }
@@ -236,7 +235,7 @@ public class ProcSupplier implements InformationSupplier<ProcDto> {
       Arrays.fill(agg, Optional.empty());
       if (result != null) {
         Matcher matcher = pattern.matcher(result);
-        for(int index = 0; index<agg.length && matcher.find(); index++) {
+        for (int index = 0; index < agg.length && matcher.find(); index++) {
           try {
             agg[index] =
                 Optional.of(Double.parseDouble(matcher.group().replace(',', '.')));
@@ -256,8 +255,8 @@ public class ProcSupplier implements InformationSupplier<ProcDto> {
    * @author Lohithsai Yadala Chanchu
    * @since 1.0.0
    */
-  private List<List<String>> parseDiskMetrics(String input) {
-    List<List<String>> result = new ArrayList<>();
+  private NestedList parseDiskMetrics(String input) {
+    NestedList result = new NestedList();
     Scanner scanner = new Scanner(input);
 
     while (scanner.hasNextLine()) {
@@ -268,7 +267,7 @@ public class ProcSupplier implements InformationSupplier<ProcDto> {
       for (String token : tokens) {
         sublist.add(token);
       }
-      result.add(sublist);
+      result.getNestedList().add(sublist);
     }
 
     return result;
@@ -297,5 +296,14 @@ public class ProcSupplier implements InformationSupplier<ProcDto> {
         })
         .collect(Collectors.toList());
     return numbersList;
+  }
+
+  @Data
+  private class NestedList {
+    private List<List<String>> nestedList;
+
+    NestedList() {
+      this.nestedList = new ArrayList<>();
+    }
   }
 }

@@ -46,10 +46,10 @@ public class EndToEnd {
   public static void main(String[] args) {
     SparkConf conf = new SparkConf().setAppName("SystemTest").setMaster("local[1]");
     conf.set("spark.plugins", "com.asml.apa.wta.spark.WtaPlugin");
-    System.setProperty("configFile", args[0]);
+    System.setProperty("configFile", "adapter/spark/src/test/resources/config.json");
     SparkSession spark = SparkSession.builder().config(conf).getOrCreate();
     SparkContext sc = spark.sparkContext();
-    testFile = JavaSparkContext.fromSparkContext(sc).textFile(args[1]);
+    testFile = JavaSparkContext.fromSparkContext(sc).textFile("adapter/spark/src/test/resources/wordcount.txt");
     for (int i = 0; i < 10; i++) {
       invokeJob();
     }
