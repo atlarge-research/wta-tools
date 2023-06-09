@@ -96,7 +96,7 @@ public class ParquetSchema {
     } catch (IllegalAccessException e) {
       log.error("Could not convert to Avro record {}.", e.getMessage());
     }
-    log.info("Converted record {}", record);
+    log.debug("Converted record {}", record);
     return record;
   }
 }

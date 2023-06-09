@@ -61,6 +61,7 @@ public class DiskOutputFile implements OutputFile {
    */
   @Override
   public org.apache.parquet.io.OutputFile wrap() {
+    log.info("wrap {}", this);
     return new DiskParquetOutputFile(file);
   }
 
