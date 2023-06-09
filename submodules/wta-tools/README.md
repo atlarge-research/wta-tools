@@ -1,11 +1,11 @@
-## This script (wta-tools) is based on the work of Laurens Versluis[@lfdversluis](https://github.com/lfdversluis) and [@JaroAmsterdam](https://github.com/JaroAmsterdam)
-## The github repo for the original script: https://github.com/atlarge-research/wta-tools
+## wta-tools is based on the work of Laurens Versluis[@lfdversluis](https://github.com/lfdversluis) and [@JaroAmsterdam](https://github.com/JaroAmsterdam)
+## The github repo for the script: https://github.com/atlarge-research/wta-tools
 
 # wta-tools
-This directory provides the tool for validating the Spark plugin parquet output in the WTA format. You can find the WTA format schema at: https://wta.atlarge-research.com/traceformat.html
+wta-tools validates the Spark plugin parquet output in the WTA format. You can find the WTA format schema at: https://wta.atlarge-research.com/traceformat.html
 
 ## Running wta-tools
-The instructions below are meant for running tool in any environment.
+The instructions below are meant for running the tool in any environment.
 
 ### Requirements
 Ensure that you have the following tools installed and environment path variables set:
@@ -28,12 +28,14 @@ Furthermore, you need to have the WTA trace parquet files as the following direc
         schema-1.0
             resource.parquet    
 ```
-
-### Download the submodule
-Download this submodule separately from the repo using the instructions specified in the [README](../README.md). 
+### Download script
+Download the script from the github repo:
+```
+git clone https://github.com/atlarge-research/wta-tools
+```
 
 ### Create virtual environment and install dependencies
-This script makes use of third-party libraries to run the script, thus a virtual environment is needed. These dependencies are specified in the `requirements.txt` file. To create a virtual environment, run the following command:
+The script makes use of third-party libraries, thus a virtual environment is needed. To create a virtual environment, run the following command:
 
 ```bash
 cd wta-tools
@@ -50,6 +52,15 @@ source venv/bin/activate
 For Windows system:
 ```bash
 source venv/Scripts/activate
+```
+
+Create `requirements.txt` file in the root directory and add the following dependencies:
+```
+numpy>=1.24.3
+pandas>=2.0.1
+pyarrow>=12.0.0
+pyspark==3.2.4
+toposort>=1.10
 ```
 
 Verify that you are inside the virtual environment and install the dependencies:
