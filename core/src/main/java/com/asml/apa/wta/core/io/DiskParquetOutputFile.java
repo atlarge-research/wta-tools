@@ -91,7 +91,7 @@ public class DiskParquetOutputFile implements OutputFile {
        */
       @Override
       public void write(byte[] data) throws IOException {
-        log.info("write {}", data);
+        log.debug("Write {}.", data);
         pos += data.length;
         stream.write(data);
       }
@@ -110,7 +110,7 @@ public class DiskParquetOutputFile implements OutputFile {
        */
       @Override
       public void write(byte[] data, int off, int len) throws IOException {
-        log.info("write {}", data);
+        log.debug("Write {}.", data);
         pos += len;
         stream.write(data, off, len);
       }
