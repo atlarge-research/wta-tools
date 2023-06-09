@@ -29,12 +29,14 @@ public class EndToEnd {
    * @since 1.0.0
    */
   private static void invokeJob() {
-    JavaRDD<String> words = testFile.flatMap(line -> Arrays.asList(line.split(" ")).iterator());
-    JavaRDD<String> wordsWithSpark = words.filter(word -> word.contains("Spark"));
+    System.out.println("Starting Spark job...");
+    JavaRDD<String> words =
+        testFile.flatMap(line -> Arrays.asList(line.split(" ")).iterator());
+    JavaRDD<String> wordsWithSpark = words.filter(word -> word.contains("the"));
     JavaRDD<String> upperCaseWords = wordsWithSpark.map(String::toUpperCase);
     upperCaseWords.count();
-    upperCaseWords.reduce((word1, word2) -> word1.length() > word2.length() ? word1 : word2).length();
-    JavaPairRDD<String, Integer> wordLengthPairs = upperCaseWords.mapToPair(word -> new Tuple2<>(word, word.length()));
+    JavaPairRDD<String, Integer> wordLengthPairs =
+        upperCaseWords.mapToPair(word -> new Tuple2<>(word, word.length()));
     JavaPairRDD<String, Tuple2<Integer, Integer>> joinedPairs = wordLengthPairs.join(wordLengthPairs);
     JavaPairRDD<String, Iterable<Tuple2<Integer, Integer>>> groupedPairs = joinedPairs.groupByKey();
     groupedPairs.reduceByKey((a, b) -> a).collect();
@@ -50,14 +52,18 @@ public class EndToEnd {
    * @since 1.0.0
    */
   public static void main(String[] args) {
-    SparkConf conf = new SparkConf().setAppName("SystemTest").setMaster("local[1]");
+    SparkConf conf = new SparkConf().setAppName("SystemTest").setMaster("local");
     conf.set("spark.plugins", "com.asml.apa.wta.spark.WtaPlugin");
-    conf.set("spark.sql.shuffle.partitions", "500");  // increase number of shuffle partitions to distribute workload more evenly across the cluster.
+    conf.set(
+        "spark.sql.shuffle.partitions",
+        "500"); // increase number of shuffle partitions to distribute workload more evenly across the cluster.
     System.setProperty("configFile", args[0]);
     SparkSession spark = SparkSession.builder().config(conf).getOrCreate();
     SparkContext sc = spark.sparkContext();
     testFile = JavaSparkContext.fromSparkContext(sc).textFile(args[1]);
-    invokeJob();
+    for (int i = 0; i < 100; i++) {
+      invokeJob();
+    }
     sc.stop();
   }
 }
