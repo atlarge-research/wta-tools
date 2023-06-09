@@ -4,7 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.doReturn;
 
 import com.asml.apa.wta.core.dto.IostatDto;
-import com.asml.apa.wta.core.utils.BashUtils;
+import com.asml.apa.wta.core.utils.ShellUtils;
 import java.util.concurrent.CompletableFuture;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -12,20 +12,20 @@ import org.mockito.Mockito;
 
 public class IostatSupplierTest {
 
-  BashUtils bashUtils;
+  ShellUtils shellUtils;
   IostatSupplier sut;
 
   @BeforeEach
   void setup() {
-    bashUtils = Mockito.mock(BashUtils.class);
-    doReturn(CompletableFuture.completedFuture("str")).when(bashUtils).executeCommand("iostat");
-    sut = Mockito.spy(new IostatSupplier(bashUtils));
+    shellUtils = Mockito.mock(ShellUtils.class);
+    doReturn(CompletableFuture.completedFuture("str")).when(shellUtils).executeCommand("iostat");
+    sut = Mockito.spy(new IostatSupplier(shellUtils));
   }
 
   @Test
   public void getSnapshotReturnsIostatDto() {
     doReturn(CompletableFuture.completedFuture("str 1.0 2.0 3.0 4.0 5.0 6.0 7.0"))
-        .when(bashUtils)
+        .when(shellUtils)
         .executeCommand("iostat -d | awk '$1 == \"sdc\"'");
 
     IostatDto expected = IostatDto.builder()

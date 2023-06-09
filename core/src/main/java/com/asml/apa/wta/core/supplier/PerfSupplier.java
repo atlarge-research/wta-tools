@@ -1,8 +1,9 @@
 package com.asml.apa.wta.core.supplier;
 
 import com.asml.apa.wta.core.dto.PerfDto;
-import com.asml.apa.wta.core.utils.BashUtils;
+import com.asml.apa.wta.core.utils.ShellUtils;
 import java.util.concurrent.CompletableFuture;
+
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -15,19 +16,19 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class PerfSupplier implements InformationSupplier<PerfDto> {
 
-  private final BashUtils bashUtils;
+  private final ShellUtils shellUtils;
 
   private final boolean isAvailable;
 
   /**
    * Constructs a {@code perf} data source.
    *
-   * @param bashUtils the {@link BashUtils} to inject.
+   * @param shellUtils the {@link ShellUtils} to inject.
    * @author Atour Mousavi Gourabi
    * @since 1.0.0
    */
-  public PerfSupplier(BashUtils bashUtils) {
-    this.bashUtils = bashUtils;
+  public PerfSupplier(ShellUtils shellUtils) {
+    this.shellUtils = shellUtils;
     this.isAvailable = isAvailable();
   }
 
@@ -42,12 +43,12 @@ public class PerfSupplier implements InformationSupplier<PerfDto> {
   @Override
   public boolean isAvailable() {
     try {
-      return bashUtils
+      return shellUtils
           .executeCommand("perf list | grep -w 'power/energy-pkg/' | awk '{print $1}'")
           .get()
           .equals("power/energy-pkg/");
     } catch (Exception e) {
-      log.error("Something went wrong while trying to execute the bash command.");
+      log.error("Something went wrong while trying to execute the shell command.");
       return false;
     }
   }
@@ -88,7 +89,7 @@ public class PerfSupplier implements InformationSupplier<PerfDto> {
    * @since 1.0.0
    */
   public CompletableFuture<String> gatherMetrics() {
-    return bashUtils.executeCommand("perf stat -e power/energy-pkg/ -a sleep 1 2>&1 | "
+    return shellUtils.executeCommand("perf stat -e power/energy-pkg/ -a sleep 1 2>&1 | "
         + "grep -oP '^\\s+\\K[0-9]+[,\\.][0-9]+(?=\\s+Joules)' | sed 's/,/./g'");
   }
 }

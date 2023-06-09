@@ -5,7 +5,7 @@ import com.asml.apa.wta.core.dto.DstatDto;
 import com.asml.apa.wta.core.dto.IostatDto;
 import com.asml.apa.wta.core.dto.OsInfoDto;
 import com.asml.apa.wta.core.dto.PerfDto;
-import com.asml.apa.wta.core.utils.BashUtils;
+import com.asml.apa.wta.core.utils.ShellUtils;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -14,6 +14,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+
 import lombok.Getter;
 
 /**
@@ -50,12 +51,12 @@ public abstract class SupplierExtractionEngine<T extends BaseSupplierDto> {
    * @since 1.0.0
    */
   public SupplierExtractionEngine(int resourcePingInterval) {
-    BashUtils bashUtils = new BashUtils();
+    ShellUtils shellUtils = new ShellUtils();
     this.resourcePingInterval = resourcePingInterval;
     this.operatingSystemSupplier = new OperatingSystemSupplier();
-    this.iostatSupplier = new IostatSupplier(bashUtils);
-    this.dstatSupplier = new DstatSupplier(bashUtils);
-    this.perfSupplier = new PerfSupplier(bashUtils);
+    this.iostatSupplier = new IostatSupplier(shellUtils);
+    this.dstatSupplier = new DstatSupplier(shellUtils);
+    this.perfSupplier = new PerfSupplier(shellUtils);
   }
 
   /**
