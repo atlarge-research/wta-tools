@@ -2,10 +2,8 @@ package com.asml.apa.wta.core.model;
 
 import com.asml.apa.wta.core.io.ParquetSchema;
 import com.asml.apa.wta.core.model.enums.Domain;
-import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Data;
-import lombok.Getter;
 import org.apache.avro.generic.GenericRecord;
 
 /**
@@ -20,42 +18,39 @@ public class Workflow implements BaseTraceObject {
 
   private static final long serialVersionUID = 9065743819019553490L;
 
-  @Getter(value = AccessLevel.NONE)
-  private final String schemaVersion = this.getSchemaVersion();
+  public final long id;
 
-  private final long id;
+  public final long submitTime;
 
-  private final long submitTime;
+  public final Task[] tasks;
 
-  private final Task[] tasks;
+  public final int numberOfTasks;
 
-  private final int numberOfTasks;
+  public final long criticalPathLength;
 
-  private final long criticalPathLength;
+  public final int criticalPathTaskCount;
 
-  private final int criticalPathTaskCount;
+  public final int maxNumberOfConcurrentTasks;
 
-  private final int maxNumberOfConcurrentTasks;
+  public final String nfrs;
 
-  private final String nfrs;
+  public final String scheduler;
 
-  private final String scheduler;
+  public final Domain domain;
 
-  private final Domain domain;
+  public final String applicationName;
 
-  private final String applicationName;
+  public final String applicationField;
 
-  private final String applicationField;
+  public final double totalResources;
 
-  private final double totalResources;
+  public final double totalMemoryUsage;
 
-  private final double totalMemoryUsage;
+  public final long totalNetworkUsage;
 
-  private final long totalNetworkUsage;
+  public final double totalDiskSpaceUsage;
 
-  private final double totalDiskSpaceUsage;
-
-  private final double totalEnergyConsumption;
+  public final double totalEnergyConsumption;
 
   /**
    * Converts the POJO object into record object, enabling it to be written by Avro.

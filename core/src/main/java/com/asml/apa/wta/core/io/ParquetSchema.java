@@ -32,13 +32,12 @@ public class ParquetSchema {
       for (Field field : fields) {
         boolean sparseField = false;
         for (T o : objects) {
-          if (field.get(o) == null) {
+          if (!field.canAccess(o) && field.get(o) == null) {
             sparseField = true;
             break;
           }
         }
         if (!sparseField) {
-          field.setAccessible(true);
           Class<?> fieldType = field.getType();
           String fieldName =
               field.getName().replaceAll(regex, replacement).toLowerCase();
