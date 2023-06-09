@@ -72,7 +72,6 @@ public class ParquetSchema {
         }
       }
       avroSchema = schemaBuilder.endRecord();
-      log.info("Schema generated: {}", avroSchema.toString(true));
     } catch (IllegalAccessException e) {
       log.error("Could not create a valid schema for {} in {}.", e.getMessage(), clazz);
       throw new RuntimeException("Could not create a valid schema for " + clazz, e);
@@ -92,12 +91,12 @@ public class ParquetSchema {
                 .toArray();
           }
           record.put(fieldsToSchema.get(field.getName()), o);
-          log.info("{} : {}", field.getName(), fieldsToSchema.get(field.getName()));
         }
       }
     } catch (IllegalAccessException e) {
       log.error("Could not convert to Avro record {}.", e.getMessage());
     }
+    log.info("Converted record {}", record);
     return record;
   }
 }
