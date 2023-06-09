@@ -1,6 +1,8 @@
 package com.asml.apa.wta.core.io;
 
+import com.asml.apa.wta.core.model.Task;
 import java.lang.reflect.Field;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -51,7 +53,7 @@ public class ParquetSchema {
             schemaBuilder = schemaBuilder.requiredFloat(fieldName);
           } else if (Boolean.class.isAssignableFrom(fieldType)) {
             schemaBuilder = schemaBuilder.requiredBoolean(fieldName);
-          } else if (long[].class.isAssignableFrom(fieldType)) {
+          } else if (long[].class.isAssignableFrom(fieldType) || Task[].class.isAssignableFrom(fieldType)) {
             schemaBuilder = schemaBuilder
                 .name(fieldName)
                 .type()
@@ -60,6 +62,7 @@ public class ParquetSchema {
                 .longType()
                 .noDefault();
           } else {
+            log.error("Could not create a valid encoding for {}", fieldType);
             throw new IllegalAccessException();
           }
           fieldsToSchema.put(field.getName(), fieldName);
@@ -78,7 +81,11 @@ public class ParquetSchema {
     try {
       for (Field field : fields) {
         if (fieldsToSchema.containsKey(field.getName())) {
-          record.put(fieldsToSchema.get(field.getName()), field.get(pojo));
+          Object o = field.get(pojo);
+          if (o instanceof Task[]) {
+            o = Arrays.stream(((Task[]) o)).map(Task::getId).toArray();
+          }
+          record.put(fieldsToSchema.get(field.getName()), field.get(o));
         }
       }
     } catch (IllegalAccessException e) {
