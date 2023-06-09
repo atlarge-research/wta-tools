@@ -180,16 +180,17 @@ public class ProcSupplier implements InformationSupplier<ProcDto> {
     CompletableFuture<String> diskMetrics = bashUtils.executeCommand("cat /proc/diskstats");
 
     return diskMetrics.thenApply(result -> {
-      Optional<Long>[] agg = (Optional<Long>[]) new Optional<?>[17];
-      Arrays.fill(agg, Optional.empty());
+      Optional<Long>[] agg = Stream.generate(Optional::empty)
+              .limit(17)
+              .toArray(Optional[]::new);
       if (result != null) {
         List<List<String>> parsedList = parseDiskMetrics(result);
         int rowLength = parsedList.get(0).size();
-        for (int outer = 0; outer < parsedList.size(); outer++) {
+        for (List<String> strings : parsedList) {
           for (int inner = 3; inner < rowLength; inner++) {
             try {
               agg[inner - 3] = Optional.of(agg[inner - 3].orElse(0L)
-                  + Long.parseLong(parsedList.get(outer).get(inner)));
+                      + Long.parseLong(strings.get(inner)));
             } catch (NumberFormatException e) {
               log.error("There was an error parsing the contents of the /proc/diskstats file");
             }
@@ -235,12 +236,10 @@ public class ProcSupplier implements InformationSupplier<ProcDto> {
       Arrays.fill(agg, Optional.empty());
       if (result != null) {
         Matcher matcher = pattern.matcher(result);
-        int index = 0;
-        while (matcher.find()) {
+        for(int index = 0; index<agg.length && matcher.find(); index++) {
           try {
             agg[index] =
                 Optional.of(Double.parseDouble(matcher.group().replace(',', '.')));
-            index++;
           } catch (NumberFormatException e) {
             log.error("There was an error parsing the contents of the /proc/loadavg file");
           }
