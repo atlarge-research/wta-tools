@@ -77,7 +77,12 @@ public abstract class SupplierExtractionEngine<T extends BaseSupplierDto> {
     CompletableFuture<ProcDto> procDtoCompletableFuture = this.procSupplier.getSnapshot();
     CompletableFuture<PerfDto> perfDtoCompletableFuture = this.perfSupplier.getSnapshot();
 
-    return CompletableFuture.allOf(osInfoDtoCompletableFuture, iostatDtoCompletableFuture)
+    return CompletableFuture.allOf(
+            osInfoDtoCompletableFuture,
+            iostatDtoCompletableFuture,
+            dstatDtoCompletableFuture,
+            procDtoCompletableFuture,
+            perfDtoCompletableFuture)
         .thenCompose((v) -> {
           LocalDateTime timestamp = LocalDateTime.now();
           OsInfoDto osInfoDto = osInfoDtoCompletableFuture.join();
