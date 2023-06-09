@@ -84,7 +84,7 @@ public class ParquetSchema {
         if (fieldsToSchema.containsKey(field.getName())) {
           Object o = field.get(pojo);
           if (o instanceof Task[]) {
-            o = Arrays.stream(((Task[]) o)).map(Task::getId).toArray();
+            o = Arrays.stream((Task[]) o).map(Task::getId).toArray();
           }
           record.put(fieldsToSchema.get(field.getName()), field.get(o));
         }
