@@ -24,6 +24,7 @@ public class ParquetWriter<T extends BaseTraceObject> implements AutoCloseable {
    * Constructs a writer to write records to Parquet.
    *
    * @param path the {@link OutputFile} to write to
+   * @param schema the {@link ParquetSchema} to write
    * @author Atour Mousavi Gourabi
    * @since 1.0.0
    */

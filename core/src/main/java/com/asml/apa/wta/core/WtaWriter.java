@@ -41,6 +41,11 @@ public class WtaWriter implements Flushable, AutoCloseable {
    *
    * @param path the output path to write to
    * @param version the version of files to write
+   * @param workload the {@link Workload} to write
+   * @param workflows the {@link Workflow}s to write
+   * @param resources the {@link Resource}s to write
+   * @param tasks the {@link Task}s to write
+   * @throws IOException when something goes wrong during I/O
    * @author Atour Mousavi Gourabi
    * @since 1.0.0
    */
@@ -70,6 +75,12 @@ public class WtaWriter implements Flushable, AutoCloseable {
         new ParquetSchema(Workflow.class, workflows, "workflows"));
   }
 
+  /**
+   * Write all the objects to file.
+   *
+   * @author Atour Mousavi Gourabi
+   * @since 1.0.0
+   */
   public void write() {
     try {
       workloadWriter.write(workloadToWrite);
@@ -91,6 +102,7 @@ public class WtaWriter implements Flushable, AutoCloseable {
   /**
    * Flushes the objects to file.
    *
+   * @throws IOException when something goes wrong during I/O
    * @author Atour Mousavi Gourabi
    * @since 1.0.0
    */
@@ -116,8 +128,15 @@ public class WtaWriter implements Flushable, AutoCloseable {
     }
   }
 
+  /**
+   * Closes the writer.
+   *
+   * @throws IOException when something goes wrong during I/O
+   * @author Atour Mousavi Gourabi
+   * @since 1.0.0
+   */
   @Override
-  public void close() throws Exception {
+  public void close() throws IOException {
     resourceWriter.close();
     taskWriter.close();
     workflowWriter.close();

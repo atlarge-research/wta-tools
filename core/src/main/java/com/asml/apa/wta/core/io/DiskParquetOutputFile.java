@@ -52,12 +52,11 @@ public class DiskParquetOutputFile implements OutputFile {
        * Get current position in the {@link BufferedOutputStream}.
        *
        * @return the current position
-       * @throws IOException when something goes wrong during I/O
        * @author Atour Mousavi Gourabi
        * @since 1.0.0
        */
       @Override
-      public long getPos() throws IOException {
+      public long getPos() {
         log.debug("Position at {}.", pos);
         return pos;
       }
@@ -142,30 +141,42 @@ public class DiskParquetOutputFile implements OutputFile {
   }
 
   /**
-   * @param l
-   * @return
-   * @throws IOException
+   * Creates a {@link PositionOutputStream} for the wrapped {@link Path}.
+   * 
+   * @see DiskParquetOutputFile#create(long) 
+   * 
+   * @param buffer buffer hint
+   * @return the created {@link PositionOutputStream}
+   * @throws IOException when something goes wrong during I/O
+   * @author Atour Mousavi Gourabi
+   * @since 1.0.0
    */
   @Override
-  public PositionOutputStream createOrOverwrite(long l) throws IOException {
-    log.info("create or overwrite {}", l);
-
-    return create(l);
+  public PositionOutputStream createOrOverwrite(long buffer) throws IOException {
+    return create(buffer);
   }
 
   /**
-   * @return
+   * Checks whether the output file supports block size.
+   *
+   * @return {@code true}
+   * @author Atour Mousavi Gourabi
+   * @since 1.0.0
    */
   @Override
   public boolean supportsBlockSize() {
-    return false;
+    return true;
   }
 
   /**
-   * @return
+   * Returns the default block size.
+   *
+   * @return {@code 512}, the default value for {@link BufferedOutputStream}
+   * @author Atour Mousavi Gourabi
+   * @since 1.0.0
    */
   @Override
   public long defaultBlockSize() {
-    return 0;
+    return 512;
   }
 }
