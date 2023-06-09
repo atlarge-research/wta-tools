@@ -4,6 +4,7 @@ import java.util.Arrays;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.spark.SparkConf;
 import org.apache.spark.SparkContext;
+import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.sql.SparkSession;
@@ -22,16 +23,21 @@ public class EndToEnd {
   private static JavaRDD<String> testFile;
 
   /**
-   * Private method to invoke a simple Spark job.
+   * Private method to invoke a Spark job with complex partitions shuffling.
    *
    * @author Pil Kyu Cho
    * @since 1.0.0
    */
   private static void invokeJob() {
-    testFile.flatMap(s -> Arrays.asList(s.split(" ")).iterator())
-        .mapToPair(word -> new Tuple2<>(word, 1))
-        .reduceByKey(Integer::sum)
-        .collect();
+    JavaRDD<String> words = testFile.flatMap(line -> Arrays.asList(line.split(" ")).iterator());
+    JavaRDD<String> wordsWithSpark = words.filter(word -> word.contains("Spark"));
+    JavaRDD<String> upperCaseWords = wordsWithSpark.map(String::toUpperCase);
+    upperCaseWords.count();
+    upperCaseWords.reduce((word1, word2) -> word1.length() > word2.length() ? word1 : word2).length();
+    JavaPairRDD<String, Integer> wordLengthPairs = upperCaseWords.mapToPair(word -> new Tuple2<>(word, word.length()));
+    JavaPairRDD<String, Tuple2<Integer, Integer>> joinedPairs = wordLengthPairs.join(wordLengthPairs);
+    JavaPairRDD<String, Iterable<Tuple2<Integer, Integer>>> groupedPairs = joinedPairs.groupByKey();
+    groupedPairs.reduceByKey((a, b) -> a).collect();
   }
 
   /**
@@ -46,13 +52,12 @@ public class EndToEnd {
   public static void main(String[] args) {
     SparkConf conf = new SparkConf().setAppName("SystemTest").setMaster("local[1]");
     conf.set("spark.plugins", "com.asml.apa.wta.spark.WtaPlugin");
+    conf.set("spark.sql.shuffle.partitions", "500");  // increase number of shuffle partitions to distribute workload more evenly across the cluster.
     System.setProperty("configFile", args[0]);
     SparkSession spark = SparkSession.builder().config(conf).getOrCreate();
     SparkContext sc = spark.sparkContext();
     testFile = JavaSparkContext.fromSparkContext(sc).textFile(args[1]);
-    for (int i = 0; i < 10; i++) {
-      invokeJob();
-    }
+    invokeJob();
     sc.stop();
   }
 }
