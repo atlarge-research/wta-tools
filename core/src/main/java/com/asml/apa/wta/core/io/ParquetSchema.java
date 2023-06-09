@@ -2,6 +2,7 @@ package com.asml.apa.wta.core.io;
 
 import com.asml.apa.wta.core.model.BaseTraceObject;
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
@@ -32,7 +33,7 @@ public class ParquetSchema {
       for (Field field : fields) {
         boolean sparseField = false;
         for (T o : objects) {
-          if (!field.canAccess(o) && field.get(o) == null) {
+          if (Modifier.isPrivate(field.getModifiers()) || field.get(o) == null) {
             sparseField = true;
             break;
           }
