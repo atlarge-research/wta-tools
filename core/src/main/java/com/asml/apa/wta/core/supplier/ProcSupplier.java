@@ -2,11 +2,13 @@ package com.asml.apa.wta.core.supplier;
 
 import com.asml.apa.wta.core.dto.ProcDto;
 import com.asml.apa.wta.core.utils.BashUtils;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.Scanner;
 import java.util.concurrent.CompletableFuture;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -14,6 +16,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.SystemUtils;
 
@@ -257,17 +260,20 @@ public class ProcSupplier implements InformationSupplier<ProcDto> {
    */
   private NestedList parseDiskMetrics(String input) {
     NestedList result = new NestedList();
-    Scanner scanner = new Scanner(input);
 
-    while (scanner.hasNextLine()) {
-      String line = scanner.nextLine().trim();
-      String[] tokens = line.split("\\s+");
+    try (BufferedReader reader = new BufferedReader(new StringReader(input))) {
+      String line;
+      while ((line = reader.readLine()) != null) {
+        String[] tokens = line.trim().split("\\s+");
 
-      List<String> sublist = new ArrayList<>();
-      for (String token : tokens) {
-        sublist.add(token);
+        List<String> sublist = new ArrayList<>();
+        for (String token : tokens) {
+          sublist.add(token);
+        }
+        result.getNestedList().add(sublist);
       }
-      result.getNestedList().add(sublist);
+    } catch (IOException e) {
+      log.error("Something went wrong while parsing the contents of /proc/diskstats");
     }
 
     return result;
@@ -298,12 +304,9 @@ public class ProcSupplier implements InformationSupplier<ProcDto> {
     return numbersList;
   }
 
+  @NoArgsConstructor
   @Data
   private class NestedList {
-    private List<List<String>> nestedList;
-
-    NestedList() {
-      this.nestedList = new ArrayList<>();
-    }
+    private List<List<String>> nestedList = new ArrayList<>();
   }
 }
