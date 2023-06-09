@@ -38,6 +38,7 @@ public class ParquetSchema {
           }
         }
         if (!sparseField) {
+          field.setAccessible(true);
           Class<?> fieldType = field.getType();
           String fieldName =
               field.getName().replaceAll(regex, replacement).toLowerCase();
