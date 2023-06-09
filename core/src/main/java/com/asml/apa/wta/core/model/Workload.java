@@ -16,6 +16,7 @@ import org.apache.avro.generic.GenericRecord;
 @Data
 @Builder
 public class Workload implements BaseTraceObject {
+
   private static final long serialVersionUID = -4547341610378381743L;
 
   private final long totalWorkflows;
@@ -170,6 +171,15 @@ public class Workload implements BaseTraceObject {
    */
   @Override
   public GenericRecord convertToRecord(ParquetSchema schema) {
-    throw new RuntimeException("Something went wrong, this method shouldn't be called!");
+    throw accessError();
+  }
+
+  @Override
+  public long getId() {
+    throw accessError();
+  }
+
+  private RuntimeException accessError() {
+    return new RuntimeException("Something went wrong, this method shouldn't be called!");
   }
 }

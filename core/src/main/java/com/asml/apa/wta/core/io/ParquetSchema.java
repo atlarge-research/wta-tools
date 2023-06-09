@@ -1,6 +1,6 @@
 package com.asml.apa.wta.core.io;
 
-import com.asml.apa.wta.core.model.Task;
+import com.asml.apa.wta.core.model.BaseTraceObject;
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.Collection;
@@ -53,7 +53,7 @@ public class ParquetSchema {
             schemaBuilder = schemaBuilder.requiredFloat(fieldName);
           } else if (Boolean.class.isAssignableFrom(fieldType)) {
             schemaBuilder = schemaBuilder.requiredBoolean(fieldName);
-          } else if (long[].class.isAssignableFrom(fieldType) || Task[].class.isAssignableFrom(fieldType)) {
+          } else if (long[].class.isAssignableFrom(fieldType) || BaseTraceObject[].class.isAssignableFrom(fieldType)) {
             schemaBuilder = schemaBuilder
                 .name(fieldName)
                 .type()
@@ -81,9 +81,10 @@ public class ParquetSchema {
     try {
       for (Field field : fields) {
         if (field.canAccess(pojo) && fieldsToSchema.containsKey(field.getName())) {
+          log.info(field.getName());
           Object o = field.get(pojo);
-          if (o instanceof Task[]) {
-            o = Arrays.stream((Task[]) o).map(Task::getId).toArray();
+          if (o instanceof BaseTraceObject[]) {
+            o = Arrays.stream((BaseTraceObject[]) o).map(BaseTraceObject::getId).toArray();
           }
           record.put(fieldsToSchema.get(field.getName()), field.get(o));
         }

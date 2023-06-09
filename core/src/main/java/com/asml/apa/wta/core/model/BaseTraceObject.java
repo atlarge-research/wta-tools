@@ -12,6 +12,8 @@ import org.apache.avro.generic.GenericRecord;
  */
 public interface BaseTraceObject extends Serializable {
 
+  long getId();
+
   /**
    * Returns a hardcoded schema version.
    *
