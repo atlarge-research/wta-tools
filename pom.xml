@@ -100,13 +100,6 @@
       <artifactId>slf4j-api</artifactId>
       <version>${slf4j.version}</version>
     </dependency>
-    <!-- https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-slf4j2-impl -->
-    <dependency>
-      <groupId>org.apache.logging.log4j</groupId>
-      <artifactId>log4j-slf4j2-impl</artifactId>
-      <version>${log4j2.version}</version>
-      <scope>runtime</scope>
-    </dependency>
     <!-- https://mvnrepository.com/artifact/org.simplify4u/slf4j2-mock/2.3.0 -->
     <dependency>
       <groupId>org.simplify4u</groupId>
@@ -134,9 +127,6 @@
           <includes>
             <include>**/*IntegrationTest.java</include>
           </includes>
-          <classpathDependencyExcludes>
-            <classpathDependencyExclude>org.apache.logging.log4j:log4j-slf4j2-impl</classpathDependencyExclude>
-          </classpathDependencyExcludes>
         </configuration>
       </plugin>
       <plugin>
@@ -152,9 +142,6 @@
           <excludes>
             <exclude>**/*IntegrationTest.java</exclude>
           </excludes>
-          <classpathDependencyExcludes>
-            <classpathDependencyExclude>org.apache.logging.log4j:log4j-slf4j2-impl</classpathDependencyExclude>
-          </classpathDependencyExcludes>
         </configuration>
       </plugin>
       <plugin>
@@ -256,9 +243,6 @@
           <targetClasses>
             <targetClass>com.asml.apa.wta.*</targetClass>
           </targetClasses>
-          <classpathDependencyExcludes>
-            <classpathDependencyExclude>org.apache.logging.log4j:log4j-slf4j2-impl</classpathDependencyExclude>
-          </classpathDependencyExcludes>
           <excludedTestClasses>
             <param>com.asml.apa.wta.spark.MultithreadTest</param>
           </excludedTestClasses>
