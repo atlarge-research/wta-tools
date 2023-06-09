@@ -8,62 +8,132 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.parquet.io.OutputFile;
 import org.apache.parquet.io.PositionOutputStream;
 
+/**
+ * Disk Parquet output file to wrap {@link Path}s for the {@link org.apache.parquet.hadoop.ParquetWriter}.
+ *
+ * @author Atour Mousavi Gourabi
+ * @since 1.0.0
+ */
 @Slf4j
 public class DiskParquetOutputFile implements OutputFile {
 
   private final Path path;
 
-  public DiskParquetOutputFile(Path p) {
-    path = p;
+  /**
+   * Constructs a {@link DiskParquetOutputFile} from a {@link Path}.
+   *
+   * @param file the path to wrap for the writer
+   * @author Atour Mousavi Gourabi
+   * @since 1.0.0
+   */
+  public DiskParquetOutputFile(Path file) {
+    path = file;
   }
 
   /**
-   * @param l
-   * @return
-   * @throws IOException
+   * Creates a {@link PositionOutputStream} for the wrapped {@link Path}.
+   *
+   * @param buffer buffer hint
+   * @return the created {@link PositionOutputStream}
+   * @throws IOException when something goes wrong during I/O
+   * @author Atour Mousavi Gourabi
+   * @since 1.0.0
    */
   @Override
-  public PositionOutputStream create(long l) throws IOException {
-    log.info("create {}", l);
+  public PositionOutputStream create(long buffer) throws IOException {
+    log.debug("Create org.apache.parquet.io.PositionOutputStream with {} buffer.", buffer);
 
     return new PositionOutputStream() {
 
-      final BufferedOutputStream stream = new BufferedOutputStream(Files.newOutputStream(path), (int) l);
+      final BufferedOutputStream stream = new BufferedOutputStream(Files.newOutputStream(path), (int) buffer);
       long pos = 0;
 
+      /**
+       * Get current position in the {@link BufferedOutputStream}.
+       *
+       * @return the current position
+       * @throws IOException when something goes wrong during I/O
+       * @author Atour Mousavi Gourabi
+       * @since 1.0.0
+       */
       @Override
       public long getPos() throws IOException {
-        log.info("pos {}", pos);
-
+        log.debug("Position at {}.", pos);
         return pos;
       }
 
+      /**
+       * Writes a byte from {@code data}.
+       *
+       * @see BufferedOutputStream#write(int)
+       *
+       * @param data the {@code byte}
+       * @throws IOException when something goes wrong during I/O
+       * @author Atour Mousavi Gourabi
+       * @since 1.0.0
+       */
       @Override
-      public void write(int b) throws IOException {
-        log.info("write {}", b);
+      public void write(int data) throws IOException {
+        log.debug("Write {}.", data);
         pos++;
-        stream.write(b);
+        stream.write(data);
       }
 
+      /**
+       * Writes the bytes from {@code data}.
+       *
+       * @see BufferedOutputStream#write(byte[])
+       *
+       * @param data the data
+       * @throws IOException when something goes wrong during I/O
+       * @author Atour Mousavi Gourabi
+       * @since 1.0.0
+       */
       @Override
-      public void write(byte[] b) throws IOException {
-        log.info("write {}", b);
-        pos += b.length;
-        stream.write(b);
+      public void write(byte[] data) throws IOException {
+        log.info("write {}", data);
+        pos += data.length;
+        stream.write(data);
       }
 
+      /**
+       * Writes {@code len} bytes from {@code data} starting at {@code off}.
+       *
+       * @see BufferedOutputStream#write(byte[], int, int)
+       *
+       * @param data the data
+       * @param off the start offset in the data
+       * @param len the number of bytes to write
+       * @throws IOException when something goes wrong during I/O
+       * @author Atour Mousavi Gourabi
+       * @since 1.0.0
+       */
       @Override
-      public void write(byte[] b, int off, int len) throws IOException {
-        log.info("write {}", b);
+      public void write(byte[] data, int off, int len) throws IOException {
+        log.info("write {}", data);
         pos += len;
-        stream.write(b, off, len);
+        stream.write(data, off, len);
       }
 
+      /**
+       * Flushes the {@link DiskParquetOutputFile}.
+       *
+       * @throws IOException when something goes wrong during I/O
+       * @author Atour Mousavi Gourabi
+       * @since 1.0.0
+       */
       @Override
       public void flush() throws IOException {
         stream.flush();
       }
 
+      /**
+       * Closes the {@link DiskParquetOutputFile}.
+       *
+       * @throws IOException when something goes wrong during I/O
+       * @author Atour Mousavi Gourabi
+       * @since 1.0.0
+       */
       @Override
       public void close() throws IOException {
         stream.close();

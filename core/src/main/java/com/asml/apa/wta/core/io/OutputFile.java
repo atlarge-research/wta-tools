@@ -41,5 +41,12 @@ public interface OutputFile {
    */
   void clearDirectory() throws IOException;
 
+  /**
+   * Wraps this {@link OutputFile} into a Parquet {@link org.apache.parquet.io.OutputFile}.
+   *
+   * @return the wrapped disk path as a Parquet {@link org.apache.parquet.io.OutputFile}
+   * @author Atour Mousavi Gourabi
+   * @since 1.0.0
+   */
   org.apache.parquet.io.OutputFile wrap() throws IOException;
 }

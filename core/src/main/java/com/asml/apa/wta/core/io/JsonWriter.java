@@ -43,11 +43,25 @@ public class JsonWriter<T> implements AutoCloseable, Flushable {
     outputStream.write(gson.toJson(record).getBytes());
   }
 
+  /**
+   * Closes the writer.
+   *
+   * @throws IOException when something goes wrong during I/O
+   * @author Atour Mousavi Gourabi
+   * @since 1.0.0
+   */
   @Override
   public void close() throws IOException {
     outputStream.close();
   }
 
+  /**
+   * Flushes the writer.
+   *
+   * @throws IOException when something goes wrong during I/O
+   * @author Atour Mousavi Gourabi
+   * @since 1.0.0
+   */
   @Override
   public void flush() throws IOException {
     outputStream.flush();

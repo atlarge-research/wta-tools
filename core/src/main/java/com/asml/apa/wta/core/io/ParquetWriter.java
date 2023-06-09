@@ -49,6 +49,13 @@ public class ParquetWriter<T extends BaseTraceObject> implements AutoCloseable {
     writer.write(record.convertToRecord(parquetSchema));
   }
 
+  /**
+   * Closes the writer.
+   *
+   * @throws IOException when something goes wrong when writing
+   * @author Atour Mousavi Gourabi
+   * @since 1.0.0
+   */
   @Override
   public void close() throws IOException {
     writer.close();

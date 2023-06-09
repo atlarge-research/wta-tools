@@ -14,6 +14,13 @@ import org.apache.avro.SchemaBuilder;
 import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.GenericRecord;
 
+/**
+ * Wrapper for the schema information we need.
+ * Includes an Avro {@link Schema} and information on the mapping of names.
+ *
+ * @author Atour Mousavi Gourabi
+ * @since 1.0.0
+ */
 @Slf4j
 public class ParquetSchema {
 
@@ -22,6 +29,16 @@ public class ParquetSchema {
 
   private final Map<String, String> fieldsToSchema = new HashMap<>();
 
+  /**
+   * Create a dense {@link ParquetSchema} for the given {@link Collection} of objects.
+   *
+   * @param clazz the {@link Class} of objects to create the schema for
+   * @param objects the {@link Collection} of objects to create the schema for
+   * @param name the name of the schema
+   * @param <T> the type parameter for the {@link Class} and {@link Collection}
+   * @author Atour Mousavi Gourabi
+   * @since 1.0.0
+   */
   public <T> ParquetSchema(Class<T> clazz, Collection<T> objects, String name) {
     String regex = "([a-z])([A-Z]+)";
     String replacement = "$1_$2";
@@ -78,6 +95,16 @@ public class ParquetSchema {
     }
   }
 
+  /**
+   * Convert POJO to a {@link GenericRecord} to write it with the {@link org.apache.parquet.avro.AvroParquetWriter}.
+   *
+   * @param pojo the POJO to convert to a {@link GenericRecord}
+   * @param clazz the {@link Class} to which the POJO belongs
+   * @param <T> type parameter for the {@link Class} and POJO
+   * @return a {@link GenericRecord} containing the POJO
+   * @author Atour Mousavi Gourabi
+   * @since 1.0.0
+   */
   public <T> GenericRecord convertFromPojo(T pojo, Class<T> clazz) {
     Field[] fields = clazz.getDeclaredFields();
     GenericData.Record record = new GenericData.Record(avroSchema);
@@ -96,7 +123,7 @@ public class ParquetSchema {
     } catch (IllegalAccessException e) {
       log.error("Could not convert to Avro record {}.", e.getMessage());
     }
-    log.debug("Converted record {}", record);
+    log.debug("Converted record {}.", record);
     return record;
   }
 }
