@@ -13,6 +13,7 @@ import org.apache.avro.generic.GenericRecord;
  */
 @Data
 @Builder
+@SuppressWarnings("VisibilityModifier")
 public class Resource implements BaseTraceObject {
 
   private static final long serialVersionUID = 3002249398331752973L;

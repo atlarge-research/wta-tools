@@ -39,6 +39,7 @@ public class ParquetSchema {
    * @author Atour Mousavi Gourabi
    * @since 1.0.0
    */
+  @SuppressWarnings("CyclomaticComplexity")
   public <T> ParquetSchema(Class<T> clazz, Collection<T> objects, String name) {
     String regex = "([a-z])([A-Z]+)";
     String replacement = "$1_$2";
@@ -111,13 +112,13 @@ public class ParquetSchema {
     try {
       for (Field field : fields) {
         if (Modifier.isPublic(field.getModifiers()) && fieldsToSchema.containsKey(field.getName())) {
-          Object o = field.get(pojo);
-          if (o instanceof BaseTraceObject[]) {
-            o = Arrays.stream((BaseTraceObject[]) o)
+          Object object = field.get(pojo);
+          if (object instanceof BaseTraceObject[]) {
+            object = Arrays.stream((BaseTraceObject[]) object)
                 .map(BaseTraceObject::getId)
                 .toArray();
           }
-          record.put(fieldsToSchema.get(field.getName()), o);
+          record.put(fieldsToSchema.get(field.getName()), object);
         }
       }
     } catch (IllegalAccessException e) {

@@ -33,7 +33,7 @@ public class DiskParquetOutputFile implements OutputFile {
   /**
    * Creates a {@link PositionOutputStream} for the wrapped {@link Path}.
    *
-   * @param buffer buffer hint
+   * @param buffer buffer hint, should not exceed {@link Integer#MAX_VALUE}
    * @return the created {@link PositionOutputStream}
    * @throws IOException when something goes wrong during I/O
    * @author Atour Mousavi Gourabi
@@ -45,8 +45,9 @@ public class DiskParquetOutputFile implements OutputFile {
 
     return new PositionOutputStream() {
 
-      final BufferedOutputStream stream = new BufferedOutputStream(Files.newOutputStream(path), (int) buffer);
-      long pos = 0;
+      private final BufferedOutputStream stream =
+          new BufferedOutputStream(Files.newOutputStream(path), (int) buffer);
+      private long pos = 0;
 
       /**
        * Get current position in the {@link BufferedOutputStream}.
@@ -142,9 +143,9 @@ public class DiskParquetOutputFile implements OutputFile {
 
   /**
    * Creates a {@link PositionOutputStream} for the wrapped {@link Path}.
-   * 
-   * @see DiskParquetOutputFile#create(long) 
-   * 
+   *
+   * @see DiskParquetOutputFile#create(long)
+   *
    * @param buffer buffer hint
    * @return the created {@link PositionOutputStream}
    * @throws IOException when something goes wrong during I/O

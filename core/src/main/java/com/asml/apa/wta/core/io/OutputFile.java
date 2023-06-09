@@ -24,7 +24,7 @@ public interface OutputFile {
   /**
    * Open a writer resource for the {@link OutputFile}.
    *
-   * @return an opened {@link OutputFile} writer.
+   * @return an opened {@link OutputFile} writer
    * @throws IOException when no writer can be opened for the location of this {@link OutputFile}
    * @author Atour Mousavi Gourabi
    * @since 1.0.0

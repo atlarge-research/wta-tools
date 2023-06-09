@@ -13,6 +13,7 @@ import org.apache.avro.generic.GenericRecord;
  */
 @Data
 @Builder
+@SuppressWarnings("VisibilityModifier")
 public class Workflow implements BaseTraceObject {
 
   private static final long serialVersionUID = 9065743819019553490L;

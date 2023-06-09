@@ -12,6 +12,7 @@ import org.apache.avro.generic.GenericRecord;
  * @author  Lohithsai Yadala Chanchu
  * @since 1.0.0
  */
+@SuppressWarnings("VisibilityModifier")
 @Data
 @Builder
 public class Task implements BaseTraceObject {

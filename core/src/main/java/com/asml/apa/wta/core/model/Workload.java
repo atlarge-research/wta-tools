@@ -164,21 +164,37 @@ public class Workload implements BaseTraceObject {
   private final String workloadDescription;
 
   /**
-   * This method shouldn't be called as it will be output into json file that doesn't require conversion to Record.
+   * This method should never be called as we do not need to output workloads in Parquet.
    *
    * @param schema schema
-   * @throws RuntimeException exception since this shouldn't be called
+   * @throws RuntimeException always
+   * @author Atour Mousavi Gourabi
+   * @since 1.0.0
    */
   @Override
-  public GenericRecord convertToRecord(ParquetSchema schema) {
+  public final GenericRecord convertToRecord(ParquetSchema schema) {
     throw accessError();
   }
 
+  /**
+   * This method should never be called as we do not need to ever fetch its ID.
+   *
+   * @throws RuntimeException always
+   * @author Atour Mousavi Gourabi
+   * @since 1.0.0
+   */
   @Override
-  public long getId() {
+  public final long getId() {
     throw accessError();
   }
 
+  /**
+   * Creates a simple {@link RuntimeException}.
+   *
+   * @return a {@link RuntimeException} with a simple error message
+   * @author Atour Mousavi Gourabi
+   * @since 1.0.0
+   */
   private RuntimeException accessError() {
     return new RuntimeException("Something went wrong, this method shouldn't be called!");
   }
