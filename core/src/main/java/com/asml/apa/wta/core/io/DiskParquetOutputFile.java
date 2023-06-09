@@ -28,7 +28,7 @@ public class DiskParquetOutputFile implements OutputFile {
 
     return new PositionOutputStream() {
 
-      BufferedOutputStream stream = new BufferedOutputStream(Files.newOutputStream(path), (int) l);
+      final BufferedOutputStream stream = new BufferedOutputStream(Files.newOutputStream(path), (int) l);
       long pos = 0;
 
       @Override
@@ -41,19 +41,19 @@ public class DiskParquetOutputFile implements OutputFile {
       @Override
       public void write(int b) throws IOException {
         log.info("write {}", b);
-        ++pos;
+        pos += 8;
         stream.write(b);
       }
 
       @Override
       public void write(byte[] b) throws IOException {
-        pos += b.length;
+        pos += 8 * b.length;
         stream.write(b);
       }
 
       @Override
       public void write(byte[] b, int off, int len) throws IOException {
-        pos += b.length;
+        pos += 8 * b.length;
         stream.write(b, off, len);
       }
 
