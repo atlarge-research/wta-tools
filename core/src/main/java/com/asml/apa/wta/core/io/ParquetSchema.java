@@ -63,7 +63,7 @@ public class ParquetSchema {
                 .noDefault();
           } else {
             log.error("Could not create a valid encoding for {}", fieldType);
-            throw new IllegalAccessException();
+            throw new IllegalAccessException(fieldType.toString());
           }
           fieldsToSchema.put(field.getName(), fieldName);
         }
