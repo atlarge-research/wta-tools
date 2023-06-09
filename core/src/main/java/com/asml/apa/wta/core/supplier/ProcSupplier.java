@@ -292,7 +292,17 @@ public class ProcSupplier implements InformationSupplier<ProcDto> {
           numbersList.add(number);
         } catch (NumberFormatException e) {
           log.error("There was an error parsing the contents of the /proc/meminfo file");
-        }
+    List<Long> numbersList = Arrays.stream(lines)
+            .flatMap(line -> pattern.matcher(line).results())
+            .map(matchResult -> {
+              try {
+                return Long.parseLong(matchResult.group());
+              } catch (NumberFormatException e) {
+                log.error("There was an error parsing the contents of the /proc/meminfo file");
+                return null;
+              }
+            })
+            .collect(Collectors.toList());
       }
     }
     return numbersList;
