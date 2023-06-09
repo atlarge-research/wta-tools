@@ -62,7 +62,7 @@ public class ParquetSchema {
                 .longType()
                 .noDefault();
           } else {
-            log.error("Could not create a valid encoding for {}", fieldType);
+            log.error("Could not create a valid encoding for {}.", fieldType);
             throw new IllegalAccessException(fieldType.toString());
           }
           fieldsToSchema.put(field.getName(), fieldName);
@@ -70,8 +70,8 @@ public class ParquetSchema {
       }
       avroSchema = schemaBuilder.endRecord();
     } catch (IllegalAccessException e) {
-      log.error("Could not create a valid schema for {}", clazz);
-      throw new RuntimeException("Could not create a valid schema for " + clazz);
+      log.error("Could not create a valid schema for {} in {}.", e.getMessage(), clazz);
+      throw new RuntimeException("Could not create a valid schema for " + clazz, e);
     }
   }
 
