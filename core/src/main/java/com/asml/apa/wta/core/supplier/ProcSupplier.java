@@ -153,11 +153,7 @@ public class ProcSupplier implements InformationSupplier<ProcDto> {
    */
   private CompletableFuture<Optional<Long>[]> getMemMetrics() {
     CompletableFuture<String> memMetrics = bashUtils.executeCommand("cat /proc/meminfo");
-    //    String str = "MemTotal:       10118252 kB\n" + "MemFree:         1921196 kB\n"
-    //        + "MemAvailable:    5470300 kB\n"
-    //        + "Buffers:          239068 kB\n";
-    //    CompletableFuture<String> memMetrics = CompletableFuture.completedFuture(str);
-    log.info("getting mem metrics");
+
     return memMetrics.thenApply(result -> {
       Optional<Long>[] agg = (Optional<Long>[]) new Optional<?>[60];
       Arrays.fill(agg, Optional.empty());
@@ -180,9 +176,6 @@ public class ProcSupplier implements InformationSupplier<ProcDto> {
    */
   private CompletableFuture<Optional<Long>[]> getDiskMetrics() {
     CompletableFuture<String> diskMetrics = bashUtils.executeCommand("cat /proc/diskstats");
-    //    String str = "8       0 sda 1114 437 141266 153\n" + "8      16 sdb 103 0 4712 174\n"
-    //        + "8      32 sdc 77636 10312 5307586 5345";
-    //    CompletableFuture<String> diskMetrics = CompletableFuture.completedFuture(str);
 
     return diskMetrics.thenApply(result -> {
       Optional<Long>[] agg = (Optional<Long>[]) new Optional<?>[17];
@@ -227,9 +220,6 @@ public class ProcSupplier implements InformationSupplier<ProcDto> {
    */
   private CompletableFuture<Optional<Double>[]> getLoadAvgMetrics() {
     CompletableFuture<String> loadAvgMetrics = bashUtils.executeCommand("cat /proc/loadavg");
-
-    //    String str = "0.62 1.23 1.02 1/479 278339";
-    //    CompletableFuture<String> loadAvgMetrics = CompletableFuture.completedFuture(str);
 
     Pattern pattern = Pattern.compile("\\d+(?:\\.\\d+)?");
 
