@@ -54,7 +54,9 @@ public class ParquetSchema {
             schemaBuilder = schemaBuilder.requiredFloat(fieldName);
           } else if (boolean.class.isAssignableFrom(fieldType) || Boolean.class.isAssignableFrom(fieldType)) {
             schemaBuilder = schemaBuilder.requiredBoolean(fieldName);
-          } else if (long[].class.isAssignableFrom(fieldType) || Long[].class.isAssignableFrom(fieldType) || BaseTraceObject[].class.isAssignableFrom(fieldType)) {
+          } else if (long[].class.isAssignableFrom(fieldType)
+              || Long[].class.isAssignableFrom(fieldType)
+              || BaseTraceObject[].class.isAssignableFrom(fieldType)) {
             schemaBuilder = schemaBuilder
                 .name(fieldName)
                 .type()
@@ -85,7 +87,9 @@ public class ParquetSchema {
           log.info(field.getName());
           Object o = field.get(pojo);
           if (o instanceof BaseTraceObject[]) {
-            o = Arrays.stream((BaseTraceObject[]) o).map(BaseTraceObject::getId).toArray();
+            o = Arrays.stream((BaseTraceObject[]) o)
+                .map(BaseTraceObject::getId)
+                .toArray();
           }
           record.put(fieldsToSchema.get(field.getName()), o);
         }
