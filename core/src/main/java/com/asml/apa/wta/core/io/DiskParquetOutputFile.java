@@ -41,19 +41,21 @@ public class DiskParquetOutputFile implements OutputFile {
       @Override
       public void write(int b) throws IOException {
         log.info("write {}", b);
-        pos += 8;
+        pos++;
         stream.write(b);
       }
 
       @Override
       public void write(byte[] b) throws IOException {
-        pos += 8 * b.length;
+        log.info("write {}", b);
+        pos += b.length;
         stream.write(b);
       }
 
       @Override
       public void write(byte[] b, int off, int len) throws IOException {
-        pos += 8 * b.length;
+        log.info("write {}", b);
+        pos += len;
         stream.write(b, off, len);
       }
 
