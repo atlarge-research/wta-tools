@@ -80,7 +80,7 @@ public class ParquetSchema {
     GenericData.Record record = new GenericData.Record(avroSchema);
     try {
       for (Field field : fields) {
-        if (fieldsToSchema.containsKey(field.getName())) {
+        if (field.canAccess(pojo) && fieldsToSchema.containsKey(field.getName())) {
           Object o = field.get(pojo);
           if (o instanceof Task[]) {
             o = Arrays.stream((Task[]) o).map(Task::getId).toArray();
