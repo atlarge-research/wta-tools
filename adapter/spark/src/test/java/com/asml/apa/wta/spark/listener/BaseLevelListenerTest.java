@@ -4,9 +4,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.asml.apa.wta.core.config.RuntimeConfig;
-import com.asml.apa.wta.core.model.Task;
-import com.asml.apa.wta.core.model.Workflow;
-import com.asml.apa.wta.core.model.Workload;
 import com.asml.apa.wta.core.model.enums.Domain;
 import org.apache.spark.SparkConf;
 import org.apache.spark.SparkContext;
@@ -18,10 +15,10 @@ public class BaseLevelListenerTest {
 
   protected RuntimeConfig fakeConfig;
 
-  protected AbstractListener<Task> fakeTaskListener;
-  protected AbstractListener<Task> fakeStageListener;
-  protected AbstractListener<Workflow> fakeJobListener;
-  protected AbstractListener<Workload> fakeApplicationListener;
+  protected TaskLevelListener fakeTaskListener;
+  protected StageLevelListener fakeStageListener;
+  protected JobLevelListener fakeJobListener;
+  protected ApplicationLevelListener fakeApplicationListener;
 
   @BeforeEach
   void setupCommonListenerDependencies() {
@@ -39,6 +36,7 @@ public class BaseLevelListenerTest {
         .domain(Domain.SCIENTIFIC)
         .description("Yer a wizard harry")
         .build();
+    fakeStageListener = new StageLevelListener(mockedSparkContext, fakeConfig);
 
     fakeTaskListener = new TaskLevelListener(mockedSparkContext, fakeConfig);
 
@@ -46,6 +44,7 @@ public class BaseLevelListenerTest {
 
     fakeJobListener = new JobLevelListener(mockedSparkContext, fakeConfig, fakeTaskListener);
 
-    fakeApplicationListener = new ApplicationLevelListener(mockedSparkContext, fakeConfig, fakeJobListener);
+    fakeApplicationListener = new ApplicationLevelListener(
+        mockedSparkContext, fakeConfig, fakeJobListener, fakeTaskListener, fakeStageListener);
   }
 }
