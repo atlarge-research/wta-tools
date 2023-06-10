@@ -7,13 +7,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.Getter;
-import org.apache.spark.ExecutorAllocationManager;
 import org.apache.spark.SparkContext;
 import org.apache.spark.TaskContext;
-import org.apache.spark.executor.Executor;
 import org.apache.spark.executor.TaskMetrics;
-import org.apache.spark.resource.ResourceProfile;
-import org.apache.spark.resource.TaskResourceRequest;
 import org.apache.spark.scheduler.SparkListenerTaskEnd;
 import org.apache.spark.scheduler.TaskInfo;
 
