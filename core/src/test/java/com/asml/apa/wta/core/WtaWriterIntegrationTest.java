@@ -13,8 +13,13 @@ import com.asml.apa.wta.core.model.Workflow;
 import com.asml.apa.wta.core.model.WorkflowStore;
 import com.asml.apa.wta.core.model.Workload;
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Stream;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -24,7 +29,7 @@ class WtaWriterIntegrationTest {
 
   @BeforeAll
   static void setUp() {
-    OutputFile file = new DiskOutputFile(Path.of("wta-format"));
+    OutputFile file = new DiskOutputFile(Path.of("wta-output"));
     sut = new WtaWriter(file, "schema-1.0");
   }
 
@@ -37,9 +42,8 @@ class WtaWriterIntegrationTest {
   void writeWorkload() {
     Workload workload = Workload.builder().build();
     sut.write(workload);
-    assertThat(new File("wta-format/workload/schema-1.0/generic_information.json").exists())
+    assertThat(new File("wta-output/workload/schema-1.0/generic_information.json").exists())
         .isTrue();
-    new File("wta-format/workload/schema-1.0/generic_information.json").delete();
   }
 
   @Test
@@ -47,9 +51,8 @@ class WtaWriterIntegrationTest {
     Workflow workflow = Workflow.builder().build();
     WorkflowStore workflows = new WorkflowStore(List.of(workflow));
     sut.write(workflows);
-    assertThat(new File("wta-format/workflows/schema-1.0/workflow.parquet").exists())
+    assertThat(new File("wta-output/workflows/schema-1.0/workflow.parquet").exists())
         .isTrue();
-    new File("wta-format/workflows/schema-1.0/workflow.parquet").delete();
   }
 
   @Test
@@ -57,9 +60,8 @@ class WtaWriterIntegrationTest {
     Task task = Task.builder().build();
     TaskStore tasks = new TaskStore(List.of(task));
     sut.write(tasks);
-    assertThat(new File("wta-format/tasks/schema-1.0/task.parquet").exists())
+    assertThat(new File("wta-output/tasks/schema-1.0/task.parquet").exists())
         .isTrue();
-    new File("wta-format/tasks/schema-1.0/task.parquet").delete();
   }
 
   @Test
@@ -67,8 +69,14 @@ class WtaWriterIntegrationTest {
     Resource resource = Resource.builder().build();
     ResourceStore resources = new ResourceStore(List.of(resource));
     sut.write(resources);
-    assertThat(new File("wta-format/resources/schema-1.0/resource.parquet").exists())
+    assertThat(new File("wta-output/resources/schema-1.0/resource.parquet").exists())
         .isTrue();
-    new File("wta-format/resources/schema-1.0/resource.parquet").delete();
+  }
+
+  @AfterAll
+  static void cleanUp() throws IOException {
+    try (Stream<Path> stream = Files.walk(Path.of("wta-output"))) {
+      stream.sorted(Comparator.reverseOrder()).map(Path::toFile).forEach(File::delete);
+    }
   }
 }
