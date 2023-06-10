@@ -100,6 +100,14 @@ public class IostatSupplier implements InformationSupplier<IostatDto> {
     });
   }
 
+  /**
+   * Sums the respective fields of each column and returns the aggregated result.
+   *
+   * @param input output of the iostat command
+   * @return Parsed ouptut of the iostat command
+   * @author Lohithsai Yadala Chanchu
+   * @since 1.0.0
+   */
   private List<OutputLine> parseIostat(String input) {
     List<OutputLine> rows =
         Arrays.stream(input.split("\n")).skip(1).map(OutputLine::new).collect(Collectors.toList());
@@ -107,6 +115,14 @@ public class IostatSupplier implements InformationSupplier<IostatDto> {
     return rows;
   }
 
+  /**
+   * Sums the respective fields of each column and returns the aggregated result.
+   *
+   * @param rows List of output rows
+   * @return Aggregated array of doubles
+   * @author Lohithsai Yadala Chanchu
+   * @since 1.0.0
+   */
   private double[] aggregateIostat(List<OutputLine> rows) {
     if (rows.size() != 0) {
       return IntStream.range(1, rows.get(0).getRowSize())
