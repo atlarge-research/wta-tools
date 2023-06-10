@@ -1,7 +1,6 @@
 package com.asml.apa.wta.core.logger;
 
 import com.asml.apa.wta.core.config.RuntimeConfig;
-import com.asml.apa.wta.core.utils.WtaUtils;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.core.appender.rolling.action.Duration;
 import org.apache.logging.log4j.core.config.Configuration;
@@ -84,11 +83,11 @@ public class Log4j2Configuration {
    * Sets up the parts of the logging configuration that are set by user input.
    * Sets the logging level in accordance with the user input in config.json.
    *
+   * @param config the runtime configuration to be used
    * @author Atour Mousavi Gourabi
    * @since 1.0.0
    */
-  public static void setUpLoggingConfig() {
-    RuntimeConfig config = WtaUtils.readConfig();
+  public static void setUpLoggingConfig(RuntimeConfig config) {
     Level logLevel;
     switch (config.getLogLevel()) {
       case "TRACE":

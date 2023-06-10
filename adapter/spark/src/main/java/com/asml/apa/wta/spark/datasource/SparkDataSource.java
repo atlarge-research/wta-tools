@@ -1,14 +1,9 @@
 package com.asml.apa.wta.spark.datasource;
 
 import com.asml.apa.wta.core.config.RuntimeConfig;
-import com.asml.apa.wta.core.model.Task;
-import com.asml.apa.wta.core.model.Workflow;
-import com.asml.apa.wta.core.model.Workload;
-import com.asml.apa.wta.core.utils.CollectorInterface;
-import com.asml.apa.wta.spark.listener.AbstractListener;
 import com.asml.apa.wta.spark.listener.ApplicationLevelListener;
-import com.asml.apa.wta.spark.listener.JobLevelListener;
 import com.asml.apa.wta.spark.listener.ExecutorResourceListener;
+import com.asml.apa.wta.spark.listener.JobLevelListener;
 import com.asml.apa.wta.spark.listener.StageLevelListener;
 import com.asml.apa.wta.spark.listener.TaskLevelListener;
 import com.asml.apa.wta.spark.streams.MetricStreamingEngine;
@@ -23,15 +18,15 @@ import org.apache.spark.SparkContext;
  * @since 1.0.0
  */
 @Getter
-public class SparkDataSource implements CollectorInterface {
+public class SparkDataSource {
 
-  private final AbstractListener<Task> taskLevelListener;
+  private final TaskLevelListener taskLevelListener;
 
-  private final AbstractListener<Workflow> jobLevelListener;
+  private final StageLevelListener stageLevelListener;
 
-  private final AbstractListener<Workload> applicationLevelListener;
+  private final JobLevelListener jobLevelListener;
 
-  private final AbstractListener<Task> stageLevelListener;
+  private final ApplicationLevelListener applicationLevelListener;
 
   private final ExecutorResourceListener executorResourceListener;
 
@@ -46,6 +41,8 @@ public class SparkDataSource implements CollectorInterface {
    * @param metricStreamingEngine The metric streaming engine required for some listeners
    * @author Pil Kyu Cho
    * @author Henry Page
+   * @author Tianchen Qu
+   * @author Lohithsai Yadala Chanchu
    * @since 1.0.0
    */
   public SparkDataSource(
@@ -58,7 +55,8 @@ public class SparkDataSource implements CollectorInterface {
     } else {
       jobLevelListener = new JobLevelListener(sparkContext, config, taskLevelListener);
     }
-    applicationLevelListener = new ApplicationLevelListener(sparkContext, config, jobLevelListener);
+    applicationLevelListener = new ApplicationLevelListener(
+        sparkContext, config, jobLevelListener, taskLevelListener, stageLevelListener);
     runtimeConfig = config;
   }
 

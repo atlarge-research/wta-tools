@@ -11,6 +11,7 @@ import org.apache.avro.generic.GenericRecord;
  *
  * @author Lohithsai Yadala Chanchu
  * @author Atour Mousavi Gourabi
+ * @author Tianchen Qu
  * @since 1.0.0
  */
 @Data
@@ -164,9 +165,12 @@ public class Workload implements BaseTraceObject {
 
   /**
    * This method shouldn't be called as it will be output into json file that doesn't require conversion to Record.
-   * @param checker checker
-   * @param schema schema
+   *
+   * @param checker checker a boolean array corresonding to what fields one should skip
+   * @param schema schema The Avro schema
    * @throws RuntimeException exception since this shouldn't be called
+   * @author Tianchen Qu
+   * @since 1.0.0
    */
   @Override
   public GenericRecord convertToRecord(Boolean[] checker, Schema schema) {

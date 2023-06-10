@@ -5,7 +5,6 @@ import com.asml.apa.wta.core.model.enums.Domain;
 import com.asml.apa.wta.spark.datasource.SparkDataSource;
 import com.asml.apa.wta.spark.streams.MetricStreamingEngine;
 import java.util.Arrays;
-import java.util.Map;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
@@ -31,7 +30,6 @@ public class BaseSparkJobIntegrationTest {
         .authors(new String[] {"Harry Potter"})
         .domain(Domain.SCIENTIFIC)
         .description("Yer a wizard harry")
-        .events(Map.of("event1", "Desc of event1", "event2", "Desc of event2"))
         .outputPath("src/test/resources/WTA")
         .build();
 
@@ -48,6 +46,13 @@ public class BaseSparkJobIntegrationTest {
     sut = new SparkDataSource(spark.sparkContext(), fakeConfig, fakeMetricStreamingEngine);
     String resourcePath = "src/test/resources/wordcount.txt";
     testFile = JavaSparkContext.fromSparkContext(spark.sparkContext()).textFile(resourcePath);
+  }
+
+  /**
+   * Need to invoke this method to call the Application end callbacks before everything ends (so that the callback is called before the assertions)
+   */
+  protected void stopJob() {
+    spark.sparkContext().stop();
   }
 
   protected void invokeJob() {

@@ -1,8 +1,10 @@
 package com.asml.apa.wta.core.supplier;
 
 import com.asml.apa.wta.core.dto.BaseSupplierDto;
+import com.asml.apa.wta.core.dto.DstatDto;
 import com.asml.apa.wta.core.dto.IostatDto;
 import com.asml.apa.wta.core.dto.OsInfoDto;
+import com.asml.apa.wta.core.dto.PerfDto;
 import com.asml.apa.wta.core.utils.BashUtils;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -26,6 +28,10 @@ public abstract class SupplierExtractionEngine<T extends BaseSupplierDto> {
 
   private final IostatSupplier iostatSupplier;
 
+  private final DstatSupplier dstatSupplier;
+
+  private final PerfSupplier perfSupplier;
+
   private final int resourcePingInterval;
 
   @Getter
@@ -39,12 +45,17 @@ public abstract class SupplierExtractionEngine<T extends BaseSupplierDto> {
    *
    * @param resourcePingInterval How often to ping the suppliers, in milliseconds
    * @author Henry Page
+   * @author Lohithsai Yadala Chanchu
+   * @author Pil Kyu Cho
    * @since 1.0.0
    */
   public SupplierExtractionEngine(int resourcePingInterval) {
+    BashUtils bashUtils = new BashUtils();
     this.resourcePingInterval = resourcePingInterval;
     this.operatingSystemSupplier = new OperatingSystemSupplier();
-    this.iostatSupplier = new IostatSupplier(new BashUtils());
+    this.iostatSupplier = new IostatSupplier(bashUtils);
+    this.dstatSupplier = new DstatSupplier(bashUtils);
+    this.perfSupplier = new PerfSupplier(bashUtils);
   }
 
   /**
@@ -58,14 +69,18 @@ public abstract class SupplierExtractionEngine<T extends BaseSupplierDto> {
   protected CompletableFuture<T> ping() {
     CompletableFuture<OsInfoDto> osInfoDtoCompletableFuture = this.operatingSystemSupplier.getSnapshot();
     CompletableFuture<IostatDto> iostatDtoCompletableFuture = this.iostatSupplier.getSnapshot();
+    CompletableFuture<DstatDto> dstatDtoCompletableFuture = this.dstatSupplier.getSnapshot();
+    CompletableFuture<PerfDto> perfDtoCompletableFuture = this.perfSupplier.getSnapshot();
 
     return CompletableFuture.allOf(osInfoDtoCompletableFuture, iostatDtoCompletableFuture)
         .thenCompose((v) -> {
           LocalDateTime timestamp = LocalDateTime.now();
           OsInfoDto osInfoDto = osInfoDtoCompletableFuture.join();
           IostatDto iostatDto = iostatDtoCompletableFuture.join();
+          DstatDto dstatDto = dstatDtoCompletableFuture.join();
+          PerfDto perfDto = perfDtoCompletableFuture.join();
           return CompletableFuture.completedFuture(
-              transform(new BaseSupplierDto(timestamp, osInfoDto, iostatDto)));
+              transform(new BaseSupplierDto(timestamp, osInfoDto, iostatDto, dstatDto, perfDto)));
         });
   }
 

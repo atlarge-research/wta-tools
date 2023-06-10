@@ -31,7 +31,7 @@ class JobLevelListenerTest extends BaseLevelListenerTest {
     Workflow fakeJobListenerWorkflow = fakeJobListener.getProcessedObjects().get(0);
     assertThat(fakeJobListenerWorkflow.getId()).isEqualTo(560);
     assertThat(fakeJobListenerWorkflow.getSubmitTime()).isEqualTo(40L);
-    assertThat(fakeJobListenerWorkflow.getScheduler()).isEqualTo("DAGScheduler");
+    assertThat(fakeJobListenerWorkflow.getScheduler()).isEqualTo("FIFO");
     assertThat(fakeJobListenerWorkflow.getDomain()).isEqualTo(fakeConfig.getDomain());
     assertThat(fakeJobListenerWorkflow.getApplicationName()).isEqualTo("testApp");
 

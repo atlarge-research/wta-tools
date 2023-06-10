@@ -1,7 +1,6 @@
 package com.asml.apa.wta.spark.listener;
 
 import com.asml.apa.wta.core.config.RuntimeConfig;
-import com.asml.apa.wta.core.dto.IostatDto;
 import com.asml.apa.wta.core.dto.OsInfoDto;
 import com.asml.apa.wta.core.model.Resource;
 import com.asml.apa.wta.spark.dto.SparkBaseSupplierWrapperDto;
@@ -10,12 +9,12 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-
 import org.apache.spark.SparkContext;
 import org.apache.spark.scheduler.SparkListenerExecutorRemoved;
 
 /**
- * ResourceLevelListener that is responsible for aggregating resource-level events relating to the lifecycle of an executor.
+ * ResourceLevelListener that is responsible for aggregating resource-level
+ * events relating to the lifecycle of an executor.
  */
 public class ExecutorResourceListener extends AbstractListener<Resource> {
 
@@ -28,7 +27,8 @@ public class ExecutorResourceListener extends AbstractListener<Resource> {
   }
 
   /**
-   * Callback for when an executor is removed from the cluster. An executor can be removed from the cluster for various reasons.
+   * Callback for when an executor is removed from the cluster.
+   * An executor can be removed from the cluster for various reasons.
    *
    * @param executorRemoved object that provides details about the executor that was removed
    */
@@ -38,18 +38,12 @@ public class ExecutorResourceListener extends AbstractListener<Resource> {
     final String type = "cluster node";
     final List<SparkBaseSupplierWrapperDto> infoList =
         metricStreamingEngine.getResourceStream().onKey(id).toList();
-    final List<OsInfoDto> iostatDtos = infoList.stream().map(SparkBaseSupplierWrapperDto::getOsInfoDto).collect(Collectors.toList());
+    final List<OsInfoDto> iostatDtos =
+        infoList.stream().map(SparkBaseSupplierWrapperDto::getOsInfoDto).collect(Collectors.toList());
     final String os = getConstantInfo(iostatDtos, OsInfoDto::getOs, "Unknown");
     final String procModel = getConstantInfo(iostatDtos, OsInfoDto::getArchitecture, "Unknown");
     final long memory = getConstantInfo(iostatDtos, OsInfoDto::getTotalPhysicalMemorySize, -1L);
-
-
-
-
-
-
   }
-
 
   /**
    * Gets information that is supposed to be constant across a stream of pings.
@@ -61,7 +55,12 @@ public class ExecutorResourceListener extends AbstractListener<Resource> {
    * @param defaultValue The default value to return if no value is found (when the supplier is unavailable)
    * @return The first value found
    */
-  private static <T,R> R getConstantInfo(List<T> infoList, Function<T,R> mapper, R defaultValue) {
-    return infoList.stream().filter(Objects::nonNull).map(mapper).distinct().findFirst().orElse(defaultValue);
+  private static <T, R> R getConstantInfo(List<T> infoList, Function<T, R> mapper, R defaultValue) {
+    return infoList.stream()
+        .filter(Objects::nonNull)
+        .map(mapper)
+        .distinct()
+        .findFirst()
+        .orElse(defaultValue);
   }
 }

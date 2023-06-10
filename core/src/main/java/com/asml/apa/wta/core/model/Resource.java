@@ -46,11 +46,12 @@ public class Resource implements BaseTraceObject {
    * It will put all fields allowed by the checker into the record.
    *
    * @param checker checker for which column to skip
-   * @param schema schema
-   * @return record
+   * @param schema schema The Avro schema
+   * @return record The record that corresponds to a row in parquet
    * @since 1.0.0
    * @author Tianchen Qu
    */
+  @Override
   @SuppressWarnings("CyclomaticComplexity")
   public GenericRecord convertToRecord(Boolean[] checker, Schema schema) {
     GenericData.Record record = new GenericData.Record(schema);

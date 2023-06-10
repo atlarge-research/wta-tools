@@ -2,10 +2,7 @@ package com.asml.apa.wta.core.supplier;
 
 import com.asml.apa.wta.core.dto.OsInfoDto;
 import com.sun.management.OperatingSystemMXBean;
-
-import java.io.File;
 import java.lang.management.ManagementFactory;
-import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -154,7 +151,6 @@ public class OperatingSystemSupplier implements InformationSupplier<OsInfoDto> {
   public String getOperatingSystem() {
     return bean.getName() + " " + bean.getVersion();
   }
-
 
   /**
    * Gathers the metrics the supplier provides (computed asynchronously).

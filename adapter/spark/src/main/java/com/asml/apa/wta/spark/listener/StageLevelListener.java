@@ -2,50 +2,72 @@ package com.asml.apa.wta.spark.listener;
 
 import com.asml.apa.wta.core.config.RuntimeConfig;
 import com.asml.apa.wta.core.model.Task;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import lombok.Getter;
 import org.apache.spark.SparkContext;
 import org.apache.spark.executor.TaskMetrics;
 import org.apache.spark.scheduler.SparkListenerStageCompleted;
 import org.apache.spark.scheduler.StageInfo;
+import scala.collection.JavaConverters;
 
 /**
  * This class is a stage-level listener for the Spark data source.
  *
+ * @author Tianchen Qu
  * @author Lohithsai Yadala Chanchu
  * @since 1.0.0
  */
+@Getter
 public class StageLevelListener extends TaskStageBaseListener {
 
-  /**
-   * Constructor for the stage-level listener.
-   *
-   * @param sparkContext The current spark context
-   * @param config Additional config specified by the user for the plugin
-   * @author Lohithsai Yadala Chanchu
-   * @since 1.0.0
-   */
+  private final Map<Integer, Integer[]> stageToParents = new ConcurrentHashMap<>();
+
+  private final Map<Integer, List<Integer>> parentToChildren = new ConcurrentHashMap<>();
+
   public StageLevelListener(SparkContext sparkContext, RuntimeConfig config) {
     super(sparkContext, config);
   }
 
   /**
-   * This method is called every time a stage ends, stage-level metrics should be collected here, and added.
+   * This method will store the stage hierarchy information from the callback.
+   * This class is a stage-level listener for the Spark data source.
    *
    * @param stageCompleted   SparkListenerStageCompleted The object corresponding to information on stage completion
+   * @author Tianchen Qu
    * @author Lohithsai Yadala Chanchu
    * @since 1.0.0
    */
   @Override
-  public void onStageCompleted(final SparkListenerStageCompleted stageCompleted) {
+  public void onStageCompleted(SparkListenerStageCompleted stageCompleted) {
     final StageInfo curStageInfo = stageCompleted.stageInfo();
     final TaskMetrics curStageMetrics = curStageInfo.taskMetrics();
 
     final int stageId = curStageInfo.stageId();
     final Long submitTime = curStageInfo.submissionTime().getOrElse(() -> -1L);
     final long runTime = curStageMetrics.executorRunTime();
-    final int userId = sparkContext.sparkUser().hashCode();
-    final long workflowId = stageIdsToJobs.get(stageId);
+    final int userId = Math.abs(sparkContext.sparkUser().hashCode());
+    final long workflowId = stageIdsToJobs.get(stageId + 1);
 
-    // unknown
+    final Integer[] parentIds = JavaConverters.seqAsJavaList(
+            curStageInfo.parentIds().toList())
+        .stream()
+        .map(x -> (Integer) x)
+        .toArray(size -> new Integer[size]);
+    stageToParents.put(stageId, parentIds);
+    for (Integer id : parentIds) {
+      List<Integer> children = parentToChildren.get(id);
+      if (children == null) {
+        children = new ArrayList<>();
+        children.add(stageId);
+        parentToChildren.put(id, children);
+      } else {
+        children.add(stageId);
+      }
+    }
+    // dummy values
     final String type = "";
     final int submissionSite = -1;
     final String resourceType = "N/A";
@@ -65,29 +87,30 @@ public class StageLevelListener extends TaskStageBaseListener {
 
     // TODO(#61): CALL EXTERNAL DEPENDENCIES
 
-    processedObjects.add(Task.builder()
-        .id(stageId)
-        .type(type)
-        .submissionSite(submissionSite)
-        .submitTime(submitTime)
-        .runtime(runTime)
-        .resourceType(resourceType)
-        .resourceAmountRequested(resourceAmountRequested)
-        .parents(parents)
-        .children(children)
-        .userId(userId)
-        .groupId(groupId)
-        .nfrs(nfrs)
-        .workflowId(workflowId)
-        .waitTime(waitTime)
-        .params(params)
-        .memoryRequested(memoryRequested)
-        .networkIoTime(networkIoTime)
-        .diskIoTime(diskIoTime)
-        .diskSpaceRequested(diskSpaceRequested)
-        .energyConsumption(energyConsumption)
-        .resourceUsed(resourceUsed)
-        .build());
-    stageIdsToJobs.remove(stageCompleted.stageInfo().stageId());
+    this.getProcessedObjects()
+        .add(Task.builder()
+            .id(stageId)
+            .type(type)
+            .submissionSite(submissionSite)
+            .submitTime(submitTime)
+            .runtime(runTime)
+            .resourceType(resourceType)
+            .resourceAmountRequested(resourceAmountRequested)
+            .parents(parents)
+            .children(children)
+            .userId(userId)
+            .groupId(groupId)
+            .nfrs(nfrs)
+            .workflowId(workflowId)
+            .waitTime(waitTime)
+            .params(params)
+            .memoryRequested(memoryRequested)
+            .networkIoTime(networkIoTime)
+            .diskIoTime(diskIoTime)
+            .diskSpaceRequested(diskSpaceRequested)
+            .energyConsumption(energyConsumption)
+            .resourceUsed(resourceUsed)
+            .build());
+    stageIdsToJobs.remove(stageCompleted.stageInfo().stageId() + 1);
   }
 }

@@ -1,3 +1,0 @@
-worker_instances=1
-worker_cores=16
-worker_memory=60g
