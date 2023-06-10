@@ -56,7 +56,8 @@ public class ProcSupplier implements InformationSupplier<ProcDto> {
    * @since 1.0.0
    */
   public CompletableFuture<ProcDto> getSnapshot() {
-    if (isProcAvailable) { CompletableFuture<Optional<Long>[]> diskStatsFuture = getDiskMetrics();
+    if (isProcAvailable) {
+      CompletableFuture<Optional<Long>[]> diskStatsFuture = getDiskMetrics();
       CompletableFuture<Optional<Long>[]> memStatsFuture = getMemMetrics();
       CompletableFuture<Optional<String>> cpuModelFuture = getCpuModel();
       CompletableFuture<Optional<Double>[]> loadAvgStatsFuture = getLoadAvgMetrics();
