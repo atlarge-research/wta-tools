@@ -18,7 +18,7 @@
     <gson.version>2.10.1</gson.version>
     <parquet.version>1.12.2</parquet.version>
     <avro.version>1.10.2</avro.version>
-    <hadoop.version>3.3.1</hadoop.version>
+    <hadoop.version>3.3.5</hadoop.version>
   </properties>
 
   <dependencies>
@@ -89,7 +89,7 @@
       <groupId>org.apache.hadoop</groupId>
       <artifactId>hadoop-client-runtime</artifactId>
       <version>${hadoop.version}</version>
-      <scope>provided</scope>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 </project>
