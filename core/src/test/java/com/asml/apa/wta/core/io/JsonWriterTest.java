@@ -1,19 +1,16 @@
 package com.asml.apa.wta.core.io;
 
-import com.asml.apa.wta.core.model.Resource;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
-import java.io.BufferedOutputStream;
-import java.io.IOException;
-import java.nio.file.Path;
-
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
+
+import com.asml.apa.wta.core.model.Resource;
+import java.io.BufferedOutputStream;
+import java.io.IOException;
+import org.junit.jupiter.api.Test;
 
 class JsonWriterTest {
 
