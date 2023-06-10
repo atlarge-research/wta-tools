@@ -9,7 +9,7 @@ import com.asml.apa.wta.core.dto.IostatDto;
 import com.asml.apa.wta.core.dto.OsInfoDto;
 import com.asml.apa.wta.core.dto.PerfDto;
 import com.asml.apa.wta.spark.dto.SparkBaseSupplierWrapperDto;
-import java.time.LocalDateTime;
+import java.util.Optional;
 import org.apache.spark.api.plugin.PluginContext;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -35,12 +35,16 @@ class SparkSupplierExtractionEngineTest {
 
   @Test
   void correctDtoGetsReturnedWhenBaseInformationIsTransformed() {
-    OsInfoDto fakeOsInfo = OsInfoDto.builder().availableProcessors(1).build();
-    IostatDto fakeIoStatDto = IostatDto.builder().kiloByteRead(40).build();
-    DstatDto fakeDstatDto = DstatDto.builder().netSend(1).build();
-    PerfDto fakePerfDto = PerfDto.builder().watt(30.12).build();
+    Optional<OsInfoDto> fakeOsInfo =
+        Optional.of(OsInfoDto.builder().availableProcessors(1).build());
+    Optional<IostatDto> fakeIoStatDto =
+        Optional.of(IostatDto.builder().kiloByteRead(40).build());
+    Optional<DstatDto> fakeDstatDto =
+        Optional.of(DstatDto.builder().netSend(1).build());
+    Optional<PerfDto> fakePerfDto =
+        Optional.of(PerfDto.builder().watt(30.12).build());
 
-    LocalDateTime fakeTime = LocalDateTime.of(2000, 1, 1, 0, 0);
+    long fakeTime = System.currentTimeMillis();
 
     BaseSupplierDto baseSupplierDto =
         new BaseSupplierDto(fakeTime, fakeOsInfo, fakeIoStatDto, fakeDstatDto, fakePerfDto);

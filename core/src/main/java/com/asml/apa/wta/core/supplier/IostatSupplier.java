@@ -2,6 +2,7 @@ package com.asml.apa.wta.core.supplier;
 
 import com.asml.apa.wta.core.dto.IostatDto;
 import com.asml.apa.wta.core.utils.BashUtils;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import lombok.extern.slf4j.Slf4j;
@@ -62,32 +63,32 @@ public class IostatSupplier implements InformationSupplier<IostatDto> {
    * @since 1.0.0
    */
   @Override
-  public CompletableFuture<IostatDto> getSnapshot() {
+  public CompletableFuture<Optional<IostatDto>> getSnapshot() {
     if (!this.isAvailable) {
-      return notAvailableResult();
+      return CompletableFuture.completedFuture(Optional.empty());
     }
 
     CompletableFuture<String> allMetrics = bashUtils.executeCommand("iostat -d | awk '$1 == \"sdc\"'");
 
     return allMetrics.thenApply(result -> {
-      if (result != null) {
+      try {
         String[] metrics = result.trim().split("\\s+");
 
-        try {
-          return IostatDto.builder()
-              .tps(Double.parseDouble(metrics[1]))
-              .kiloByteReadPerSec(Double.parseDouble(metrics[2]))
-              .kiloByteWrtnPerSec(Double.parseDouble(metrics[3]))
-              .kiloByteDscdPerSec(Double.parseDouble(metrics[4]))
-              .kiloByteRead(Double.parseDouble(metrics[5]))
-              .kiloByteWrtn(Double.parseDouble(metrics[6]))
-              .kiloByteDscd(Double.parseDouble(metrics[7]))
-              .build();
-        } catch (Exception e) {
-          log.error("Something went wrong while receiving the iostat bash command outputs.");
-        }
+        return Optional.of(IostatDto.builder()
+            .tps(Double.parseDouble(metrics[1]))
+            .kiloByteReadPerSec(Double.parseDouble(metrics[2]))
+            .kiloByteWrtnPerSec(Double.parseDouble(metrics[3]))
+            .kiloByteDscdPerSec(Double.parseDouble(metrics[4]))
+            .kiloByteRead(Double.parseDouble(metrics[5]))
+            .kiloByteWrtn(Double.parseDouble(metrics[6]))
+            .kiloByteDscd(Double.parseDouble(metrics[7]))
+            .build());
+      } catch (NullPointerException npe) {
+        log.error("Iostat returned a malformed output.");
+      } catch (Exception e) {
+        log.error("Something went wrong while receiving the iostat bash command outputs.");
       }
-      return null;
+      return Optional.empty();
     });
   }
 }

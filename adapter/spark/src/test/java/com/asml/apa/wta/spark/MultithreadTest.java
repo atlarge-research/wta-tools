@@ -60,7 +60,7 @@ public class MultithreadTest {
     SparkBaseSupplierWrapperDto testObj = buffer.get(0);
 
     assertThat(testObj.getExecutorId()).isEqualTo("test-executor-id");
-    assertThat(testObj.getOsInfoDto().getAvailableProcessors()).isGreaterThanOrEqualTo(1);
+    assertThat(testObj.getOsInfoDto().get().getAvailableProcessors()).isGreaterThanOrEqualTo(1);
   }
 
   @Test

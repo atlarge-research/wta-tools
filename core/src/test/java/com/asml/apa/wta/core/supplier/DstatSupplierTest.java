@@ -25,7 +25,7 @@ public class DstatSupplierTest {
         .executeCommand("dstat -cdngy 1 -c 1");
     DstatSupplier sut = Mockito.spy(new DstatSupplier(bashUtils));
 
-    var actual = sut.getSnapshot();
+    var actual = sut.getSnapshot().join();
 
     DstatDto expected = DstatDto.builder()
         .totalUsageUsr(0)

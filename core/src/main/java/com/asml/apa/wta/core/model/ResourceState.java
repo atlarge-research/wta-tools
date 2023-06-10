@@ -40,7 +40,9 @@ public class ResourceState implements BaseTraceObject {
   private double availableNetworkBandwidth;
 
   private double averageUtilization1Minute;
+
   private double averageUtilization5Minute;
+
   private double averageUtilization15Minute;
 
   /**

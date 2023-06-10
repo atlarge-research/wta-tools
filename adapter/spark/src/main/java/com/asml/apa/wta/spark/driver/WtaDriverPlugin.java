@@ -109,19 +109,7 @@ public class WtaDriverPlugin implements DriverPlugin {
       log.error("Error initialising WTA plugin. Shutting down plugin");
     } else {
       try {
-        removeListeners();
-        List<Task> tasks = sparkDataSource.getRuntimeConfig().isStageLevel()
-            ? sparkDataSource.getStageLevelListener().getProcessedObjects()
-            : sparkDataSource.getTaskLevelListener().getProcessedObjects();
-        List<Workflow> workFlow = sparkDataSource.getJobLevelListener().getProcessedObjects();
-        Workload workLoad = sparkDataSource
-            .getApplicationLevelListener()
-            .getProcessedObjects()
-            .get(0);
-        parquetUtil.getTasks().addAll(tasks);
-        parquetUtil.getWorkflows().addAll(workFlow);
-        parquetUtil.readWorkload(workLoad);
-        parquetUtil.writeToFile("resource", "task", "workflow", "generic_information");
+        endApplicationAndWrite();
       } catch (Exception e) {
         log.error("Error while writing to Parquet file");
       }
@@ -152,5 +140,34 @@ public class WtaDriverPlugin implements DriverPlugin {
     this.sparkDataSource.removeTaskListener();
     this.sparkDataSource.removeTaskListener();
     this.sparkDataSource.removeApplicationListener();
+  }
+
+  /**
+   * Should be called when all the data collection is done at the end of the application.
+   * This method encapsulates everything that needs to be done at the end of the job. Including, writing
+   * the final output to Parquet.
+   *
+   * @throws Exception if there is an error while writing to Parquet file
+   * @author Tianchen Qu
+   * @author Atour Mousavi Gourabi
+   * @author Pil Kyu Cho
+   * @author Henry Page
+   * @author Lohithsai Yadala Chanchu
+   * @since 1.0.0
+   */
+  private void endApplicationAndWrite() throws Exception {
+    removeListeners();
+    List<Task> tasks = sparkDataSource.getRuntimeConfig().isStageLevel()
+        ? sparkDataSource.getStageLevelListener().getProcessedObjects()
+        : sparkDataSource.getTaskLevelListener().getProcessedObjects();
+    List<Workflow> workFlow = sparkDataSource.getJobLevelListener().getProcessedObjects();
+    Workload workLoad = sparkDataSource
+        .getApplicationLevelListener()
+        .getProcessedObjects()
+        .get(0);
+    parquetUtil.getTasks().addAll(tasks);
+    parquetUtil.getWorkflows().addAll(workFlow);
+    parquetUtil.readWorkload(workLoad);
+    parquetUtil.writeToFile("resource", "task", "workflow", "generic_information");
   }
 }

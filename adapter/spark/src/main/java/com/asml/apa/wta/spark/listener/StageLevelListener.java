@@ -85,8 +85,6 @@ public class StageLevelListener extends TaskStageBaseListener {
     final long waitTime = -1L;
     final long resourceUsed = -1L;
 
-    // TODO(#61): CALL EXTERNAL DEPENDENCIES
-
     this.getProcessedObjects()
         .add(Task.builder()
             .id(stageId)

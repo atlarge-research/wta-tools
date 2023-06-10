@@ -5,6 +5,7 @@ import static org.mockito.Mockito.*;
 
 import com.asml.apa.wta.core.dto.PerfDto;
 import com.asml.apa.wta.core.utils.BashUtils;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import org.junit.jupiter.api.Test;
 
@@ -60,8 +61,8 @@ public class PerfSupplierTest {
     when(bashUtils.executeCommand(isAvailableBashCommand)).thenReturn(nullCompletableFuture);
     sut = spy(new PerfSupplier(bashUtils));
     assertThat(sut.isAvailable()).isFalse();
-    PerfDto result = sut.getSnapshot().join();
-    assertThat(result).isNull();
+    Optional<PerfDto> result = sut.getSnapshot().join();
+    assertThat(result).isEmpty();
   }
 
   @Test
@@ -72,8 +73,8 @@ public class PerfSupplierTest {
         .thenReturn(CompletableFuture.completedFuture("12.34"));
     sut = spy(new PerfSupplier(bashUtils));
     assertThat(sut.isAvailable()).isTrue();
-    PerfDto result = sut.getSnapshot().join();
-    assertThat(result.getWatt()).isEqualTo(12.34);
+    Optional<PerfDto> result = sut.getSnapshot().join();
+    assertThat(result.get().getWatt()).isEqualTo(12.34);
   }
 
   @Test
@@ -83,8 +84,8 @@ public class PerfSupplierTest {
     when(bashUtils.executeCommand(getEnergyMetricsBashCommand)).thenReturn(nullCompletableFuture);
     sut = spy(new PerfSupplier(bashUtils));
     assertThat(sut.isAvailable()).isTrue();
-    PerfDto result = sut.getSnapshot().join();
-    assertThat(result.getWatt()).isEqualTo(0.0);
+    Optional<PerfDto> result = sut.getSnapshot().join();
+    assertThat(result).isEmpty();
   }
 
   @Test
@@ -95,7 +96,7 @@ public class PerfSupplierTest {
         .thenReturn(CompletableFuture.completedFuture("12,34"));
     sut = spy(new PerfSupplier(bashUtils));
     assertThat(sut.isAvailable()).isTrue();
-    PerfDto result = sut.getSnapshot().join();
-    assertThat(result.getWatt()).isEqualTo(0.0);
+    Optional<PerfDto> result = sut.getSnapshot().join();
+    assertThat(result).isEmpty();
   }
 }

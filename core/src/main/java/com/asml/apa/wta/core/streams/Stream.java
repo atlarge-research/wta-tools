@@ -11,7 +11,6 @@ import java.io.Serializable;
 import java.time.Instant;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Queue;
@@ -375,10 +374,10 @@ public class Stream<V extends Serializable> {
    * @since 1.0.0
    */
   public synchronized List<V> toList() {
-    List<V> ret = new LinkedList<>();
+    List<V> ret = new ArrayList<>();
     while (!isEmpty()) {
       ret.add(head());
     }
-    return ret;
+    return ret; // memory optimization
   }
 }

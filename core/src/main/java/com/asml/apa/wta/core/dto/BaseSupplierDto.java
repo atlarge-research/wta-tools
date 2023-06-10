@@ -1,7 +1,7 @@
 package com.asml.apa.wta.core.dto;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
+import java.util.Optional;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -18,17 +18,18 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @AllArgsConstructor
 @SuperBuilder
+@SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public class BaseSupplierDto implements Serializable {
 
   private static final long serialVersionUID = -3101218638564306099L;
 
-  private LocalDateTime timestamp;
+  private long timestamp;
 
-  private OsInfoDto osInfoDto;
+  private Optional<OsInfoDto> osInfoDto;
 
-  private IostatDto iostatDto;
+  private Optional<IostatDto> iostatDto;
 
-  private DstatDto dstatDto;
+  private Optional<DstatDto> dstatDto;
 
-  private PerfDto perfDto;
+  private Optional<PerfDto> perfDto;
 }

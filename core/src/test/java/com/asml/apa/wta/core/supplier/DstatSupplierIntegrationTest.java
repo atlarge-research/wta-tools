@@ -13,7 +13,7 @@ public class DstatSupplierIntegrationTest {
     DstatSupplier a = new DstatSupplier(new BashUtils());
     var actual = a.getSnapshot().join();
     if (a.isAvailable()) {
-      assertTrue(actual instanceof DstatDto);
+      assertTrue(actual.get() instanceof DstatDto);
     } else {
       assertNull(actual);
     }

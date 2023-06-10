@@ -2,7 +2,6 @@ package com.asml.apa.wta.spark.datasource;
 
 import com.asml.apa.wta.core.config.RuntimeConfig;
 import com.asml.apa.wta.spark.listener.ApplicationLevelListener;
-import com.asml.apa.wta.spark.listener.ExecutorResourceListener;
 import com.asml.apa.wta.spark.listener.JobLevelListener;
 import com.asml.apa.wta.spark.listener.StageLevelListener;
 import com.asml.apa.wta.spark.listener.TaskLevelListener;
@@ -28,8 +27,6 @@ public class SparkDataSource {
 
   private final ApplicationLevelListener applicationLevelListener;
 
-  private final ExecutorResourceListener executorResourceListener;
-
   private final RuntimeConfig runtimeConfig;
 
   /**
@@ -49,7 +46,6 @@ public class SparkDataSource {
       SparkContext sparkContext, RuntimeConfig config, MetricStreamingEngine metricStreamingEngine) {
     taskLevelListener = new TaskLevelListener(sparkContext, config);
     stageLevelListener = new StageLevelListener(sparkContext, config);
-    executorResourceListener = new ExecutorResourceListener(sparkContext, config, metricStreamingEngine);
     if (config.isStageLevel()) {
       jobLevelListener = new JobLevelListener(sparkContext, config, stageLevelListener);
     } else {

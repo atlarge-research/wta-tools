@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.condition.OS.LINUX;
 
 import com.asml.apa.wta.core.dto.PerfDto;
 import com.asml.apa.wta.core.utils.BashUtils;
+import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledOnOs;
 
@@ -41,8 +42,8 @@ public class PerfSupplierIntegrationTest {
   void perfEnergyGetSnapshotSuccessful() {
     sut = new PerfSupplier(bashUtils);
     if (sut.isAvailable()) {
-      PerfDto result = sut.getSnapshot().join();
-      assertThat(result.getWatt()).isGreaterThan(0.0);
+      Optional<PerfDto> result = sut.getSnapshot().join();
+      assertThat(result.get().getWatt()).isGreaterThan(0.0);
     }
   }
 }

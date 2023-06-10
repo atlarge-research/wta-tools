@@ -1,6 +1,7 @@
 package com.asml.apa.wta.core.supplier;
 
 import com.asml.apa.wta.core.dto.SupplierDto;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 public interface InformationSupplier<T extends SupplierDto> {
@@ -18,14 +19,5 @@ public interface InformationSupplier<T extends SupplierDto> {
    *
    * @return A {@link CompletableFuture} containing the snapshot of the information
    */
-  CompletableFuture<T> getSnapshot();
-
-  /**
-   * Provides a dummy value when the supplier is not available.
-   *
-   * @return The default implementation provides a null value
-   */
-  default CompletableFuture<T> notAvailableResult() {
-    return CompletableFuture.completedFuture(null);
-  }
+  CompletableFuture<Optional<T>> getSnapshot();
 }

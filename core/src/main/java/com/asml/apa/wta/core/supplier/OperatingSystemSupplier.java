@@ -3,6 +3,7 @@ package com.asml.apa.wta.core.supplier;
 import com.asml.apa.wta.core.dto.OsInfoDto;
 import com.sun.management.OperatingSystemMXBean;
 import java.lang.management.ManagementFactory;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -160,9 +161,9 @@ public class OperatingSystemSupplier implements InformationSupplier<OsInfoDto> {
    * @since 1.0.0
    */
   @Override
-  public CompletableFuture<OsInfoDto> getSnapshot() {
+  public CompletableFuture<Optional<OsInfoDto>> getSnapshot() {
     if (!isAvailable) {
-      return notAvailableResult();
+      return CompletableFuture.completedFuture(Optional.empty());
     }
 
     return CompletableFuture.supplyAsync(() -> {
@@ -175,7 +176,7 @@ public class OperatingSystemSupplier implements InformationSupplier<OsInfoDto> {
       double systemLoadAverage = getSystemLoadAverage();
       String architecture = getArch();
       String os = getOperatingSystem();
-      return new OsInfoDto(
+      return Optional.of(new OsInfoDto(
           vMemSize,
           freeMemSize,
           cpuLoad,
@@ -184,7 +185,7 @@ public class OperatingSystemSupplier implements InformationSupplier<OsInfoDto> {
           availableProc,
           systemLoadAverage,
           architecture,
-          os);
+          os));
     });
   }
 }
