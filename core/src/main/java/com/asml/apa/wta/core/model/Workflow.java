@@ -1,6 +1,7 @@
 package com.asml.apa.wta.core.model;
 
 import com.asml.apa.wta.core.io.ParquetSchema;
+import com.asml.apa.wta.core.model.enums.Domain;
 import lombok.Builder;
 import lombok.Data;
 import org.apache.avro.generic.GenericRecord;
@@ -35,6 +36,8 @@ public class Workflow implements BaseTraceObject {
   public final String nfrs;
 
   public final String scheduler;
+
+  private final Domain domain;
 
   public final String applicationName;
 

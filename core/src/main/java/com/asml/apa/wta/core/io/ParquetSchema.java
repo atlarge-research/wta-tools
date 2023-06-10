@@ -1,6 +1,7 @@
 package com.asml.apa.wta.core.io;
 
 import com.asml.apa.wta.core.model.BaseTraceObject;
+import com.asml.apa.wta.core.model.enums.Domain;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
@@ -63,7 +64,7 @@ public class ParquetSchema {
               .replaceAll(followedByCapitalized, replacement)
               .replaceAll(followedByDigit, replacement)
               .toLowerCase();
-          if (String.class.isAssignableFrom(fieldType)) {
+          if (String.class.isAssignableFrom(fieldType) || Domain.class.isAssignableFrom(fieldType)) {
             schemaBuilder = schemaBuilder.requiredString(fieldName);
           } else if (long.class.isAssignableFrom(fieldType)) {
             schemaBuilder = schemaBuilder.requiredLong(fieldName);
@@ -115,6 +116,25 @@ public class ParquetSchema {
             object = Arrays.stream((BaseTraceObject[]) object)
                 .map(BaseTraceObject::getId)
                 .toArray();
+          } else if (object instanceof Domain) {
+            Domain domain = (Domain) object;
+            switch (domain) {
+              case INDUSTRIAL:
+                object = "Industrial";
+                break;
+              case ENGINEERING:
+                object = "Engineering";
+                break;
+              case SCIENTIFIC:
+                object = "Scientific";
+                break;
+              case BIOMEDICAL:
+                object = "Biomedical";
+                break;
+              default:
+                object = "";
+                break;
+            }
           }
           record.put(fieldsToSchema.get(field.getName()), object);
         }
