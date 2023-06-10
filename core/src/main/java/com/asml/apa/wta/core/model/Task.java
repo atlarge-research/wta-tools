@@ -3,7 +3,6 @@ package com.asml.apa.wta.core.model;
 import com.asml.apa.wta.core.io.ParquetSchema;
 import lombok.Builder;
 import lombok.Data;
-import lombok.Setter;
 import org.apache.avro.generic.GenericRecord;
 
 /**
@@ -23,7 +22,7 @@ public class Task implements BaseTraceObject {
 
   public final String type;
 
-  public final long submitTime;
+  public final long tsSubmit;
 
   public final int submissionSite;
 
@@ -33,10 +32,8 @@ public class Task implements BaseTraceObject {
 
   public final double resourceAmountRequested;
 
-  @Setter
   public long[] parents;
 
-  @Setter
   public long[] children;
 
   public final int userId;
@@ -53,13 +50,13 @@ public class Task implements BaseTraceObject {
 
   public final double memoryRequested;
 
-  public final long networkIoTime;
-
   public final long diskIoTime;
 
   public final double diskSpaceRequested;
 
   public final double energyConsumption;
+
+  public final long networkIoTime;
 
   public final long resourceUsed;
 

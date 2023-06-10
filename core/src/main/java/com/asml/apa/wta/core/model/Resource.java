@@ -30,7 +30,7 @@ public class Resource implements BaseTraceObject {
 
   public final long diskSpace;
 
-  public final long networkSpeed;
+  public final long network;
 
   public final String os;
 

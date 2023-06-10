@@ -20,17 +20,17 @@ public class Workflow implements BaseTraceObject {
 
   public final long id;
 
-  public final long submitTime;
+  public final long tsSubmit;
 
   public final Task[] tasks;
 
-  public final int numberOfTasks;
+  public final int taskCount;
 
   public final long criticalPathLength;
 
   public final int criticalPathTaskCount;
 
-  public final int maxNumberOfConcurrentTasks;
+  public final int maxConcurrentTasks;
 
   public final String nfrs;
 
