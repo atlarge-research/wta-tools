@@ -184,13 +184,13 @@ public class ProcSupplier implements InformationSupplier<ProcDto> {
     return diskMetrics.thenApply(result -> {
       Optional<Long>[] agg = Stream.generate(Optional::empty).limit(17).toArray(Optional[]::new);
       if (result != null) {
-        NestedList parsedList = parseDiskMetrics(result);
-        int rowLength = parsedList.getNestedList().get(0).size();
-        for (List<String> strings : parsedList.getNestedList()) {
+        List<OutputLine> parsedList = parseDiskMetrics(result);
+        int rowLength = parsedList.get(0).getLineLength();
+        for (OutputLine line : parsedList) {
           for (int inner = 3; inner < rowLength; inner++) {
             try {
               agg[inner - 3] =
-                  Optional.of(agg[inner - 3].orElse(0L) + Long.parseLong(strings.get(inner)));
+                  Optional.of(agg[inner - 3].orElse(0L) + Long.parseLong(line.getElementAt(inner)));
             } catch (NumberFormatException e) {
               log.error("There was an error parsing the contents of the /proc/diskstats file");
             }
@@ -252,23 +252,24 @@ public class ProcSupplier implements InformationSupplier<ProcDto> {
   /**
    * Parse /proc/diskstats.
    *
+   * @param input the input to be parsed
    * @return List&lt;List&lt;String&gt;&gt; of the parsed numbers from the /proc/diskstats file
    * @author Lohithsai Yadala Chanchu
    * @since 1.0.0
    */
-  private NestedList parseDiskMetrics(String input) {
-    NestedList result = new NestedList();
+  private List<OutputLine> parseDiskMetrics(String input) {
+    List<OutputLine> result = new ArrayList<>();
 
     try (BufferedReader reader = new BufferedReader(new StringReader(input))) {
       String line;
       while ((line = reader.readLine()) != null) {
         String[] tokens = line.trim().split("\\s+");
 
-        List<String> sublist = new ArrayList<>();
+        OutputLine outputLine = new OutputLine();
         for (String token : tokens) {
-          sublist.add(token);
+          outputLine.addToLine(token);
         }
-        result.getNestedList().add(sublist);
+        result.add(outputLine);
       }
     } catch (IOException e) {
       log.error("Something went wrong while parsing the contents of /proc/diskstats");
@@ -280,6 +281,7 @@ public class ProcSupplier implements InformationSupplier<ProcDto> {
   /**
    * Parse /proc/diskstats.
    *
+   * @param input the input to be parsed
    * @return List&lt;Long&gt; of the parsed numbers from the /proc/meminfo file
    * @author Lohithsai Yadala Chanchu
    * @since 1.0.0
@@ -302,9 +304,49 @@ public class ProcSupplier implements InformationSupplier<ProcDto> {
     return numbersList;
   }
 
+  /**
+   * Container class to be used in nested String Lists.
+   *
+   * @author Lohithsai Yadala Chanchu
+   * @since 1.0.0
+   */
   @NoArgsConstructor
   @Data
-  private class NestedList {
-    private List<List<String>> nestedList = new ArrayList<>();
+  private class OutputLine {
+    private List<String> outputLine = new ArrayList<>();
+
+    /**
+     * Add an element to the outputLine.
+     *
+     * @param element the string to be added to the outputLine
+     * @author Lohithsai Yadala Chanchu
+     * @since 1.0.0
+     */
+    public void addToLine(String element) {
+      this.outputLine.add(element);
+    }
+
+    /**
+     * Gets the length of the outputLine.
+     *
+     * @return the length of the outputLine
+     * @author Lohithsai Yadala Chanchu
+     * @since 1.0.0
+     */
+    public int getLineLength() {
+      return this.outputLine.size();
+    }
+
+    /**
+     * Gets the element at the specified index.
+     *
+     * @param index the index of the element we want to receive
+     * @return the string that is at the specified index
+     * @author Lohithsai Yadala Chanchu
+     * @since 1.0.0
+     */
+    public String getElementAt(int index) {
+      return this.outputLine.get(index);
+    }
   }
 }
