@@ -111,7 +111,8 @@ public class IostatSupplier implements InformationSupplier<IostatDto> {
     if (rows.size() != 0) {
       return IntStream.range(1, rows.get(0).getRowSize())
           .mapToDouble(j -> rows.stream()
-              .mapToDouble(row -> Double.parseDouble(row.getMetricAt(j)))
+              .mapToDouble(
+                  row -> Double.parseDouble(row.getMetricAt(j).replace(',', '.')))
               .sum())
           .toArray();
     }
