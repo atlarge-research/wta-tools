@@ -5,14 +5,26 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.nio.file.Path;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledOnOs;
+import org.junit.jupiter.api.condition.OS;
 
 class DiskOutputFileTest {
 
   @Test
-  void resolve() {
+  @EnabledOnOs(OS.WINDOWS)
+  void resolveWindows() {
     OutputFile file = new DiskOutputFile(Path.of("folder"));
     assertThat(file.toString()).isEqualTo("folder");
     file = file.resolve("subfolder");
     assertThat(file.toString()).isEqualTo("folder\\subfolder");
+  }
+
+  @Test
+  @EnabledOnOs(OS.LINUX)
+  void resolveLinux() {
+    OutputFile file = new DiskOutputFile(Path.of("folder"));
+    assertThat(file.toString()).isEqualTo("folder");
+    file = file.resolve("subfolder");
+    assertThat(file.toString()).isEqualTo("folder/subfolder");
   }
 }
