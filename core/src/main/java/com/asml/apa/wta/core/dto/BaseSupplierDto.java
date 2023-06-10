@@ -32,4 +32,6 @@ public class BaseSupplierDto implements Serializable {
   private Optional<DstatDto> dstatDto;
 
   private Optional<PerfDto> perfDto;
+
+  private Optional<JvmFileDto> jvmFileDto;
 }

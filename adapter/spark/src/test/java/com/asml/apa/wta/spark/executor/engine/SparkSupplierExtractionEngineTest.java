@@ -6,6 +6,7 @@ import static org.mockito.Mockito.*;
 import com.asml.apa.wta.core.dto.BaseSupplierDto;
 import com.asml.apa.wta.core.dto.DstatDto;
 import com.asml.apa.wta.core.dto.IostatDto;
+import com.asml.apa.wta.core.dto.JvmFileDto;
 import com.asml.apa.wta.core.dto.OsInfoDto;
 import com.asml.apa.wta.core.dto.PerfDto;
 import com.asml.apa.wta.spark.dto.SparkBaseSupplierWrapperDto;
@@ -44,10 +45,13 @@ class SparkSupplierExtractionEngineTest {
     Optional<PerfDto> fakePerfDto =
         Optional.of(PerfDto.builder().watt(30.12).build());
 
+    Optional<JvmFileDto> fakeJvmFileDto =
+        Optional.of(JvmFileDto.builder().freeSpace(11L).build());
+
     long fakeTime = System.currentTimeMillis();
 
     BaseSupplierDto baseSupplierDto =
-        new BaseSupplierDto(fakeTime, fakeOsInfo, fakeIoStatDto, fakeDstatDto, fakePerfDto);
+        new BaseSupplierDto(fakeTime, fakeOsInfo, fakeIoStatDto, fakeDstatDto, fakePerfDto, fakeJvmFileDto);
 
     SparkBaseSupplierWrapperDto result = sutSupplierExtractionEngine.transform(baseSupplierDto);
 
@@ -58,6 +62,7 @@ class SparkSupplierExtractionEngineTest {
             .iostatDto(fakeIoStatDto)
             .dstatDto(fakeDstatDto)
             .perfDto(fakePerfDto)
+            .jvmFileDto(fakeJvmFileDto)
             .executorId("test-executor-id")
             .build());
   }
