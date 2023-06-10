@@ -41,7 +41,8 @@ public class ParquetSchema {
    */
   @SuppressWarnings("CyclomaticComplexity")
   public <T> ParquetSchema(Class<T> clazz, Collection<T> objects, String name) {
-    String regex = "([a-z])([A-Z]+)";
+    String followedByCapitalized = "([a-z0-9])([A-Z]+)";
+    String followedByDigit = "([a-zA-Z])([0-9]+)";
     String replacement = "$1_$2";
     Field[] fields = clazz.getDeclaredFields();
     SchemaBuilder.FieldAssembler<Schema> schemaBuilder = SchemaBuilder.record(name)
@@ -58,8 +59,10 @@ public class ParquetSchema {
         }
         if (!sparseField) {
           Class<?> fieldType = field.getType();
-          String fieldName =
-              field.getName().replaceAll(regex, replacement).toLowerCase();
+          String fieldName = field.getName()
+              .replaceAll(followedByCapitalized, replacement)
+              .replaceAll(followedByDigit, replacement)
+              .toLowerCase();
           if (String.class.isAssignableFrom(fieldType)) {
             schemaBuilder = schemaBuilder.requiredString(fieldName);
           } else if (long.class.isAssignableFrom(fieldType)) {

@@ -12,9 +12,9 @@ import org.apache.avro.generic.GenericRecord;
  * @author  Lohithsai Yadala Chanchu
  * @since 1.0.0
  */
-@SuppressWarnings("VisibilityModifier")
 @Data
 @Builder
+@SuppressWarnings("VisibilityModifier")
 public class Task implements BaseTraceObject {
 
   private static final long serialVersionUID = -1372345471722101373L;
