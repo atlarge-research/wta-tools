@@ -66,7 +66,9 @@ public class WtaWriter {
   /**
    * Writes a {@link List} of WTA objects to their corresponding Parquet file.
    *
+   * @param clazz the class of WTA objects to write
    * @param wtaObjects the WTA objects to write
+   * @param <T> type parameter for the type of WTA object to write, should extend {@link BaseTraceObject}
    * @author Atour Mousavi Gourabi
    * @since 1.0.0
    */
