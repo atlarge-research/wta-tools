@@ -15,6 +15,7 @@ import org.apache.spark.executor.TaskMetrics;
 import org.apache.spark.scheduler.SparkListenerJobStart;
 import org.apache.spark.scheduler.SparkListenerStageCompleted;
 import org.apache.spark.scheduler.SparkListenerTaskEnd;
+import org.apache.spark.scheduler.SparkListenerTaskStart;
 import org.apache.spark.scheduler.StageInfo;
 import org.apache.spark.scheduler.TaskInfo;
 import org.apache.spark.scheduler.TaskLocality;
@@ -34,6 +35,10 @@ class TaskLevelListenerTest extends BaseLevelListenerTest {
   SparkListenerTaskEnd taskEndEvent;
 
   SparkListenerTaskEnd taskEndEvent2;
+
+  SparkListenerTaskStart taskStartEvent;
+
+  SparkListenerTaskStart taskStartEvent2;
 
   SparkListenerStageCompleted stageCompleted;
 
@@ -69,7 +74,8 @@ class TaskLevelListenerTest extends BaseLevelListenerTest {
         3, 1, "testTaskType", null, testTaskInfo, new ExecutorMetrics(), mockedMetrics);
     taskEndEvent2 = new SparkListenerTaskEnd(
         3, 1, "testTaskType", null, testTaskInfo2, new ExecutorMetrics(), mockedMetrics);
-
+    taskStartEvent = new SparkListenerTaskStart(3, 1, testTaskInfo);
+    taskStartEvent2 = new SparkListenerTaskStart(3, 1, testTaskInfo2);
     stageCompleted = new SparkListenerStageCompleted(testStageInfo);
   }
 
@@ -79,6 +85,7 @@ class TaskLevelListenerTest extends BaseLevelListenerTest {
     stageBuffer.$plus$eq(testStageInfo);
 
     fakeTaskListener.onJobStart(new SparkListenerJobStart(1, 2L, stageBuffer.toList(), new Properties()));
+    fakeTaskListener.onTaskStart(taskStartEvent);
     fakeTaskListener.onTaskEnd(taskEndEvent);
     assertThat(fakeTaskListener.getStageToTasks().size()).isEqualTo(1);
     List<Long> list = new ArrayList<>();
@@ -86,6 +93,7 @@ class TaskLevelListenerTest extends BaseLevelListenerTest {
     assertThat(fakeTaskListener.getStageToTasks()).containsEntry(3, list);
     assertThat(fakeTaskListener.getTaskToStage().size()).isEqualTo(1);
     assertThat(fakeTaskListener.getTaskToStage()).containsEntry(1L, 3);
+    fakeTaskListener.onTaskStart(taskStartEvent2);
     fakeTaskListener.onTaskEnd(taskEndEvent2);
     assertThat(fakeTaskListener.getStageToTasks().size()).isEqualTo(1);
     list.add(2L);
@@ -101,6 +109,7 @@ class TaskLevelListenerTest extends BaseLevelListenerTest {
     stageBuffer.$plus$eq(testStageInfo);
 
     fakeTaskListener.onJobStart(new SparkListenerJobStart(1, 2L, stageBuffer.toList(), new Properties()));
+    fakeTaskListener.onTaskStart(taskStartEvent);
     fakeTaskListener.onTaskEnd(taskEndEvent);
     assertEquals(1, fakeTaskListener.getProcessedObjects().size());
     Task curTask = fakeTaskListener.getProcessedObjects().get(0);
