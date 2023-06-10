@@ -6,7 +6,7 @@ import com.asml.apa.wta.core.model.Task;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
-class ParquetSchemaIntegrationTest {
+class ParquetSchemaTest {
 
   @Test
   public void generateSchemaAndConvert() {

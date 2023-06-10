@@ -24,5 +24,6 @@ class JsonWriterIntegrationTest {
       writer.write(resource);
     }
     assertThat(new File("test.json").exists()).isTrue();
+    new File("test.json").delete();
   }
 }

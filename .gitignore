@@ -85,3 +85,4 @@ core/src/test/resources/AvroOutput
 adapter/spark/src/test/resources/WTA
 wta-output
 test.json
+test.parquet
