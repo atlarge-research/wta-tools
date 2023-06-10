@@ -7,16 +7,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.Getter;
+import org.apache.spark.ExecutorAllocationManager;
 import org.apache.spark.SparkContext;
+import org.apache.spark.TaskContext;
+import org.apache.spark.executor.Executor;
 import org.apache.spark.executor.TaskMetrics;
 import org.apache.spark.resource.ResourceProfile;
 import org.apache.spark.resource.TaskResourceRequest;
-import org.apache.spark.scheduler.SparkListenerExecutorAdded;
-import org.apache.spark.scheduler.SparkListenerTaskEnd;
-import org.apache.spark.scheduler.TaskInfo;
-
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import org.apache.spark.scheduler.*;
 
 /**
  * This class is a task-level listener for the Spark data source.
@@ -33,8 +31,6 @@ public class TaskLevelListener extends TaskStageBaseListener {
 
   private final Map<Long, Integer> taskToStage = new ConcurrentHashMap<>();
 
-  private final Map<String, Integer> executorResources = new ConcurrentHashMap<>();
-
   /**
    * Constructor for the task-level listener.
    *
@@ -46,12 +42,7 @@ public class TaskLevelListener extends TaskStageBaseListener {
   public TaskLevelListener(SparkContext sparkContext, RuntimeConfig config) {
     super(sparkContext, config);
   }
-
-  @Override
-  public void onExecutorAdded(SparkListenerExecutorAdded executorAdded) {
-    super.onExecutorAdded(executorAdded);
-    executorResources.put(executorAdded.executorId(),executorAdded.executorInfo().resourceProfileId());
-  }
+  
 
   /**
    * This method is called every time a task ends, task-level metrics should be collected here, and added.
@@ -66,12 +57,11 @@ public class TaskLevelListener extends TaskStageBaseListener {
     final TaskInfo curTaskInfo = taskEnd.taskInfo();
     final TaskMetrics curTaskMetrics = taskEnd.taskMetrics();
     final String executorId = curTaskInfo.executorId();
-    final ResourceProfile resourceProfile = sparkContext.resourceProfileManager()
-            .resourceProfileFromId(executorResources.get(executorId));
 
     final long taskId = curTaskInfo.taskId() + 1;
     final String type = taskEnd.taskType();
     final long submitTime = curTaskInfo.launchTime();
+    TaskContext t = TaskContext.get();
     final long runTime = curTaskMetrics.executorRunTime();
     final int userId = sparkContext.sparkUser().hashCode();
     final int stageId = taskEnd.stageId();
@@ -88,24 +78,18 @@ public class TaskLevelListener extends TaskStageBaseListener {
     final long[] parents = new long[0];
     final long[] children = new long[0];
     taskToStage.put(taskId, stageId);
-    final double diskSpaceRequested = (double) curTaskMetrics.diskBytesSpilled()/1048576;
-    String memoryString = ResourceProfile.MEMORY();
-    System.out.println(memoryString);
-    final double memoryRequested = Double.parseDouble(memoryString.substring(0,memoryString.length()-1));
-    final TaskResourceRequest resourceRequest = resourceProfile.taskResources().values().head();
-    final String resourceType = resourceRequest.resourceName();
-    final double resourceAmountRequested = resourceRequest.amount();
-    final long diskIoTime = curTaskMetrics.executorDeserializeTime() + curTaskMetrics.resultSerializationTime(); //unsure
-    // unknown
-    final int submissionSite = -1;
+    final double diskSpaceRequested = (double) curTaskMetrics.diskBytesSpilled();
+    final double memoryRequested = curTaskMetrics.peakExecutionMemory();
+
     final String resourceType = "N/A";
     final double resourceAmountRequested = -1.0;
-    final long[] parents = new long[0];
-    final long[] children = new long[0];
+    final long diskIoTime =
+        curTaskMetrics.executorDeserializeTime() + curTaskMetrics.resultSerializationTime(); // unsure
+    // unknown
+    final int submissionSite = -1;
     final int groupId = -1;
     final String nfrs = "";
     final String params = "";
-    final int groupId = -1;
     final long networkIoTime = -1L;
 
     final double energyConsumption = -1L;
@@ -139,6 +123,4 @@ public class TaskLevelListener extends TaskStageBaseListener {
             .resourceUsed(resourceUsed)
             .build());
   }
-
-
 }

@@ -34,9 +34,11 @@ public class Task implements BaseTraceObject {
 
   private final long runtime;
 
-  private final String resourceType;
+  @Setter
+  private String resourceType;
 
-  private final double resourceAmountRequested;
+  @Setter
+  private double resourceAmountRequested;
 
   @Setter
   private long[] parents;
@@ -66,7 +68,8 @@ public class Task implements BaseTraceObject {
 
   private final double energyConsumption;
 
-  private final long resourceUsed;
+  @Setter
+  private long resourceUsed;
 
   /**
    * Converts the POJO object into record object, enabling it to be written by Avro.
