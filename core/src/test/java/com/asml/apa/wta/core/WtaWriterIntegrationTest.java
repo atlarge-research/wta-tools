@@ -6,11 +6,9 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import com.asml.apa.wta.core.io.DiskOutputFile;
 import com.asml.apa.wta.core.io.OutputFile;
 import com.asml.apa.wta.core.model.Resource;
-import com.asml.apa.wta.core.model.ResourceStore;
+import com.asml.apa.wta.core.model.ResourceState;
 import com.asml.apa.wta.core.model.Task;
-import com.asml.apa.wta.core.model.TaskStore;
 import com.asml.apa.wta.core.model.Workflow;
-import com.asml.apa.wta.core.model.WorkflowStore;
 import com.asml.apa.wta.core.model.Workload;
 import java.io.File;
 import java.io.IOException;
@@ -49,27 +47,31 @@ class WtaWriterIntegrationTest {
   @Test
   void writeWorkflows() {
     Workflow workflow = Workflow.builder().build();
-    WorkflowStore workflows = new WorkflowStore(List.of(workflow));
-    sut.write(workflows);
-    assertThat(new File("wta-output/workflows/schema-1.0/workflow.parquet").exists())
+    sut.write(Workflow.class, List.of(workflow));
+    assertThat(new File("wta-output/workflow/schema-1.0/workflow.parquet").exists())
         .isTrue();
   }
 
   @Test
   void writeTasks() {
     Task task = Task.builder().build();
-    TaskStore tasks = new TaskStore(List.of(task));
-    sut.write(tasks);
-    assertThat(new File("wta-output/tasks/schema-1.0/task.parquet").exists())
-        .isTrue();
+    sut.write(Task.class, List.of(task));
+    assertThat(new File("wta-output/task/schema-1.0/task.parquet").exists()).isTrue();
   }
 
   @Test
   void writeResources() {
     Resource resource = Resource.builder().build();
-    ResourceStore resources = new ResourceStore(List.of(resource));
-    sut.write(resources);
-    assertThat(new File("wta-output/resources/schema-1.0/resource.parquet").exists())
+    sut.write(Resource.class, List.of(resource));
+    assertThat(new File("wta-output/resource/schema-1.0/resource.parquet").exists())
+        .isTrue();
+  }
+
+  @Test
+  void writeResourceStates() {
+    ResourceState resourceState = ResourceState.builder().build();
+    sut.write(ResourceState.class, List.of(resourceState));
+    assertThat(new File("wta-output/resource_state/schema-1.0/resource_state.parquet").exists())
         .isTrue();
   }
 

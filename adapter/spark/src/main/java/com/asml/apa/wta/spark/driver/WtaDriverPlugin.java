@@ -5,11 +5,8 @@ import com.asml.apa.wta.core.config.RuntimeConfig;
 import com.asml.apa.wta.core.io.DiskOutputFile;
 import com.asml.apa.wta.core.io.OutputFile;
 import com.asml.apa.wta.core.model.Resource;
-import com.asml.apa.wta.core.model.ResourceStore;
 import com.asml.apa.wta.core.model.Task;
-import com.asml.apa.wta.core.model.TaskStore;
 import com.asml.apa.wta.core.model.Workflow;
-import com.asml.apa.wta.core.model.WorkflowStore;
 import com.asml.apa.wta.core.model.Workload;
 import com.asml.apa.wta.spark.datasource.SparkDataSource;
 import com.asml.apa.wta.spark.dto.ResourceCollectionDto;
@@ -123,9 +120,9 @@ public class WtaDriverPlugin implements DriverPlugin {
             .getProcessedObjects()
             .get(0);
         WtaWriter wtaWriter = new WtaWriter(outputFile, "schema-1.0");
-        wtaWriter.write(new TaskStore(tasks));
-        wtaWriter.write(new ResourceStore(resources));
-        wtaWriter.write(new WorkflowStore(workflows));
+        wtaWriter.write(Task.class, tasks);
+        wtaWriter.write(Resource.class, resources);
+        wtaWriter.write(Workflow.class, workflows);
         wtaWriter.write(workload);
       } catch (Exception e) {
         log.error("Error while writing to the generated files, {} : {}.", e.getClass(), e.getMessage());
