@@ -22,6 +22,8 @@ public class WtaExecutorPlugin implements ExecutorPlugin {
 
   private SparkSupplierExtractionEngine supplierEngine;
 
+  private boolean error = false;
+
   /**
    * This method is called when the plugin is initialized on the executor.
    * Developers are urged not to put inefficient code here as it blocks executor initialization until
@@ -38,10 +40,13 @@ public class WtaExecutorPlugin implements ExecutorPlugin {
    */
   @Override
   public void init(PluginContext pCtx, Map<String, String> extraConf) {
+    if (extraConf == null || extraConf.isEmpty() || extraConf.get("errorStatus").equals("true")) {
+      log.error("Error occurred while initializing the plugin.");
+      error = true;
+      return;
+    }
     int resourcePingInterval = Integer.parseInt(extraConf.get("resourcePingInterval"));
-
     int executorSynchronizationInterval = Integer.parseInt(extraConf.get("executorSynchronizationInterval"));
-
     this.supplierEngine =
         new SparkSupplierExtractionEngine(resourcePingInterval, pCtx, executorSynchronizationInterval);
     this.supplierEngine.startPinging();
@@ -89,6 +94,9 @@ public class WtaExecutorPlugin implements ExecutorPlugin {
    */
   @Override
   public void shutdown() {
+    if (error) {
+      return;
+    }
     this.supplierEngine.stopPinging();
     this.supplierEngine.stopSynchronizing();
   }

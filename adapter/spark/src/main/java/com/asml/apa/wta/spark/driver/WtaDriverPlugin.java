@@ -68,10 +68,11 @@ public class WtaDriverPlugin implements DriverPlugin {
       executorVars.put(
           "executorSynchronizationInterval",
           String.valueOf(runtimeConfig.getExecutorSynchronizationInterval()));
+      executorVars.put("errorStatus", "false");
     } catch (Exception e) {
       log.error(String.valueOf(e));
       error = true;
-      shutdown();
+      log.error("Error initialising WTA driver plugin.");
     }
     return executorVars;
   }
@@ -106,25 +107,24 @@ public class WtaDriverPlugin implements DriverPlugin {
   @Override
   public void shutdown() {
     if (error) {
-      log.error("Error initialising WTA plugin. Shutting down plugin");
-    } else {
-      try {
-        removeListeners();
-        List<Task> tasks = sparkDataSource.getRuntimeConfig().isStageLevel()
-            ? sparkDataSource.getStageLevelListener().getProcessedObjects()
-            : sparkDataSource.getTaskLevelListener().getProcessedObjects();
-        List<Workflow> workFlow = sparkDataSource.getJobLevelListener().getProcessedObjects();
-        Workload workLoad = sparkDataSource
-            .getApplicationLevelListener()
-            .getProcessedObjects()
-            .get(0);
-        parquetUtil.getTasks().addAll(tasks);
-        parquetUtil.getWorkflows().addAll(workFlow);
-        parquetUtil.readWorkload(workLoad);
-        parquetUtil.writeToFile("resource", "task", "workflow", "generic_information");
-      } catch (Exception e) {
-        log.error("Error while writing to Parquet file");
-      }
+      return;
+    }
+    try {
+      removeListeners();
+      List<Task> tasks = sparkDataSource.getRuntimeConfig().isStageLevel()
+          ? sparkDataSource.getStageLevelListener().getProcessedObjects()
+          : sparkDataSource.getTaskLevelListener().getProcessedObjects();
+      List<Workflow> workFlow = sparkDataSource.getJobLevelListener().getProcessedObjects();
+      Workload workLoad = sparkDataSource
+          .getApplicationLevelListener()
+          .getProcessedObjects()
+          .get(0);
+      parquetUtil.getTasks().addAll(tasks);
+      parquetUtil.getWorkflows().addAll(workFlow);
+      parquetUtil.readWorkload(workLoad);
+      parquetUtil.writeToFile("resource", "task", "workflow", "generic_information");
+    } catch (Exception e) {
+      log.error("Error while writing to Parquet file");
     }
   }
 
