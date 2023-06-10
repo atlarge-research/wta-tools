@@ -5,6 +5,8 @@ import com.asml.apa.wta.core.io.OutputFile;
 import com.asml.apa.wta.core.io.ParquetSchema;
 import com.asml.apa.wta.core.io.ParquetWriter;
 import com.asml.apa.wta.core.model.Resource;
+import com.asml.apa.wta.core.model.ResourceState;
+import com.asml.apa.wta.core.model.ResourceStateStore;
 import com.asml.apa.wta.core.model.ResourceStore;
 import com.asml.apa.wta.core.model.Task;
 import com.asml.apa.wta.core.model.TaskStore;
@@ -111,6 +113,25 @@ public class WtaWriter {
       }
     } catch (IOException e) {
       log.error("Could not write resources to file.");
+    }
+  }
+
+  /**
+   * Writes a {@link ResourceStateStore} of {@link ResourceState}s to the corresponding Parquet file.
+   *
+   * @param resourceStates the resource states to write
+   * @author Atour Mousavi Gourabi
+   * @since 1.0.0
+   */
+  public void write(ResourceStateStore resourceStates) {
+    ParquetSchema schema = new ParquetSchema(ResourceState.class, resourceStates.getResources(), "resourceStates");
+    OutputFile path = file.resolve("resource_states").resolve(schemaVersion).resolve("resource_state.parquet");
+    try (ParquetWriter<ResourceState> resourceStateWriter = new ParquetWriter<>(path, schema)) {
+      for (ResourceState resourceState : resourceStates.getResources()) {
+        resourceStateWriter.write(resourceState);
+      }
+    } catch (IOException e) {
+      log.error("Could not write resource states to file.");
     }
   }
 
