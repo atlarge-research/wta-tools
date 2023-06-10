@@ -24,16 +24,20 @@ public class IostatSupplierTest {
 
   @Test
   public void getSnapshotReturnsIostatDto() {
-    doReturn(CompletableFuture.completedFuture("str 1.0 2.0 3.0 4.0 5.0 6.0 7.0"))
+    doReturn(
+            CompletableFuture.completedFuture(
+                "Device             tps    kB_read/s    kB_wrtn/s    kB_dscd/s    kB_read    kB_wrtn    kB_dscd\n"
+                    + "sda               0.01         0.54         0.00         0.00      70941          0          0\n"
+                    + "str               1.0          2.0          3.0          4.0       5.0        6.0        7.0"))
         .when(bashUtils)
-        .executeCommand("iostat -d | awk '$1 == \"sdc\"'");
+        .executeCommand("iostat -d");
 
     IostatDto expected = IostatDto.builder()
-        .tps(1.0)
-        .kiloByteReadPerSec(2.0)
+        .tps(1.01)
+        .kiloByteReadPerSec(2.54)
         .kiloByteWrtnPerSec(3.0)
         .kiloByteDscdPerSec(4.0)
-        .kiloByteRead(5.0)
+        .kiloByteRead(70946.0)
         .kiloByteWrtn(6.0)
         .kiloByteDscd(7.0)
         .build();
