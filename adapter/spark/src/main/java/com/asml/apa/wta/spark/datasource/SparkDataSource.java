@@ -44,7 +44,7 @@ public class SparkDataSource {
     stageLevelListener = new StageLevelListener(sparkContext, config);
     taskLevelListener = new TaskLevelListener(sparkContext, config);
     if (config.isStageLevel()) {
-      jobLevelListener = new JobLevelListener(sparkContext, config, stageLevelListener, stageLevelListener);
+      jobLevelListener = new JobLevelListener(sparkContext, config, taskLevelListener, stageLevelListener);
     } else {
       jobLevelListener = new JobLevelListener(sparkContext, config, taskLevelListener, stageLevelListener);
     }
@@ -132,6 +132,4 @@ public class SparkDataSource {
   public void removeStageListener() {
     stageLevelListener.remove();
   }
-
-
 }

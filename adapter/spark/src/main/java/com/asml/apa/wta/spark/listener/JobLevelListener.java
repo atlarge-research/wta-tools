@@ -5,7 +5,10 @@ import com.asml.apa.wta.core.model.Task;
 import com.asml.apa.wta.core.model.Workflow;
 import com.asml.apa.wta.core.model.enums.Domain;
 import java.util.Arrays;
-import java.util.Collection;
+
+import java.util.List;
+import java.util.ArrayList;
+
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.Getter;
@@ -23,7 +26,7 @@ import scala.collection.JavaConverters;
 @Getter
 public class JobLevelListener extends AbstractListener<Workflow> {
 
-  private final AbstractListener<Task> taskListener;
+  private final TaskLevelListener taskListener;
 
   private final StageLevelListener stageLevelListener;
 
@@ -33,7 +36,7 @@ public class JobLevelListener extends AbstractListener<Workflow> {
 
   private long jobStartTime = -1L;
 
-  private Collection<Object> stages;
+  private List<Object> jobStages;
 
   /**
    * Constructor for the job-level listener.
@@ -49,7 +52,7 @@ public class JobLevelListener extends AbstractListener<Workflow> {
   public JobLevelListener(
       SparkContext sparkContext,
       RuntimeConfig config,
-      AbstractListener<Task> taskListener,
+      TaskLevelListener taskListener,
       StageLevelListener stageLevelListener) {
     super(sparkContext, config);
     this.taskListener = taskListener;
@@ -67,7 +70,7 @@ public class JobLevelListener extends AbstractListener<Workflow> {
     jobSubmitTimes.put(jobStart.jobId() + 1, jobStart.time());
     criticalPathTasks = jobStart.stageIds().length();
     jobStartTime = System.currentTimeMillis();
-    stages = JavaConverters.asJavaCollection(jobStart.stageIds());
+    jobStages = JavaConverters.seqAsJavaList(jobStart.stageIds());
   }
 
   /**
@@ -117,16 +120,31 @@ public class JobLevelListener extends AbstractListener<Workflow> {
     final long jobRunTime = System.currentTimeMillis() - jobStartTime;
     final long driverTime = jobRunTime
         - stageLevelListener.getProcessedObjects().stream()
-            .filter(x -> stages.contains(x.getId()))
-            .map(x -> x.getRuntime())
+            .filter(x -> jobStages.contains(Math.toIntExact(x.getId())))
+            .map(Task::getRuntime)
             .reduce(Long::sum)
-            .get();
-    final long criticalPathLength = driverTime; // wait for parent children mr
+            .orElse(0L);
+    final Map<Integer, List<Task>> stageToTasks = taskListener.getStageToTasks();
+    List<Long> stageMaximumTaskTime = new ArrayList<>();
+    for (Object id : jobStages) {
+      List<Task> stageTasks = stageToTasks.get((Integer) id);
+      if (stageTasks != null) {
+        stageMaximumTaskTime.add(stageTasks.stream()
+            .map(Task::getRuntime)
+            .reduce(Long::max)
+            .orElse(0L));
+      } else {
+        stageMaximumTaskTime.add(0L);
+      }
+    }
+    final long criticalPathLength =
+        driverTime + stageMaximumTaskTime.stream().reduce(Long::sum).orElse(0L);
     // unknown
 
     final int maxNumberOfConcurrentTasks = -1;
     final String nfrs = "";
     final String applicationField = "ETL";
+
     this.getProcessedObjects()
         .add(Workflow.builder()
             .id(jobId)

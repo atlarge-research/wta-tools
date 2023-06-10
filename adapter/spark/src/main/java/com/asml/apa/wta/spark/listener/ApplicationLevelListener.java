@@ -5,19 +5,20 @@ import com.asml.apa.wta.core.model.Task;
 import com.asml.apa.wta.core.model.Workflow;
 import com.asml.apa.wta.core.model.Workload;
 import com.asml.apa.wta.core.model.enums.Domain;
-
-import java.util.*;
 import java.util.stream.Collectors;
 import lombok.Getter;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Optional;
+import java.util.Collections;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.spark.SparkContext;
 import org.apache.spark.resource.ResourceProfile;
 import org.apache.spark.resource.TaskResourceRequest;
 import org.apache.spark.scheduler.SparkListenerApplicationEnd;
 import org.apache.spark.scheduler.SparkListenerApplicationStart;
-import org.apache.spark.scheduler.SparkListenerJobStart;
 import scala.collection.JavaConverters;
-
 
 /**
  * This class is an application-level listener for the Spark data source.
@@ -61,8 +62,6 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
     this.stageLevelListener = stageLevelListener;
   }
 
-
-
   /**
    * Callback function that is called right at the end of the application. Further experimentation
    * is needed to determine if applicationEnd is called first or shutdown.
@@ -75,7 +74,7 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
     // only terminates once.
     final List<Task> tasks = taskLevelListener.getProcessedObjects();
     for (Task task : tasks) {
-      //parent children fields
+      // parent children fields
       final int stageId = taskLevelListener.getTaskToStage().get(task.getId());
       final Integer[] parentStages =
           stageLevelListener.getStageToParents().get(stageId);
@@ -90,23 +89,25 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
       List<Integer> childrenStages =
           stageLevelListener.getParentToChildren().get(stageId);
       if (childrenStages != null) {
-        List<Long> children = new ArrayList<>();
+        List<Task> children = new ArrayList<>();
         childrenStages.forEach(
             x -> children.addAll(taskLevelListener.getStageToTasks().get(x)));
-        Long[] temp = children.toArray(new Long[0]);
+        Long[] temp = children.stream().map(Task::getId).toArray(size -> new Long[size]);
         task.setChildren(ArrayUtils.toPrimitive(temp));
       }
-      //resource related fields
-      final int resourceProfileId = stageLevelListener.getStageToResource().getOrDefault(stageId, -1);
-      final ResourceProfile resourceProfile = sparkContext.resourceProfileManager().resourceProfileFromId(resourceProfileId);
-      final List<TaskResourceRequest> resources = JavaConverters.seqAsJavaList(resourceProfile.taskResources().values().toList());
-      if (resources.size()>0){
+      // resource related fields
+      final int resourceProfileId =
+          stageLevelListener.getStageToResource().getOrDefault(stageId, -1);
+      final ResourceProfile resourceProfile =
+          sparkContext.resourceProfileManager().resourceProfileFromId(resourceProfileId);
+      final List<TaskResourceRequest> resources = JavaConverters.seqAsJavaList(
+          resourceProfile.taskResources().values().toList());
+      if (resources.size() > 0) {
         task.setResourceType(resources.get(0).resourceName());
         task.setResourceAmountRequested(resources.get(0).amount());
         task.setResourceUsed(resourceProfileId);
       }
     }
-
 
     List<Workload> processedObjects = this.getProcessedObjects();
     if (!processedObjects.isEmpty()) {
@@ -153,8 +154,9 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
         .orElse(-1.0);
 
     double meanResourceTask = -1.0;
-    long resourceTaskSize = (int)
-        tasks.stream().filter(x -> x.getResourceAmountRequested() >= 0.0).count();
+    long resourceTaskSize = (int) tasks.stream()
+        .filter(x -> x.getResourceAmountRequested() >= 0.0)
+        .count();
     if (resourceTaskSize != 0) {
       meanResourceTask = tasks.stream()
               .map(Task::getResourceAmountRequested)
@@ -165,7 +167,9 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
     }
 
     final double stdResourceTask = standardDeviation(
-        tasks.stream().map(Task::getResourceAmountRequested).filter(x -> x >= 0.0), meanResourceTask,resourceTaskSize);
+        tasks.stream().map(Task::getResourceAmountRequested).filter(x -> x >= 0.0),
+        meanResourceTask,
+        resourceTaskSize);
 
     final Optional<Object[]> resourceStats = medianAndQuatiles(tasks.stream()
         .map(Task::getResourceAmountRequested)
@@ -174,9 +178,11 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
 
     final double medianResourceTask = (Double) resourceStats.orElseGet(() -> new Double[] {-1.0, -1.0, -1.0})[0];
 
-    final double firstQuartileResourceTask = (Double) resourceStats.orElseGet(() -> new Double[] {-1.0, -1.0, -1.0})[1];
+    final double firstQuartileResourceTask =
+        (Double) resourceStats.orElseGet(() -> new Double[] {-1.0, -1.0, -1.0})[1];
 
-    final double thirdQuartileResourceTask = (Double) resourceStats.orElseGet(() -> new Double[] {-1.0, -1.0, -1.0})[2];
+    final double thirdQuartileResourceTask =
+        (Double) resourceStats.orElseGet(() -> new Double[] {-1.0, -1.0, -1.0})[2];
 
     double covResourceTask = -1.0;
     if (meanResourceTask != 0 && medianResourceTask != -1.0) {
@@ -209,8 +215,8 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
           / memorySize;
     }
 
-    final double stdMemory =
-        standardDeviation(tasks.stream().map(Task::getMemoryRequested).filter(x -> x >= 0.0), meanMemory,memorySize);
+    final double stdMemory = standardDeviation(
+        tasks.stream().map(Task::getMemoryRequested).filter(x -> x >= 0.0), meanMemory, memorySize);
 
     final Optional<Object[]> memoryStats = medianAndQuatiles(tasks.stream()
         .map(Task::getMemoryRequested)
@@ -252,17 +258,19 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
           / networkUsageSize;
     }
 
-    final double stdNetworkUsage =
-        standardDeviation(tasks.stream().map(Task::getNetworkIoTime).filter(x -> x>=0.0).map(Long::doubleValue), meanNetworkUsage,networkUsageSize);
+    final double stdNetworkUsage = standardDeviation(
+        tasks.stream().map(Task::getNetworkIoTime).filter(x -> x >= 0.0).map(Long::doubleValue),
+        meanNetworkUsage,
+        networkUsageSize);
 
     final Optional<Object[]> networkStats = medianAndQuatiles(
         tasks.stream().map(Task::getNetworkIoTime).filter(x -> x >= 0).collect(Collectors.toList()));
 
-    final long medianNetworkUsage = (Long)networkStats.orElseGet(() -> new Long[] {-1L, -1L, -1L})[0];
+    final long medianNetworkUsage = (Long) networkStats.orElseGet(() -> new Long[] {-1L, -1L, -1L})[0];
 
-    final long firstQuartileNetworkUsage =(Long) networkStats.orElseGet(() -> new Long[] {-1L, -1L, -1L})[1];
+    final long firstQuartileNetworkUsage = (Long) networkStats.orElseGet(() -> new Long[] {-1L, -1L, -1L})[1];
 
-    final long thirdQuartileNetworkUsage = (Long)networkStats.orElseGet(() -> new Long[] {-1L, -1L, -1L})[2];
+    final long thirdQuartileNetworkUsage = (Long) networkStats.orElseGet(() -> new Long[] {-1L, -1L, -1L})[2];
 
     double covNetworkUsage = -1.0;
     if (meanNetworkUsage != 0 && meanNetworkUsage != -1.0) {
@@ -296,7 +304,9 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
     }
 
     final double stdDiskSpaceUsage = standardDeviation(
-        tasks.stream().map(Task::getDiskSpaceRequested).filter(x -> x >= 0.0), meanDiskSpaceUsage, diskSpaceSize);
+        tasks.stream().map(Task::getDiskSpaceRequested).filter(x -> x >= 0.0),
+        meanDiskSpaceUsage,
+        diskSpaceSize);
 
     final Optional<Object[]> diskSpaceStats = medianAndQuatiles(tasks.stream()
         .map(Task::getDiskSpaceRequested)
@@ -305,9 +315,11 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
 
     final double medianDiskSpaceUsage = (Double) diskSpaceStats.orElseGet(() -> new Double[] {-1.0, -1.0, -1.0})[0];
 
-    final double firstQuartileDiskSpaceUsage = (Double) diskSpaceStats.orElseGet(() -> new Double[] {-1.0, -1.0, -1.0})[1];
+    final double firstQuartileDiskSpaceUsage =
+        (Double) diskSpaceStats.orElseGet(() -> new Double[] {-1.0, -1.0, -1.0})[1];
 
-    final double thirdQuartileDiskSpaceUsage = (Double) diskSpaceStats.orElseGet(() -> new Double[] {-1.0, -1.0, -1.0})[2];
+    final double thirdQuartileDiskSpaceUsage =
+        (Double) diskSpaceStats.orElseGet(() -> new Double[] {-1.0, -1.0, -1.0})[2];
 
     double covDiskSpaceUsage = -1.0;
     if (meanDiskSpaceUsage != 0 && meanNetworkUsage != -1.0) {
@@ -340,8 +352,8 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
           / energySize;
     }
 
-    final double stdEnergy =
-        standardDeviation(tasks.stream().map(Task::getEnergyConsumption).filter(x -> x >= 0.0), meanEnergy, energySize);
+    final double stdEnergy = standardDeviation(
+        tasks.stream().map(Task::getEnergyConsumption).filter(x -> x >= 0.0), meanEnergy, energySize);
 
     final Optional<Object[]> energyStats = medianAndQuatiles(tasks.stream()
         .map(Task::getEnergyConsumption)
@@ -420,7 +432,7 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
     if (temp == -1.0) {
       return -1.0;
     } else {
-      return Math.pow(temp/size - mean * mean, 0.5);
+      return Math.pow(temp / size - mean * mean, 0.5);
     }
   }
 

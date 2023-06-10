@@ -81,14 +81,14 @@ class TaskLevelListenerTest extends BaseLevelListenerTest {
     fakeTaskListener.onJobStart(new SparkListenerJobStart(1, 2L, stageBuffer.toList(), new Properties()));
     fakeTaskListener.onTaskEnd(taskEndEvent);
     assertThat(fakeTaskListener.getStageToTasks().size()).isEqualTo(1);
-    List<Long> list = new ArrayList<>();
-    list.add(1L);
+    List<Task> list = new ArrayList<>();
+    list.add(Task.builder().id(1L).build());
     assertThat(fakeTaskListener.getStageToTasks()).containsEntry(3, list);
     assertThat(fakeTaskListener.getTaskToStage().size()).isEqualTo(1);
     assertThat(fakeTaskListener.getTaskToStage()).containsEntry(1L, 3);
     fakeTaskListener.onTaskEnd(taskEndEvent2);
     assertThat(fakeTaskListener.getStageToTasks().size()).isEqualTo(1);
-    list.add(2L);
+    list.add(Task.builder().id(2L).build());
     assertThat(fakeTaskListener.getStageToTasks()).containsEntry(3, list);
     assertThat(fakeTaskListener.getTaskToStage().size()).isEqualTo(2);
     assertThat(fakeTaskListener.getTaskToStage()).containsEntry(1L, 3);

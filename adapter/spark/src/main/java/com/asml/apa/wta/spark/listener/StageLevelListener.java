@@ -11,7 +11,6 @@ import org.apache.spark.SparkContext;
 import org.apache.spark.executor.TaskMetrics;
 import org.apache.spark.scheduler.SparkListenerStageCompleted;
 import org.apache.spark.scheduler.StageInfo;
-import org.apache.spark.storage.RDDInfo;
 import scala.collection.JavaConverters;
 
 /**
@@ -29,6 +28,8 @@ public class StageLevelListener extends TaskStageBaseListener {
   private final Map<Integer, List<Integer>> parentToChildren = new ConcurrentHashMap<>();
 
   private final Map<Integer, Integer> stageToResource = new ConcurrentHashMap<>();
+
+  private final Map<Integer, Long> stageToMaximumTask = new ConcurrentHashMap<>();
 
   public StageLevelListener(SparkContext sparkContext, RuntimeConfig config) {
     super(sparkContext, config);

@@ -14,7 +14,8 @@ import org.apache.spark.executor.Executor;
 import org.apache.spark.executor.TaskMetrics;
 import org.apache.spark.resource.ResourceProfile;
 import org.apache.spark.resource.TaskResourceRequest;
-import org.apache.spark.scheduler.*;
+import org.apache.spark.scheduler.SparkListenerTaskEnd;
+import org.apache.spark.scheduler.TaskInfo;
 
 /**
  * This class is a task-level listener for the Spark data source.
@@ -27,7 +28,7 @@ import org.apache.spark.scheduler.*;
 @Getter
 public class TaskLevelListener extends TaskStageBaseListener {
 
-  private final Map<Integer, List<Long>> stageToTasks = new ConcurrentHashMap<>();
+  private final Map<Integer, List<Task>> stageToTasks = new ConcurrentHashMap<>();
 
   private final Map<Long, Integer> taskToStage = new ConcurrentHashMap<>();
 
@@ -42,7 +43,6 @@ public class TaskLevelListener extends TaskStageBaseListener {
   public TaskLevelListener(SparkContext sparkContext, RuntimeConfig config) {
     super(sparkContext, config);
   }
-  
 
   /**
    * This method is called every time a task ends, task-level metrics should be collected here, and added.
@@ -67,14 +67,6 @@ public class TaskLevelListener extends TaskStageBaseListener {
     final int stageId = taskEnd.stageId();
     final long workflowId = stageIdsToJobs.get(taskEnd.stageId() + 1);
 
-    final List<Long> tasks = stageToTasks.get(stageId);
-    if (tasks == null) {
-      List<Long> newTasks = new ArrayList<>();
-      newTasks.add(taskId);
-      stageToTasks.put(stageId, newTasks);
-    } else {
-      tasks.add(taskId);
-    }
     final long[] parents = new long[0];
     final long[] children = new long[0];
     taskToStage.put(taskId, stageId);
@@ -97,30 +89,37 @@ public class TaskLevelListener extends TaskStageBaseListener {
     final long resourceUsed = -1L;
 
     // TODO(#61): CALL EXTERNAL DEPENDENCIES
-
-    this.getProcessedObjects()
-        .add(Task.builder()
-            .id(taskId)
-            .type(type)
-            .submissionSite(submissionSite)
-            .submitTime(submitTime)
-            .runtime(runTime)
-            .resourceType(resourceType)
-            .resourceAmountRequested(resourceAmountRequested)
-            .parents(parents)
-            .children(children)
-            .userId(userId)
-            .groupId(groupId)
-            .nfrs(nfrs)
-            .workflowId(workflowId)
-            .waitTime(waitTime)
-            .params(params)
-            .memoryRequested(memoryRequested)
-            .networkIoTime(networkIoTime)
-            .diskIoTime(diskIoTime)
-            .diskSpaceRequested(diskSpaceRequested)
-            .energyConsumption(energyConsumption)
-            .resourceUsed(resourceUsed)
-            .build());
+    Task task = Task.builder()
+        .id(taskId)
+        .type(type)
+        .submissionSite(submissionSite)
+        .submitTime(submitTime)
+        .runtime(runTime)
+        .resourceType(resourceType)
+        .resourceAmountRequested(resourceAmountRequested)
+        .parents(parents)
+        .children(children)
+        .userId(userId)
+        .groupId(groupId)
+        .nfrs(nfrs)
+        .workflowId(workflowId)
+        .waitTime(waitTime)
+        .params(params)
+        .memoryRequested(memoryRequested)
+        .networkIoTime(networkIoTime)
+        .diskIoTime(diskIoTime)
+        .diskSpaceRequested(diskSpaceRequested)
+        .energyConsumption(energyConsumption)
+        .resourceUsed(resourceUsed)
+        .build();
+    final List<Task> tasks = stageToTasks.get(stageId);
+    if (tasks == null) {
+      List<Task> newTasks = new ArrayList<>();
+      newTasks.add(task);
+      stageToTasks.put(stageId, newTasks);
+    } else {
+      tasks.add(task);
+    }
+    this.getProcessedObjects().add(task);
   }
 }
