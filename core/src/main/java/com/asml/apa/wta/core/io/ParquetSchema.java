@@ -62,18 +62,13 @@ public class ParquetSchema {
               field.getName().replaceAll(regex, replacement).toLowerCase();
           if (String.class.isAssignableFrom(fieldType)) {
             schemaBuilder = schemaBuilder.requiredString(fieldName);
-          } else if (long.class.isAssignableFrom(fieldType) || Long.class.isAssignableFrom(fieldType)) {
+          } else if (long.class.isAssignableFrom(fieldType)) {
             schemaBuilder = schemaBuilder.requiredLong(fieldName);
-          } else if (int.class.isAssignableFrom(fieldType) || Integer.class.isAssignableFrom(fieldType)) {
+          } else if (int.class.isAssignableFrom(fieldType)) {
             schemaBuilder = schemaBuilder.requiredInt(fieldName);
-          } else if (double.class.isAssignableFrom(fieldType) || Double.class.isAssignableFrom(fieldType)) {
+          } else if (double.class.isAssignableFrom(fieldType)) {
             schemaBuilder = schemaBuilder.requiredDouble(fieldName);
-          } else if (float.class.isAssignableFrom(fieldType) || Float.class.isAssignableFrom(fieldType)) {
-            schemaBuilder = schemaBuilder.requiredFloat(fieldName);
-          } else if (boolean.class.isAssignableFrom(fieldType) || Boolean.class.isAssignableFrom(fieldType)) {
-            schemaBuilder = schemaBuilder.requiredBoolean(fieldName);
           } else if (long[].class.isAssignableFrom(fieldType)
-              || Long[].class.isAssignableFrom(fieldType)
               || BaseTraceObject[].class.isAssignableFrom(fieldType)) {
             schemaBuilder = schemaBuilder
                 .name(fieldName)
