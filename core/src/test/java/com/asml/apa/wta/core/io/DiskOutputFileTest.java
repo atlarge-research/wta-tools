@@ -19,7 +19,7 @@ class DiskOutputFileTest {
   }
 
   @Test
-  @EnabledOnOs(OS.LINUX)
+  @EnabledOnOs({OS.LINUX, OS.MAC})
   void resolveLinux() {
     OutputFile file = new DiskOutputFile(Path.of("folder"));
     assertThat(file.toString()).isEqualTo("folder");
