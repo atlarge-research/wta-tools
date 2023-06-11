@@ -4,7 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.doReturn;
 
 import com.asml.apa.wta.core.dto.ProcDto;
-import com.asml.apa.wta.core.utils.BashUtils;
+import com.asml.apa.wta.core.utils.ShellUtils;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import org.junit.jupiter.api.Test;
@@ -13,26 +13,26 @@ import org.mockito.Mockito;
 public class ProcSupplierTest {
   @Test
   void getSnapshotReturnsProcDto() {
-    BashUtils bashUtils = Mockito.mock(BashUtils.class);
+    ShellUtils shellUtils = Mockito.mock(ShellUtils.class);
     doReturn(CompletableFuture.completedFuture("8       0 sda 1114 437 141266 153\n"
             + "8      16 sdb 103 0 4712 174\n" + "8      32 sdc 77636 10312 5307586 5345"))
-        .when(bashUtils)
+        .when(shellUtils)
         .executeCommand("cat /proc/diskstats");
 
     doReturn(CompletableFuture.completedFuture("MemTotal:       10118252 kB\n" + "MemFree:         1921196 kB\n"
             + "MemAvailable:    5470300 kB\n"
             + "Buffers:          239068 kB\n"))
-        .when(bashUtils)
+        .when(shellUtils)
         .executeCommand("cat /proc/meminfo");
 
     doReturn(CompletableFuture.completedFuture("Intel(R) Core(TM) i7-10750H CPU @ 2.60GHz"))
-        .when(bashUtils)
+        .when(shellUtils)
         .executeCommand("grep -m 1 \"model name\" /proc/cpuinfo | awk -F: '{print $2}' | sed 's/^[ \\t]*//'");
 
     doReturn(CompletableFuture.completedFuture("0,62 1.23 1.02 1/479 278339"))
-        .when(bashUtils)
+        .when(shellUtils)
         .executeCommand("cat /proc/loadavg");
-    ProcSupplier sut = new ProcSupplier(bashUtils);
+    ProcSupplier sut = new ProcSupplier(shellUtils);
 
     ProcDto expected = ProcDto.builder()
         .readsCompleted(Optional.of(78853L))
