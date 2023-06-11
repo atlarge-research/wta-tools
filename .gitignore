@@ -75,10 +75,6 @@ tmp
 logs
 *.log
 
-# DAS config files
-*.pyc
-benchmarking/das-bigdata-deployment/frameworks
-
 # test output
 core/src/test/resources/WTA
 core/src/test/resources/AvroOutput
@@ -86,3 +82,15 @@ adapter/spark/src/test/resources/WTA
 wta-output
 test.json
 test.parquet
+
+# DAS config files
+*.pyc
+submodules/benchmarking/das-bigdata-deployment/frameworks
+
+# wta-tools
+venv
+__pycache__
+*.cfg
+include
+lib
+bin
