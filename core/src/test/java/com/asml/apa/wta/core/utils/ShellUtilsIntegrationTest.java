@@ -5,11 +5,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.util.concurrent.CompletableFuture;
 import org.junit.jupiter.api.Test;
 
-public class BashUtilsIntegrationTest {
+public class ShellUtilsIntegrationTest {
   @Test
   void runExecuteCommandSuccessfully() {
-    BashUtils bashUtils = new BashUtils();
-    CompletableFuture<String> actual = bashUtils.executeCommand("echo hello");
+    ShellUtils shellUtils = new ShellUtils();
+    CompletableFuture<String> actual = shellUtils.executeCommand("echo hello");
     assertEquals(actual.join(), "hello\n");
   }
 }

@@ -1,7 +1,7 @@
 package com.asml.apa.wta.core.supplier;
 
 import com.asml.apa.wta.core.dto.ProcDto;
-import com.asml.apa.wta.core.utils.BashUtils;
+import com.asml.apa.wta.core.utils.ShellUtils;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
@@ -27,12 +27,12 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 public class ProcSupplier implements InformationSupplier<ProcDto> {
-  private BashUtils bashUtils;
-  private boolean isProcAvailable;
+  private final ShellUtils shell;
+  private final boolean isProcAvailable;
 
-  public ProcSupplier(BashUtils bashUtils) {
-    this.bashUtils = bashUtils;
-    this.isProcAvailable = isAvailable();
+  public ProcSupplier(ShellUtils shellUtils) {
+    shell = shellUtils;
+    isProcAvailable = isAvailable();
   }
 
   /**
@@ -157,7 +157,7 @@ public class ProcSupplier implements InformationSupplier<ProcDto> {
    * @since 1.0.0
    */
   private CompletableFuture<Optional<Long>[]> getMemMetrics() {
-    CompletableFuture<String> memMetrics = bashUtils.executeCommand("cat /proc/meminfo");
+    CompletableFuture<String> memMetrics = shell.executeCommand("cat /proc/meminfo");
 
     return memMetrics.thenApply(result -> {
       Optional<Long>[] agg = Stream.generate(Optional::empty).limit(60).toArray(Optional[]::new);
@@ -178,7 +178,7 @@ public class ProcSupplier implements InformationSupplier<ProcDto> {
    * @since 1.0.0
    */
   private CompletableFuture<Optional<Long>[]> getDiskMetrics() {
-    CompletableFuture<String> diskMetrics = bashUtils.executeCommand("cat /proc/diskstats");
+    CompletableFuture<String> diskMetrics = shell.executeCommand("cat /proc/diskstats");
 
     return diskMetrics.thenApply(result -> {
       Optional<Long>[] agg = Stream.generate(Optional::empty).limit(17).toArray(Optional[]::new);
@@ -208,7 +208,7 @@ public class ProcSupplier implements InformationSupplier<ProcDto> {
    * @since 1.0.0
    */
   private CompletableFuture<Optional<String>> getCpuModel() {
-    CompletableFuture<String> cpuMetrics = bashUtils.executeCommand(
+    CompletableFuture<String> cpuMetrics = shell.executeCommand(
         "grep -m 1 \"model name\" /proc/cpuinfo | awk -F: '{print $2}' | sed 's/^[ \\t]*//'");
     return cpuMetrics.thenApply(result -> {
       if (result != null && !result.isEmpty() && !fileNotFound(result)) {
@@ -226,7 +226,7 @@ public class ProcSupplier implements InformationSupplier<ProcDto> {
    * @since 1.0.0
    */
   private CompletableFuture<Optional<Double>[]> getLoadAvgMetrics() {
-    CompletableFuture<String> loadAvgMetrics = bashUtils.executeCommand("cat /proc/loadavg");
+    CompletableFuture<String> loadAvgMetrics = shell.executeCommand("cat /proc/loadavg");
 
     Pattern pattern = Pattern.compile("\\d+(?:[.,]\\d+)?");
 

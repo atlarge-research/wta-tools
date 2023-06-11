@@ -1,7 +1,7 @@
 package com.asml.apa.wta.core.supplier;
 
 import com.asml.apa.wta.core.dto.IostatDto;
-import com.asml.apa.wta.core.utils.BashUtils;
+import com.asml.apa.wta.core.utils.ShellUtils;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -22,21 +22,21 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class IostatSupplier implements InformationSupplier<IostatDto> {
 
-  private final BashUtils bashUtils;
+  private final ShellUtils shellUtils;
 
   private boolean isAvailable;
 
   private static final int NUMBER_OF_IOSTAT_METRICS = 7;
 
   /**
-   * Constructs the supplier with a given instance of bash utils.
+   * Constructs the supplier with a given instance of shell utils.
    *
-   * @param bashUtils The bash utils instance to use
+   * @param shellUtils the shell utils instance to use
    * @author Henry Page
    * @since 1.0.0
    */
-  public IostatSupplier(BashUtils bashUtils) {
-    this.bashUtils = bashUtils;
+  public IostatSupplier(ShellUtils shellUtils) {
+    this.shellUtils = shellUtils;
     this.isAvailable = isAvailable();
   }
 
@@ -50,11 +50,11 @@ public class IostatSupplier implements InformationSupplier<IostatDto> {
   @Override
   public boolean isAvailable() {
     try {
-      if (bashUtils.executeCommand("iostat").get() != null) {
+      if (shellUtils.executeCommand("iostat").get() != null) {
         return true;
       }
     } catch (InterruptedException | ExecutionException e) {
-      log.error("Something went wrong while receiving the iostat bash command outputs.");
+      log.error("Something went wrong while receiving the iostat shell command outputs.");
       return false;
     }
     log.info("System does not have the necessary dependencies (sysstat) to run iostat.");
@@ -75,7 +75,7 @@ public class IostatSupplier implements InformationSupplier<IostatDto> {
       return notAvailableResult();
     }
 
-    CompletableFuture<String> allMetrics = bashUtils.executeCommand("iostat -d");
+    CompletableFuture<String> allMetrics = shellUtils.executeCommand("iostat -d | awk '$1 == \"sdc\"'");
 
     return allMetrics.thenApply(result -> {
       if (result != null) {
@@ -93,7 +93,7 @@ public class IostatSupplier implements InformationSupplier<IostatDto> {
               .kiloByteDscd(metrics[6])
               .build();
         } catch (Exception e) {
-          log.error("Something went wrong while receiving the iostat bash command outputs.");
+          log.error("Something went wrong while receiving the iostat shell command outputs.");
         }
       }
       return null;

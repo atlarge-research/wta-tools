@@ -4,7 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.doReturn;
 
 import com.asml.apa.wta.core.dto.IostatDto;
-import com.asml.apa.wta.core.utils.BashUtils;
+import com.asml.apa.wta.core.utils.ShellUtils;
 import java.util.concurrent.CompletableFuture;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -12,24 +12,27 @@ import org.mockito.Mockito;
 
 public class IostatSupplierTest {
 
-  BashUtils bashUtils;
+  ShellUtils shellUtils;
   IostatSupplier sut;
 
   @BeforeEach
   void setup() {
-    bashUtils = Mockito.mock(BashUtils.class);
-    doReturn(CompletableFuture.completedFuture("str")).when(bashUtils).executeCommand("iostat");
-    sut = Mockito.spy(new IostatSupplier(bashUtils));
+    shellUtils = Mockito.mock(ShellUtils.class);
+    doReturn(CompletableFuture.completedFuture("str")).when(shellUtils).executeCommand("iostat");
+    sut = Mockito.spy(new IostatSupplier(shellUtils));
   }
 
   @Test
   public void getSnapshotReturnsIostatDto() {
+    doReturn(CompletableFuture.completedFuture("str 1.0 2.0 3.0 4.0 5.0 6.0 7.0"))
+        .when(shellUtils)
+        .executeCommand("iostat -d | awk '$1 == \"sdc\"'");
     doReturn(
             CompletableFuture.completedFuture(
                 "Device             tps    kB_read/s    kB_wrtn/s    kB_dscd/s    kB_read    kB_wrtn    kB_dscd\n"
                     + "sda               0,01         0.54         0.00         0.00      70941          0          0\n"
                     + "str               1.0          2.0          3.0          4.0       5.0        6.0        7.0"))
-        .when(bashUtils)
+        .when(shellUtils)
         .executeCommand("iostat -d");
 
     IostatDto expected = IostatDto.builder()
