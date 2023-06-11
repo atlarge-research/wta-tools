@@ -24,9 +24,6 @@ public class IostatSupplierTest {
 
   @Test
   public void getSnapshotReturnsIostatDto() {
-    doReturn(CompletableFuture.completedFuture("str 1.0 2.0 3.0 4.0 5.0 6.0 7.0"))
-        .when(shellUtils)
-        .executeCommand("iostat -d | awk '$1 == \"sdc\"'");
     doReturn(
             CompletableFuture.completedFuture(
                 "Device             tps    kB_read/s    kB_wrtn/s    kB_dscd/s    kB_read    kB_wrtn    kB_dscd\n"

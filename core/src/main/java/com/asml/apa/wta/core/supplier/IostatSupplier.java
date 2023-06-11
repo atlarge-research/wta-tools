@@ -75,7 +75,7 @@ public class IostatSupplier implements InformationSupplier<IostatDto> {
       return notAvailableResult();
     }
 
-    CompletableFuture<String> allMetrics = shellUtils.executeCommand("iostat -d | awk '$1 == \"sdc\"'");
+    CompletableFuture<String> allMetrics = shellUtils.executeCommand("iostat -d");
 
     return allMetrics.thenApply(result -> {
       if (result != null) {
