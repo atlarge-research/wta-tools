@@ -47,6 +47,7 @@ For the most part, since we are pre-release this will serve no real purpose, oth
 - Added energy consumption metrics data source [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab) [@pcho](https://gitlab.ewi.tudelft.nl/pcho)
 - Added dstat datasource and wrote integration tests for all io datasources [@lyadalachanchu](https://gitlab.ewi.tudelft.nl/lyadalachanchu)
 - Added tutorials to running TPC-DS benchmark using zoo-tutorials and tpcds-kit [@pcho](https://gitlab.ewi.tudelft.nl/pcho)
+- Added proc metrics data source [@lyadalachanchu](https://gitlab.ewi.tudelft.nl/lyadalachanchu)
 - Implemented Parent Children fields for Task [@tqu](https://gitlab.ewi.tudelft.nl/tqu)
 
 ### Changed
