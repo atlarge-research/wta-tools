@@ -7,12 +7,12 @@ import java.util.concurrent.CompletableFuture;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class BashUtils {
+public class ShellUtils {
 
   /**
-   * Executes given bash command and returns the terminal output.
+   * Executes given shell command and returns the terminal output.
    *
-   * @param command The bash command string that is run.
+   * @param command The shell command string that is run.
    * @return CompletableFuture that returns the output of the command
    * @author Lohithsai Yadala Chanchu
    * @since 1.0.0
@@ -20,18 +20,18 @@ public class BashUtils {
   public CompletableFuture<String> executeCommand(String command) {
     return CompletableFuture.supplyAsync(() -> {
       try {
-        String[] commands = {"bash", "-c", command};
+        String[] commands = {"sh", "-c", command};
         Process process = new ProcessBuilder(commands).start();
         int exitValue = process.waitFor();
 
         if (exitValue != 0) {
-          log.error("Bash command execution failed with exit code: {}", exitValue);
+          log.error("Shell command execution failed with exit code: {}", exitValue);
           return null;
         }
 
         return readProcessOutput(process);
       } catch (Exception e) {
-        log.error("Something went wrong while trying to execute the bash command.");
+        log.error("Something went wrong while trying to execute the shell command.");
         return null;
       }
     });
@@ -53,7 +53,7 @@ public class BashUtils {
       }
       return output.toString();
     } catch (IOException e) {
-      log.error("Something went wrong while trying to read bash command outputs.");
+      log.error("Something went wrong while trying to read shell command outputs.");
       return null;
     }
   }

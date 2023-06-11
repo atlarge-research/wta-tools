@@ -60,6 +60,7 @@ For the most part, since we are pre-release this will serve no real purpose, oth
 - Reworked the Docker images from the ground up to use Ubuntu Focal [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 - Refactor energy consumption metrics data source to be synchronized with driver [@pcho](https://gitlab.ewi.tudelft.nl/pcho)
 - Update the DAS-5 script for Spark with Scala 2.12.x and 2.13.x [@pcho](https://gitlab.ewi.tudelft.nl/pcho)
+- Moved away from bash to sh [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 - Refactored the WTA writers [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 - Decreased JAR size by over 90% [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 
