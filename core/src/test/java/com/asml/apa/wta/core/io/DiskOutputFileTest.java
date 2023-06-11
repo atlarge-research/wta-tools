@@ -1,7 +1,6 @@
 package com.asml.apa.wta.core.io;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 import java.nio.file.Path;
 import org.junit.jupiter.api.Test;
