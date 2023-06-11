@@ -51,7 +51,6 @@ public class TaskLevelListener extends TaskStageBaseListener {
   public void onTaskEnd(SparkListenerTaskEnd taskEnd) {
     final TaskInfo curTaskInfo = taskEnd.taskInfo();
     final TaskMetrics curTaskMetrics = taskEnd.taskMetrics();
-    
     final long taskId = curTaskInfo.taskId() + 1;
     final String type = taskEnd.taskType();
     final long submitTime = curTaskInfo.launchTime();
