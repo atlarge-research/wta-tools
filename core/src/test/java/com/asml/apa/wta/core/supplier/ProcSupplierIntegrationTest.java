@@ -4,9 +4,8 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.asml.apa.wta.core.dto.ProcDto;
-import java.util.concurrent.TimeUnit;
-
 import com.asml.apa.wta.core.utils.ShellUtils;
+import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
 

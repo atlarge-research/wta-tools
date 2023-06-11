@@ -4,10 +4,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.doReturn;
 
 import com.asml.apa.wta.core.dto.ProcDto;
+import com.asml.apa.wta.core.utils.ShellUtils;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
-
-import com.asml.apa.wta.core.utils.ShellUtils;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 

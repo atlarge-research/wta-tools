@@ -1,6 +1,7 @@
 package com.asml.apa.wta.core.supplier;
 
 import com.asml.apa.wta.core.dto.ProcDto;
+import com.asml.apa.wta.core.utils.ShellUtils;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
@@ -14,7 +15,6 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
-import com.asml.apa.wta.core.utils.ShellUtils;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
