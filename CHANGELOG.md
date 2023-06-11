@@ -58,7 +58,7 @@ For the most part, since we are pre-release this will serve no real purpose, oth
 - Reworked the Docker images from the ground up to use Ubuntu Focal [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 - Refactored energy consumption metrics data source to be synchronized with driver [@pcho](https://gitlab.ewi.tudelft.nl/pcho)
 - Updated the DAS-5 script for Spark with Scala 2.12.x and 2.13.x [@pcho](https://gitlab.ewi.tudelft.nl/pcho)
-- Added documentations to running the validator script for Parquet files [@pcho](https://gitlab.ewi.tudelft.nl/pcho)
+- Added documentation for running the validator script on the generated trace [@pcho](https://gitlab.ewi.tudelft.nl/pcho)
 - Restructured the benchmarking directory into a submodule directory [@pcho](https://gitlab.ewi.tudelft.nl/pcho)
 
 ### Fixed
