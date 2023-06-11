@@ -56,10 +56,10 @@ public class EndToEnd {
     conf.set(
         "spark.sql.shuffle.partitions",
         "500"); // increase number of shuffle partitions to distribute workload more evenly across the cluster.
-    System.setProperty("configFile", args[0]);
+    System.setProperty("configFile","adapter/spark/src/test/resources/config.json");
     SparkSession spark = SparkSession.builder().config(conf).getOrCreate();
     SparkContext sc = spark.sparkContext();
-    testFile = JavaSparkContext.fromSparkContext(sc).textFile(args[1]);
+    testFile = JavaSparkContext.fromSparkContext(sc).textFile("adapter/spark/src/test/resources/wordcount.txt");
     for (int i = 0; i < 100; i++) {
       sparkOperations();
     }
