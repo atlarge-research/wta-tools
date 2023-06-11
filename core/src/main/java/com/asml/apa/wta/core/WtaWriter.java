@@ -27,7 +27,7 @@ public class WtaWriter {
 
   private final OutputFile file;
   private final String schemaVersion;
-  private final Map<Class<?>, String> parquetLabels = Map.of(
+  private final Map<Class<? extends BaseTraceObject>, String> parquetLabels = Map.of(
       Resource.class, "resource",
       ResourceState.class, "resource_state",
       Task.class, "task",
