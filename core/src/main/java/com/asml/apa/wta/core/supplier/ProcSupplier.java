@@ -36,9 +36,9 @@ public class ProcSupplier implements InformationSupplier<ProcDto> {
   }
 
   /**
-   * Checks if the proc directory is available.
+   * Checks if the system runs Linux.
    *
-   * @return A boolean that represents if the proc directory is available
+   * @return a {@code boolean} that represents if the proc directory is available
    * @author Lohithsai Yadala Chanchu
    * @since 1.0.0
    */

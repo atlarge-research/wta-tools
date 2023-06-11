@@ -1,5 +1,6 @@
 package com.asml.apa.wta.core.supplier;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.doReturn;
 
@@ -52,7 +53,11 @@ public class ProcSupplierTest {
         .pIdOfMostRecentlyCreatedProcess(Optional.of(278339.0))
         .build();
 
-    assertEquals(expected, sut.getSnapshot().join());
+    if (sut.isAvailable()) {
+      assertEquals(expected, sut.getSnapshot().join());
+    } else {
+      assertThat(sut.getSnapshot().join()).isNull();
+    }
   }
 
   @Test

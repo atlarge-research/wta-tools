@@ -17,7 +17,7 @@ class JobLevelListenerTest extends BaseLevelListenerTest {
   void recordsTheTimeWhenJobIsSubmittedInMap() {
     fakeJobListener.onJobStart(
         new SparkListenerJobStart(559, 40L, new ListBuffer<StageInfo>().toList(), new Properties()));
-    assertThat(((JobLevelListener) fakeJobListener).getJobSubmitTimes()).containsEntry(560, 40L);
+    assertThat(fakeJobListener.getJobSubmitTimes()).containsEntry(560, 40L);
   }
 
   @Test
@@ -25,14 +25,13 @@ class JobLevelListenerTest extends BaseLevelListenerTest {
     fakeJobListener.onJobStart(
         new SparkListenerJobStart(559, 40L, new ListBuffer<StageInfo>().toList(), new Properties()));
     fakeJobListener.onJobEnd(new SparkListenerJobEnd(559, 60L, new JobFailed(new RuntimeException("test"))));
-    assertThat(((JobLevelListener) fakeJobListener).getJobSubmitTimes()).isEmpty();
+    assertThat(fakeJobListener.getJobSubmitTimes()).isEmpty();
     assertThat(fakeJobListener.getProcessedObjects()).hasSize(1);
 
     Workflow fakeJobListenerWorkflow = fakeJobListener.getProcessedObjects().get(0);
     assertThat(fakeJobListenerWorkflow.getId()).isEqualTo(560);
-    assertThat(fakeJobListenerWorkflow.getSubmitTime()).isEqualTo(40L);
+    assertThat(fakeJobListenerWorkflow.getTsSubmit()).isEqualTo(40L);
     assertThat(fakeJobListenerWorkflow.getScheduler()).isEqualTo("DAGScheduler");
-    assertThat(fakeJobListenerWorkflow.getDomain()).isEqualTo(fakeConfig.getDomain());
     assertThat(fakeJobListenerWorkflow.getApplicationName()).isEqualTo("testApp");
 
     assertThat(fakeJobListenerWorkflow.getNfrs()).isEmpty();

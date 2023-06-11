@@ -43,6 +43,29 @@ build-spark-adapter:
       paths:
         - .m2/repository
 
+build-hadoop-connector:
+  stage: build
+  needs: [build-core]
+  dependencies:
+    - build-core
+  script:
+    - echo "Build Hadoop connector started"
+    - "mvn -pl connector/hadoop process-test-classes"
+  artifacts:
+    name: build-hadoop-connector
+    expire_in: 20 minutes
+    paths:
+      - connector/hadoop/target
+      - .m2/repository/com/asml/apa/wta
+  cache:
+    - key:
+        prefix: test
+        files:
+          - pom.xml
+          - core/pom.xml
+      paths:
+        - .m2/repository
+
 package-spark-adapter-e2e_2.12:
   stage: build
   needs: [build-spark-adapter]
