@@ -1,7 +1,9 @@
 ## [wta-tools](https://github.com/atlarge-research/wta-tools) is the work of Laurens Versluis[@lfdversluis](https://github.com/lfdversluis) and [@JaroAmsterdam](https://github.com/JaroAmsterdam)
 
 # wta-tools
-wta-tools validates the Spark plugin Parquet output in the WTA format. You can find the WTA format schema at: https://wta.atlarge-research.com/traceformat.html
+wta-tools validates the Spark plugin Parquet output in the WTA format. You can find the WTA trace schema [here](https://wta.atlarge-research.com/traceformat.html)
+
+Note that the WTA trace schema from the above link might be outdated. Should there be any conflicts, make use of the schema from the script's [GitHub repository](https://github.com/atlarge-research/wta-tools).
 
 ## Running wta-tools
 The instructions below are meant for running the tool in any environment.
