@@ -18,12 +18,12 @@ The diagram above illustrates the workflow of the adapter.
 ## Installation and Usage
 1.  Clone the repository
 2.  Optional (if more I/O metrics are needed):
-   - Install sysstat by running the following bash command:
+   - Install the sysstat package by running the following command in the terminal:
      ```bash
      sudo apt install sysstat
      ```
 
-   - Install dstat by running the following bash command:
+   - Install the dstat package by running the following command in the terminal:
     ```bash
     sudo apt install dstat
     ```
