@@ -97,6 +97,14 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
         Long[] temp = children.stream().map(Task::getId).toArray(size -> new Long[size]);
         task.setChildren(ArrayUtils.toPrimitive(temp));
       }
+      final List<Workflow> workflows = jobLevelListener.getProcessedObjects();
+      for (Workflow workflow : workflows) {
+        workflow.setTotalResources(Arrays.stream(workflow.getTasks())
+            .map(Task::getResourceAmountRequested)
+            .filter(x -> x >= 0.0)
+            .reduce(Double::sum)
+            .orElseGet(() -> -1.0));
+      }
       // resource related fields
       final int resourceProfileId =
           stageLevelListener.getStageToResource().getOrDefault(stageId, -1);

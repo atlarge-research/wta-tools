@@ -49,7 +49,7 @@ public class Workflow implements BaseTraceObject {
 
   private final String applicationField;
 
-  private final double totalResources;
+  private double totalResources;
 
   private final double totalMemoryUsage;
 

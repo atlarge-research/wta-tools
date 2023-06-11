@@ -90,31 +90,27 @@ public class JobLevelListener extends AbstractListener<Workflow> {
     final Domain domain = config.getDomain();
     final String appName = sparkContext.appName();
     final int criticalPathTaskCount = criticalPathTasks;
-    final double totalResources = Arrays.stream(tasks)
-        .map(Task::getResourceAmountRequested)
-        .filter(x -> x > 0.0)
-        .reduce(Double::sum)
-        .orElseGet(() -> -1.0);
+    final double totalResources = -1.0;
     final double totalMemoryUsage = Arrays.stream(tasks)
         .map(Task::getMemoryRequested)
-        .filter(x -> x > 0.0)
+        .filter(x -> x >= 0.0)
         .reduce(Double::sum)
         .orElseGet(() -> -1.0);
     final long totalNetworkUsage = Arrays.stream(tasks)
         .map(Task::getNetworkIoTime)
-        .filter(x -> x > 0)
+        .filter(x -> x >= 0)
         .reduce(Long::sum)
-        .orElseGet(() -> -1L);
+        .orElse(-1L);
     final double totalDiskSpaceUsage = Arrays.stream(tasks)
         .map(Task::getDiskSpaceRequested)
-        .filter(x -> x > 0.0)
+        .filter(x -> x >= 0.0)
         .reduce(Double::sum)
         .orElseGet(() -> -1.0);
     final double totalEnergyConsumption = Arrays.stream(tasks)
         .map(Task::getEnergyConsumption)
-        .filter(x -> x > 0.0)
+        .filter(x -> x >= 0.0)
         .reduce(Double::sum)
-        .orElseGet(() -> -1.0);
+        .orElse(-1.0);
     final long jobRunTime = System.currentTimeMillis() - jobStartTime;
     final long driverTime = jobRunTime
         - stageLevelListener.getProcessedObjects().stream()
