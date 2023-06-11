@@ -28,10 +28,10 @@ public class WtaWriter {
   private final OutputFile file;
   private final String schemaVersion;
   private final Map<Class<? extends BaseTraceObject>, String> parquetLabels = Map.of(
-      Resource.class, "resource",
-      ResourceState.class, "resource_state",
-      Task.class, "task",
-      Workflow.class, "workflow");
+      Resource.class, "resources",
+      ResourceState.class, "resource_states",
+      Task.class, "tasks",
+      Workflow.class, "workflows");
 
   /**
    * Sets up a WTA writer for the specified output path and version.
