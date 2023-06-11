@@ -1,8 +1,7 @@
-## wta-tools is based on the work of Laurens Versluis[@lfdversluis](https://github.com/lfdversluis) and [@JaroAmsterdam](https://github.com/JaroAmsterdam)
-## The github repo for the script: https://github.com/atlarge-research/wta-tools
+## [wta-tools](https://github.com/atlarge-research/wta-tools) is the work of Laurens Versluis[@lfdversluis](https://github.com/lfdversluis) and [@JaroAmsterdam](https://github.com/JaroAmsterdam)
 
 # wta-tools
-wta-tools validates the Spark plugin parquet output in the WTA format. You can find the WTA format schema at: https://wta.atlarge-research.com/traceformat.html
+wta-tools validates the Spark plugin Parquet output in the WTA format. You can find the WTA format schema at: https://wta.atlarge-research.com/traceformat.html
 
 ## Running wta-tools
 The instructions below are meant for running the tool in any environment.
@@ -11,7 +10,7 @@ The instructions below are meant for running the tool in any environment.
 Ensure that you have the following tools installed and environment path variables set:
 - Python 3.6 or above
 
-Furthermore, you need to have the WTA trace parquet files as the following directory structure:
+Furthermore, you need to have the WTA trace Parquet files as the following directory structure:
 
 ```
 <dir_name>
@@ -20,7 +19,7 @@ Furthermore, you need to have the WTA trace parquet files as the following direc
             generic_information.json
     workflows
         schema-1.0
-            workflow.parquet
+            workflows.parquet
     tasks
         schema-1.0
             task.parquet
@@ -77,4 +76,4 @@ cd wta-tools
 python parse_scripts/validate_parquet_files.py <dir_name>
 ```
 
-<dir_name> is the directory of the WTA trace parquet files.
+<dir_name> is the directory of the WTA trace Parquet files.
