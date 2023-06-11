@@ -24,10 +24,10 @@ Furthermore, you need to have the WTA trace Parquet files as the following direc
             workflows.parquet
     tasks
         schema-1.0
-            task.parquet
+            tasks.parquet
     resources
         schema-1.0
-            resource.parquet    
+            resources.parquet    
 ```
 ### Download script
 Download the script from the github repo:
