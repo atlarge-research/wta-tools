@@ -18,7 +18,6 @@ import java.util.stream.Stream;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.SystemUtils;
 
 /**
  * ProcSupplier class.
@@ -45,7 +44,7 @@ public class ProcSupplier implements InformationSupplier<ProcDto> {
    */
   @Override
   public boolean isAvailable() {
-    return SystemUtils.IS_OS_LINUX;
+    return System.getProperty("os.name").toLowerCase().contains("linux");
   }
 
   /**
@@ -163,7 +162,7 @@ public class ProcSupplier implements InformationSupplier<ProcDto> {
     return memMetrics.thenApply(result -> {
       Optional<Long>[] agg = Stream.generate(Optional::empty).limit(60).toArray(Optional[]::new);
 
-      if (result != null) {
+      if (result != null && !fileNotFound(result)) {
         List<Long> parsedList = parseMemMetrics(result);
         IntStream.range(0, parsedList.size()).forEach(i -> agg[i] = Optional.of(parsedList.get(i)));
       }
@@ -183,7 +182,7 @@ public class ProcSupplier implements InformationSupplier<ProcDto> {
 
     return diskMetrics.thenApply(result -> {
       Optional<Long>[] agg = Stream.generate(Optional::empty).limit(17).toArray(Optional[]::new);
-      if (result != null) {
+      if (result != null && !fileNotFound(result)) {
         List<OutputLine> parsedList = parseDiskMetrics(result);
         int rowLength = parsedList.get(0).getLineLength();
         for (OutputLine line : parsedList) {
@@ -212,7 +211,7 @@ public class ProcSupplier implements InformationSupplier<ProcDto> {
     CompletableFuture<String> cpuMetrics = bashUtils.executeCommand(
         "grep -m 1 \"model name\" /proc/cpuinfo | awk -F: '{print $2}' | sed 's/^[ \\t]*//'");
     return cpuMetrics.thenApply(result -> {
-      if (result != null && !result.isEmpty()) {
+      if (result != null && !result.isEmpty() && !fileNotFound(result)) {
         return Optional.of(result);
       }
       return Optional.empty();
@@ -234,7 +233,7 @@ public class ProcSupplier implements InformationSupplier<ProcDto> {
     return loadAvgMetrics.thenApply(result -> {
       Optional<Double>[] agg = (Optional<Double>[]) new Optional<?>[6];
       Arrays.fill(agg, Optional.empty());
-      if (result != null) {
+      if (result != null && !fileNotFound(result)) {
         Matcher matcher = pattern.matcher(result);
         for (int index = 0; index < agg.length && matcher.find(); index++) {
           try {
@@ -302,6 +301,18 @@ public class ProcSupplier implements InformationSupplier<ProcDto> {
         })
         .collect(Collectors.toList());
     return numbersList;
+  }
+
+  /**
+   * Checks the terminal output if the file that is going to be accessed exists.
+   *
+   * @param output the output of the cat terminal command
+   * @return a boolean value that represents if the file was not found
+   * @author Lohithsai Yadala Chanchu
+   * @since 1.0.0
+   */
+  private boolean fileNotFound(String output) {
+    return output.contains("No such file or directory");
   }
 
   /**
