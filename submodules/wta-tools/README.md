@@ -28,6 +28,9 @@ Furthermore, you need to have the WTA trace Parquet files as the following direc
     resources
         schema-1.0
             resources.parquet    
+    resource_states
+        schema-1.0 
+            resource_states.parquet
 ```
 ### Download script
 Download the script from the github repo:
