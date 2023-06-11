@@ -95,10 +95,9 @@ public class WtaWriter {
   private void setupDirectories(OutputFile path, String version) {
     try {
       path.resolve("workload").resolve(version).resolve(".temp").clearDirectory();
-      path.resolve("workflow").resolve(version).resolve(".temp").clearDirectory();
-      path.resolve("task").resolve(version).resolve(".temp").clearDirectory();
-      path.resolve("resource").resolve(version).resolve(".temp").clearDirectory();
-      path.resolve("resource_state").resolve(version).resolve(".temp").clearDirectory();
+      for (String directory : parquetLabels.values()) {
+        path.resolve(directory).resolve(version).resolve(".temp").clearDirectory();
+      }
     } catch (IOException e) {
       log.error("Could not create directory structure for the output.");
     }

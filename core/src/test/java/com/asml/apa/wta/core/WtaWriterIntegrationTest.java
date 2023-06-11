@@ -56,7 +56,8 @@ class WtaWriterIntegrationTest {
   void writeTasks() {
     Task task = Task.builder().build();
     sut.write(Task.class, List.of(task));
-    assertThat(new File("wta-output/tasks/schema-1.0/tasks.parquet").exists()).isTrue();
+    assertThat(new File("wta-output/tasks/schema-1.0/tasks.parquet").exists())
+        .isTrue();
   }
 
   @Test
