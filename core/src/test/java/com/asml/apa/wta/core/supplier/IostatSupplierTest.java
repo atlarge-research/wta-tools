@@ -46,4 +46,31 @@ public class IostatSupplierTest {
 
     assertEquals(expected, result);
   }
+
+  @Test
+  public void aggregateIostatWorksCorrectlyWithZeroRows() {
+    doReturn(CompletableFuture.completedFuture("")).when(shellUtils).executeCommand("iostat -d");
+
+    IostatDto expected = IostatDto.builder().build();
+
+    IostatDto result = sut.getSnapshot().join();
+
+    assertEquals(expected, result);
+  }
+
+  @Test
+  public void aggregateIostatWorksCorrectlyWithDiffColNumber() {
+    doReturn(CompletableFuture.completedFuture(
+            "Device             tps    kB_read/s    kB_wrtn/s    kB_dscd/s    kB_read    kB_wrtn\n"
+                + "sda               0,01         0.54         0.00         0.00      70941          0\n"
+                + "str               1.0          2.0          3.0          4.0       5.0        6.0"))
+        .when(shellUtils)
+        .executeCommand("iostat -d");
+
+    IostatDto expected = IostatDto.builder().build();
+
+    IostatDto result = sut.getSnapshot().join();
+
+    assertEquals(expected, result);
+  }
 }
