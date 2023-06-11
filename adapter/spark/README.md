@@ -18,12 +18,12 @@ The diagram above illustrates the workflow of the adapter.
 ## Installation and Usage
 1.  Clone the repository
 2.  Optional (if more I/O metrics are needed):
-   - Install sysstat by running the following bash command:
+   - Install the sysstat package by running the following command in the terminal:
      ```bash
      sudo apt install sysstat
      ```
 
-   - Install dstat by running the following bash command:
+   - Install the dstat package by running the following command in the terminal:
     ```bash
     sudo apt install dstat
     ```
@@ -136,3 +136,8 @@ Aggregation of all the resource utilisation metrics are done at the driver's end
 ## Guidelines for Developers
 - If a new data source is added in the future, be sure to use the existing streaming infrastructure that handles `MetricsRecord`. This helps the driver in terms of memory usage.
 - When a resource is not needed anymore, release it in `shutdown()`, within the respective `PluginContext`.
+
+## Benchmarking
+[The benchmarking module](../../submodules/benchmarking/README.md) is used to benchmark the performance of the plugin. Any changes to the plugin should be benchmarked to ensure no significant performance degradation.
+
+It is important to note that the benchmarking module is not part of the plugin itself but a separate tool.

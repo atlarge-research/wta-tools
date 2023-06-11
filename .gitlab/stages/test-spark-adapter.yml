@@ -106,6 +106,7 @@ e2e-spark-adapter_2.12:
     expire_in: 3 hours
     paths:
       - wta-output
+  cache: []
 
 e2e-barebones-spark-adapter_2.12:
   stage: test-spark-adapter
@@ -123,6 +124,7 @@ e2e-barebones-spark-adapter_2.12:
     expire_in: 3 hours
     paths:
       - wta-output
+  cache: []
 
 
 e2e-spark-adapter_2.13:
@@ -143,6 +145,7 @@ e2e-spark-adapter_2.13:
     expire_in: 3 hours
     paths:
       - wta-output
+  cache: []
 
 e2e-barebones-spark-adapter_2.13:
   stage: test-spark-adapter
@@ -160,3 +163,4 @@ e2e-barebones-spark-adapter_2.13:
     expire_in: 3 hours
     paths:
       - wta-output
+  cache: []

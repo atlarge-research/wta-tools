@@ -1,9 +1,9 @@
 package com.asml.apa.wta.core.model;
 
+import com.asml.apa.wta.core.io.ParquetSchema;
 import com.asml.apa.wta.core.model.enums.Domain;
 import lombok.Builder;
 import lombok.Data;
-import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericRecord;
 
 /**
@@ -16,6 +16,7 @@ import org.apache.avro.generic.GenericRecord;
 @Data
 @Builder
 public class Workload implements BaseTraceObject {
+
   private static final long serialVersionUID = -4547341610378381743L;
 
   private final long totalWorkflows;
@@ -163,13 +164,38 @@ public class Workload implements BaseTraceObject {
   private final String workloadDescription;
 
   /**
-   * This method shouldn't be called as it will be output into json file that doesn't require conversion to Record.
-   * @param checker checker
+   * This method should never be called as we do not need to output workloads in Parquet.
+   *
    * @param schema schema
-   * @throws RuntimeException exception since this shouldn't be called
+   * @throws RuntimeException always
+   * @author Atour Mousavi Gourabi
+   * @since 1.0.0
    */
   @Override
-  public GenericRecord convertToRecord(Boolean[] checker, Schema schema) {
-    throw new RuntimeException("Something went wrong, this method shouldn't be called!");
+  public final GenericRecord convertToRecord(ParquetSchema schema) {
+    throw accessError();
+  }
+
+  /**
+   * This method should never be called as we do not need to ever fetch its ID.
+   *
+   * @throws RuntimeException always
+   * @author Atour Mousavi Gourabi
+   * @since 1.0.0
+   */
+  @Override
+  public final long getId() {
+    throw accessError();
+  }
+
+  /**
+   * Creates a simple {@link RuntimeException}.
+   *
+   * @return a {@link RuntimeException} with a simple error message
+   * @author Atour Mousavi Gourabi
+   * @since 1.0.0
+   */
+  private RuntimeException accessError() {
+    return new RuntimeException("Something went wrong, this method shouldn't be called!");
   }
 }
