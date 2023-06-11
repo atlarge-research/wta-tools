@@ -2,10 +2,6 @@
   "authors": ["John Doe", "Jane Doe"],
   "domain": "Scientific",
   "description": "Processing data for scientific research purposes",
-  "events": {
-    "f1": "v1",
-    "f2": "v2"
-  },
   "logLevel": "INFO",
   "outputPath": "wta-output",
   "isStageLevel": "true",
