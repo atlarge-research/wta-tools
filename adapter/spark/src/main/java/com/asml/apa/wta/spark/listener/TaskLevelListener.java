@@ -8,7 +8,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.Getter;
 import org.apache.spark.SparkContext;
-import org.apache.spark.TaskContext;
 import org.apache.spark.executor.TaskMetrics;
 import org.apache.spark.scheduler.SparkListenerTaskEnd;
 import org.apache.spark.scheduler.TaskInfo;
@@ -57,7 +56,6 @@ public class TaskLevelListener extends TaskStageBaseListener {
     final long taskId = curTaskInfo.taskId() + 1;
     final String type = taskEnd.taskType();
     final long submitTime = curTaskInfo.launchTime();
-    TaskContext t = TaskContext.get();
     final long runTime = curTaskMetrics.executorRunTime();
     final int userId = sparkContext.sparkUser().hashCode();
     final int stageId = taskEnd.stageId();

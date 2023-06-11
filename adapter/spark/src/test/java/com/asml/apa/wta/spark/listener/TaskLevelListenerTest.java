@@ -48,6 +48,10 @@ class TaskLevelListenerTest extends BaseLevelListenerTest {
     parents.$plus$eq(1);
     TaskMetrics mockedMetrics = mock(TaskMetrics.class);
     when(mockedMetrics.executorRunTime()).thenReturn(100L);
+    when(mockedMetrics.peakExecutionMemory()).thenReturn(-1L);
+    when(mockedMetrics.diskBytesSpilled()).thenReturn(-1L);
+    when(mockedMetrics.resultSerializationTime()).thenReturn(-1L);
+    when(mockedMetrics.executorDeserializeTime()).thenReturn(0L);
 
     testStageInfo = new StageInfo(
         3,
@@ -83,13 +87,16 @@ class TaskLevelListenerTest extends BaseLevelListenerTest {
     assertThat(fakeTaskListener.getStageToTasks().size()).isEqualTo(1);
     List<Task> list = new ArrayList<>();
     list.add(Task.builder().id(1L).build());
-    assertThat(fakeTaskListener.getStageToTasks()).containsEntry(3, list);
+    assertThat(fakeTaskListener.getStageToTasks().get(3).size()).isEqualTo(1);
+    assertThat(fakeTaskListener.getStageToTasks().get(3).get(0).getId()).isEqualTo(1);
     assertThat(fakeTaskListener.getTaskToStage().size()).isEqualTo(1);
     assertThat(fakeTaskListener.getTaskToStage()).containsEntry(1L, 3);
     fakeTaskListener.onTaskEnd(taskEndEvent2);
     assertThat(fakeTaskListener.getStageToTasks().size()).isEqualTo(1);
     list.add(Task.builder().id(2L).build());
-    assertThat(fakeTaskListener.getStageToTasks()).containsEntry(3, list);
+    assertThat(fakeTaskListener.getStageToTasks().get(3).size()).isEqualTo(2);
+    assertThat(fakeTaskListener.getStageToTasks().get(3).get(0).getId()).isEqualTo(1);
+    assertThat(fakeTaskListener.getStageToTasks().get(3).get(1).getId()).isEqualTo(2);
     assertThat(fakeTaskListener.getTaskToStage().size()).isEqualTo(2);
     assertThat(fakeTaskListener.getTaskToStage()).containsEntry(1L, 3);
     assertThat(fakeTaskListener.getTaskToStage()).containsEntry(2L, 3);

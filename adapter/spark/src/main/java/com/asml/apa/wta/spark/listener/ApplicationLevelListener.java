@@ -136,7 +136,6 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
     final long numUsers = tasks.stream().filter(x -> x.getUserId() != -1).count();
     final long numGroups = tasks.stream().filter(x -> x.getGroupId() != -1).count();
     final double totalResourceSeconds = tasks.stream()
-        .filter(x -> x.getGroupId() != -1)
         .filter(x -> x.getRuntime() >= 0 && x.getResourceAmountRequested() >= 0.0)
         .map(x -> x.getResourceAmountRequested() * x.getRuntime())
         .reduce(Double::sum)
