@@ -133,6 +133,7 @@ public class ParquetSchema {
                 break;
               default:
                 object = "";
+                log.error("Failed to properly serialise {} for value {}.", field.getName(), domain);
                 break;
             }
           }
