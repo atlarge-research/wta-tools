@@ -4,15 +4,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
 import com.asml.apa.wta.core.dto.PerfDto;
-import com.asml.apa.wta.core.utils.BashUtils;
+import com.asml.apa.wta.core.utils.ShellUtils;
 import java.util.concurrent.CompletableFuture;
 import org.junit.jupiter.api.Test;
 
 public class PerfSupplierTest {
 
-  private final BashUtils bashUtils = mock(BashUtils.class);
+  private final ShellUtils shellUtils = mock(ShellUtils.class);
 
-  private PerfSupplier sut = spy(new PerfSupplier(bashUtils));
+  private PerfSupplier sut = spy(new PerfSupplier(shellUtils));
 
   private final String isAvailableBashCommand = "perf list | grep -w 'power/energy-pkg/' | awk '{print $1}'";
 
@@ -23,26 +23,26 @@ public class PerfSupplierTest {
 
   @Test
   void perfEnergyDataSourceIsAvailable() {
-    when(bashUtils.executeCommand(isAvailableBashCommand))
+    when(shellUtils.executeCommand(isAvailableBashCommand))
         .thenReturn(CompletableFuture.completedFuture("power/energy-pkg/"));
     assertThat(sut.isAvailable()).isTrue();
   }
 
   @Test
   void perfIsAvailableThrowsNullPointerException() {
-    when(bashUtils.executeCommand(isAvailableBashCommand)).thenReturn(nullCompletableFuture);
+    when(shellUtils.executeCommand(isAvailableBashCommand)).thenReturn(nullCompletableFuture);
     assertThat(sut.isAvailable()).isFalse();
   }
 
   @Test
   void perfEnergyDataSourceNoPowerPkg() {
-    when(bashUtils.executeCommand(isAvailableBashCommand)).thenReturn(CompletableFuture.completedFuture(""));
+    when(shellUtils.executeCommand(isAvailableBashCommand)).thenReturn(CompletableFuture.completedFuture(""));
     assertThat(sut.isAvailable()).isFalse();
   }
 
   @Test
   void perfEnergyGatherMetricsSuccessful() {
-    when(bashUtils.executeCommand(getEnergyMetricsBashCommand))
+    when(shellUtils.executeCommand(getEnergyMetricsBashCommand))
         .thenReturn(CompletableFuture.completedFuture("12.34"));
     String result = sut.gatherMetrics().join();
     assertThat(result).isEqualTo("12.34");
@@ -50,15 +50,15 @@ public class PerfSupplierTest {
 
   @Test
   void perfEnergyGatherMetricsCommandErrorReturnsNull() {
-    when(bashUtils.executeCommand(getEnergyMetricsBashCommand)).thenReturn(nullCompletableFuture);
+    when(shellUtils.executeCommand(getEnergyMetricsBashCommand)).thenReturn(nullCompletableFuture);
     String result = sut.gatherMetrics().join();
     assertThat(result).isNull();
   }
 
   @Test
   void notAvailablePerfReturnsNotAvailableResult() {
-    when(bashUtils.executeCommand(isAvailableBashCommand)).thenReturn(nullCompletableFuture);
-    sut = spy(new PerfSupplier(bashUtils));
+    when(shellUtils.executeCommand(isAvailableBashCommand)).thenReturn(nullCompletableFuture);
+    sut = spy(new PerfSupplier(shellUtils));
     assertThat(sut.isAvailable()).isFalse();
     PerfDto result = sut.getSnapshot().join();
     assertThat(result).isNull();
@@ -66,11 +66,11 @@ public class PerfSupplierTest {
 
   @Test
   void isAvailablePerfReturnsPerfDtoCompletableFuture() {
-    when(bashUtils.executeCommand(isAvailableBashCommand))
+    when(shellUtils.executeCommand(isAvailableBashCommand))
         .thenReturn(CompletableFuture.completedFuture("power/energy-pkg/"));
-    when(bashUtils.executeCommand(getEnergyMetricsBashCommand))
+    when(shellUtils.executeCommand(getEnergyMetricsBashCommand))
         .thenReturn(CompletableFuture.completedFuture("12.34"));
-    sut = spy(new PerfSupplier(bashUtils));
+    sut = spy(new PerfSupplier(shellUtils));
     assertThat(sut.isAvailable()).isTrue();
     PerfDto result = sut.getSnapshot().join();
     assertThat(result.getWatt()).isEqualTo(12.34);
@@ -78,10 +78,10 @@ public class PerfSupplierTest {
 
   @Test
   void perfEnergyGetSnapshotNullValueReturnsZero() {
-    when(bashUtils.executeCommand(isAvailableBashCommand))
+    when(shellUtils.executeCommand(isAvailableBashCommand))
         .thenReturn(CompletableFuture.completedFuture("power/energy-pkg/"));
-    when(bashUtils.executeCommand(getEnergyMetricsBashCommand)).thenReturn(nullCompletableFuture);
-    sut = spy(new PerfSupplier(bashUtils));
+    when(shellUtils.executeCommand(getEnergyMetricsBashCommand)).thenReturn(nullCompletableFuture);
+    sut = spy(new PerfSupplier(shellUtils));
     assertThat(sut.isAvailable()).isTrue();
     PerfDto result = sut.getSnapshot().join();
     assertThat(result.getWatt()).isEqualTo(0.0);
@@ -89,11 +89,11 @@ public class PerfSupplierTest {
 
   @Test
   void perfEnergyGetSnapshotCommaDecimalStringReturnsZero() {
-    when(bashUtils.executeCommand(isAvailableBashCommand))
+    when(shellUtils.executeCommand(isAvailableBashCommand))
         .thenReturn(CompletableFuture.completedFuture("power/energy-pkg/"));
-    when(bashUtils.executeCommand(getEnergyMetricsBashCommand))
+    when(shellUtils.executeCommand(getEnergyMetricsBashCommand))
         .thenReturn(CompletableFuture.completedFuture("12,34"));
-    sut = spy(new PerfSupplier(bashUtils));
+    sut = spy(new PerfSupplier(shellUtils));
     assertThat(sut.isAvailable()).isTrue();
     PerfDto result = sut.getSnapshot().join();
     assertThat(result.getWatt()).isEqualTo(0.0);

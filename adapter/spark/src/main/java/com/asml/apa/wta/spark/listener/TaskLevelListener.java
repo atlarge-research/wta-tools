@@ -101,7 +101,7 @@ public class TaskLevelListener extends TaskStageBaseListener {
             .id(taskId)
             .type(type)
             .submissionSite(submissionSite)
-            .submitTime(submitTime)
+            .tsSubmit(submitTime)
             .runtime(runTime)
             .resourceType(resourceType)
             .resourceAmountRequested(resourceAmountRequested)
