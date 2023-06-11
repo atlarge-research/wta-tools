@@ -125,12 +125,15 @@ public class IostatSupplier implements InformationSupplier<IostatDto> {
    */
   private double[] aggregateIostat(List<OutputLine> rows) {
     if (rows.size() != 0) {
-      return IntStream.range(1, rows.get(0).getRowSize())
+      double[] aggregatedResult = IntStream.range(1, rows.get(0).getRowSize())
           .mapToDouble(j -> rows.stream()
               .mapToDouble(
                   row -> Double.parseDouble(row.getMetricAt(j).replace(',', '.')))
               .sum())
           .toArray();
+      if (aggregatedResult.length == NUMBER_OF_IOSTAT_METRICS) {
+        return aggregatedResult;
+      }
     }
     return new double[NUMBER_OF_IOSTAT_METRICS];
   }

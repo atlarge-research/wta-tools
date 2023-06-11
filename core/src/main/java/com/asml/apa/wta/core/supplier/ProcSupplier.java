@@ -162,7 +162,7 @@ public class ProcSupplier implements InformationSupplier<ProcDto> {
     return memMetrics.thenApply(result -> {
       Optional<Long>[] agg = Stream.generate(Optional::empty).limit(60).toArray(Optional[]::new);
 
-      if (result != null && !fileNotFound(result)) {
+      if (result != null && !result.isEmpty() && !result.isEmpty() && !fileNotFound(result)) {
         List<Long> parsedList = parseMemMetrics(result);
         IntStream.range(0, parsedList.size()).forEach(i -> agg[i] = Optional.of(parsedList.get(i)));
       }
@@ -182,7 +182,7 @@ public class ProcSupplier implements InformationSupplier<ProcDto> {
 
     return diskMetrics.thenApply(result -> {
       Optional<Long>[] agg = Stream.generate(Optional::empty).limit(17).toArray(Optional[]::new);
-      if (result != null && !fileNotFound(result)) {
+      if (result != null && !result.isEmpty() && !fileNotFound(result)) {
         List<OutputLine> parsedList = parseDiskMetrics(result);
         int rowLength = parsedList.get(0).getLineLength();
         for (OutputLine line : parsedList) {
@@ -233,7 +233,7 @@ public class ProcSupplier implements InformationSupplier<ProcDto> {
     return loadAvgMetrics.thenApply(result -> {
       Optional<Double>[] agg = (Optional<Double>[]) new Optional<?>[6];
       Arrays.fill(agg, Optional.empty());
-      if (result != null && !fileNotFound(result)) {
+      if (result != null && !result.isEmpty() && !fileNotFound(result)) {
         Matcher matcher = pattern.matcher(result);
         for (int index = 0; index < agg.length && matcher.find(); index++) {
           try {
