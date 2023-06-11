@@ -56,11 +56,11 @@ source venv/Scripts/activate
 
 Create `requirements.txt` file in the root directory and add the following dependencies:
 ```
-numpy>=1.24.3
-pandas>=2.0.1
-pyarrow>=12.0.0
+numpy==1.24.3
+pandas==2.0.1
+pyarrow==12.0.0
 pyspark==3.2.4
-toposort>=1.10
+toposort==1.10
 ```
 
 Verify that you are inside the virtual environment and install the dependencies:

@@ -136,3 +136,6 @@ Aggregation of all the resource utilisation metrics are done at the driver's end
 ## Guidelines for Developers
 - If a new data source is added in the future, be sure to use the existing streaming infrastructure that handles `MetricsRecord`. This helps the driver in terms of memory usage.
 - When a resource is not needed anymore, release it in `shutdown()`, within the respective `PluginContext`.
+
+## Benchmarking
+Any changes to the plugin should be benchmarked to ensure no significant performance degradation. The benchmarking module is located [here](../../submodules/benchmarking/README.md). It is used to benchmark the performance of the plugin. It is important to note that the benchmarking module is not part of the plugin itself. It is only used to benchmark the plugin.
