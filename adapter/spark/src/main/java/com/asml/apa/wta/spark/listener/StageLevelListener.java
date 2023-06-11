@@ -29,8 +29,6 @@ public class StageLevelListener extends TaskStageBaseListener {
 
   private final Map<Integer, Integer> stageToResource = new ConcurrentHashMap<>();
 
-  private final Map<Integer, Long> stageToMaximumTask = new ConcurrentHashMap<>();
-
   public StageLevelListener(SparkContext sparkContext, RuntimeConfig config) {
     super(sparkContext, config);
   }
