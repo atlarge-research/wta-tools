@@ -49,6 +49,7 @@ For the most part, since we are pre-release this will serve no real purpose, oth
 - Added tutorials to running TPC-DS benchmark using zoo-tutorials and tpcds-kit [@pcho](https://gitlab.ewi.tudelft.nl/pcho)
 - Added proc metrics data source [@lyadalachanchu](https://gitlab.ewi.tudelft.nl/lyadalachanchu)
 - Implemented Parent Children fields for Task [@tqu](https://gitlab.ewi.tudelft.nl/tqu)
+- Added automatic Avro record converters for POJOs [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 
 ### Changed
 - Refactored listeners into a generic interface to reduce code duplication and increase cc [@hpage](https://gitlab.ewi.tudelft.nl/hpage)
@@ -60,6 +61,8 @@ For the most part, since we are pre-release this will serve no real purpose, oth
 - Refactor energy consumption metrics data source to be synchronized with driver [@pcho](https://gitlab.ewi.tudelft.nl/pcho)
 - Update the DAS-5 script for Spark with Scala 2.12.x and 2.13.x [@pcho](https://gitlab.ewi.tudelft.nl/pcho)
 - Moved away from bash to sh [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
+- Refactored the WTA writers [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
+- Decreased JAR size by over 90% [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 
 ### Fixed
 - Fixed the slf4j logging module to allow use in testing and `adapter/spark` [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
@@ -77,3 +80,4 @@ For the most part, since we are pre-release this will serve no real purpose, oth
 - Removed all instances of events [@hpage](https://gitlab.ewi.tudelft.nl/hpage)
 - Removed WtaUtils [@hpage](https://gitlab.ewi.tudelft.nl/hpage)
 - Removed the outdated spark-benchmarking module [@pcho](https://gitlab.ewi.tudelft.nl/pcho)
+- Removed custom Log4j2 configuration [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
