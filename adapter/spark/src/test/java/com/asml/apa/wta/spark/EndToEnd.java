@@ -22,19 +22,17 @@ import scala.Tuple2;
 @Slf4j
 public class EndToEnd {
 
-  private static JavaRDD<String> testFile;
-
   /**
    * Private method to invoke the Spark application with complex jobs involving partitions shuffling. Results don't
    * matter as the purpose is to generate Spark tasks with multiple parent-child relations and jobs with diverse
    * number of tasks for generated traces.
-   *
+   * @param textFile  The text file to read from.
    * @author Pil Kyu Cho
    * @since 1.0.0
    */
-  private static void sparkOperation() {
+  private static void sparkOperation(JavaRDD<String> textFile) {
     JavaRDD<String> words =
-        testFile.flatMap(line -> Arrays.asList(line.split(" ")).iterator());
+            textFile.flatMap(line -> Arrays.asList(line.split(" ")).iterator());
     JavaRDD<String> upperCaseWords =
         words.filter(word -> word.contains("harry")).map(String::toUpperCase);
 
@@ -141,8 +139,7 @@ public class EndToEnd {
     System.setProperty("configFile", args[0]);
     SparkSession spark = SparkSession.builder().config(conf).getOrCreate();
     SparkContext sc = spark.sparkContext();
-    testFile = JavaSparkContext.fromSparkContext(sc).textFile(args[1]);
-    sparkOperation();
+    sparkOperation(JavaSparkContext.fromSparkContext(sc).textFile(args[1]));
     sc.stop();
   }
 }
