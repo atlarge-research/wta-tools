@@ -78,15 +78,15 @@ class StageLevelListenerTest extends BaseLevelListenerTest {
     assertEquals(-1, curStage.getSubmissionSite());
     assertEquals("N/A", curStage.getResourceType());
     assertEquals(-1.0, curStage.getResourceAmountRequested());
-    assertEquals(-1.0, curStage.getMemoryRequested());
-    assertEquals(-1.0, curStage.getDiskSpaceRequested());
+    assertEquals(0.0, curStage.getMemoryRequested());
+    assertEquals(0.0, curStage.getDiskSpaceRequested());
     assertEquals(-1L, curStage.getEnergyConsumption());
     assertEquals(-1L, curStage.getNetworkIoTime());
     assertEquals(-1L, curStage.getDiskIoTime());
     assertEquals(-1, curStage.getGroupId());
     assertEquals("", curStage.getNfrs());
     assertEquals("", curStage.getParams());
-    assertEquals(0, curStage.getParents().length);
+    assertEquals(2, curStage.getParents().length);
     assertEquals(0, curStage.getChildren().length);
   }
 
