@@ -59,4 +59,27 @@ public class ProcSupplierTest {
       assertThat(sut.getSnapshot().join()).isNull();
     }
   }
+
+  @Test
+  void emptyOutputReturnEmptyProcDto() {
+    ShellUtils shellUtils = Mockito.mock(ShellUtils.class);
+    doReturn(CompletableFuture.completedFuture("")).when(shellUtils).executeCommand("cat /proc/diskstats");
+
+    doReturn(CompletableFuture.completedFuture("")).when(shellUtils).executeCommand("cat /proc/meminfo");
+
+    doReturn(CompletableFuture.completedFuture(""))
+        .when(shellUtils)
+        .executeCommand("grep -m 1 \"model name\" /proc/cpuinfo | awk -F: '{print $2}' | sed 's/^[ \\t]*//'");
+
+    doReturn(CompletableFuture.completedFuture("")).when(shellUtils).executeCommand("cat /proc/loadavg");
+    ProcSupplier sut = new ProcSupplier(shellUtils);
+
+    ProcDto expected = ProcDto.builder().build();
+
+    if (sut.isAvailable()) {
+      assertEquals(expected, sut.getSnapshot().join());
+    } else {
+      assertThat(sut.getSnapshot().join()).isNull();
+    }
+  }
 }
