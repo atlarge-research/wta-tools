@@ -90,7 +90,7 @@ public class StageLevelListener extends TaskStageBaseListener {
             .id(stageId)
             .type(type)
             .submissionSite(submissionSite)
-            .submitTime(submitTime)
+            .tsSubmit(submitTime)
             .runtime(runTime)
             .resourceType(resourceType)
             .resourceAmountRequested(resourceAmountRequested)

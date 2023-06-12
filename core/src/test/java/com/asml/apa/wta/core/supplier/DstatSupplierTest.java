@@ -4,7 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.doReturn;
 
 import com.asml.apa.wta.core.dto.DstatDto;
-import com.asml.apa.wta.core.utils.BashUtils;
+import com.asml.apa.wta.core.utils.ShellUtils;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import org.junit.jupiter.api.Test;
@@ -16,14 +16,14 @@ import org.mockito.junit.jupiter.MockitoExtension;
 public class DstatSupplierTest {
   @Test
   void getSnapshotReturnsDstatDto() throws ExecutionException, InterruptedException {
-    BashUtils bashUtils = Mockito.mock(BashUtils.class);
+    ShellUtils shellUtils = Mockito.mock(ShellUtils.class);
     doReturn(CompletableFuture.completedFuture(
             "----total-usage---- -dsk/total- -net/total- ---paging-- ---system--\n"
                 + "usr sys idl wai stl| read  writ| recv  send|  in   out | int   csw\n"
                 + "  0   1  98   0   0|   0     0 |   0     0 |   0     0 | 516  2116"))
-        .when(bashUtils)
+        .when(shellUtils)
         .executeCommand("dstat -cdngy 1 -c 1");
-    DstatSupplier sut = Mockito.spy(new DstatSupplier(bashUtils));
+    DstatSupplier sut = Mockito.spy(new DstatSupplier(shellUtils));
 
     var actual = sut.getSnapshot().join();
 

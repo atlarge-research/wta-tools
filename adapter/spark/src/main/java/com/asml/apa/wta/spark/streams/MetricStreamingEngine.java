@@ -81,14 +81,14 @@ public class MetricStreamingEngine {
         .map(entry -> {
           long transformedId = Math.abs(entry.getKey().hashCode());
           Resource resource = produceResourceFromExecutorInfo(transformedId, entry.getValue());
-          List<ResourceState> states = produceResourceStatesFromExecutorInfo(transformedId, entry.getValue());
+          List<ResourceState> states = produceResourceStatesFromExecutorInfo(resource, entry.getValue());
           return new ResourceAndStateWrapper(transformedId, resource, states);
         })
         .collect(Collectors.toList());
   }
 
   private List<ResourceState> produceResourceStatesFromExecutorInfo(
-      long executorId, List<SparkBaseSupplierWrapperDto> pings) {
+      Resource associatedResource, List<SparkBaseSupplierWrapperDto> pings) {
     return pings.stream()
         .map(ping -> {
           final long timestamp = ping.getTimestamp();
@@ -104,7 +104,7 @@ public class MetricStreamingEngine {
           // TODO(#144): Fill lohit's code here
 
           return ResourceState.builder()
-              .resourceId(executorId)
+              .resourceId(associatedResource)
               .timestamp(timestamp)
               .eventType(eventType)
               .platformId(platformId)
@@ -143,7 +143,7 @@ public class MetricStreamingEngine {
         .diskSpace(diskSpace)
         .procModel("TO BE FILLED")
         .os(os)
-        .networkSpeed(-1L)
+        .network(-1L)
         .build();
   }
 

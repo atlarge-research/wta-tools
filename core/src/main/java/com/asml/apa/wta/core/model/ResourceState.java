@@ -1,97 +1,58 @@
 package com.asml.apa.wta.core.model;
 
-import lombok.AccessLevel;
+import com.asml.apa.wta.core.io.ParquetSchema;
 import lombok.Builder;
 import lombok.Data;
-import lombok.Getter;
-import org.apache.avro.Schema;
-import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.GenericRecord;
 
 /**
  * ResourceState class corresponding to WTA format.
  *
- * @author Henry Page
+ * @author Atour Mousavi Gourabi
  * @since 1.0.0
  */
 @Data
 @Builder
+@SuppressWarnings("VisibilityModifier")
 public class ResourceState implements BaseTraceObject {
 
-  private static final long serialVersionUID = 3002249398331752973L;
+  public final long id;
 
-  @Getter(value = AccessLevel.NONE)
-  private final String schemaVersion = this.getSchemaVersion();
+  private static final long serialVersionUID = 8912154769719138654L;
 
-  private long resourceId;
+  public final Resource resourceId;
 
-  private long timestamp;
+  public final long timestamp;
 
-  private String eventType;
+  public final String eventType;
 
-  private long platformId;
+  public final long platformId;
 
-  private double availableResources;
+  public final double availableResources;
 
-  private double availableMemory;
+  public final double availableMemory;
 
-  private double availableDiskIoBandwidth;
+  public final double availableDiskSpace;
 
-  private double availableNetworkBandwidth;
+  public final double availableDiskIoBandwidth;
 
-  private double averageUtilization1Minute;
+  public final double availableNetworkBandwidth;
 
-  private double averageUtilization5Minute;
+  public final double averageUtilization1Minute;
 
-  private double averageUtilization15Minute;
+  public final double averageUtilization5Minute;
+
+  public final double averageUtilization15Minute;
 
   /**
-   * Converts the POJO object into record object, enabling it to be written by Avro.
-   * It will put all fields allowed by the checker into the record.
+   * All WTA objects that are stored as Parquet files rely on this method to convert the object to a record.
+   * It should build the record object based on the checker and the schema provided.
    *
-   * @param checker checker for which column to skip
-   * @param schema schema The Avro schema
-   * @return record A record that corresponds to a row in parquet
-   * @author Henry Page
-   * @since 1.0.0
+   * @param schema schema for the output object
+   * @return record of the object
    */
   @Override
-  @SuppressWarnings("CyclomaticComplexity")
-  public GenericRecord convertToRecord(Boolean[] checker, Schema schema) {
-    GenericData.Record record = new GenericData.Record(schema);
-    if (checker[0]) {
-      record.put("resource_id", this.resourceId);
-    }
-    if (checker[1]) {
-      record.put("timestamp", this.timestamp);
-    }
-    if (checker[2]) {
-      record.put("event_type", this.eventType);
-    }
-    if (checker[3]) {
-      record.put("platform_id", this.platformId);
-    }
-    if (checker[4]) {
-      record.put("available_resources", this.availableResources);
-    }
-    if (checker[5]) {
-      record.put("available_memory", this.availableMemory);
-    }
-    if (checker[6]) {
-      record.put("available_disk_io_bandwidth", this.availableDiskIoBandwidth);
-    }
-    if (checker[7]) {
-      record.put("available_network_bandwidth", this.availableNetworkBandwidth);
-    }
-    if (checker[8]) {
-      record.put("average_utilization_1_minute", this.averageUtilization1Minute);
-    }
-    if (checker[9]) {
-      record.put("average_utilization_5_minute", this.averageUtilization5Minute);
-    }
-    if (checker[10]) {
-      record.put("average_utilization_15_minute", this.averageUtilization15Minute);
-    }
-    return record;
+  public GenericRecord convertToRecord(ParquetSchema schema) {
+    return schema.convertFromPojo(this, ResourceState.class);
   }
 }

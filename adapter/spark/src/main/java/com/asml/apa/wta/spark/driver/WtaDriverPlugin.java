@@ -1,15 +1,17 @@
 package com.asml.apa.wta.spark.driver;
 
+import com.asml.apa.wta.core.WtaWriter;
 import com.asml.apa.wta.core.config.RuntimeConfig;
-import com.asml.apa.wta.core.logger.Log4j2Configuration;
+import com.asml.apa.wta.core.io.DiskOutputFile;
+import com.asml.apa.wta.core.io.OutputFile;
+import com.asml.apa.wta.core.model.Resource;
 import com.asml.apa.wta.core.model.Task;
 import com.asml.apa.wta.core.model.Workflow;
 import com.asml.apa.wta.core.model.Workload;
-import com.asml.apa.wta.core.utils.ParquetWriterUtils;
 import com.asml.apa.wta.spark.datasource.SparkDataSource;
 import com.asml.apa.wta.spark.dto.ResourceCollectionDto;
 import com.asml.apa.wta.spark.streams.MetricStreamingEngine;
-import java.io.File;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,7 +38,7 @@ public class WtaDriverPlugin implements DriverPlugin {
 
   private SparkDataSource sparkDataSource;
 
-  private ParquetWriterUtils parquetUtil;
+  private OutputFile outputFile;
 
   private boolean error = false;
 
@@ -58,11 +60,9 @@ public class WtaDriverPlugin implements DriverPlugin {
     Map<String, String> executorVars = new HashMap<>();
     try {
       RuntimeConfig runtimeConfig = RuntimeConfig.readConfig();
-      Log4j2Configuration.setUpLoggingConfig(runtimeConfig);
-      metricStreamingEngine = new MetricStreamingEngine();
-      sparkDataSource = new SparkDataSource(sparkCtx, runtimeConfig, metricStreamingEngine);
-      parquetUtil = new ParquetWriterUtils(new File(runtimeConfig.getOutputPath()), "schema-1.0");
-      parquetUtil.deletePreExistingFiles();
+      this.metricStreamingEngine = new MetricStreamingEngine();
+      sparkDataSource = new SparkDataSource(sparkCtx, runtimeConfig, this.metricStreamingEngine);
+      outputFile = new DiskOutputFile(Path.of(runtimeConfig.getOutputPath()));
       initListeners();
       executorVars.put("resourcePingInterval", String.valueOf(runtimeConfig.getResourcePingInterval()));
       executorVars.put(
@@ -111,9 +111,33 @@ public class WtaDriverPlugin implements DriverPlugin {
       try {
         endApplicationAndWrite();
       } catch (Exception e) {
-        log.error("Error while writing to Parquet file");
+        log.error("Error while writing to the generated files, {} : {}.", e.getClass(), e.getMessage());
       }
     }
+  }
+
+  /**
+   * Removes the listeners and writes the collected data to the output file.
+   *
+   * @author Henry Page
+   * @since 1.0.0
+   */
+  private void endApplicationAndWrite() {
+    removeListeners();
+    List<Task> tasks = sparkDataSource.getRuntimeConfig().isStageLevel()
+        ? sparkDataSource.getStageLevelListener().getProcessedObjects()
+        : sparkDataSource.getTaskLevelListener().getProcessedObjects();
+    List<Workflow> workflows = sparkDataSource.getJobLevelListener().getProcessedObjects();
+    List<Resource> resources = List.of();
+    Workload workload = sparkDataSource
+        .getApplicationLevelListener()
+        .getProcessedObjects()
+        .get(0);
+    WtaWriter wtaWriter = new WtaWriter(outputFile, "schema-1.0");
+    wtaWriter.write(Task.class, tasks);
+    wtaWriter.write(Resource.class, resources);
+    wtaWriter.write(Workflow.class, workflows);
+    wtaWriter.write(workload);
   }
 
   /**
@@ -137,37 +161,8 @@ public class WtaDriverPlugin implements DriverPlugin {
    * @since 1.0.0
    */
   public void removeListeners() {
-    this.sparkDataSource.removeTaskListener();
-    this.sparkDataSource.removeTaskListener();
-    this.sparkDataSource.removeApplicationListener();
-  }
-
-  /**
-   * Should be called when all the data collection is done at the end of the application.
-   * This method encapsulates everything that needs to be done at the end of the job. Including, writing
-   * the final output to Parquet.
-   *
-   * @throws Exception if there is an error while writing to Parquet file
-   * @author Tianchen Qu
-   * @author Atour Mousavi Gourabi
-   * @author Pil Kyu Cho
-   * @author Henry Page
-   * @author Lohithsai Yadala Chanchu
-   * @since 1.0.0
-   */
-  private void endApplicationAndWrite() throws Exception {
-    removeListeners();
-    List<Task> tasks = sparkDataSource.getRuntimeConfig().isStageLevel()
-        ? sparkDataSource.getStageLevelListener().getProcessedObjects()
-        : sparkDataSource.getTaskLevelListener().getProcessedObjects();
-    List<Workflow> workFlow = sparkDataSource.getJobLevelListener().getProcessedObjects();
-    Workload workLoad = sparkDataSource
-        .getApplicationLevelListener()
-        .getProcessedObjects()
-        .get(0);
-    parquetUtil.getTasks().addAll(tasks);
-    parquetUtil.getWorkflows().addAll(workFlow);
-    parquetUtil.readWorkload(workLoad);
-    parquetUtil.writeToFile("resource", "task", "workflow", "generic_information");
+    sparkDataSource.removeTaskListener();
+    sparkDataSource.removeTaskListener();
+    sparkDataSource.removeApplicationListener();
   }
 }

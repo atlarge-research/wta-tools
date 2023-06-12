@@ -71,7 +71,7 @@ class StageLevelListenerTest extends BaseLevelListenerTest {
     Task curStage = fakeStageListener.getProcessedObjects().get(0);
     assertEquals(3, curStage.getId());
     assertEquals("", curStage.getType());
-    assertEquals(10L, curStage.getSubmitTime());
+    assertEquals(10L, curStage.getTsSubmit());
     assertEquals(100L, curStage.getRuntime());
     assertEquals(2L, curStage.getWorkflowId());
     assertEquals(Math.abs("testUser".hashCode()), curStage.getUserId());

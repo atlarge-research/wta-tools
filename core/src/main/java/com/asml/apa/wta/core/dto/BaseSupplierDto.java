@@ -21,7 +21,7 @@ import lombok.experimental.SuperBuilder;
 @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public class BaseSupplierDto implements Serializable {
 
-  private static final long serialVersionUID = -3101218638564306099L;
+  private static final long serialVersionUID = 21352L;
 
   private long timestamp;
 
@@ -34,4 +34,6 @@ public class BaseSupplierDto implements Serializable {
   private Optional<PerfDto> perfDto;
 
   private Optional<JvmFileDto> jvmFileDto;
+
+  private Optional<ProcDto> procDto;
 }

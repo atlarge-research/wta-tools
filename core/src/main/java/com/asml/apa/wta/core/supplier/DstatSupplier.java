@@ -1,7 +1,7 @@
 package com.asml.apa.wta.core.supplier;
 
 import com.asml.apa.wta.core.dto.DstatDto;
-import com.asml.apa.wta.core.utils.BashUtils;
+import com.asml.apa.wta.core.utils.ShellUtils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -19,11 +19,11 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 public class DstatSupplier implements InformationSupplier<DstatDto> {
-  private BashUtils bashUtils;
-  private boolean isDstatAvailable;
+  private final ShellUtils shellUtils;
+  private final boolean isDstatAvailable;
 
-  public DstatSupplier(BashUtils bashUtils) {
-    this.bashUtils = bashUtils;
+  public DstatSupplier(ShellUtils shellUtils) {
+    this.shellUtils = shellUtils;
     this.isDstatAvailable = isAvailable();
   }
 
@@ -37,10 +37,10 @@ public class DstatSupplier implements InformationSupplier<DstatDto> {
   @Override
   public CompletableFuture<Optional<DstatDto>> getSnapshot() {
     if (!isDstatAvailable) {
-      return CompletableFuture.completedFuture(Optional.empty());
+      return notAvailableResult();
     }
 
-    CompletableFuture<String> allMetrics = bashUtils.executeCommand("dstat -cdngy 1 -c 1");
+    CompletableFuture<String> allMetrics = shellUtils.executeCommand("dstat -cdngy 1 -c 1");
 
     return allMetrics.thenApply(result -> {
       if (result != null) {
@@ -105,11 +105,11 @@ public class DstatSupplier implements InformationSupplier<DstatDto> {
   @Override
   public boolean isAvailable() {
     try {
-      if (bashUtils.executeCommand("dstat -cdngy 1 -c 1").get() != null) {
+      if (shellUtils.executeCommand("dstat -cdngy 1 -c 1").get() != null) {
         return true;
       }
     } catch (InterruptedException | ExecutionException e) {
-      log.error("Something went wrong while receiving the dstat bash command outputs.");
+      log.error("Something went wrong while receiving the dstat shell command outputs.");
       return false;
     }
     log.info("System does not have the necessary dependencies (sysstat) to run dstat.");

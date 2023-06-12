@@ -59,7 +59,7 @@ public class JavaFileSupplier implements InformationSupplier<JvmFileDto> {
   @Override
   public CompletableFuture<Optional<JvmFileDto>> getSnapshot() {
     if (!isAvailable) {
-      return CompletableFuture.completedFuture(Optional.empty());
+      return notAvailableResult();
     }
 
     return CompletableFuture.supplyAsync(() -> {

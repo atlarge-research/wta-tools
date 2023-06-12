@@ -6,7 +6,8 @@ import com.asml.apa.wta.core.dto.IostatDto;
 import com.asml.apa.wta.core.dto.JvmFileDto;
 import com.asml.apa.wta.core.dto.OsInfoDto;
 import com.asml.apa.wta.core.dto.PerfDto;
-import com.asml.apa.wta.core.utils.BashUtils;
+import com.asml.apa.wta.core.dto.ProcDto;
+import com.asml.apa.wta.core.utils.ShellUtils;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -31,6 +32,8 @@ public abstract class SupplierExtractionEngine<T extends BaseSupplierDto> {
 
   private final DstatSupplier dstatSupplier;
 
+  private final ProcSupplier procSupplier;
+
   private final PerfSupplier perfSupplier;
 
   private final JavaFileSupplier javaFileSupplier;
@@ -53,13 +56,14 @@ public abstract class SupplierExtractionEngine<T extends BaseSupplierDto> {
    * @since 1.0.0
    */
   public SupplierExtractionEngine(int resourcePingInterval) {
-    BashUtils bashUtils = new BashUtils();
+    ShellUtils shellUtils = new ShellUtils();
     this.resourcePingInterval = resourcePingInterval;
     this.operatingSystemSupplier = new OperatingSystemSupplier();
-    this.iostatSupplier = new IostatSupplier(bashUtils);
-    this.dstatSupplier = new DstatSupplier(bashUtils);
-    this.perfSupplier = new PerfSupplier(bashUtils);
     this.javaFileSupplier = new JavaFileSupplier();
+    this.iostatSupplier = new IostatSupplier(shellUtils);
+    this.dstatSupplier = new DstatSupplier(shellUtils);
+    this.procSupplier = new ProcSupplier(shellUtils);
+    this.perfSupplier = new PerfSupplier(shellUtils);
   }
 
   /**
@@ -76,13 +80,15 @@ public abstract class SupplierExtractionEngine<T extends BaseSupplierDto> {
     CompletableFuture<Optional<DstatDto>> dstatDtoCompletableFuture = this.dstatSupplier.getSnapshot();
     CompletableFuture<Optional<PerfDto>> perfDtoCompletableFuture = this.perfSupplier.getSnapshot();
     CompletableFuture<Optional<JvmFileDto>> jvmFileDtoCompletableFuture = this.javaFileSupplier.getSnapshot();
+    CompletableFuture<Optional<ProcDto>> procDtoCompletableFuture = this.procSupplier.getSnapshot();
 
     return CompletableFuture.allOf(
             osInfoDtoCompletableFuture,
             iostatDtoCompletableFuture,
             dstatDtoCompletableFuture,
             perfDtoCompletableFuture,
-            jvmFileDtoCompletableFuture)
+            jvmFileDtoCompletableFuture,
+            procDtoCompletableFuture)
         .thenCompose((v) -> {
           long timestamp = System.currentTimeMillis();
           Optional<OsInfoDto> osInfoDto = osInfoDtoCompletableFuture.join();
@@ -90,8 +96,9 @@ public abstract class SupplierExtractionEngine<T extends BaseSupplierDto> {
           Optional<DstatDto> dstatDto = dstatDtoCompletableFuture.join();
           Optional<PerfDto> perfDto = perfDtoCompletableFuture.join();
           Optional<JvmFileDto> jvmFileDto = jvmFileDtoCompletableFuture.join();
-          return CompletableFuture.completedFuture(transform(
-              new BaseSupplierDto(timestamp, osInfoDto, iostatDto, dstatDto, perfDto, jvmFileDto)));
+          Optional<ProcDto> procDto = procDtoCompletableFuture.join();
+          return CompletableFuture.completedFuture(transform(new BaseSupplierDto(
+              timestamp, osInfoDto, iostatDto, dstatDto, perfDto, jvmFileDto, procDto)));
         });
   }
 

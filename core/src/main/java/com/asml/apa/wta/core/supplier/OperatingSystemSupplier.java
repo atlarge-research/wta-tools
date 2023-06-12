@@ -163,7 +163,7 @@ public class OperatingSystemSupplier implements InformationSupplier<OsInfoDto> {
   @Override
   public CompletableFuture<Optional<OsInfoDto>> getSnapshot() {
     if (!isAvailable) {
-      return CompletableFuture.completedFuture(Optional.empty());
+      return notAvailableResult();
     }
 
     return CompletableFuture.supplyAsync(() -> {
