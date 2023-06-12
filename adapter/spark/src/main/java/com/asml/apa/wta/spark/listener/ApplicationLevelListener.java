@@ -66,8 +66,7 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
    * @since 1.0.0
    */
   public void onApplicationEnd(SparkListenerApplicationEnd applicationEnd) {
-
-    // we should nenver enter this branch, this is a guard since an application
+    // we should never enter this branch, this is a guard since an application
     // only terminates once.
     List<Workload> processedObjects = this.getProcessedObjects();
     if (!processedObjects.isEmpty()) {
@@ -89,9 +88,9 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
           stageLevelListener.getStageToParents().get(stageId);
       if (parentStages != null) {
         final Long[] parents = Arrays.stream(parentStages)
-            .flatMap(parentStage -> Arrays.stream(taskLevelListener
+            .flatMap(parentId -> Arrays.stream(taskLevelListener
                 .getStageToTasks()
-                .get(parentStage)
+                .getOrDefault(parentId, new ArrayList<>())
                 .toArray(new Long[0])))
             .toArray(size -> new Long[size]);
         task.setParents(ArrayUtils.toPrimitive(parents));

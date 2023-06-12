@@ -68,6 +68,7 @@ For the most part, since we are pre-release this will serve no real purpose, oth
 - Decreased JAR size by over 90% [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 - Added documentation for running the validator script on the generated trace [@pcho](https://gitlab.ewi.tudelft.nl/pcho)
 - Restructured the benchmarking directory into a submodule directory [@pcho](https://gitlab.ewi.tudelft.nl/pcho)
+- Updated the Spark method in EndToEnd class to cover more broad shuffling operations [@pcho](https://gitlab.ewi.tudelft.nl/pcho)
 
 ### Fixed
 - Fixed the slf4j logging module to allow use in testing and `adapter/spark` [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
