@@ -69,6 +69,7 @@ public class TaskLevelListener extends TaskStageBaseListener {
     final double resourceAmountRequested = -1.0;
     final long diskIoTime =
         curTaskMetrics.executorDeserializeTime() + curTaskMetrics.resultSerializationTime(); // unsure
+    final long resourceUsed = curTaskInfo.executorId().hashCode();
     // unknown
     final int submissionSite = -1;
     final int groupId = -1;
@@ -78,14 +79,14 @@ public class TaskLevelListener extends TaskStageBaseListener {
 
     final double energyConsumption = -1L;
     final long waitTime = -1L;
-    final long resourceUsed = -1L;
+
 
     // TODO(#61): CALL EXTERNAL DEPENDENCIES
     Task task = Task.builder()
         .id(taskId)
         .type(type)
         .submissionSite(submissionSite)
-        .submitTime(submitTime)
+        .tsSubmit(submitTime)
         .runtime(runTime)
         .resourceType(resourceType)
         .resourceAmountRequested(resourceAmountRequested)

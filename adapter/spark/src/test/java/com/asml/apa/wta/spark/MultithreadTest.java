@@ -36,6 +36,7 @@ public class MultithreadTest {
   }
 
   @Test
+  @Timeout(value = 5000L, unit = TimeUnit.MILLISECONDS)
   void startAndStopPingingWorksAsIntended() {
     sutSupplierExtractionEngine.startPinging();
 
@@ -77,6 +78,7 @@ public class MultithreadTest {
   }
 
   @Test
+  @Timeout(value = 10000L, unit = TimeUnit.MILLISECONDS)
   void pingAndBufferWithANegativeOrZeroExecutorSynchronizationIntervalDoesNotBuffer() throws IOException {
     SparkSupplierExtractionEngine testEngine = spy(new SparkSupplierExtractionEngine(2000, mockPluginContext, 0));
 
@@ -94,6 +96,7 @@ public class MultithreadTest {
   }
 
   @Test
+  @Timeout(value = 5000L, unit = TimeUnit.MILLISECONDS)
   void pingsGetSentToDriver() throws IOException {
     sutExecutorPlugin.init(
         mockPluginContext, Map.of("executorSynchronizationInterval", "2000", "resourcePingInterval", "1000"));

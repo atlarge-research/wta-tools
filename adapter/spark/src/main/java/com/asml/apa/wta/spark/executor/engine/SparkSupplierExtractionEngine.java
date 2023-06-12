@@ -134,6 +134,7 @@ public class SparkSupplierExtractionEngine extends SupplierExtractionEngine<Spar
         .iostatDto(record.getIostatDto())
         .dstatDto(record.getDstatDto())
         .perfDto(record.getPerfDto())
+        .procDto(record.getProcDto())
         .build();
   }
 }

@@ -17,7 +17,7 @@ class TraceObjectTest {
         .procModel("")
         .memory(1L)
         .diskSpace(1L)
-        .networkSpeed(1L)
+        .network(1L)
         .os("")
         .details("");
     assertThat(traceObjectBuilder.build().getSchemaVersion()).isEqualTo("1.0");

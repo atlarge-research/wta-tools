@@ -99,7 +99,6 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
       if (resources.size() > 0) {
         task.setResourceType(resources.get(0).resourceName());
         task.setResourceAmountRequested(resources.get(0).amount());
-        task.setResourceUsed(resourceProfileId);
       }
     }
   }
@@ -151,7 +150,7 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
     final Workflow[] workflows = jobLevelListener.getProcessedObjects().toArray(new Workflow[0]);
     final int numWorkflows = workflows.length;
     final int totalTasks =
-        Arrays.stream(workflows).mapToInt(Workflow::getNumberOfTasks).sum();
+        Arrays.stream(workflows).mapToInt(Workflow::getTaskCount).sum();
     final Domain domain = config.getDomain();
     final long startDate = sparkContext.startTime();
     final long endDate = applicationEnd.time();

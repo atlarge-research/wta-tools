@@ -12,6 +12,7 @@
   </parent>
 
   <artifactId>spark</artifactId>
+  <packaging>jar</packaging>
 
   <properties>
     <spark.scala.version>2.12</spark.scala.version>
