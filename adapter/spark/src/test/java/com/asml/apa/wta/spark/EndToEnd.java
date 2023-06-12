@@ -34,10 +34,9 @@ public class EndToEnd {
    */
   private static void sparkOperation() {
     JavaRDD<String> words =
-            testFile.flatMap(line -> Arrays.asList(line.split(" ")).iterator());
-    JavaRDD<String> upperCaseWords = words
-            .filter(word -> word.contains("harry"))
-            .map(String::toUpperCase);
+        testFile.flatMap(line -> Arrays.asList(line.split(" ")).iterator());
+    JavaRDD<String> upperCaseWords =
+        words.filter(word -> word.contains("harry")).map(String::toUpperCase);
 
     JavaPairRDD<String, Tuple2<Integer, Integer>> wordCountPairs = upperCaseWords
         .mapToPair(word -> new Tuple2<>(word, 1))
@@ -53,10 +52,11 @@ public class EndToEnd {
                 tuple._1()._2()._1() + tuple._2()._2()._1(),
                 tuple._1()._2()._2() + tuple._2()._2()._2())));
     JavaPairRDD<Double, Tuple2<String, String>> sortedPairs = joinedPairs
-            .filter(tuple -> tuple._2()._2() > 3)
-            .mapValues(tuple -> (double) tuple._1() / tuple._2())
-            .mapToPair(pair -> new Tuple2<>(pair._2(), pair._1()))
-            .repartition(10).sortByKey(false);
+        .filter(tuple -> tuple._2()._2() > 3)
+        .mapValues(tuple -> (double) tuple._1() / tuple._2())
+        .mapToPair(pair -> new Tuple2<>(pair._2(), pair._1()))
+        .repartition(10)
+        .sortByKey(false);
     JavaRDD<Tuple2<Double, Tuple2<String, String>>> tupled = sortedPairs.mapPartitionsWithIndex(
         (index, iter) -> {
           List<Tuple2<Double, Tuple2<String, String>>> tuples = new ArrayList<>();
@@ -70,17 +70,19 @@ public class EndToEnd {
           return tuples.iterator();
         },
         true);
-    JavaRDD<Tuple2<Double, String>> mappedPairs = tupled
-            .mapToPair(tuple -> new Tuple2<>(tuple._1(), tuple._2())).groupByKey()
-            .filter(pair -> {return pair._1() >= 10;})
-            .map(pair -> {
-              String concatenated = "";
-              for (Tuple2<String, String> value : pair._2()) {
-                concatenated += value._1() + ":" + value._2() + ",";
-              }
-              return new Tuple2<Double, String>(pair._1(), concatenated);
-            })
-            .repartition(20);
+    JavaRDD<Tuple2<Double, String>> mappedPairs = tupled.mapToPair(tuple -> new Tuple2<>(tuple._1(), tuple._2()))
+        .groupByKey()
+        .filter(pair -> {
+          return pair._1() >= 10;
+        })
+        .map(pair -> {
+          String concatenated = "";
+          for (Tuple2<String, String> value : pair._2()) {
+            concatenated += value._1() + ":" + value._2() + ",";
+          }
+          return new Tuple2<Double, String>(pair._1(), concatenated);
+        })
+        .repartition(20);
     JavaRDD<String> strings = mappedPairs
         .mapToPair(tuple -> new Tuple2<>(tuple._2(), tuple._1()))
         .reduceByKey(Double::sum)
@@ -88,11 +90,10 @@ public class EndToEnd {
         .sortByKey()
         .map(t -> t._1);
 
-    wordCountPairs = strings
-            .mapToPair(word -> new Tuple2<>(word, 1))
-            .reduceByKey((a, b) -> a + b)
-            .mapToPair(tuple ->
-                new Tuple2<>(tuple._1(), new Tuple2<>(tuple._1().length(), tuple._2())));
+    wordCountPairs = strings.mapToPair(word -> new Tuple2<>(word, 1))
+        .reduceByKey((a, b) -> a + b)
+        .mapToPair(tuple ->
+            new Tuple2<>(tuple._1(), new Tuple2<>(tuple._1().length(), tuple._2())));
     joinedPairs = wordCountPairs
         .cartesian(wordCountPairs)
         .filter(tuple -> tuple._1()._1().compareTo(tuple._2()._1()) < 0)
@@ -102,11 +103,11 @@ public class EndToEnd {
                 tuple._1()._2()._1() + tuple._2()._2()._1(),
                 tuple._1()._2()._2() + tuple._2()._2()._2())));
     sortedPairs = joinedPairs
-            .filter(tuple -> tuple._2()._2() > 3)
-            .mapValues(tuple -> (double) tuple._1() / tuple._2())
-            .mapToPair(pair -> new Tuple2<>(pair._2(), pair._1()))
-            .repartition(10)
-            .sortByKey(false);
+        .filter(tuple -> tuple._2()._2() > 3)
+        .mapValues(tuple -> (double) tuple._1() / tuple._2())
+        .mapToPair(pair -> new Tuple2<>(pair._2(), pair._1()))
+        .repartition(10)
+        .sortByKey(false);
     tupled = sortedPairs.mapPartitionsWithIndex(
         (index, iter) -> {
           List<Tuple2<Double, Tuple2<String, String>>> tuples = new ArrayList<>();
@@ -134,11 +135,8 @@ public class EndToEnd {
   public static void main(String[] args) {
     SparkConf conf = new SparkConf()
         .setAppName("SystemTest")
-        .setMaster("local[*]")
+        .setMaster("local")
         .set("spark.sql.shuffle.partitions", "500")
-        .set("spark.executor.instances", "2")
-        .set("spark.executor.cores", "2")
-        .set("spark.executor.memory", "4g")
         .set("spark.plugins", "com.asml.apa.wta.spark.WtaPlugin");
     System.setProperty("configFile", args[0]);
     SparkSession spark = SparkSession.builder().config(conf).getOrCreate();
