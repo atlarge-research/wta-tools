@@ -99,7 +99,7 @@ e2e-spark-adapter_2.12:
     - echo "This job does not provide coverage metrics, it just verifies the system as a whole functions to some degree"
     - apt-get install -y linux-tools-`uname -r`
     - sysctl -w kernel.perf_event_paranoid=0
-    - spark-submit --class com.asml.apa.wta.spark.EndToEnd --master local[1] adapter/spark/target/spark-1.0-SNAPSHOT-e2e.jar adapter/spark/src/test/resources/config.json adapter/spark/src/test/resources/wordcount.txt
+    - spark-submit --class com.asml.apa.wta.spark.EndToEnd --master local adapter/spark/target/spark-1.0-SNAPSHOT-e2e.jar adapter/spark/src/test/resources/config.json adapter/spark/src/test/resources/e2e-input.txt
     - if ! [ -n "$(ls -A wta-output 2>/dev/null)" ] ; then exit 1 ; fi
   artifacts:
     name: e2e-output_2.12
@@ -117,7 +117,7 @@ e2e-barebones-spark-adapter_2.12:
   script:
     - echo "Barebones Spark adapter end-to-end run started"
     - echo "This job does not provide coverage metrics, it just verifies the system as a whole functions in a barebones environment"
-    - spark-submit --class com.asml.apa.wta.spark.EndToEnd --master local[1] adapter/spark/target/spark-1.0-SNAPSHOT-e2e.jar adapter/spark/src/test/resources/config.json adapter/spark/src/test/resources/wordcount.txt
+    - spark-submit --class com.asml.apa.wta.spark.EndToEnd --master local adapter/spark/target/spark-1.0-SNAPSHOT-e2e.jar adapter/spark/src/test/resources/config.json adapter/spark/src/test/resources/e2e-input.txt
     - if ! [ -n "$(ls -A wta-output 2>/dev/null)" ] ; then exit 1 ; fi
   artifacts:
     name: barebones-e2e-output_2.12
@@ -138,7 +138,7 @@ e2e-spark-adapter_2.13:
     - echo "This job does not provide coverage metrics, it just verifies the system as a whole functions to some degree"
     - apt-get install -y linux-tools-`uname -r`
     - sysctl -w kernel.perf_event_paranoid=0
-    - spark-submit --class com.asml.apa.wta.spark.EndToEnd --master local[1] adapter/spark/target/spark-1.0-SNAPSHOT-e2e.jar adapter/spark/src/test/resources/config.json adapter/spark/src/test/resources/wordcount.txt
+    - spark-submit --class com.asml.apa.wta.spark.EndToEnd --master local adapter/spark/target/spark-1.0-SNAPSHOT-e2e.jar adapter/spark/src/test/resources/config.json adapter/spark/src/test/resources/e2e-input.txt
     - if ! [ -n "$(ls -A wta-output 2>/dev/null)" ] ; then exit 1 ; fi
   artifacts:
     name: e2e-output_2.13
@@ -156,7 +156,7 @@ e2e-barebones-spark-adapter_2.13:
   script:
     - echo "Barebones Spark adapter end-to-end run started"
     - echo "This job does not provide coverage metrics, it just verifies the system as a whole functions in a barebones environment"
-    - spark-submit --class com.asml.apa.wta.spark.EndToEnd --master local[1] adapter/spark/target/spark-1.0-SNAPSHOT-e2e.jar adapter/spark/src/test/resources/config.json adapter/spark/src/test/resources/wordcount.txt
+    - spark-submit --class com.asml.apa.wta.spark.EndToEnd --master local[1] adapter/spark/target/spark-1.0-SNAPSHOT-e2e.jar adapter/spark/src/test/resources/config.json adapter/spark/src/test/resources/e2e-input.txt
     - if ! [ -n "$(ls -A wta-output 2>/dev/null)" ] ; then exit 1 ; fi
   artifacts:
     name: barebones-e2e-output_2.13
