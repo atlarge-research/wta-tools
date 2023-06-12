@@ -9,7 +9,6 @@ import com.asml.apa.wta.core.model.ResourceState;
 import com.asml.apa.wta.core.streams.KeyedStream;
 import com.asml.apa.wta.spark.dto.ResourceAndStateWrapper;
 import com.asml.apa.wta.spark.dto.SparkBaseSupplierWrapperDto;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -75,7 +74,6 @@ public class MetricStreamingEngine {
    * @since 1.0.0
    */
   public List<ResourceAndStateWrapper> collectResourceInformation() {
-    List<ResourceAndStateWrapper> result = new ArrayList<>();
     Map<String, List<SparkBaseSupplierWrapperDto>> allPings = executorResourceStream.collectAll();
 
     return allPings.entrySet().stream()
@@ -112,11 +110,11 @@ public class MetricStreamingEngine {
     final double numResources =
         sampleOsInfo.map(OsInfoDto::getAvailableProcessors).orElse(-1);
     final long memory = sampleOsInfo
-        .map(pg -> (pg.getTotalPhysicalMemorySize() / (bytesToGbDenom)))
+        .map(pg -> pg.getTotalPhysicalMemorySize() / bytesToGbDenom)
         .orElse(-1L);
 
     final long diskSpace = sampleJvmInfo
-        .map(jvmDto -> (jvmDto.getTotalSpace() / bytesToGbDenom))
+        .map(jvmDto -> jvmDto.getTotalSpace() / bytesToGbDenom)
         .orElse(-1L);
 
     return Resource.builder()
@@ -186,6 +184,7 @@ public class MetricStreamingEngine {
               .eventType(eventType)
               .platformId(platformId)
               .availableResources(availableResources)
+              .availableDiskSpace(availableDiskSpace)
               .availableMemory(availableMemory)
               .availableDiskIoBandwidth(availableDiskIoBandwith)
               .availableNetworkBandwidth(availableNetworkBandwidth)
