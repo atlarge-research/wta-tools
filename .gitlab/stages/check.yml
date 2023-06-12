@@ -35,6 +35,7 @@ pmd:
     paths:
       - core/reports/pmd
       - adapter/spark/reports/pmd
+      - connector/hadoop/reports/pmd
   cache:
     - key:
         prefix: test
@@ -58,6 +59,7 @@ checkstyle:
     paths:
       - core/reports/checkstyle/violations.txt
       - adapter/spark/reports/checkstyle/violations.txt
+      - connector/hadoop/reports/checkstyle/violations.txt
   cache:
     - key:
         prefix: checkstyle

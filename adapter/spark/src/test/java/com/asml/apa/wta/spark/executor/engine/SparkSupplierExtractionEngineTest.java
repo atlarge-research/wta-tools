@@ -8,8 +8,10 @@ import com.asml.apa.wta.core.dto.DstatDto;
 import com.asml.apa.wta.core.dto.IostatDto;
 import com.asml.apa.wta.core.dto.OsInfoDto;
 import com.asml.apa.wta.core.dto.PerfDto;
+import com.asml.apa.wta.core.dto.ProcDto;
 import com.asml.apa.wta.spark.dto.SparkBaseSupplierWrapperDto;
 import java.time.LocalDateTime;
+import java.util.Optional;
 import org.apache.spark.api.plugin.PluginContext;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -38,12 +40,13 @@ class SparkSupplierExtractionEngineTest {
     OsInfoDto fakeOsInfo = OsInfoDto.builder().availableProcessors(1).build();
     IostatDto fakeIoStatDto = IostatDto.builder().kiloByteRead(40).build();
     DstatDto fakeDstatDto = DstatDto.builder().netSend(1).build();
+    ProcDto fakeProcDto = ProcDto.builder().active(Optional.of(1L)).build();
     PerfDto fakePerfDto = PerfDto.builder().watt(30.12).build();
 
     LocalDateTime fakeTime = LocalDateTime.of(2000, 1, 1, 0, 0);
 
     BaseSupplierDto baseSupplierDto =
-        new BaseSupplierDto(fakeTime, fakeOsInfo, fakeIoStatDto, fakeDstatDto, fakePerfDto);
+        new BaseSupplierDto(fakeTime, fakeOsInfo, fakeIoStatDto, fakeDstatDto, fakeProcDto, fakePerfDto);
 
     SparkBaseSupplierWrapperDto result = sutSupplierExtractionEngine.transform(baseSupplierDto);
 
@@ -54,6 +57,7 @@ class SparkSupplierExtractionEngineTest {
             .iostatDto(fakeIoStatDto)
             .dstatDto(fakeDstatDto)
             .perfDto(fakePerfDto)
+            .procDto(fakeProcDto)
             .executorId("test-executor-id")
             .build());
   }
