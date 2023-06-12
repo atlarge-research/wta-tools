@@ -71,6 +71,7 @@ public class WtaDriverPlugin implements DriverPlugin {
       executorVars.put("errorStatus", "false");
     } catch (Exception e) {
       log.error("Error initialising WTA driver plugin, {} : {}.", e.getClass(), e.getMessage());
+      executorVars.put("errorStatus", "true");
       error = true;
     }
     return executorVars;
@@ -106,7 +107,7 @@ public class WtaDriverPlugin implements DriverPlugin {
   @Override
   public void shutdown() {
     if (error) {
-      log.error("Plugin shutting without writing to file");
+      log.error("Plugin shutting down without writing to file");
       return;
     }
     try {

@@ -36,41 +36,13 @@ class WtaDriverPluginTest {
   void wtaDriverPluginInitialized() {
     injectConfig();
     assertThat(sut.isError()).isFalse();
-    assertThat(sut.init(mockedSparkContext, mockedPluginContext))
-        .containsKeys("executorSynchronizationInterval", "resourcePingInterval");
+    Map<String, String> configMap = sut.init(mockedSparkContext, mockedPluginContext);
+    assertThat(configMap).containsKeys("executorSynchronizationInterval", "resourcePingInterval", "errorStatus");
+    assertThat(configMap.get("errorStatus")).isEqualTo("false");
     assertThat(sut.getSparkDataSource()).isNotNull();
     assertThat(sut.isError()).isFalse();
-    verify(sut, times(0)).shutdown();
     verify(sut, times(1)).initListeners();
     verify(sut, times(0)).removeListeners();
-  }
-
-  @Test
-  void wtaDriverPluginInitializeThrowsException() {
-    System.setProperty("configFile", "non-existing-file.json");
-    assertThat(sut.isError()).isFalse();
-    sut.init(mockedSparkContext, mockedPluginContext);
-    assertThat(sut.getSparkDataSource()).isNull();
-    assertThat(sut.isError()).isTrue();
-    verify(sut, times(1)).shutdown();
-    verify(sut, times(0)).initListeners();
-    verify(sut, times(0)).removeListeners();
-  }
-
-  @Test
-  void wtaDriverPluginDoesNotInitializeWithNegativeResourceTimer() {
-    System.setProperty("configFile", "testConfigNegativeResourcePingInterval.json");
-    assertThat(sut.isError()).isFalse();
-    Map<String, String> result = sut.init(mockedSparkContext, mockedPluginContext);
-    assertThat(sut.isError()).isTrue();
-    assertThat(result).isEmpty();
-  }
-
-  @Test
-  void wtaDriverPluginShutdown() {
-    injectConfig();
-    sut.init(mock(SparkContext.class), null);
-    assertThat(sut.isError()).isFalse();
     try {
       sut.shutdown();
     } catch (Exception ignored) {
@@ -79,11 +51,31 @@ class WtaDriverPluginTest {
   }
 
   @Test
-  void wtaDriverPluginShutdownFromError() {
+  void wtaDriverPluginInitializeThrowsException() {
     System.setProperty("configFile", "non-existing-file.json");
-    sut.init(mockedSparkContext, mockedPluginContext);
+    assertThat(sut.isError()).isFalse();
+    Map<String, String> configMap = sut.init(mockedSparkContext, mockedPluginContext);
+    assertThat(configMap).containsKeys("errorStatus");
+    assertThat(configMap.get("errorStatus")).isEqualTo("true");
+    assertThat(sut.getSparkDataSource()).isNull();
     assertThat(sut.isError()).isTrue();
-    sut.shutdown();
+    verify(sut, times(0)).initListeners();
+    try {
+      sut.shutdown();
+    } catch (Exception ignored) {
+    }
+    verify(sut, times(0)).removeListeners();
+  }
+
+  @Test
+  void wtaDriverPluginDoesNotInitializeWithNegativeResourceTimer() {
+    System.setProperty("configFile", "testConfigNegativeResourcePingInterval.json");
+    assertThat(sut.isError()).isFalse();
+    Map<String, String> configMap = sut.init(mockedSparkContext, mockedPluginContext);
+    assertThat(configMap).containsKeys("errorStatus");
+    assertThat(configMap.get("errorStatus")).isEqualTo("true");
+    assertThat(sut.isError()).isTrue();
+    verify(sut, times(0)).initListeners();
     verify(sut, times(0)).removeListeners();
   }
 
