@@ -66,7 +66,7 @@ public class ParquetSchema {
               .toLowerCase();
           if (String.class.isAssignableFrom(fieldType) || Domain.class.isAssignableFrom(fieldType)) {
             schemaBuilder = schemaBuilder.requiredString(fieldName);
-          } else if (long.class.isAssignableFrom(fieldType)) {
+          } else if (long.class.isAssignableFrom(fieldType) || BaseTraceObject.class.isAssignableFrom(fieldType)) {
             schemaBuilder = schemaBuilder.requiredLong(fieldName);
           } else if (int.class.isAssignableFrom(fieldType)) {
             schemaBuilder = schemaBuilder.requiredInt(fieldName);
@@ -136,6 +136,9 @@ public class ParquetSchema {
                 log.error("Failed to properly serialise {} for value {}.", field.getName(), domain);
                 break;
             }
+          } else if (object instanceof BaseTraceObject) {
+            BaseTraceObject traceObject = (BaseTraceObject) object;
+            object = traceObject.getId();
           }
           record.put(fieldsToSchema.get(field.getName()), object);
         }
