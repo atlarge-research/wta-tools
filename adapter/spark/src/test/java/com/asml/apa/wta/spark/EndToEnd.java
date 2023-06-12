@@ -32,7 +32,7 @@ public class EndToEnd {
    */
   private static void sparkOperation(JavaRDD<String> textFile) {
     JavaRDD<String> words =
-            textFile.flatMap(line -> Arrays.asList(line.split(" ")).iterator());
+        textFile.flatMap(line -> Arrays.asList(line.split(" ")).iterator());
     JavaRDD<String> upperCaseWords =
         words.filter(word -> word.contains("harry")).map(String::toUpperCase);
 
@@ -74,7 +74,11 @@ public class EndToEnd {
         .map(pair -> {
           StringBuilder concatenated = new StringBuilder();
           for (Tuple2<String, String> value : pair._2()) {
-            concatenated.append(value._1()).append(":").append(value._2()).append(",");
+            concatenated
+                .append(value._1())
+                .append(":")
+                .append(value._2())
+                .append(",");
           }
           return new Tuple2<>(pair._1(), concatenated.toString());
         })
@@ -134,10 +138,12 @@ public class EndToEnd {
         .setMaster("local")
         .set("spark.sql.shuffle.partitions", "500")
         .set("spark.plugins", "com.asml.apa.wta.spark.WtaPlugin");
-    System.setProperty("configFile", args[0]);
+//    System.setProperty("configFile", args[0]);
+    System.setProperty("configFile", "adapter/spark/src/test/resources/config.json");
     SparkSession spark = SparkSession.builder().config(conf).getOrCreate();
     SparkContext sc = spark.sparkContext();
-    sparkOperation(JavaSparkContext.fromSparkContext(sc).textFile(args[1]));
+//    sparkOperation(JavaSparkContext.fromSparkContext(sc).textFile(args[1]));
+    sparkOperation(JavaSparkContext.fromSparkContext(sc).textFile("adapter/spark/src/test/resources/e2e-input.txt"));
     sc.stop();
   }
 }

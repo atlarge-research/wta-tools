@@ -17,7 +17,7 @@ public class BaseSparkJobIntegrationTest {
 
   protected SparkDataSource sut;
 
-  protected JavaRDD<String> testFile;
+  protected JavaRDD<String> textFile;
 
   RuntimeConfig fakeConfig;
 
@@ -27,20 +27,24 @@ public class BaseSparkJobIntegrationTest {
         .authors(new String[] {"Harry Potter"})
         .domain(Domain.SCIENTIFIC)
         .description("Yer a wizard harry")
-        .outputPath("src/test/resources/WTA")
+        .logLevel("INFO")
+        .isStageLevel(false)
+        .resourcePingInterval(500)
+        .executorSynchronizationInterval(-100)
+        .outputPath("src/test/resources/wta-output")
         .build();
 
     SparkConf conf = new SparkConf()
         .setAppName("SparkTestRunner")
-        .setMaster("local[1]")
-        .set("spark.executor.instances", "1") // 1 executor per instance of each worker
-        .set("spark.executor.cores", "2"); // 2 cores on each executor
+        .setMaster("local")
+        .set("spark.executor.instances", "1")
+        .set("spark.executor.cores", "2");
     spark = SparkSession.builder().config(conf).getOrCreate();
     spark.sparkContext().setLogLevel("ERROR");
 
     sut = new SparkDataSource(spark.sparkContext(), fakeConfig);
     String resourcePath = "src/test/resources/wordcount.txt";
-    testFile = JavaSparkContext.fromSparkContext(spark.sparkContext()).textFile(resourcePath);
+    textFile = JavaSparkContext.fromSparkContext(spark.sparkContext()).textFile(resourcePath);
   }
 
   /**
@@ -50,10 +54,13 @@ public class BaseSparkJobIntegrationTest {
     spark.sparkContext().stop();
   }
 
+  /**
+   * Method to invoke the Spark operation. Important to invoke collect() to store the metrics.
+   */
   protected void invokeJob() {
-    testFile.flatMap(s -> Arrays.asList(s.split(" ")).iterator())
+    textFile.flatMap(s -> Arrays.asList(s.split(" ")).iterator())
         .mapToPair(word -> new Tuple2<>(word, 1))
-        .reduceByKey((a, b) -> a + b)
-        .collect(); // important to collect to store the metrics
+        .reduceByKey(Integer::sum)
+        .collect();
   }
 }

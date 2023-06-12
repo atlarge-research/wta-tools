@@ -50,7 +50,6 @@ class ApplicationLevelListenerTest extends BaseLevelListenerTest {
 
   @BeforeEach
   void setup() {
-
     testTaskInfo = new TaskInfo(1, 0, 1, 50L, "testExecutor", "local", TaskLocality.NODE_LOCAL(), false);
     testTaskInfo2 = new TaskInfo(2, 0, 1, 50L, "testExecutor", "local", TaskLocality.NODE_LOCAL(), false);
     testTaskInfo3 = new TaskInfo(3, 0, 1, 50L, "testExecutor", "local", TaskLocality.NODE_LOCAL(), false);

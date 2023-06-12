@@ -1,9 +1,8 @@
-package com.asml.apa.wta.spark;
+package com.asml.apa.wta.spark.driver;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
-import com.asml.apa.wta.spark.driver.WtaDriverPlugin;
 import com.asml.apa.wta.spark.dto.ResourceCollectionDto;
 import com.asml.apa.wta.spark.dto.SparkBaseSupplierWrapperDto;
 import java.util.List;
@@ -20,7 +19,6 @@ class WtaDriverPluginTest {
   protected final PluginContext mockedPluginContext = mock(PluginContext.class);
 
   protected final WtaDriverPlugin sut = Mockito.spy(new WtaDriverPlugin());
-
 
   void injectConfig() {
     System.setProperty("configFile", "src/test/resources/config.json");

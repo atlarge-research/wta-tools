@@ -1,15 +1,14 @@
-package com.asml.apa.wta.spark;
-
-import com.asml.apa.wta.spark.executor.plugin.WtaExecutorPlugin;
-import org.apache.spark.api.plugin.PluginContext;
-import org.junit.jupiter.api.Test;
-import java.util.HashMap;
-import java.util.Map;
+package com.asml.apa.wta.spark.executor.plugin;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
+
+import java.util.HashMap;
+import java.util.Map;
+import org.apache.spark.api.plugin.PluginContext;
+import org.junit.jupiter.api.Test;
 
 class WtaExecutorPluginTest {
 

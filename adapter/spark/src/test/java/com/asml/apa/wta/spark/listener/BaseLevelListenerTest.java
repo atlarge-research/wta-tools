@@ -9,7 +9,7 @@ import org.apache.spark.SparkConf;
 import org.apache.spark.SparkContext;
 import org.junit.jupiter.api.BeforeEach;
 
-public class BaseLevelListenerTest {
+class BaseLevelListenerTest {
 
   protected SparkContext mockedSparkContext;
 

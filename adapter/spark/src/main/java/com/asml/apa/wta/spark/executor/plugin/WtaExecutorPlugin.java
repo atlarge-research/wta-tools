@@ -4,7 +4,6 @@ import com.asml.apa.wta.spark.WtaPlugin;
 import com.asml.apa.wta.spark.driver.WtaDriverPlugin;
 import com.asml.apa.wta.spark.executor.engine.SparkSupplierExtractionEngine;
 import java.util.Map;
-
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.spark.SparkContext;
@@ -44,7 +43,10 @@ public class WtaExecutorPlugin implements ExecutorPlugin {
    */
   @Override
   public void init(PluginContext pCtx, Map<String, String> extraConf) {
-    if (extraConf == null || extraConf.isEmpty() || !extraConf.containsKey("errorStatus") || extraConf.get("errorStatus").equals("true")) {
+    if (extraConf == null
+        || extraConf.isEmpty()
+        || !extraConf.containsKey("errorStatus")
+        || extraConf.get("errorStatus").equals("true")) {
       log.error("Error initialising WTA executor plugin due to driver failure");
       error = true;
       return;
@@ -53,7 +55,7 @@ public class WtaExecutorPlugin implements ExecutorPlugin {
       int resourcePingInterval = Integer.parseInt(extraConf.get("resourcePingInterval"));
       int executorSynchronizationInterval = Integer.parseInt(extraConf.get("executorSynchronizationInterval"));
       supplierEngine =
-              new SparkSupplierExtractionEngine(resourcePingInterval, pCtx, executorSynchronizationInterval);
+          new SparkSupplierExtractionEngine(resourcePingInterval, pCtx, executorSynchronizationInterval);
       supplierEngine.startPinging();
       supplierEngine.startSynchonizing();
     } catch (NumberFormatException e) {
