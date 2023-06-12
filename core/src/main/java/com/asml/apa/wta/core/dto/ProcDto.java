@@ -16,6 +16,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public class ProcDto implements SupplierDto {
   private static final long serialVersionUID = -5587452226552818612L;
 

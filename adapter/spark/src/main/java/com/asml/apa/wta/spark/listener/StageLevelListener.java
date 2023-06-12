@@ -54,7 +54,7 @@ public class StageLevelListener extends TaskStageBaseListener {
     final Integer[] parentIds = JavaConverters.seqAsJavaList(
             curStageInfo.parentIds().toList())
         .stream()
-        .map(x -> (Integer) x)
+        .map(parentId -> (Integer) parentId)
         .toArray(size -> new Integer[size]);
     stageToParents.put(stageId, parentIds);
     for (Integer id : parentIds) {

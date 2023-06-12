@@ -64,9 +64,9 @@ public class JavaFileSupplier implements InformationSupplier<JvmFileDto> {
 
     return CompletableFuture.supplyAsync(() -> {
       try {
-        long totalSpace = rootDir.getTotalSpace();
-        long freeSpace = rootDir.getFreeSpace();
-        long usableSpace = rootDir.getUsableSpace();
+        final long totalSpace = rootDir.getTotalSpace();
+        final long freeSpace = rootDir.getFreeSpace();
+        final long usableSpace = rootDir.getUsableSpace();
 
         return Optional.of(JvmFileDto.builder()
             .totalSpace(totalSpace)

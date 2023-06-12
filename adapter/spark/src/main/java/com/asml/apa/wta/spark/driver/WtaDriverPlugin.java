@@ -5,16 +5,19 @@ import com.asml.apa.wta.core.config.RuntimeConfig;
 import com.asml.apa.wta.core.io.DiskOutputFile;
 import com.asml.apa.wta.core.io.OutputFile;
 import com.asml.apa.wta.core.model.Resource;
+import com.asml.apa.wta.core.model.ResourceState;
 import com.asml.apa.wta.core.model.Task;
 import com.asml.apa.wta.core.model.Workflow;
 import com.asml.apa.wta.core.model.Workload;
 import com.asml.apa.wta.spark.datasource.SparkDataSource;
+import com.asml.apa.wta.spark.dto.ResourceAndStateWrapper;
 import com.asml.apa.wta.spark.dto.ResourceCollectionDto;
 import com.asml.apa.wta.spark.streams.MetricStreamingEngine;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.spark.SparkContext;
@@ -61,7 +64,7 @@ public class WtaDriverPlugin implements DriverPlugin {
     try {
       RuntimeConfig runtimeConfig = RuntimeConfig.readConfig();
       this.metricStreamingEngine = new MetricStreamingEngine();
-      sparkDataSource = new SparkDataSource(sparkCtx, runtimeConfig, this.metricStreamingEngine);
+      sparkDataSource = new SparkDataSource(sparkCtx, runtimeConfig);
       outputFile = new DiskOutputFile(Path.of(runtimeConfig.getOutputPath()));
       initListeners();
       executorVars.put("resourcePingInterval", String.valueOf(runtimeConfig.getResourcePingInterval()));
@@ -128,7 +131,13 @@ public class WtaDriverPlugin implements DriverPlugin {
         ? sparkDataSource.getStageLevelListener().getProcessedObjects()
         : sparkDataSource.getTaskLevelListener().getProcessedObjects();
     List<Workflow> workflows = sparkDataSource.getJobLevelListener().getProcessedObjects();
-    List<Resource> resources = List.of();
+    List<ResourceAndStateWrapper> resourceAndStateWrappers = metricStreamingEngine.collectResourceInformation();
+    List<Resource> resources = resourceAndStateWrappers.stream()
+        .map(ResourceAndStateWrapper::getResource)
+        .collect(Collectors.toList());
+    List<ResourceState> resourceStates = resourceAndStateWrappers.stream()
+        .flatMap(rs -> rs.getStates().stream())
+        .collect(Collectors.toList());
     Workload workload = sparkDataSource
         .getApplicationLevelListener()
         .getProcessedObjects()
@@ -137,6 +146,7 @@ public class WtaDriverPlugin implements DriverPlugin {
     wtaWriter.write(Task.class, tasks);
     wtaWriter.write(Resource.class, resources);
     wtaWriter.write(Workflow.class, workflows);
+    wtaWriter.write(ResourceState.class, resourceStates);
     wtaWriter.write(workload);
   }
 

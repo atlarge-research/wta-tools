@@ -43,7 +43,7 @@ public class BaseSparkJobIntegrationTest {
 
     fakeMetricStreamingEngine = new MetricStreamingEngine();
 
-    sut = new SparkDataSource(spark.sparkContext(), fakeConfig, fakeMetricStreamingEngine);
+    sut = new SparkDataSource(spark.sparkContext(), fakeConfig);
     String resourcePath = "src/test/resources/wordcount.txt";
     testFile = JavaSparkContext.fromSparkContext(spark.sparkContext()).textFile(resourcePath);
   }

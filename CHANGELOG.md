@@ -50,6 +50,7 @@ For the most part, since we are pre-release this will serve no real purpose, oth
 - Added proc metrics data source [@lyadalachanchu](https://gitlab.ewi.tudelft.nl/lyadalachanchu)
 - Implemented Parent Children fields for Task [@tqu](https://gitlab.ewi.tudelft.nl/tqu)
 - Added automatic Avro record converters for POJOs [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
+- Add aggregation for resource related metrics [@hpage](https://gitlab.ewi.tudelft.nl/hpage)
 
 ### Changed
 - Refactored listeners into a generic interface to reduce code duplication and increase cc [@hpage](https://gitlab.ewi.tudelft.nl/hpage)

@@ -5,7 +5,6 @@ import com.asml.apa.wta.spark.listener.ApplicationLevelListener;
 import com.asml.apa.wta.spark.listener.JobLevelListener;
 import com.asml.apa.wta.spark.listener.StageLevelListener;
 import com.asml.apa.wta.spark.listener.TaskLevelListener;
-import com.asml.apa.wta.spark.streams.MetricStreamingEngine;
 import lombok.Getter;
 import org.apache.spark.SparkContext;
 
@@ -35,15 +34,13 @@ public class SparkDataSource {
    *
    * @param sparkContext  SparkContext of the running Spark session
    * @param config Additional config specified by the user for the plugin
-   * @param metricStreamingEngine The metric streaming engine required for some listeners
    * @author Pil Kyu Cho
    * @author Henry Page
    * @author Tianchen Qu
    * @author Lohithsai Yadala Chanchu
    * @since 1.0.0
    */
-  public SparkDataSource(
-      SparkContext sparkContext, RuntimeConfig config, MetricStreamingEngine metricStreamingEngine) {
+  public SparkDataSource(SparkContext sparkContext, RuntimeConfig config) {
     taskLevelListener = new TaskLevelListener(sparkContext, config);
     stageLevelListener = new StageLevelListener(sparkContext, config);
     if (config.isStageLevel()) {

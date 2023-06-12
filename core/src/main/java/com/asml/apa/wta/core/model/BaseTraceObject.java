@@ -33,4 +33,15 @@ public interface BaseTraceObject extends Serializable {
    * @return record of the object
    */
   GenericRecord convertToRecord(ParquetSchema schema);
+
+  /**
+   * Creates a simple {@link RuntimeException}.
+   *
+   * @return a {@link RuntimeException} with a simple error message
+   * @author Atour Mousavi Gourabi
+   * @since 1.0.0
+   */
+  default RuntimeException accessError() {
+    return new RuntimeException("Something went wrong, this method shouldn't be called!");
+  }
 }

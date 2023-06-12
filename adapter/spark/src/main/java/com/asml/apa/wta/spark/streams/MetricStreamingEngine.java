@@ -3,6 +3,7 @@ package com.asml.apa.wta.spark.streams;
 import com.asml.apa.wta.core.dto.BaseSupplierDto;
 import com.asml.apa.wta.core.dto.JvmFileDto;
 import com.asml.apa.wta.core.dto.OsInfoDto;
+import com.asml.apa.wta.core.dto.ProcDto;
 import com.asml.apa.wta.core.model.Resource;
 import com.asml.apa.wta.core.model.ResourceState;
 import com.asml.apa.wta.core.streams.KeyedStream;
@@ -73,7 +74,7 @@ public class MetricStreamingEngine {
    * @author Henry Page
    * @since 1.0.0
    */
-  public List<ResourceAndStateWrapper> processResources() {
+  public List<ResourceAndStateWrapper> collectResourceInformation() {
     List<ResourceAndStateWrapper> result = new ArrayList<>();
     Map<String, List<SparkBaseSupplierWrapperDto>> allPings = executorResourceStream.collectAll();
 
@@ -87,6 +88,58 @@ public class MetricStreamingEngine {
         .collect(Collectors.toList());
   }
 
+  /**
+   * Constructs a resource from a stream of pings.
+   *
+   * @param executorId The transformed id of the executor
+   * @param pings The stream of pings that correspond to this executor
+   * @return A Resource object that is constructed from the given information
+   * @author Henry Page
+   * @since 1.0.0
+   */
+  private Resource produceResourceFromExecutorInfo(long executorId, List<SparkBaseSupplierWrapperDto> pings) {
+
+    Optional<OsInfoDto> sampleOsInfo = getFirstAvailable(pings, BaseSupplierDto::getOsInfoDto);
+    Optional<JvmFileDto> sampleJvmInfo = getFirstAvailable(pings, BaseSupplierDto::getJvmFileDto);
+    Optional<ProcDto> sampleProcInfo = getFirstAvailable(pings, BaseSupplierDto::getProcDto);
+
+    final String type = "cluster node";
+    final String os = sampleOsInfo.map(OsInfoDto::getOs).orElse("unknown");
+    final String procModel = sampleProcInfo
+        .map(ProcDto::getCpuModel)
+        .orElse(Optional.of("unknown"))
+        .get();
+    final double numResources =
+        sampleOsInfo.map(OsInfoDto::getAvailableProcessors).orElse(-1);
+    final long memory = sampleOsInfo
+        .map(pg -> (pg.getTotalPhysicalMemorySize() / (bytesToGbDenom)))
+        .orElse(-1L);
+
+    final long diskSpace = sampleJvmInfo
+        .map(jvmDto -> (jvmDto.getTotalSpace() / bytesToGbDenom))
+        .orElse(-1L);
+
+    return Resource.builder()
+        .id(executorId)
+        .type(type)
+        .numResources(numResources)
+        .memory(memory)
+        .diskSpace(diskSpace)
+        .procModel(procModel)
+        .os(os)
+        .network(-1L)
+        .build();
+  }
+
+  /**
+   * Constructs a list of resource states from a stream of pings.
+   *
+   * @param associatedResource The associated resource object
+   * @param pings The stream of pings that are to be transformed to states
+   * @return A list of resource states that is constructed from the given information
+   * @author Henry Page
+   * @since 1.0.0
+   */
   private List<ResourceState> produceResourceStatesFromExecutorInfo(
       Resource associatedResource, List<SparkBaseSupplierWrapperDto> pings) {
     return pings.stream()
@@ -95,13 +148,37 @@ public class MetricStreamingEngine {
           final String eventType = "resource active";
           final long platformId = -1L;
           final double availableResources = ping.getOsInfoDto()
+              .map(pg -> (double) pg.getAvailableProcessors())
+              .orElse(-1.0);
+          final double availableMemory = ping.getOsInfoDto()
+              .map(pg -> (double) pg.getFreePhysicalMemorySize() / bytesToGbDenom)
+              .orElse(-1.0);
+          final double availableDiskSpace = ping.getJvmFileDto()
+              .map(pg -> (double) pg.getUsableSpace() / bytesToGbDenom)
+              .orElse(-1.0);
+
+          final double availableDiskIoBandwith = -1.0;
+
+          final double availableNetworkBandwidth = -1.0;
+
+          final double numCores = ping.getOsInfoDto()
               .map(OsInfoDto::getAvailableProcessors)
               .orElse(-1);
-          final double availableMemory = ping.getOsInfoDto()
-              .map(x -> (x.getFreePhysicalMemorySize() / (bytesToGbDenom)))
-              .orElse(-1L);
 
-          // TODO(#144): Fill lohit's code here
+          final double averageUtilization1Minute = ping.getProcDto()
+              .flatMap(ProcDto::getLoadAvgOneMinute)
+              .map(loadAvg -> loadAvg / numCores)
+              .orElse(-1.0);
+
+          final double averageUtilization5Minute = ping.getProcDto()
+              .flatMap(ProcDto::getLoadAvgFiveMinutes)
+              .map(loadAvg -> loadAvg / numCores)
+              .orElse(-1.0);
+
+          final double averageUtilization15Minute = ping.getProcDto()
+              .flatMap(ProcDto::getLoadAvgFifteenMinutes)
+              .map(loadAvg -> loadAvg / numCores)
+              .orElse(-1.0);
 
           return ResourceState.builder()
               .resourceId(associatedResource)
@@ -110,41 +187,14 @@ public class MetricStreamingEngine {
               .platformId(platformId)
               .availableResources(availableResources)
               .availableMemory(availableMemory)
+              .availableDiskIoBandwidth(availableDiskIoBandwith)
+              .availableNetworkBandwidth(availableNetworkBandwidth)
+              .averageUtilization1Minute(averageUtilization1Minute)
+              .averageUtilization5Minute(averageUtilization5Minute)
+              .averageUtilization15Minute(averageUtilization15Minute)
               .build();
         })
         .collect(Collectors.toList());
-  }
-
-  private Resource produceResourceFromExecutorInfo(long executorId, List<SparkBaseSupplierWrapperDto> pings) {
-
-    Optional<OsInfoDto> sampleOsInfo = getFirstAvailable(pings, BaseSupplierDto::getOsInfoDto);
-    Optional<JvmFileDto> sampleJvmInfo = getFirstAvailable(pings, BaseSupplierDto::getJvmFileDto);
-
-    final String type = "cluster node";
-    final String os = sampleOsInfo.map(OsInfoDto::getOs).orElse("unknown");
-    final double numResources =
-        sampleOsInfo.map(OsInfoDto::getAvailableProcessors).orElse(-1);
-
-    final long memory = sampleOsInfo
-        .map(x -> (x.getTotalPhysicalMemorySize() / (bytesToGbDenom)))
-        .orElse(-1L);
-
-    final long diskSpace = sampleJvmInfo
-        .map(jvmDto -> (jvmDto.getTotalSpace() / bytesToGbDenom))
-        .orElse(-1L);
-
-    // TODO(#144): Fill lohit's code here
-
-    return Resource.builder()
-        .id(executorId)
-        .type(type)
-        .numResources(numResources)
-        .memory(memory)
-        .diskSpace(diskSpace)
-        .procModel("TO BE FILLED")
-        .os(os)
-        .network(-1L)
-        .build();
   }
 
   /**

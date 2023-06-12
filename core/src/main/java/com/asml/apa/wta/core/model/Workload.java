@@ -4,6 +4,7 @@ import com.asml.apa.wta.core.io.ParquetSchema;
 import com.asml.apa.wta.core.model.enums.Domain;
 import lombok.Builder;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.avro.generic.GenericRecord;
 
 /**
@@ -14,6 +15,7 @@ import org.apache.avro.generic.GenericRecord;
  * @author Tianchen Qu
  * @since 1.0.0
  */
+@Slf4j
 @Data
 @Builder
 public class Workload implements BaseTraceObject {
@@ -174,6 +176,8 @@ public class Workload implements BaseTraceObject {
    */
   @Override
   public final GenericRecord convertToRecord(ParquetSchema schema) {
+    log.error(
+        "The application attempted to convert a Workload to parquet, this is illegal and should never happen.");
     throw accessError();
   }
 
@@ -186,17 +190,7 @@ public class Workload implements BaseTraceObject {
    */
   @Override
   public final long getId() {
+    log.error("The application attempted to get the id of a Workload, this is illegal and should never happen.");
     throw accessError();
-  }
-
-  /**
-   * Creates a simple {@link RuntimeException}.
-   *
-   * @return a {@link RuntimeException} with a simple error message
-   * @author Atour Mousavi Gourabi
-   * @since 1.0.0
-   */
-  private RuntimeException accessError() {
-    return new RuntimeException("Something went wrong, this method shouldn't be called!");
   }
 }
