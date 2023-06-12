@@ -3,6 +3,7 @@ package com.asml.apa.wta.spark.listener;
 import com.asml.apa.wta.core.config.RuntimeConfig;
 import com.asml.apa.wta.core.model.Task;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -70,20 +71,23 @@ public class StageLevelListener extends TaskStageBaseListener {
         children.add(stageId);
       }
     }
+    final double diskSpaceRequested = curStageMetrics.diskBytesSpilled();
+    final double memoryRequested = curStageMetrics.peakExecutionMemory();
+    final long[] parents = Arrays.stream(parentIds).mapToLong(x -> x).toArray();
+    final long[] children = new long[0];
     // dummy values
     final String type = "";
     final int submissionSite = -1;
     final String resourceType = "N/A";
     final double resourceAmountRequested = -1.0;
-    final long[] parents = new long[0];
-    final long[] children = new long[0];
+
     final int groupId = -1;
     final String nfrs = "";
     final String params = "";
-    final double memoryRequested = -1.0;
+
     final long networkIoTime = -1L;
     final long diskIoTime = -1L;
-    final double diskSpaceRequested = -1.0;
+
     final double energyConsumption = -1L;
     final long waitTime = -1L;
     final long resourceUsed = -1L;
