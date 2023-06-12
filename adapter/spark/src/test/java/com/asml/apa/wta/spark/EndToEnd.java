@@ -70,15 +70,13 @@ public class EndToEnd {
         true);
     JavaRDD<Tuple2<Double, String>> mappedPairs = tupled.mapToPair(tuple -> new Tuple2<>(tuple._1(), tuple._2()))
         .groupByKey()
-        .filter(pair -> {
-          return pair._1() >= 10;
-        })
+        .filter(pair -> pair._1() >= 10)
         .map(pair -> {
-          String concatenated = "";
+          StringBuilder concatenated = new StringBuilder();
           for (Tuple2<String, String> value : pair._2()) {
-            concatenated += value._1() + ":" + value._2() + ",";
+            concatenated.append(value._1()).append(":").append(value._2()).append(",");
           }
-          return new Tuple2<Double, String>(pair._1(), concatenated);
+          return new Tuple2<>(pair._1(), concatenated.toString());
         })
         .repartition(20);
     JavaRDD<String> strings = mappedPairs
@@ -89,7 +87,7 @@ public class EndToEnd {
         .map(t -> t._1);
 
     wordCountPairs = strings.mapToPair(word -> new Tuple2<>(word, 1))
-        .reduceByKey((a, b) -> a + b)
+        .reduceByKey(Integer::sum)
         .mapToPair(tuple ->
             new Tuple2<>(tuple._1(), new Tuple2<>(tuple._1().length(), tuple._2())));
     joinedPairs = wordCountPairs
@@ -106,7 +104,7 @@ public class EndToEnd {
         .mapToPair(pair -> new Tuple2<>(pair._2(), pair._1()))
         .repartition(10)
         .sortByKey(false);
-    tupled = sortedPairs.mapPartitionsWithIndex(
+    sortedPairs.mapPartitionsWithIndex(
         (index, iter) -> {
           List<Tuple2<Double, Tuple2<String, String>>> tuples = new ArrayList<>();
           while (iter.hasNext()) {

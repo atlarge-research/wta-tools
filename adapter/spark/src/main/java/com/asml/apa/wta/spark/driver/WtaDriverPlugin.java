@@ -70,9 +70,8 @@ public class WtaDriverPlugin implements DriverPlugin {
           String.valueOf(runtimeConfig.getExecutorSynchronizationInterval()));
       executorVars.put("errorStatus", "false");
     } catch (Exception e) {
-      log.error(String.valueOf(e));
+      log.error("Error initialising WTA driver plugin, {} : {}.", e.getClass(), e.getMessage());
       error = true;
-      log.error("Error initialising WTA driver plugin.");
     }
     return executorVars;
   }
@@ -107,6 +106,7 @@ public class WtaDriverPlugin implements DriverPlugin {
   @Override
   public void shutdown() {
     if (error) {
+      log.error("Plugin shutting without writing to file");
       return;
     }
     try {
@@ -144,6 +144,7 @@ public class WtaDriverPlugin implements DriverPlugin {
     this.sparkDataSource.registerJobListener();
     this.sparkDataSource.registerApplicationListener();
   }
+
   /**
    * Removes the listeners.
    *

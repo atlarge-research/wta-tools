@@ -41,7 +41,7 @@ public class WtaExecutorPlugin implements ExecutorPlugin {
   @Override
   public void init(PluginContext pCtx, Map<String, String> extraConf) {
     if (extraConf == null || extraConf.isEmpty() || extraConf.get("errorStatus").equals("true")) {
-      log.error("Error occurred while initializing the plugin.");
+      log.error("Error initialising WTA executor plugin due to driver failure");
       error = true;
       return;
     }
@@ -95,6 +95,7 @@ public class WtaExecutorPlugin implements ExecutorPlugin {
   @Override
   public void shutdown() {
     if (error) {
+      log.error("Shutting down WTA executor plugin due to driver failure");
       return;
     }
     this.supplierEngine.stopPinging();
