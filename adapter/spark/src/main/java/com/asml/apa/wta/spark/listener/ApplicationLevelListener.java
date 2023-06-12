@@ -63,14 +63,13 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
     this.stageLevelListener = stageLevelListener;
   }
 
-  private void setTasks(TaskStageBaseListener taskLevelListener, StageLevelListener stageLevelListener) {
-    TaskLevelListener listener = (TaskLevelListener) taskLevelListener;
-    final List<Task> tasks = taskLevelListener.getProcessedObjects();
+  private void setTasks(TaskStageBaseListener taskListener, StageLevelListener stageListener) {
+    TaskLevelListener listener = (TaskLevelListener) taskListener;
+    final List<Task> tasks = taskListener.getProcessedObjects();
     for (Task task : tasks) {
       // parent children fields
       final int stageId = listener.getTaskToStage().get(task.getId());
-      final Integer[] parentStages =
-          stageLevelListener.getStageToParents().get(stageId);
+      final Integer[] parentStages = stageListener.getStageToParents().get(stageId);
       if (parentStages != null) {
         final Long[] parents = Arrays.stream(parentStages)
             .flatMap(x -> Arrays.stream(listener.getStageToTasks().get(x).stream()
@@ -105,9 +104,9 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
     }
   }
 
-  private void setStages(StageLevelListener stageLevelListener) {
-    final List<Task> stages = stageLevelListener.getProcessedObjects();
-    Map<Integer, List<Integer>> parentToChildren = stageLevelListener.getParentToChildren();
+  private void setStages(StageLevelListener stageListener) {
+    final List<Task> stages = stageListener.getProcessedObjects();
+    Map<Integer, List<Integer>> parentToChildren = stageListener.getParentToChildren();
     for (Task stage : stages) {
       stage.setChildren(parentToChildren.getOrDefault(Math.toIntExact(stage.getId()), new ArrayList<>()).stream()
           .mapToLong(x -> x)
@@ -115,8 +114,8 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
     }
   }
 
-  private void setWorkflows(JobLevelListener jobLevelListener) {
-    final List<Workflow> workflows = jobLevelListener.getProcessedObjects();
+  private void setWorkflows(JobLevelListener jobListener) {
+    final List<Workflow> workflows = jobListener.getProcessedObjects();
     for (Workflow workflow : workflows) {
       workflow.setTotalResources(Arrays.stream(workflow.getTasks())
           .map(Task::getResourceAmountRequested)
