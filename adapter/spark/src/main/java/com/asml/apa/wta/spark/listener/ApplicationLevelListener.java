@@ -5,9 +5,12 @@ import com.asml.apa.wta.core.model.Task;
 import com.asml.apa.wta.core.model.Workflow;
 import com.asml.apa.wta.core.model.Workload;
 import com.asml.apa.wta.core.model.enums.Domain;
-
-import java.util.*;
-import java.util.function.IntFunction;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.Getter;
 import org.apache.commons.lang3.ArrayUtils;
@@ -60,40 +63,40 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
     this.stageLevelListener = stageLevelListener;
   }
 
-  private void setTasks(TaskStageBaseListener taskLevelListener, StageLevelListener stageLevelListener){
+  private void setTasks(TaskStageBaseListener taskLevelListener, StageLevelListener stageLevelListener) {
     TaskLevelListener listener = (TaskLevelListener) taskLevelListener;
     final List<Task> tasks = taskLevelListener.getProcessedObjects();
     for (Task task : tasks) {
       // parent children fields
       final int stageId = listener.getTaskToStage().get(task.getId());
       final Integer[] parentStages =
-              stageLevelListener.getStageToParents().get(stageId);
+          stageLevelListener.getStageToParents().get(stageId);
       if (parentStages != null) {
         final Long[] parents = Arrays.stream(parentStages)
-                .flatMap(x -> Arrays.stream(listener.getStageToTasks().get(x).stream()
-                        .map(Task::getId)
-                        .toArray(size -> new Long[size])))
-                .toArray(size -> new Long[size]);
+            .flatMap(x -> Arrays.stream(listener.getStageToTasks().get(x).stream()
+                .map(Task::getId)
+                .toArray(size -> new Long[size])))
+            .toArray(size -> new Long[size]);
         task.setParents(ArrayUtils.toPrimitive(parents));
       }
 
       List<Integer> childrenStages =
-              stageLevelListener.getParentToChildren().get(stageId);
+          stageLevelListener.getParentToChildren().get(stageId);
       if (childrenStages != null) {
         List<Task> children = new ArrayList<>();
         childrenStages.forEach(
-                x -> children.addAll(listener.getStageToTasks().get(x)));
+            x -> children.addAll(listener.getStageToTasks().get(x)));
         Long[] temp = children.stream().map(Task::getId).toArray(size -> new Long[size]);
         task.setChildren(ArrayUtils.toPrimitive(temp));
       }
 
       // resource related fields
       final int resourceProfileId =
-              stageLevelListener.getStageToResource().getOrDefault(stageId, -1);
+          stageLevelListener.getStageToResource().getOrDefault(stageId, -1);
       final ResourceProfile resourceProfile =
-              sparkContext.resourceProfileManager().resourceProfileFromId(resourceProfileId);
+          sparkContext.resourceProfileManager().resourceProfileFromId(resourceProfileId);
       final List<TaskResourceRequest> resources = JavaConverters.seqAsJavaList(
-              resourceProfile.taskResources().values().toList());
+          resourceProfile.taskResources().values().toList());
       if (resources.size() > 0) {
         task.setResourceType(resources.get(0).resourceName());
         task.setResourceAmountRequested(resources.get(0).amount());
@@ -102,22 +105,24 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
     }
   }
 
-  private void setStages(StageLevelListener stageLevelListener){
+  private void setStages(StageLevelListener stageLevelListener) {
     final List<Task> stages = stageLevelListener.getProcessedObjects();
     Map<Integer, List<Integer>> parentToChildren = stageLevelListener.getParentToChildren();
-    for (Task stage : stages){
-      stage.setChildren(parentToChildren.getOrDefault(Math.toIntExact(stage.getId()),new ArrayList<>()).stream().mapToLong(x -> x).toArray());
+    for (Task stage : stages) {
+      stage.setChildren(parentToChildren.getOrDefault(Math.toIntExact(stage.getId()), new ArrayList<>()).stream()
+          .mapToLong(x -> x)
+          .toArray());
     }
   }
 
-  private void setWorkflows(JobLevelListener jobLevelListener){
+  private void setWorkflows(JobLevelListener jobLevelListener) {
     final List<Workflow> workflows = jobLevelListener.getProcessedObjects();
     for (Workflow workflow : workflows) {
       workflow.setTotalResources(Arrays.stream(workflow.getTasks())
-              .map(Task::getResourceAmountRequested)
-              .filter(x -> x >= 0.0)
-              .reduce(Double::sum)
-              .orElseGet(() -> -1.0));
+          .map(Task::getResourceAmountRequested)
+          .filter(x -> x >= 0.0)
+          .reduce(Double::sum)
+          .orElseGet(() -> -1.0));
     }
   }
 
@@ -132,10 +137,10 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
 
     // we should enver enter this branch, this is a guard since an application
     // only terminates once.
-    if (config.isStageLevel()){
+    if (config.isStageLevel()) {
       setStages(stageLevelListener);
-    }else {
-      setTasks(taskLevelListener,stageLevelListener);
+    } else {
+      setTasks(taskLevelListener, stageLevelListener);
     }
     setWorkflows(jobLevelListener);
     final List<Task> tasks = taskLevelListener.getProcessedObjects();
