@@ -44,7 +44,7 @@ public class SparkDataSource {
     stageLevelListener = new StageLevelListener(sparkContext, config);
     taskLevelListener = new TaskLevelListener(sparkContext, config);
     if (config.isStageLevel()) {
-      jobLevelListener = new JobLevelListener(sparkContext, config, taskLevelListener, stageLevelListener);
+      jobLevelListener = new JobLevelListener(sparkContext, config, stageLevelListener, stageLevelListener);
       applicationLevelListener = new ApplicationLevelListener(
           sparkContext, config, jobLevelListener, stageLevelListener, stageLevelListener);
     } else {

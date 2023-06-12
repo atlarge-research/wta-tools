@@ -24,7 +24,7 @@ import scala.collection.JavaConverters;
 @Getter
 public class JobLevelListener extends AbstractListener<Workflow> {
 
-  private final TaskLevelListener taskListener;
+  private final TaskStageBaseListener taskListener;
 
   private final StageLevelListener stageLevelListener;
 
@@ -50,7 +50,7 @@ public class JobLevelListener extends AbstractListener<Workflow> {
   public JobLevelListener(
       SparkContext sparkContext,
       RuntimeConfig config,
-      TaskLevelListener taskListener,
+      TaskStageBaseListener taskListener,
       StageLevelListener stageLevelListener) {
     super(sparkContext, config);
     this.taskListener = taskListener;
@@ -118,21 +118,25 @@ public class JobLevelListener extends AbstractListener<Workflow> {
             .map(Task::getRuntime)
             .reduce(Long::sum)
             .orElse(0L);
-    final Map<Integer, List<Task>> stageToTasks = taskListener.getStageToTasks();
-    List<Long> stageMaximumTaskTime = new ArrayList<>();
-    for (Object id : jobStages) {
-      List<Task> stageTasks = stageToTasks.get((Integer) id);
-      if (stageTasks != null) {
-        stageMaximumTaskTime.add(stageTasks.stream()
-            .map(Task::getRuntime)
-            .reduce(Long::max)
-            .orElse(0L));
-      } else {
-        stageMaximumTaskTime.add(0L);
+    long criticalPathLength = -1L;
+    if (!config.isStageLevel()) {
+      TaskLevelListener listener = (TaskLevelListener) taskListener;
+      final Map<Integer, List<Task>> stageToTasks = listener.getStageToTasks();
+      List<Long> stageMaximumTaskTime = new ArrayList<>();
+      for (Object id : jobStages) {
+        List<Task> stageTasks = stageToTasks.get((Integer) id);
+        if (stageTasks != null) {
+          stageMaximumTaskTime.add(stageTasks.stream()
+              .map(Task::getRuntime)
+              .reduce(Long::max)
+              .orElse(0L));
+        } else {
+          stageMaximumTaskTime.add(0L);
+        }
       }
+      criticalPathLength =
+          driverTime + stageMaximumTaskTime.stream().reduce(Long::sum).orElse(0L);
     }
-    final long criticalPathLength =
-        driverTime + stageMaximumTaskTime.stream().reduce(Long::sum).orElse(0L);
     // unknown
 
     final int maxNumberOfConcurrentTasks = -1;

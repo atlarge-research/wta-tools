@@ -25,7 +25,7 @@ public class BaseSparkJobIntegrationTest {
   void setupBaseIntegrationTest() {
     fakeConfig = RuntimeConfig.builder()
         .authors(new String[] {"Harry Potter"})
-        .isStageLevel(true)
+        .isStageLevel(false)
         .domain(Domain.SCIENTIFIC)
         .description("Yer a wizard harry")
         .outputPath("src/test/resources/WTA")
