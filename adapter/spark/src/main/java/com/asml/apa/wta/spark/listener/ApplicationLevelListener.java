@@ -86,8 +86,10 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
           stageLevelListener.getStageToParents().get(stageId);
       if (parentStages != null) {
         final Long[] parents = Arrays.stream(parentStages)
-            .flatMap(x -> Arrays.stream(
-                taskLevelListener.getStageToTasks().get(x).toArray(new Long[0])))
+            .flatMap(x -> Arrays.stream(taskLevelListener
+                .getStageToTasks()
+                .getOrDefault(x, new ArrayList<>())
+                .toArray(new Long[0])))
             .toArray(size -> new Long[size]);
         task.setParents(ArrayUtils.toPrimitive(parents));
       }
