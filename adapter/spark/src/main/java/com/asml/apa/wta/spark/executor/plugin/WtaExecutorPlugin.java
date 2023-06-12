@@ -4,6 +4,8 @@ import com.asml.apa.wta.spark.WtaPlugin;
 import com.asml.apa.wta.spark.driver.WtaDriverPlugin;
 import com.asml.apa.wta.spark.executor.engine.SparkSupplierExtractionEngine;
 import java.util.Map;
+
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.spark.SparkContext;
 import org.apache.spark.TaskFailedReason;
@@ -17,6 +19,7 @@ import org.apache.spark.api.plugin.PluginContext;
  * @author Lohithsai Yadala Chanchu
  * @since 1.0.0
  */
+@Getter
 @Slf4j
 public class WtaExecutorPlugin implements ExecutorPlugin {
 
@@ -36,21 +39,30 @@ public class WtaExecutorPlugin implements ExecutorPlugin {
    * as it is loaded on to the executor.
    *
    * @author Henry Page
+   * @author Pil Kyu Cho
    * @since 1.0.0
    */
   @Override
   public void init(PluginContext pCtx, Map<String, String> extraConf) {
-    if (extraConf == null || extraConf.isEmpty() || extraConf.get("errorStatus").equals("true")) {
+    if (extraConf == null || extraConf.isEmpty() || !extraConf.containsKey("errorStatus") || extraConf.get("errorStatus").equals("true")) {
       log.error("Error initialising WTA executor plugin due to driver failure");
       error = true;
       return;
     }
-    int resourcePingInterval = Integer.parseInt(extraConf.get("resourcePingInterval"));
-    int executorSynchronizationInterval = Integer.parseInt(extraConf.get("executorSynchronizationInterval"));
-    this.supplierEngine =
-        new SparkSupplierExtractionEngine(resourcePingInterval, pCtx, executorSynchronizationInterval);
-    this.supplierEngine.startPinging();
-    this.supplierEngine.startSynchonizing();
+    try {
+      int resourcePingInterval = Integer.parseInt(extraConf.get("resourcePingInterval"));
+      int executorSynchronizationInterval = Integer.parseInt(extraConf.get("executorSynchronizationInterval"));
+      supplierEngine =
+              new SparkSupplierExtractionEngine(resourcePingInterval, pCtx, executorSynchronizationInterval);
+      supplierEngine.startPinging();
+      supplierEngine.startSynchonizing();
+    } catch (NumberFormatException e) {
+      log.error("Invalid resource ping interval or executor synchronization interval");
+      error = true;
+    } catch (Exception e) {
+      log.error("Error pinging resources or synchronizing executor and driver");
+      error = true;
+    }
   }
 
   /**
@@ -84,12 +96,15 @@ public class WtaExecutorPlugin implements ExecutorPlugin {
    * @since 1.0.0
    */
   @Override
-  public void onTaskFailed(TaskFailedReason failureReason) {}
+  public void onTaskFailed(TaskFailedReason failureReason) {
+    log.error("Task failed due to {}", failureReason.toErrorString());
+  }
 
   /**
    * Gets called just before shutdown. Blocks executor shutdown until it is completed.
    *
    * @author Henry Page
+   * @author Pil Kyu Cho
    * @since 1.0.0
    */
   @Override
@@ -98,7 +113,7 @@ public class WtaExecutorPlugin implements ExecutorPlugin {
       log.error("Shutting down WTA executor plugin due to driver failure");
       return;
     }
-    this.supplierEngine.stopPinging();
-    this.supplierEngine.stopSynchronizing();
+    supplierEngine.stopPinging();
+    supplierEngine.stopSynchronizing();
   }
 }

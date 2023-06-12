@@ -23,6 +23,7 @@ class WtaDriverPluginIntegrationTest {
   private JavaRDD<String> testFile;
 
   private final String resourcePath = "src/test/resources/wordcount.txt";
+
   private final String configPath = "src/test/resources/config.json";
 
   private final String pluginClass = "com.asml.apa.wta.spark.WtaPlugin";
