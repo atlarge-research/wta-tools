@@ -3,6 +3,7 @@ package com.asml.apa.wta.core.dto;
 import java.io.Serializable;
 import java.util.Optional;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
@@ -25,15 +26,25 @@ public class BaseSupplierDto implements Serializable {
 
   private long timestamp;
 
-  private Optional<OsInfoDto> osInfoDto;
+  @Builder.Default
+  private Optional<OsInfoDto> osInfoDto = Optional.empty();
 
-  private Optional<IostatDto> iostatDto;
+  @Builder.Default
+  private Optional<IostatDto> iostatDto = Optional.empty();
 
-  private Optional<DstatDto> dstatDto;
+  @Builder.Default
+  private Optional<DstatDto> dstatDto = Optional.empty();
 
-  private Optional<PerfDto> perfDto;
+  @Builder.Default
+  private Optional<PerfDto> perfDto = Optional.empty();
 
-  private Optional<JvmFileDto> jvmFileDto;
+  @Builder.Default
+  private Optional<JvmFileDto> jvmFileDto = Optional.empty();
 
-  private Optional<ProcDto> procDto;
+  ;
+
+  @Builder.Default
+  private Optional<ProcDto> procDto = Optional.empty();
+
+  ;
 }

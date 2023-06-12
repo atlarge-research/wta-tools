@@ -378,6 +378,6 @@ public class Stream<V extends Serializable> {
     while (!isEmpty()) {
       ret.add(head());
     }
-    return ret; // memory optimization
+    return ret;
   }
 }

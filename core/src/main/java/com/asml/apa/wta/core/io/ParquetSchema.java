@@ -66,7 +66,8 @@ public class ParquetSchema {
               .toLowerCase();
           if (String.class.isAssignableFrom(fieldType) || Domain.class.isAssignableFrom(fieldType)) {
             schemaBuilder = schemaBuilder.requiredString(fieldName);
-          } else if (long.class.isAssignableFrom(fieldType) || BaseTraceObject.class.isAssignableFrom(fieldType)) {
+          } else if (long.class.isAssignableFrom(fieldType)
+              || BaseTraceObject.class.isAssignableFrom(fieldType)) {
             schemaBuilder = schemaBuilder.requiredLong(fieldName);
           } else if (int.class.isAssignableFrom(fieldType)) {
             schemaBuilder = schemaBuilder.requiredInt(fieldName);

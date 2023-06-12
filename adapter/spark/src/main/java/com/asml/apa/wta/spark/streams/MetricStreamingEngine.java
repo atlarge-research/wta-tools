@@ -20,6 +20,7 @@ import lombok.Getter;
  * Facade that maintains the resource and task streams.
  *
  * @author Atour Mousavi Gourabi
+ * @author Henry Page
  * @since 1.0.0
  */
 @Getter
@@ -103,10 +104,18 @@ public class MetricStreamingEngine {
 
     final String type = "cluster node";
     final String os = sampleOsInfo.map(OsInfoDto::getOs).orElse("unknown");
-    final String procModel = sampleProcInfo
-        .map(ProcDto::getCpuModel)
-        .orElse(Optional.of("unknown"))
-        .get();
+
+    StringBuilder processorInformation = new StringBuilder();
+
+    final var processorModel = sampleProcInfo.flatMap(ProcDto::getCpuModel).orElse("unknown");
+
+    processorInformation.append(processorModel);
+    if (sampleOsInfo.map(OsInfoDto::getArchitecture).isPresent()) {
+      processorInformation
+          .append(" / ")
+          .append(sampleOsInfo.map(OsInfoDto::getArchitecture).get());
+    }
+
     final double numResources =
         sampleOsInfo.map(OsInfoDto::getAvailableProcessors).orElse(-1);
     final long memory = sampleOsInfo
@@ -123,7 +132,7 @@ public class MetricStreamingEngine {
         .numResources(numResources)
         .memory(memory)
         .diskSpace(diskSpace)
-        .procModel(procModel)
+        .procModel(processorInformation.toString())
         .os(os)
         .network(-1L)
         .build();
