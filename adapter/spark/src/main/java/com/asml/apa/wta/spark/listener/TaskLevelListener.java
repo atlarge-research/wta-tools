@@ -80,7 +80,6 @@ public class TaskLevelListener extends TaskStageBaseListener {
     final double energyConsumption = -1L;
     final long waitTime = -1L;
 
-
     // TODO(#61): CALL EXTERNAL DEPENDENCIES
     Task task = Task.builder()
         .id(taskId)
