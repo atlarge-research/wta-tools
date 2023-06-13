@@ -10,7 +10,6 @@ import lombok.Getter;
 import org.apache.spark.SparkContext;
 import org.apache.spark.executor.TaskMetrics;
 import org.apache.spark.scheduler.SparkListenerTaskEnd;
-import org.apache.spark.scheduler.SparkListenerTaskStart;
 import org.apache.spark.scheduler.TaskInfo;
 
 /**
