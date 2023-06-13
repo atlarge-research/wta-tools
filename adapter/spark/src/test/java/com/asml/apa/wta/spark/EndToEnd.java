@@ -31,18 +31,24 @@ public class EndToEnd {
    * @since 1.0.0
    */
   private static void sparkOperation(JavaRDD<String> textFile) {
-    JavaRDD<String> words =
-        textFile.flatMap(line -> Arrays.asList(line.split(" ")).iterator());
-    JavaRDD<String> upperCaseWords =
-        words.filter(word -> word.contains("harry")).map(String::toUpperCase);
-
-    JavaPairRDD<String, Tuple2<Integer, Integer>> wordCountPairs = upperCaseWords
-        .mapToPair(word -> new Tuple2<>(word, 1))
+    JavaRDD<String> words1 = textFile.flatMap(
+            line -> Arrays.asList(line.split(" ")).iterator())
+        .filter(word -> word.contains("harry"))
+        .map(String::toUpperCase);
+    JavaRDD<String> words2 = textFile.flatMap(
+            line -> Arrays.asList(line.split(" ")).iterator())
+        .filter(word -> word.contains("potter"))
+        .map(String::toUpperCase);
+    JavaPairRDD<String, Tuple2<Integer, Integer>> wordCountPairs1 = words1.mapToPair(word -> new Tuple2<>(word, 1))
         .reduceByKey(Integer::sum)
         .mapToPair(tuple ->
             new Tuple2<>(tuple._1(), new Tuple2<>(tuple._1().length(), tuple._2())));
-    JavaPairRDD<Tuple2<String, String>, Tuple2<Integer, Integer>> joinedPairs = wordCountPairs
-        .cartesian(wordCountPairs)
+    JavaPairRDD<String, Tuple2<Integer, Integer>> wordCountPairs2 = words2.mapToPair(word -> new Tuple2<>(word, 1))
+        .reduceByKey(Integer::sum)
+        .mapToPair(tuple ->
+            new Tuple2<>(tuple._1(), new Tuple2<>(tuple._1().length(), tuple._2())));
+    JavaPairRDD<Tuple2<String, String>, Tuple2<Integer, Integer>> joinedPairs = wordCountPairs1
+        .cartesian(wordCountPairs2)
         .filter(tuple -> tuple._1()._1().compareTo(tuple._2()._1()) < 0)
         .mapToPair(tuple -> new Tuple2<>(
             new Tuple2<>(tuple._1()._1(), tuple._2()._1()),
@@ -68,6 +74,7 @@ public class EndToEnd {
           return tuples.iterator();
         },
         true);
+
     JavaRDD<Tuple2<Double, String>> mappedPairs = tupled.mapToPair(tuple -> new Tuple2<>(tuple._1(), tuple._2()))
         .groupByKey()
         .filter(pair -> pair._1() >= 10)
@@ -90,12 +97,12 @@ public class EndToEnd {
         .sortByKey()
         .map(t -> t._1);
 
-    wordCountPairs = strings.mapToPair(word -> new Tuple2<>(word, 1))
+    wordCountPairs1 = strings.mapToPair(word -> new Tuple2<>(word, 1))
         .reduceByKey(Integer::sum)
         .mapToPair(tuple ->
             new Tuple2<>(tuple._1(), new Tuple2<>(tuple._1().length(), tuple._2())));
-    joinedPairs = wordCountPairs
-        .cartesian(wordCountPairs)
+    joinedPairs = wordCountPairs1
+        .cartesian(wordCountPairs2)
         .filter(tuple -> tuple._1()._1().compareTo(tuple._2()._1()) < 0)
         .mapToPair(tuple -> new Tuple2<>(
             new Tuple2<>(tuple._1()._1(), tuple._2()._1()),
