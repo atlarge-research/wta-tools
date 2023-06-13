@@ -47,7 +47,7 @@ public class WtaExecutorPlugin implements ExecutorPlugin {
         || extraConf.isEmpty()
         || !extraConf.containsKey("errorStatus")
         || extraConf.get("errorStatus").equals("true")) {
-      log.error("Error initialising WTA executor plugin due to driver failure");
+      log.error("Error initialising WTA executor plugin due to driver failure.");
       error = true;
       return;
     }
@@ -59,10 +59,10 @@ public class WtaExecutorPlugin implements ExecutorPlugin {
       supplierEngine.startPinging();
       supplierEngine.startSynchonizing();
     } catch (NumberFormatException e) {
-      log.error("Invalid resource ping interval or executor synchronization interval");
+      log.error("Invalid resource ping interval or executor synchronization interval.");
       error = true;
     } catch (Exception e) {
-      log.error("Error pinging resources or synchronizing executor and driver");
+      log.error("Error pinging resources or synchronizing executor and driver.");
       error = true;
     }
   }
@@ -99,7 +99,7 @@ public class WtaExecutorPlugin implements ExecutorPlugin {
    */
   @Override
   public void onTaskFailed(TaskFailedReason failureReason) {
-    log.error("Task failed due to {}", failureReason.toErrorString());
+    log.error("A task has failed due to {}.", failureReason.toErrorString());
   }
 
   /**
@@ -113,7 +113,8 @@ public class WtaExecutorPlugin implements ExecutorPlugin {
   public void shutdown() {
     if (error) {
       log.error("Shutting down WTA executor plugin due to driver failure");
-      return;
+    } else {
+      log.info("Shutting down WTA executor with no error");
     }
     supplierEngine.stopPinging();
     supplierEngine.stopSynchronizing();
