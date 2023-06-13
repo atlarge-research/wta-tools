@@ -107,7 +107,7 @@ public class WtaDriverPlugin implements DriverPlugin {
   @Override
   public void shutdown() {
     if (error) {
-      log.error("Plugin shutting down without writing to file");
+      log.error("Plugin shutting down without generating files");
       return;
     }
     try {
@@ -127,7 +127,7 @@ public class WtaDriverPlugin implements DriverPlugin {
       wtaWriter.write(Workflow.class, workflows);
       wtaWriter.write(workload);
     } catch (Exception e) {
-      log.error("Error while writing to the generated files, {} : {}.", e.getClass(), e.getMessage());
+      log.error("A {} error occurred while generating files: {}", e.getClass(), e.getMessage());
     }
   }
 
