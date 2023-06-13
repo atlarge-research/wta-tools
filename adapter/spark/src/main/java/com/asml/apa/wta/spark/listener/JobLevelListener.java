@@ -58,33 +58,37 @@ public class JobLevelListener extends AbstractListener<Workflow> {
   @Override
   public void onJobEnd(SparkListenerJobEnd jobEnd) {
     final int jobId = jobEnd.jobId() + 1;
-    final long submitTime = jobSubmitTimes.get(jobId);
+    final long tsSubmit = jobSubmitTimes.remove(jobId);
     final Task[] tasks = taskListener
         .getWithCondition(task -> task.getWorkflowId() == jobId)
         .toArray(Task[]::new);
-    final int numTasks = tasks.length;
-    // we can also get the mode from the config, if that's what the user wants?
-    final String scheduler = "DAGScheduler";
-    final Domain domain = config.getDomain();
-    final String appName = sparkContext.appName();
+    final int taskCount = tasks.length;
 
     // unknown
     final long criticalPathLength = -1;
     final int criticalPathTaskCount = -1;
     final int maxNumberOfConcurrentTasks = -1;
     final String nfrs = "";
+
+    // we can also get the mode from the config, if that's what the user wants?
+    final String scheduler = "DAGScheduler";
+    final Domain domain = config.getDomain();
+    final String appName = sparkContext.appName();
+
+    // unknown
     final String applicationField = "ETL";
     final double totalResources = -1.0;
     final double totalMemoryUsage = -1.0;
     final long totalNetworkUsage = -1L;
     final double totalDiskSpaceUsage = -1.0;
     final double totalEnergyConsumption = -1.0;
+
     this.getProcessedObjects()
         .add(Workflow.builder()
             .id(jobId)
-            .tsSubmit(submitTime)
+            .tsSubmit(tsSubmit)
             .tasks(tasks)
-            .taskCount(numTasks)
+            .taskCount(taskCount)
             .criticalPathLength(criticalPathLength)
             .criticalPathTaskCount(criticalPathTaskCount)
             .maxConcurrentTasks(maxNumberOfConcurrentTasks)
@@ -99,7 +103,5 @@ public class JobLevelListener extends AbstractListener<Workflow> {
             .totalDiskSpaceUsage(totalDiskSpaceUsage)
             .totalEnergyConsumption(totalEnergyConsumption)
             .build());
-
-    jobSubmitTimes.remove(jobId);
   }
 }

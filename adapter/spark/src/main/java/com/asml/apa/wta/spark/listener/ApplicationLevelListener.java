@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import lombok.Getter;
-import org.apache.commons.lang3.ArrayUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.spark.SparkContext;
 import org.apache.spark.scheduler.SparkListenerApplicationEnd;
 import org.apache.spark.scheduler.SparkListenerApplicationStart;
@@ -25,6 +25,7 @@ import org.apache.spark.scheduler.SparkListenerApplicationStart;
  * @since 1.0.0
  */
 @Getter
+@Slf4j
 public class ApplicationLevelListener extends AbstractListener<Workload> {
 
   private final JobLevelListener jobLevelListener;
@@ -63,11 +64,10 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
    * @param applicationEnd The event corresponding to the end of the application
    */
   public void onApplicationEnd(SparkListenerApplicationEnd applicationEnd) {
-
-    // we should enver enter this branch, this is a guard since an application
-    // only terminates once.
+    // we should never enter this branch, this is a guard since an application only terminates once.
     List<Workload> processedObjects = this.getProcessedObjects();
     if (!processedObjects.isEmpty()) {
+      log.debug("Application end called twice, this should never happen");
       return;
     }
 
@@ -80,27 +80,11 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
     final long endDate = applicationEnd.time();
     final String[] authors = config.getAuthors();
     final String workloadDescription = config.getDescription();
-    for (Task task : taskLevelListener.getProcessedObjects()) {
-      final int stageId = taskLevelListener.getTaskToStage().get(task.getId());
-      final Integer[] parentStages =
-          stageLevelListener.getStageToParents().get(stageId);
-      if (parentStages != null) {
-        final Long[] parents = Arrays.stream(parentStages)
-            .flatMap(x -> Arrays.stream(
-                taskLevelListener.getStageToTasks().getOrDefault(x, new ArrayList<>()).toArray(new Long[0])))
-            .toArray(size -> new Long[size]);
-        task.setParents(ArrayUtils.toPrimitive(parents));
-      }
 
-      List<Integer> childrenStages =
-          stageLevelListener.getParentToChildren().get(stageId);
-      if (childrenStages != null) {
-        List<Long> children = new ArrayList<>();
-        childrenStages.forEach(
-            x -> children.addAll(taskLevelListener.getStageToTasks().get(x)));
-        Long[] temp = children.toArray(new Long[0]);
-        task.setChildren(ArrayUtils.toPrimitive(temp));
-      }
+    if (config.isStageLevel()) {
+      addStageRelations();
+    } else {
+      addTaskRelations();
     }
 
     // unknown
@@ -109,8 +93,8 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
     final long numUsers = -1L;
     final long numGroups = -1L;
     final double totalResourceSeconds = -1.0;
-    // all statistics (stdev, mean, etc.) are unknown
 
+    // all statistics (stdev, mean, etc.) are unknown
     processedObjects.add(Workload.builder()
         .totalWorkflows(numWorkflows)
         .totalTasks(totalTasks)
@@ -125,5 +109,62 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
         .numGroups(numGroups)
         .totalResourceSeconds(totalResourceSeconds)
         .build());
+  }
+
+  /**
+   * Goes over all the processed Spark tasks and add its parent and child tasks, if they exist.
+   *
+   * @author Tianchen QU
+   * @author Pil Kyu Cho
+   * @since 1.0.0
+   */
+  private void addTaskRelations() {
+    for (Task task : taskLevelListener.getProcessedObjects()) {
+      final int stageId = taskLevelListener.getTaskToStage().get(task.getId());
+      final Integer[] parentStages =
+          stageLevelListener.getStageToParents().get(stageId);
+      if (parentStages != null) {
+        task.setParents(Arrays.stream(parentStages)
+            .flatMap(parentStageId -> Arrays.stream(taskLevelListener
+                .getStageToTasks()
+                .getOrDefault(parentStageId, new ArrayList<>())
+                .toArray(new Long[0])))
+            .mapToLong(Long::longValue)
+            .toArray());
+      }
+      List<Integer> childrenStages =
+          stageLevelListener.getParentToChildren().get(stageId);
+      if (childrenStages != null) {
+        task.setChildren(childrenStages.stream()
+            .flatMap(childStageId -> taskLevelListener.getStageToTasks().get(childStageId).stream())
+            .mapToLong(Long::longValue)
+            .toArray());
+      }
+    }
+  }
+
+  /**
+   * Goes over all the processed Spark stages and add its parent and child stages, if they exist.
+   *
+   * @author Pil Kyu Cho
+   * @since 1.0.0
+   */
+  private void addStageRelations() {
+    for (Task stage : stageLevelListener.getProcessedObjects()) {
+      final int stageId = (int) stage.getId();
+      final Integer[] parentStages =
+          stageLevelListener.getStageToParents().get(stageId);
+      if (parentStages != null) {
+        stage.setParents(Arrays.stream(parentStages)
+            .mapToLong(Integer::longValue)
+            .toArray());
+      }
+      final List<Integer> childrenStages =
+          stageLevelListener.getParentToChildren().get(stageId);
+      if (childrenStages != null) {
+        stage.setChildren(
+            childrenStages.stream().mapToLong(Integer::longValue).toArray());
+      }
+    }
   }
 }

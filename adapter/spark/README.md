@@ -2,7 +2,7 @@
 
 ## Overview
 
-![img.png](./src/main/resources/architecture.png)
+![img.png](architecture.png)
 
 The Spark Adapter is responsible for parsing Spark execution information into WTA objects.
 The diagram above illustrates the workflow of the adapter.

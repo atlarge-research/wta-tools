@@ -50,6 +50,8 @@ For the most part, since we are pre-release this will serve no real purpose, oth
 - Added proc metrics data source [@lyadalachanchu](https://gitlab.ewi.tudelft.nl/lyadalachanchu)
 - Implemented Parent Children fields for Task [@tqu](https://gitlab.ewi.tudelft.nl/tqu)
 - Added automatic Avro record converters for POJOs [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
+- Added shading for plugin dependencies [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
+- Added parent-child functionality to Spark stage listeners as well [@pcho](https://gitlab.ewi.tudelft.nl/pcho)
 
 ### Changed
 - Refactored listeners into a generic interface to reduce code duplication and increase cc [@hpage](https://gitlab.ewi.tudelft.nl/hpage)
@@ -65,6 +67,7 @@ For the most part, since we are pre-release this will serve no real purpose, oth
 - Decreased JAR size by over 90% [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 - Added documentation for running the validator script on the generated trace [@pcho](https://gitlab.ewi.tudelft.nl/pcho)
 - Restructured the benchmarking directory into a submodule directory [@pcho](https://gitlab.ewi.tudelft.nl/pcho)
+- Updated the Spark method in EndToEnd class to cover more broad shuffling operations [@pcho](https://gitlab.ewi.tudelft.nl/pcho)
 
 ### Fixed
 - Fixed the slf4j logging module to allow use in testing and `adapter/spark` [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
@@ -73,6 +76,8 @@ For the most part, since we are pre-release this will serve no real purpose, oth
 - Fixed the format of the outputted files [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 - Fixed the type inconsistency in the field types of the WTA Objects [@tqu](https://gitlab.ewi.tudelft.nl/tqu)
 - Fixed iostat partition bug and added support for comma decimal separator [@lyadalachanchu](https://gitlab.ewi.tudelft.nl/lyadalachanchu)
+- Fixed the bug that caused the plugin to crash if given invalid configs [@pcho](https://gitlab.ewi.tudelft.nl/pcho)
+- Fixed the stage id bug in stage listener [@pcho](https://gitlab.ewi.tudelft.nl/pcho)
 
 ### Deprecated
 
