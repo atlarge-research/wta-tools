@@ -49,16 +49,9 @@ public class TaskLevelListener extends TaskStageBaseListener {
    */
   @Override
   public void onTaskEnd(SparkListenerTaskEnd taskEnd) {
-    final TaskInfo curTaskInfo = taskEnd.taskInfo();
-    final TaskMetrics curTaskMetrics = taskEnd.taskMetrics();
-    final long taskId = curTaskInfo.taskId() + 1;
-
-    final String type = taskEnd.taskType();
-    final long submitTime = curTaskInfo.launchTime();
-    final long runTime = curTaskMetrics.executorRunTime();
-    final int userId = sparkContext.sparkUser().hashCode();
-    final int stageId = taskEnd.stageId();
-    final long workflowId = stageIdsToJobs.get(taskEnd.stageId() + 1);
+    final long taskId = taskEnd.taskInfo().taskId() + 1;
+    final int stageId = taskEnd.stageId() + 1;
+    taskToStage.put(taskId, stageId);
 
     final List<Long> tasks = stageToTasks.get(stageId);
     if (tasks == null) {
@@ -69,9 +62,13 @@ public class TaskLevelListener extends TaskStageBaseListener {
       tasks.add(taskId);
     }
 
+    final String type = taskEnd.taskType();
+    final long tsSubmit = taskEnd.taskInfo().launchTime();
+    final long runtime = taskEnd.taskMetrics().executorRunTime();
     final long[] parents = new long[0];
     final long[] children = new long[0];
-    taskToStage.put(taskId, stageId);
+    final int userId = sparkContext.sparkUser().hashCode();
+    final long workflowId = stageIdsToJobs.get(stageId);
 
     // unknown
     final int submissionSite = -1;
@@ -95,8 +92,8 @@ public class TaskLevelListener extends TaskStageBaseListener {
             .id(taskId)
             .type(type)
             .submissionSite(submissionSite)
-            .tsSubmit(submitTime)
-            .runtime(runTime)
+            .tsSubmit(tsSubmit)
+            .runtime(runtime)
             .resourceType(resourceType)
             .resourceAmountRequested(resourceAmountRequested)
             .parents(parents)

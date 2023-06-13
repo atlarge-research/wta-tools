@@ -5,6 +5,6 @@
   "logLevel": "INFO",
   "outputPath": "wta-output",
   "isStageLevel": "false",
-  "resourcePingInterval": 1000,
-  "executorSynchronizationInterval": 2000
+  "resourcePingInterval": 50,
+  "executorSynchronizationInterval": -5
 }

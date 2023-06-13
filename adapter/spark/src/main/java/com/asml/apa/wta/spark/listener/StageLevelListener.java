@@ -43,19 +43,12 @@ public class StageLevelListener extends TaskStageBaseListener {
   @Override
   public void onStageCompleted(SparkListenerStageCompleted stageCompleted) {
     final StageInfo curStageInfo = stageCompleted.stageInfo();
-    final TaskMetrics curStageMetrics = curStageInfo.taskMetrics();
-
-    final int stageId = curStageInfo.stageId();
-    final Long submitTime = curStageInfo.submissionTime().getOrElse(() -> -1L);
-    final long runTime = curStageMetrics.executorRunTime();
-    final int userId = sparkContext.sparkUser().hashCode();
-    final long workflowId = stageIdsToJobs.get(stageId + 1);
-
+    final int stageId = curStageInfo.stageId() + 1;
     final Integer[] parentIds = JavaConverters.seqAsJavaList(
             curStageInfo.parentIds().toList())
         .stream()
         .map(x -> (Integer) x)
-        .toArray(size -> new Integer[size]);
+        .toArray(Integer[]::new);
     stageToParents.put(stageId, parentIds);
     for (Integer id : parentIds) {
       List<Integer> children = parentToChildren.get(id);
@@ -67,13 +60,19 @@ public class StageLevelListener extends TaskStageBaseListener {
         children.add(stageId);
       }
     }
+
+    final Long tsSubmit = curStageInfo.submissionTime().getOrElse(() -> -1L);
+    final long runtime = curStageInfo.taskMetrics().executorRunTime();
+    final long[] parents = new long[0];
+    final long[] children = new long[0];
+    final int userId = sparkContext.sparkUser().hashCode();
+    final long workflowId = stageIdsToJobs.remove(stageId);
+
     // dummy values
     final String type = "";
     final int submissionSite = -1;
     final String resourceType = "N/A";
     final double resourceAmountRequested = -1.0;
-    final long[] parents = new long[0];
-    final long[] children = new long[0];
     final int groupId = -1;
     final String nfrs = "";
     final String params = "";
@@ -92,8 +91,8 @@ public class StageLevelListener extends TaskStageBaseListener {
             .id(stageId)
             .type(type)
             .submissionSite(submissionSite)
-            .tsSubmit(submitTime)
-            .runtime(runTime)
+            .tsSubmit(tsSubmit)
+            .runtime(runtime)
             .resourceType(resourceType)
             .resourceAmountRequested(resourceAmountRequested)
             .parents(parents)
@@ -111,6 +110,5 @@ public class StageLevelListener extends TaskStageBaseListener {
             .energyConsumption(energyConsumption)
             .resourceUsed(resourceUsed)
             .build());
-    stageIdsToJobs.remove(stageCompleted.stageInfo().stageId() + 1);
   }
 }

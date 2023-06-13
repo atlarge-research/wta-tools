@@ -63,8 +63,7 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
    * @param applicationEnd The event corresponding to the end of the application
    */
   public void onApplicationEnd(SparkListenerApplicationEnd applicationEnd) {
-
-    // we should enver enter this branch, this is a guard since an application
+    // we should never enter this branch, this is a guard since an application
     // only terminates once.
     List<Workload> processedObjects = this.getProcessedObjects();
     if (!processedObjects.isEmpty()) {
@@ -90,7 +89,7 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
                 .getStageToTasks()
                 .getOrDefault(x, new ArrayList<>())
                 .toArray(new Long[0])))
-            .toArray(size -> new Long[size]);
+            .toArray(Long[]::new);
         task.setParents(ArrayUtils.toPrimitive(parents));
       }
 

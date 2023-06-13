@@ -55,7 +55,7 @@ public abstract class TaskStageBaseListener extends AbstractListener<Task> {
    */
   @Override
   public void onStageCompleted(SparkListenerStageCompleted stageCompleted) {
-    // all tasks are guaranteed to be completed, so we can remove the stage id to reduce memory usage.
+    // all tasks are guaranteed to be completed, so we can remove the stage id to reduce memory usage??
     stageIdsToJobs.remove(stageCompleted.stageInfo().stageId() + 1);
   }
 }
