@@ -78,6 +78,23 @@ class ApplicationLevelListenerTest extends BaseLevelListenerTest {
   }
 
   @Test
+  void doingNothingTest() {
+    ListBuffer<StageInfo> stageBuffer = new ListBuffer<>();
+    SparkListenerJobStart jobStart = new SparkListenerJobStart(1, 2L, stageBuffer.toList(), new Properties());
+    fakeTaskListener.onJobStart(jobStart);
+    fakeStageListener.onJobStart(jobStart);
+    fakeApplicationListener.onApplicationEnd(applicationEndObj);
+    Workload workload = fakeApplicationListener.getProcessedObjects().get(0);
+    assertThat(fakeApplicationListener.getProcessedObjects().size()).isEqualTo(1);
+    assertThat(workload.getTotalTasks()).isEqualTo(0);
+    assertThat(workload.getMeanEnergy()).isEqualTo(-1.0);
+    assertThat(workload.getMeanMemory()).isEqualTo(-1.0);
+    assertThat(workload.getMeanResourceTask()).isEqualTo(-1.0);
+    assertThat(workload.getMeanNetworkUsage()).isEqualTo(-1.0);
+    assertThat(workload.getMeanDiskSpaceUsage()).isEqualTo(-1.0);
+  }
+
+  @Test
   void parentChildrenAggregationTest() {
     ListBuffer<StageInfo> stageBuffer = new ListBuffer<>();
     stageBuffer.$plus$eq(testStageInfo);
