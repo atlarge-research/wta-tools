@@ -109,7 +109,7 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
     Map<Integer, List<Integer>> parentToChildren = stageListener.getParentToChildren();
     for (Task stage : stages) {
       stage.setChildren(parentToChildren.getOrDefault(Math.toIntExact(stage.getId()), new ArrayList<>()).stream()
-          .mapToLong(x -> x)
+          .mapToLong(x -> x + 1)
           .toArray());
     }
   }

@@ -73,7 +73,7 @@ public class StageLevelListener extends TaskStageBaseListener {
     }
     final double diskSpaceRequested = curStageMetrics.diskBytesSpilled();
     final double memoryRequested = curStageMetrics.peakExecutionMemory();
-    final long[] parents = Arrays.stream(parentIds).mapToLong(x -> x).toArray();
+    final long[] parents = Arrays.stream(parentIds).mapToLong(x -> x + 1).toArray();
     final long[] children = new long[0];
     // dummy values
     final String type = "";

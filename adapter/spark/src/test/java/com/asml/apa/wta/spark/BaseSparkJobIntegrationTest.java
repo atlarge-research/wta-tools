@@ -17,9 +17,13 @@ public class BaseSparkJobIntegrationTest {
 
   protected SparkDataSource sut;
 
+  protected SparkDataSource sut2;
+
   protected JavaRDD<String> testFile;
 
   RuntimeConfig fakeConfig;
+
+  RuntimeConfig fakeConfig2;
 
   @BeforeEach
   void setupBaseIntegrationTest() {
@@ -31,6 +35,13 @@ public class BaseSparkJobIntegrationTest {
         .outputPath("src/test/resources/WTA")
         .build();
 
+    fakeConfig2 = RuntimeConfig.builder()
+        .authors(new String[] {"Harry Potter"})
+        .isStageLevel(true)
+        .domain(Domain.SCIENTIFIC)
+        .description("Yer a wizard harry")
+        .outputPath("src/test/resources/WTA")
+        .build();
     SparkConf conf = new SparkConf()
         .setAppName("SparkTestRunner")
         .setMaster("local[1]")
@@ -40,6 +51,7 @@ public class BaseSparkJobIntegrationTest {
     spark.sparkContext().setLogLevel("ERROR");
 
     sut = new SparkDataSource(spark.sparkContext(), fakeConfig);
+    sut2 = new SparkDataSource(spark.sparkContext(), fakeConfig2);
     String resourcePath = "src/test/resources/wordcount.txt";
     testFile = JavaSparkContext.fromSparkContext(spark.sparkContext()).textFile(resourcePath);
   }
