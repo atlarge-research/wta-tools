@@ -7,7 +7,6 @@ import com.asml.apa.wta.spark.dto.ResourceCollectionDto;
 import com.asml.apa.wta.spark.dto.SparkBaseSupplierWrapperDto;
 import java.util.List;
 import java.util.Map;
-
 import org.apache.spark.SparkConf;
 import org.apache.spark.SparkContext;
 import org.apache.spark.api.plugin.PluginContext;
@@ -31,9 +30,9 @@ class WtaDriverPluginTest {
    */
   private void createSparkConf(String configFile) {
     SparkConf conf = new SparkConf()
-            .setAppName("SystemTest")
-            .setMaster("local")
-            .set("spark.driver.extraJavaOptions", "-DconfigFile=" + configFile);
+        .setAppName("SystemTest")
+        .setMaster("local")
+        .set("spark.driver.extraJavaOptions", "-DconfigFile=" + configFile);
     sc = SparkSession.builder().config(conf).getOrCreate().sparkContext();
   }
 
@@ -64,7 +63,7 @@ class WtaDriverPluginTest {
   }
 
   @Test
-  void wtaDriverPluginInitializeNonExistingConfigFilepathThrowsException() {
+  void wtaDriverPluginDoesNotInitializeWithNonExistingConfigFilepath() {
     createSparkConf("non-existing-file.json");
     assertThat(sut.isError()).isFalse();
     Map<String, String> configMap = sut.init(sc, mockedPluginContext);
@@ -89,6 +88,27 @@ class WtaDriverPluginTest {
     assertThat(configMap.get("errorStatus")).isEqualTo("true");
     assertThat(sut.isError()).isTrue();
     verify(sut, times(0)).initListeners();
+    try {
+      sut.shutdown();
+    } catch (Exception ignored) {
+    }
+    verify(sut, times(0)).removeListeners();
+  }
+
+  @Test
+  void wtaDriverPluginDoesNotInitializeWithMissingConfig() {
+    SparkConf conf = new SparkConf().setAppName("SystemTest").setMaster("local");
+    sc = SparkSession.builder().config(conf).getOrCreate().sparkContext();
+    assertThat(sut.isError()).isFalse();
+    Map<String, String> configMap = sut.init(sc, mockedPluginContext);
+    assertThat(configMap).containsKeys("errorStatus");
+    assertThat(configMap.get("errorStatus")).isEqualTo("true");
+    assertThat(sut.isError()).isTrue();
+    verify(sut, times(0)).initListeners();
+    try {
+      sut.shutdown();
+    } catch (Exception ignored) {
+    }
     verify(sut, times(0)).removeListeners();
   }
 
