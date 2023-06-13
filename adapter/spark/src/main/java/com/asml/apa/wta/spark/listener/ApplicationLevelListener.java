@@ -68,7 +68,7 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
     // we should never enter this branch, this is a guard since an application only terminates once.
     List<Workload> processedObjects = this.getProcessedObjects();
     if (!processedObjects.isEmpty()) {
-      log.error("Application end called twice, this should never happen");
+      log.debug("Application end called twice, this should never happen");
       return;
     }
 

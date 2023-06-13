@@ -113,10 +113,10 @@ public class WtaExecutorPlugin implements ExecutorPlugin {
   public void shutdown() {
     if (error) {
       log.error("Shutting down WTA executor plugin due to driver failure.");
-    } else {
-      log.info("Shutting down WTA executor with no error.");
+      supplierEngine.stopPinging();
+      supplierEngine.stopSynchronizing();
+      return;
     }
-    supplierEngine.stopPinging();
-    supplierEngine.stopSynchronizing();
+    log.info("Shutting down WTA executor with no error.");
   }
 }
