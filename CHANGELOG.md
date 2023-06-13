@@ -51,6 +51,7 @@ For the most part, since we are pre-release this will serve no real purpose, oth
 - Implemented Parent Children fields for Task [@tqu](https://gitlab.ewi.tudelft.nl/tqu)
 - Added automatic Avro record converters for POJOs [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 - Added shading for plugin dependencies [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
+- Enhanced documentation relating to Spark [@hpage](https://gitlab.ewi.tudelft.nl/hpage)
 
 ### Changed
 - Refactored listeners into a generic interface to reduce code duplication and increase cc [@hpage](https://gitlab.ewi.tudelft.nl/hpage)

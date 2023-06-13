@@ -133,6 +133,7 @@ utilisation metrics on the executor side. These metrics are then passed to the d
 
 Aggregation of all the resource utilisation metrics are done at the driver's end.
 
+
 ## Guidelines for Developers
 - If a new data source is added in the future, be sure to use the existing streaming infrastructure that handles `MetricsRecord`. This helps the driver in terms of memory usage.
 - When a resource is not needed anymore, release it in `shutdown()`, within the respective `PluginContext`.
