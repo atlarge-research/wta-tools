@@ -157,7 +157,7 @@ public class MetricStreamingEngine {
    */
   private List<ResourceState> produceResourceStatesFromExecutorInfo(
       Resource associatedResource, List<SparkBaseSupplierWrapperDto> pings) {
-    var result = pings.stream()
+    return pings.stream()
         .map(ping -> {
           final long timestamp = ping.getTimestamp();
           final String eventType = "resource active";
@@ -211,8 +211,6 @@ public class MetricStreamingEngine {
               .build();
         })
         .collect(Collectors.toList());
-
-    return result;
   }
 
   /**
