@@ -19,7 +19,7 @@ public class ParquetWriterTest {
 
     OutputFile pathMock = Mockito.mock(OutputFile.class);
 
-    ParquetWriter<BaseTraceObject> sut = new ParquetWriter<>(pathMock, schemaMock, writerMock);
+    ParquetWriter<BaseTraceObject> sut = new ParquetWriter<>(schemaMock, writerMock);
 
     BaseTraceObject recordMock = Mockito.mock(BaseTraceObject.class);
 
