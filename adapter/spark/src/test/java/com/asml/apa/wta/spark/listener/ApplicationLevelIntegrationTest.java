@@ -58,28 +58,28 @@ class ApplicationLevelIntegrationTest extends BaseSparkJobIntegrationTest {
 
     assertThat(sut2.getTaskLevelListener().getProcessedObjects().size()).isEqualTo(6);
     assertThat(sut2.getStageLevelListener().getProcessedObjects().get(0).getParents())
-            .isEqualTo(new long[0]);
+        .isEqualTo(new long[0]);
     assertThat(sut2.getStageLevelListener().getProcessedObjects().get(0).getChildren())
-            .isEqualTo(new long[] {2});
+        .isEqualTo(new long[] {2});
     assertThat(sut2.getStageLevelListener().getProcessedObjects().get(1).getParents())
-            .isEqualTo(new long[] {1});
+        .isEqualTo(new long[] {1});
     assertThat(sut2.getStageLevelListener().getProcessedObjects().get(1).getChildren())
-            .isEqualTo(new long[0]);
+        .isEqualTo(new long[0]);
     assertThat(sut2.getStageLevelListener().getProcessedObjects().get(2).getParents())
-            .isEqualTo(new long[0]);
+        .isEqualTo(new long[0]);
     assertThat(sut2.getStageLevelListener().getProcessedObjects().get(2).getChildren())
-            .isEqualTo(new long[] {4});
+        .isEqualTo(new long[] {4});
     assertThat(sut2.getStageLevelListener().getProcessedObjects().get(3).getParents())
-            .isEqualTo(new long[] {3});
+        .isEqualTo(new long[] {3});
     assertThat(sut2.getStageLevelListener().getProcessedObjects().get(3).getChildren())
-            .isEqualTo(new long[0]);
+        .isEqualTo(new long[0]);
     assertThat(sut2.getStageLevelListener().getProcessedObjects().get(4).getParents())
-            .isEqualTo(new long[0]);
+        .isEqualTo(new long[0]);
     assertThat(sut2.getStageLevelListener().getProcessedObjects().get(4).getChildren())
-            .isEqualTo(new long[] {6});
+        .isEqualTo(new long[] {6});
     assertThat(sut2.getStageLevelListener().getProcessedObjects().get(5).getParents())
-            .isEqualTo(new long[] {5});
+        .isEqualTo(new long[] {5});
     assertThat(sut2.getStageLevelListener().getProcessedObjects().get(5).getChildren())
-            .isEqualTo(new long[0]);
+        .isEqualTo(new long[0]);
   }
 }
