@@ -41,10 +41,6 @@ public class BaseSupplierDto implements Serializable {
   @Builder.Default
   private Optional<JvmFileDto> jvmFileDto = Optional.empty();
 
-  ;
-
   @Builder.Default
   private Optional<ProcDto> procDto = Optional.empty();
-
-  ;
 }
