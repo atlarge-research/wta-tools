@@ -25,7 +25,7 @@ import scala.collection.mutable.ListBuffer;
 
 class TaskLevelListenerTest extends BaseLevelListenerTest {
 
-  TaskInfo testTaskInfo;
+  TaskInfo testTaskInfo1;
 
   TaskInfo testTaskInfo2;
 
@@ -39,8 +39,7 @@ class TaskLevelListenerTest extends BaseLevelListenerTest {
 
   @BeforeEach
   void setup() {
-
-    testTaskInfo = new TaskInfo(0, 0, 1, 50L, "testExecutor", "local", TaskLocality.NODE_LOCAL(), false);
+    testTaskInfo1 = new TaskInfo(0, 0, 1, 50L, "testExecutor", "local", TaskLocality.NODE_LOCAL(), false);
     testTaskInfo2 = new TaskInfo(1, 0, 1, 50L, "testExecutor", "local", TaskLocality.NODE_LOCAL(), false);
 
     ListBuffer<Integer> parents = new ListBuffer<>();
@@ -66,7 +65,7 @@ class TaskLevelListenerTest extends BaseLevelListenerTest {
         100);
     parents.$plus$eq(3);
     taskEndEvent = new SparkListenerTaskEnd(
-        3, 1, "testTaskType", null, testTaskInfo, new ExecutorMetrics(), mockedMetrics);
+        3, 1, "testTaskType", null, testTaskInfo1, new ExecutorMetrics(), mockedMetrics);
     taskEndEvent2 = new SparkListenerTaskEnd(
         3, 1, "testTaskType", null, testTaskInfo2, new ExecutorMetrics(), mockedMetrics);
     stageCompleted = new SparkListenerStageCompleted(testStageInfo);
@@ -82,16 +81,16 @@ class TaskLevelListenerTest extends BaseLevelListenerTest {
     assertThat(fakeTaskListener.getStageToTasks().size()).isEqualTo(1);
     List<Long> list = new ArrayList<>();
     list.add(1L);
-    assertThat(fakeTaskListener.getStageToTasks()).containsEntry(3, list);
+    assertThat(fakeTaskListener.getStageToTasks()).containsEntry(4, list);
     assertThat(fakeTaskListener.getTaskToStage().size()).isEqualTo(1);
-    assertThat(fakeTaskListener.getTaskToStage()).containsEntry(1L, 3);
+    assertThat(fakeTaskListener.getTaskToStage()).containsEntry(1L, 4);
     fakeTaskListener.onTaskEnd(taskEndEvent2);
     assertThat(fakeTaskListener.getStageToTasks().size()).isEqualTo(1);
     list.add(2L);
-    assertThat(fakeTaskListener.getStageToTasks()).containsEntry(3, list);
+    assertThat(fakeTaskListener.getStageToTasks()).containsEntry(4, list);
     assertThat(fakeTaskListener.getTaskToStage().size()).isEqualTo(2);
-    assertThat(fakeTaskListener.getTaskToStage()).containsEntry(1L, 3);
-    assertThat(fakeTaskListener.getTaskToStage()).containsEntry(2L, 3);
+    assertThat(fakeTaskListener.getTaskToStage()).containsEntry(1L, 4);
+    assertThat(fakeTaskListener.getTaskToStage()).containsEntry(2L, 4);
   }
 
   @Test
@@ -99,7 +98,7 @@ class TaskLevelListenerTest extends BaseLevelListenerTest {
     ListBuffer<StageInfo> stageBuffer = new ListBuffer<>();
     stageBuffer.$plus$eq(testStageInfo);
 
-    fakeTaskListener.onJobStart(new SparkListenerJobStart(1, 2L, stageBuffer.toList(), new Properties()));
+    fakeTaskListener.onJobStart(new SparkListenerJobStart(0, 2L, stageBuffer.toList(), new Properties()));
     fakeTaskListener.onTaskEnd(taskEndEvent);
     assertEquals(1, fakeTaskListener.getProcessedObjects().size());
     Task curTask = fakeTaskListener.getProcessedObjects().get(0);
@@ -107,7 +106,7 @@ class TaskLevelListenerTest extends BaseLevelListenerTest {
     assertEquals("testTaskType", curTask.getType());
     assertEquals(50L, curTask.getTsSubmit());
     assertEquals(100L, curTask.getRuntime());
-    assertEquals(2L, curTask.getWorkflowId());
+    assertEquals(1L, curTask.getWorkflowId());
     assertEquals("testUser".hashCode(), curTask.getUserId());
     assertEquals(-1, curTask.getSubmissionSite());
     assertEquals("N/A", curTask.getResourceType());
