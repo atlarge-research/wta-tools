@@ -129,11 +129,13 @@ class MetricStreamingEngineTest {
     assertThat(result).hasSize(2);
 
     ResourceAndStateWrapper executor1 = result.stream()
-        .filter(r -> r.getResourceId() == Math.abs(s1.getExecutorId().hashCode()))
+        .filter(r ->
+            r.getResource().getId() == Math.abs(s1.getExecutorId().hashCode()))
         .findFirst()
         .get();
     ResourceAndStateWrapper executor2 = result.stream()
-        .filter(r -> r.getResourceId() == Math.abs(s3.getExecutorId().hashCode()))
+        .filter(r ->
+            r.getResource().getId() == Math.abs(s3.getExecutorId().hashCode()))
         .findFirst()
         .get();
 
@@ -175,5 +177,20 @@ class MetricStreamingEngineTest {
     assertThat(executor2.getStates()).hasSize(1);
     assertThat(sut.collectResourceInformation().get(0).getStates()).isEmpty();
     assertThat(sut.collectResourceInformation().get(0).getResource()).isNotNull();
+  }
+
+  @Test
+  void filteringThroughAStreamReturnsTheFirstValueWhereTheOptionalIsPresent() {
+    OsInfoDto modifiedDto = s3.getOsInfoDto().get();
+    modifiedDto.setOs("asfasdfjasfsadfasfasdfsa");
+    s3.setOsInfoDto(Optional.of(modifiedDto));
+    s3.setExecutorId(s1.getExecutorId());
+
+    sut.addToResourceStream(s1.getExecutorId(), s1);
+    sut.addToResourceStream(s3.getExecutorId(), s3);
+
+    List<ResourceAndStateWrapper> result = sut.collectResourceInformation();
+    assertThat(result).hasSize(1);
+    assertThat(result.get(0).getResource().os).isEqualTo("asfasdfjasfsadfasfasdfsa");
   }
 }

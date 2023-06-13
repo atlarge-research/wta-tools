@@ -18,8 +18,6 @@ import lombok.NoArgsConstructor;
 @Data
 public class ResourceAndStateWrapper {
 
-  private long resourceId;
-
   private Resource resource;
 
   private List<ResourceState> states;

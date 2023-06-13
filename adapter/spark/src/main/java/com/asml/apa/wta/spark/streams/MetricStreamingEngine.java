@@ -84,7 +84,7 @@ public class MetricStreamingEngine {
           Resource resource = produceResourceFromExecutorInfo(transformedId, entry.getValue());
           List<ResourceState> states = produceResourceStatesFromExecutorInfo(resource, entry.getValue());
           states.sort(Comparator.comparing(ResourceState::getTimestamp));
-          return new ResourceAndStateWrapper(transformedId, resource, states);
+          return new ResourceAndStateWrapper(resource, states);
         })
         .collect(Collectors.toList());
   }
@@ -110,10 +110,10 @@ public class MetricStreamingEngine {
     StringBuilder processorInformation = new StringBuilder();
 
     final String processorModel = pings.stream()
-        .filter(x -> x.getProcDto().isPresent())
-        .map(x -> x.getProcDto().get())
-        .filter(x -> x.getCpuModel().isPresent())
-        .map(x -> x.getCpuModel().get())
+        .filter(ping -> ping.getProcDto().isPresent())
+        .map(ping -> ping.getProcDto().get())
+        .filter(pcDto -> pcDto.getCpuModel().isPresent())
+        .map(pcDto -> pcDto.getCpuModel().get())
         .findFirst()
         .orElse("unknown");
 
