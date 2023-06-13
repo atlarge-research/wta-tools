@@ -144,9 +144,10 @@ public class EndToEnd {
         .setAppName("SystemTest")
         .setMaster("local")
         .set("spark.sql.shuffle.partitions", "500")
-        .set("spark.plugins", "com.asml.apa.wta.spark.WtaPlugin");
-    System.setProperty("configFile", args[0]);
-    //    System.setProperty("configFile", "adapter/spark/src/test/resources/config.json");
+        .set("spark.plugins", "com.asml.apa.wta.spark.WtaPlugin")
+        .set("spark.driver.extraJavaOptions", "-DconfigFile=" + args[0]);
+    //        .set("spark.driver.extraJavaOptions", "-DconfigFile=" +
+    // "adapter/spark/src/test/resources/config.json");
     SparkSession spark = SparkSession.builder().config(conf).getOrCreate();
     SparkContext sc = spark.sparkContext();
     sparkOperation(JavaSparkContext.fromSparkContext(sc).textFile(args[1]));

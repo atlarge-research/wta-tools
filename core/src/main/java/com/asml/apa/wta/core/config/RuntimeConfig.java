@@ -54,13 +54,13 @@ public class RuntimeConfig {
   /**
    * Reads the config file and creates the associated config object.
    *
-   * @param configDir The directory where the config is located.
+   * @param configFile The filepath to the config file
    * @return The associated config object
    * @author Atour Mousavi Gourabi
    */
   @SuppressWarnings("CyclomaticComplexity")
-  public static RuntimeConfig readConfig(String configDir) {
-    try (FileReader reader = new FileReader(configDir)) {
+  public static RuntimeConfig readConfig(String configFile) {
+    try (FileReader reader = new FileReader(configFile)) {
       Gson gson = new Gson();
       RuntimeConfig config = gson.fromJson(reader, RuntimeConfig.class);
       if (config.getAuthors() == null || config.getAuthors().length < 1) {
@@ -85,26 +85,15 @@ public class RuntimeConfig {
       log.error("The config file has invalid fields");
       throw new IllegalArgumentException("The config file has invalid fields");
     } catch (FileNotFoundException e) {
-      log.error("No config file was found at {}", configDir);
-      throw new IllegalArgumentException("No config file was found at " + configDir);
+      log.error("No config file was found at {}", configFile);
+      throw new IllegalArgumentException("No config file was found at " + configFile);
     } catch (IOException e) {
-      log.error("Something went wrong while reading {}", configDir);
-      throw new IllegalArgumentException("Something went wrong while reading " + configDir);
+      log.error("Something went wrong while reading {}", configFile);
+      throw new IllegalArgumentException("Something went wrong while reading " + configFile);
     } catch (Exception e) {
       log.error("\"configFile\" was not set in the command line arguments or system property");
       throw new IllegalArgumentException(
           "\"configFile\" was not set in the command line arguments or system property");
     }
-  }
-
-  /**
-   * Reads the config file specified at the path of the system property "configFile".
-   *
-   * @return The config file object representing the user config
-   * @author Henry Page
-   * @since 1.0.0
-   */
-  public static RuntimeConfig readConfig() {
-    return readConfig(System.getProperty("configFile"));
   }
 }
