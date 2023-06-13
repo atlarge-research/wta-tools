@@ -22,8 +22,8 @@ docker build --build-arg base_image=[BASE IMAGE TAG] -t [IMAGE TAG] path/to/repo
 
 Note: it is important to note that for `perf` to be installed correctly, the host machine will need to run a kernel
 that is compatible with the virtualised OS. This means that when you use hosts for your jobs that run
-`5.4.0-149-generic`, you will need to use a Focal image when running Ubuntu, as that OS is compatible with this kernel
-version. If the pool of hosts is diverse enough for this not to be a viable (i.e., multiple incompatible kernel
+`5.4.0-149-generic`, you cannot use an Ubuntu Jammy image when running Ubuntu, as that OS is incompatible with this
+kernel. If the pool of hosts is diverse enough for this not to be a viable (i.e., multiple incompatible kernel
 versions are being  used among the hosts), you might want to consider removing the `perf` installation from the
 `Dockerfile` you layer on top of your image.
 
