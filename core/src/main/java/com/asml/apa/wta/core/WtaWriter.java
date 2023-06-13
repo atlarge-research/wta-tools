@@ -32,6 +32,7 @@ public class WtaWriter {
       ResourceState.class, "resource_states",
       Task.class, "tasks",
       Workflow.class, "workflows");
+  private JsonWriter<Workload> workloadWriter;
 
   /**
    * Sets up a WTA writer for the specified output path and version.
@@ -41,10 +42,24 @@ public class WtaWriter {
    * @author Atour Mousavi Gourabi
    * @since 1.0.0
    */
+  public WtaWriter(@NonNull OutputFile path, String version, JsonWriter<Workload> workloadWriter) {
+    file = path;
+    schemaVersion = version;
+    setupDirectories(path, version);
+    this.workloadWriter = workloadWriter;
+  }
+
   public WtaWriter(@NonNull OutputFile path, String version) {
     file = path;
     schemaVersion = version;
     setupDirectories(path, version);
+    OutputFile jsonPath = file.resolve("workload").resolve(schemaVersion).resolve("generic_information.json");
+    try {
+      this.workloadWriter = new JsonWriter<>(jsonPath);
+    } catch (IOException e) {
+      log.error("Could not write workload to file.");
+      this.workloadWriter = null;
+    }
   }
 
   /**
@@ -55,11 +70,12 @@ public class WtaWriter {
    * @since 1.0.0
    */
   public void write(Workload workload) {
-    OutputFile path = file.resolve("workload").resolve(schemaVersion).resolve("generic_information.json");
-    try (JsonWriter<Workload> workloadWriter = new JsonWriter<>(path)) {
-      workloadWriter.write(workload);
-    } catch (IOException e) {
-      log.error("Could not write workload to file.");
+    if (this.workloadWriter != null) {
+      try {
+        this.workloadWriter.write(workload);
+      } catch (IOException e) {
+        log.error("Could not write workload to file.");
+      }
     }
   }
 
@@ -92,7 +108,7 @@ public class WtaWriter {
    * @author Atour Mousavi Gourabi
    * @since 1.0.0
    */
-  private void setupDirectories(OutputFile path, String version) {
+  protected void setupDirectories(OutputFile path, String version) {
     try {
       path.resolve("workload").resolve(version).resolve(".temp").clearDirectory();
       for (String directory : parquetLabels.values()) {

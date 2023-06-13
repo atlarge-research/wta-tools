@@ -1,6 +1,7 @@
 package com.asml.apa.wta.spark.executor.engine;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.Mockito.*;
 
 import com.asml.apa.wta.core.dto.BaseSupplierDto;
@@ -49,6 +50,8 @@ class SparkSupplierExtractionEngineTest {
         new BaseSupplierDto(fakeTime, fakeOsInfo, fakeIoStatDto, fakeDstatDto, fakeProcDto, fakePerfDto);
 
     SparkBaseSupplierWrapperDto result = sutSupplierExtractionEngine.transform(baseSupplierDto);
+
+    assertDoesNotThrow(() -> sutSupplierExtractionEngine.pingAndBuffer().join());
 
     assertThat(result)
         .isEqualTo(SparkBaseSupplierWrapperDto.builder()

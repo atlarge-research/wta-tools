@@ -1,8 +1,11 @@
 package com.asml.apa.wta.core.supplier;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.spy;
 
+import com.asml.apa.wta.core.dto.OsInfoDto;
 import org.junit.jupiter.api.Test;
 
 class OperatingSystemSupplierTest {
@@ -50,5 +53,11 @@ class OperatingSystemSupplierTest {
   @Test
   void getArchitecture() {
     assertThat(sut.getArch()).isNotBlank();
+  }
+
+  @Test
+  void getSnapshot() {
+    assertNotEquals(sut.getSnapshot(), null);
+    assertTrue(sut.getSnapshot().join() instanceof OsInfoDto);
   }
 }

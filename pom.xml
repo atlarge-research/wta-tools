@@ -243,7 +243,8 @@
           </outputFormats>
           <failWhenNoMutations>false</failWhenNoMutations>
           <targetClasses>
-            <targetClass>com.asml.apa.wta.*</targetClass>
+            <targetClass>com.asml.apa.wta.core.*</targetClass>
+            <targetClass>com.asml.apa.wta.spark.*</targetClass>
           </targetClasses>
           <excludedTestClasses>
             <param>com.asml.apa.wta.spark.MultithreadTest</param>

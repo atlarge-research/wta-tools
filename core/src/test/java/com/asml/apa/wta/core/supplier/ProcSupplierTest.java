@@ -79,7 +79,7 @@ public class ProcSupplierTest {
     if (sut.isAvailable()) {
       assertEquals(expected, sut.getSnapshot().join());
     } else {
-      assertThat(sut.getSnapshot().join()).isNull();
+      assertEquals(sut.getSnapshot(), CompletableFuture.completedFuture(null));
     }
   }
 }
