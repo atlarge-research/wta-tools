@@ -3,6 +3,30 @@
 ## Installation and Usage
 - [Spark Plugin](/adapter/spark/README.md#installation-and-usage)
 
+### Deployment
+The applications use optional packages on Linux to gather more information and generate more complete traces.
+The packages that are used for this purpose are `sysstat`, `dstat`, and `perf`. To install them, you need to install
+their corresponding packages, or alternatively layer the provided `Dockerfiles` over your own Docker images to deploy
+in containerised environments.
+
+#### Dockerfiles
+If you are running in a containerised environment, you might want to layer our provided `Dockerfile` on top of your
+image. `Dockerfiles` for this purpose are provided for Alpine, CentOS, Debian, and Ubuntu. The `Dockerfiles` can be
+found in `submodules/dockerfiles`, under their respective distro names (`alpine`, `centos`, `debian`, `ubuntu`).
+To layer them on top of existing images, please run the following command, after setting the base image and generated
+image tags, and defining the Linux distro to use the `Dockerfile` of.
+
+```bash
+docker build --build-arg base_image=[BASE IMAGE TAG] -t [IMAGE TAG] path/to/repository/submodules/dockerfiles/[DISTRO]
+```
+
+Note: it is important to note that for `perf` to be installed correctly, the host machine will need to run a kernel
+that is compatible with the virtualised OS. This means that when you use hosts for your jobs that run
+`5.4.0-149-generic`, you will need to use a Focal image when running Ubuntu, as that OS is compatible with this kernel
+version. If the pool of hosts is diverse enough for this not to be a viable (i.e., multiple incompatible kernel
+versions are being  used among the hosts), you might want to consider removing the `perf` installation from the
+`Dockerfile` you layer on top of your image.
+
 ## Configuration
 The converter expects some user-defined configuration. This is done via a JSON file.
 An example of a valid configuration can be seen here:
