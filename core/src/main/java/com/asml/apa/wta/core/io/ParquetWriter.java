@@ -37,8 +37,7 @@ public class ParquetWriter<T extends BaseTraceObject> implements AutoCloseable {
         .build();
   }
 
-  public ParquetWriter(
-      OutputFile path, ParquetSchema schema, org.apache.parquet.hadoop.ParquetWriter<GenericRecord> writer)
+  public ParquetWriter(ParquetSchema schema, org.apache.parquet.hadoop.ParquetWriter<GenericRecord> writer)
       throws IOException {
     parquetSchema = schema;
     this.writer = writer;

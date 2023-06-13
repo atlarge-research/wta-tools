@@ -39,6 +39,7 @@ public class WtaWriter {
    *
    * @param path the output path to write to
    * @param version the version of files to write
+   * @param workloadWriter jsonWorkloadWriter dependency injected for increased testability
    * @author Atour Mousavi Gourabi
    * @since 1.0.0
    */
