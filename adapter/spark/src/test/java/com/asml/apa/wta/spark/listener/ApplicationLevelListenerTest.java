@@ -45,14 +45,6 @@ class ApplicationLevelListenerTest extends BaseLevelListenerTest {
 
   SparkListenerTaskEnd taskEndEvent4;
 
-  SparkListenerTaskStart taskStartEvent;
-
-  SparkListenerTaskStart taskStartEvent2;
-
-  SparkListenerTaskStart taskStartEvent3;
-
-  SparkListenerTaskStart taskStartEvent4;
-
   SparkListenerStageCompleted stageCompleted;
 
   SparkListenerStageCompleted stageCompleted2;
@@ -80,10 +72,6 @@ class ApplicationLevelListenerTest extends BaseLevelListenerTest {
         6, 1, "testTaskType", null, testTaskInfo3, new ExecutorMetrics(), mockedMetrics);
     taskEndEvent4 = new SparkListenerTaskEnd(
         6, 1, "testTaskType", null, testTaskInfo4, new ExecutorMetrics(), mockedMetrics);
-    taskStartEvent = new SparkListenerTaskStart(5, 1, testTaskInfo);
-    taskStartEvent2 = new SparkListenerTaskStart(5, 1, testTaskInfo2);
-    taskStartEvent3 = new SparkListenerTaskStart(6, 1, testTaskInfo3);
-    taskStartEvent4 = new SparkListenerTaskStart(6, 1, testTaskInfo4);
 
     stageCompleted = new SparkListenerStageCompleted(testStageInfo);
     stageCompleted2 = new SparkListenerStageCompleted(testStageInfo2);
@@ -98,14 +86,10 @@ class ApplicationLevelListenerTest extends BaseLevelListenerTest {
     SparkListenerJobStart jobStart = new SparkListenerJobStart(1, 2L, stageBuffer.toList(), new Properties());
     fakeTaskListener.onJobStart(jobStart);
     fakeStageListener.onJobStart(jobStart);
-    fakeTaskListener.onTaskStart(taskStartEvent);
     fakeTaskListener.onTaskEnd(taskEndEvent);
-    fakeTaskListener.onTaskStart(taskStartEvent2);
     fakeTaskListener.onTaskEnd(taskEndEvent2);
     fakeStageListener.onStageCompleted(stageCompleted);
-    fakeTaskListener.onTaskStart(taskStartEvent3);
     fakeTaskListener.onTaskEnd(taskEndEvent3);
-    fakeTaskListener.onTaskStart(taskStartEvent4);
     fakeTaskListener.onTaskEnd(taskEndEvent4);
     fakeStageListener.onStageCompleted(stageCompleted2);
     fakeApplicationListener.onApplicationEnd(applicationEndObj);
