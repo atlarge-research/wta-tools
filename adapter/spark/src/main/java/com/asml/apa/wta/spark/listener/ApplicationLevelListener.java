@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.spark.SparkContext;
 import org.apache.spark.scheduler.SparkListenerApplicationEnd;
@@ -25,6 +26,7 @@ import org.apache.spark.scheduler.SparkListenerApplicationStart;
  * @since 1.0.0
  */
 @Getter
+@Slf4j
 public class ApplicationLevelListener extends AbstractListener<Workload> {
 
   private final JobLevelListener jobLevelListener;
@@ -63,11 +65,10 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
    * @param applicationEnd The event corresponding to the end of the application
    */
   public void onApplicationEnd(SparkListenerApplicationEnd applicationEnd) {
-
-    // we should enver enter this branch, this is a guard since an application
-    // only terminates once.
+    // we should never enter this branch, this is a guard since an application only terminates once.
     List<Workload> processedObjects = this.getProcessedObjects();
     if (!processedObjects.isEmpty()) {
+      log.debug("Application end called twice, this should never happen");
       return;
     }
 
@@ -90,7 +91,7 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
                 .getStageToTasks()
                 .getOrDefault(x, new ArrayList<>())
                 .toArray(new Long[0])))
-            .toArray(size -> new Long[size]);
+            .toArray(Long[]::new);
         task.setParents(ArrayUtils.toPrimitive(parents));
       }
 

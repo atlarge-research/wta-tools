@@ -22,19 +22,17 @@ import scala.Tuple2;
 @Slf4j
 public class EndToEnd {
 
-  private static JavaRDD<String> testFile;
-
   /**
    * Private method to invoke the Spark application with complex jobs involving partitions shuffling. Results don't
    * matter as the purpose is to generate Spark tasks with multiple parent-child relations and jobs with diverse
    * number of tasks for generated traces.
-   *
+   * @param textFile  The text file to read from.
    * @author Pil Kyu Cho
    * @since 1.0.0
    */
-  private static void sparkOperation() {
+  private static void sparkOperation(JavaRDD<String> textFile) {
     JavaRDD<String> words =
-        testFile.flatMap(line -> Arrays.asList(line.split(" ")).iterator());
+        textFile.flatMap(line -> Arrays.asList(line.split(" ")).iterator());
     JavaRDD<String> upperCaseWords =
         words.filter(word -> word.contains("harry")).map(String::toUpperCase);
 
@@ -72,15 +70,17 @@ public class EndToEnd {
         true);
     JavaRDD<Tuple2<Double, String>> mappedPairs = tupled.mapToPair(tuple -> new Tuple2<>(tuple._1(), tuple._2()))
         .groupByKey()
-        .filter(pair -> {
-          return pair._1() >= 10;
-        })
+        .filter(pair -> pair._1() >= 10)
         .map(pair -> {
-          String concatenated = "";
+          StringBuilder concatenated = new StringBuilder();
           for (Tuple2<String, String> value : pair._2()) {
-            concatenated += value._1() + ":" + value._2() + ",";
+            concatenated
+                .append(value._1())
+                .append(":")
+                .append(value._2())
+                .append(",");
           }
-          return new Tuple2<Double, String>(pair._1(), concatenated);
+          return new Tuple2<>(pair._1(), concatenated.toString());
         })
         .repartition(20);
     JavaRDD<String> strings = mappedPairs
@@ -91,7 +91,7 @@ public class EndToEnd {
         .map(t -> t._1);
 
     wordCountPairs = strings.mapToPair(word -> new Tuple2<>(word, 1))
-        .reduceByKey((a, b) -> a + b)
+        .reduceByKey(Integer::sum)
         .mapToPair(tuple ->
             new Tuple2<>(tuple._1(), new Tuple2<>(tuple._1().length(), tuple._2())));
     joinedPairs = wordCountPairs
@@ -108,7 +108,7 @@ public class EndToEnd {
         .mapToPair(pair -> new Tuple2<>(pair._2(), pair._1()))
         .repartition(10)
         .sortByKey(false);
-    tupled = sortedPairs.mapPartitionsWithIndex(
+    sortedPairs.mapPartitionsWithIndex(
         (index, iter) -> {
           List<Tuple2<Double, Tuple2<String, String>>> tuples = new ArrayList<>();
           while (iter.hasNext()) {
@@ -139,10 +139,12 @@ public class EndToEnd {
         .set("spark.sql.shuffle.partitions", "500")
         .set("spark.plugins", "com.asml.apa.wta.spark.WtaPlugin");
     System.setProperty("configFile", args[0]);
+    //    System.setProperty("configFile", "adapter/spark/src/test/resources/config.json");
     SparkSession spark = SparkSession.builder().config(conf).getOrCreate();
     SparkContext sc = spark.sparkContext();
-    testFile = JavaSparkContext.fromSparkContext(sc).textFile(args[1]);
-    sparkOperation();
+    sparkOperation(JavaSparkContext.fromSparkContext(sc).textFile(args[1]));
+    //    sparkOperation(
+    //        JavaSparkContext.fromSparkContext(sc).textFile("adapter/spark/src/test/resources/e2e-input.txt"));
     sc.stop();
   }
 }

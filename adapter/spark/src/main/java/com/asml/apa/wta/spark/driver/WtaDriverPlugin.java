@@ -68,10 +68,11 @@ public class WtaDriverPlugin implements DriverPlugin {
       executorVars.put(
           "executorSynchronizationInterval",
           String.valueOf(runtimeConfig.getExecutorSynchronizationInterval()));
+      executorVars.put("errorStatus", "false");
     } catch (Exception e) {
-      log.error(String.valueOf(e));
+      log.error("Error initialising WTA driver plugin, {} : {}.", e.getClass(), e.getMessage());
+      executorVars.put("errorStatus", "true");
       error = true;
-      shutdown();
     }
     return executorVars;
   }
@@ -106,27 +107,27 @@ public class WtaDriverPlugin implements DriverPlugin {
   @Override
   public void shutdown() {
     if (error) {
-      log.error("Error initialising WTA plugin. Shutting down plugin");
-    } else {
-      try {
-        removeListeners();
-        List<Task> tasks = sparkDataSource.getRuntimeConfig().isStageLevel()
-            ? sparkDataSource.getStageLevelListener().getProcessedObjects()
-            : sparkDataSource.getTaskLevelListener().getProcessedObjects();
-        List<Workflow> workflows = sparkDataSource.getJobLevelListener().getProcessedObjects();
-        List<Resource> resources = List.of();
-        Workload workload = sparkDataSource
-            .getApplicationLevelListener()
-            .getProcessedObjects()
-            .get(0);
-        WtaWriter wtaWriter = new WtaWriter(outputFile, "schema-1.0");
-        wtaWriter.write(Task.class, tasks);
-        wtaWriter.write(Resource.class, resources);
-        wtaWriter.write(Workflow.class, workflows);
-        wtaWriter.write(workload);
-      } catch (Exception e) {
-        log.error("Error while writing to the generated files, {} : {}.", e.getClass(), e.getMessage());
-      }
+      log.error("Plugin shutting down without generating files");
+      return;
+    }
+    try {
+      removeListeners();
+      List<Task> tasks = sparkDataSource.getRuntimeConfig().isStageLevel()
+          ? sparkDataSource.getStageLevelListener().getProcessedObjects()
+          : sparkDataSource.getTaskLevelListener().getProcessedObjects();
+      List<Workflow> workflows = sparkDataSource.getJobLevelListener().getProcessedObjects();
+      List<Resource> resources = List.of();
+      Workload workload = sparkDataSource
+          .getApplicationLevelListener()
+          .getProcessedObjects()
+          .get(0);
+      WtaWriter wtaWriter = new WtaWriter(outputFile, "schema-1.0");
+      wtaWriter.write(Task.class, tasks);
+      wtaWriter.write(Resource.class, resources);
+      wtaWriter.write(Workflow.class, workflows);
+      wtaWriter.write(workload);
+    } catch (Exception e) {
+      log.error("A {} error occurred while generating files: {}", e.getClass(), e.getMessage());
     }
   }
 
@@ -144,6 +145,7 @@ public class WtaDriverPlugin implements DriverPlugin {
     this.sparkDataSource.registerJobListener();
     this.sparkDataSource.registerApplicationListener();
   }
+
   /**
    * Removes the listeners.
    *

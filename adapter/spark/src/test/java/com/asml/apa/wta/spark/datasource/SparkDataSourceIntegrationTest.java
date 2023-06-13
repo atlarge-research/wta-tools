@@ -1,10 +1,11 @@
-package com.asml.apa.wta.spark;
+package com.asml.apa.wta.spark.datasource;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.asml.apa.wta.spark.BaseSparkJobIntegrationTest;
 import org.junit.jupiter.api.Test;
 
-public class SparkDataSourceIntegrationTest extends BaseSparkJobIntegrationTest {
+class SparkDataSourceIntegrationTest extends BaseSparkJobIntegrationTest {
 
   @Test
   public void taskListenerReturnsList() {
