@@ -27,6 +27,15 @@ kernel. If the pool of hosts is diverse enough for this not to be a viable (i.e.
 versions are being  used among the hosts), you might want to consider removing the `perf` installation from the
 `Dockerfile` you layer on top of your image.
 
+To allow the application to make use of `perf` commands, it is important the relevant `perf` commands are available
+to the application. This means the application will either have to be run with `sudo`, or `perf_even_paranoia`
+needs to be set to 0. Even when layering one of the provided `Dockerfiles`, this will still have to be set. This can
+be done by running the following command:
+
+```bash
+sysctl -w kernel.perf_event_paranoid=0
+```
+
 ## Configuration
 The converter expects some user-defined configuration. This is done via a JSON file.
 An example of a valid configuration can be seen here:
