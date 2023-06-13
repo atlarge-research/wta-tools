@@ -60,8 +60,8 @@ public class JobLevelListener extends AbstractListener<Workflow> {
     final int jobId = jobEnd.jobId() + 1;
     final long tsSubmit = jobSubmitTimes.remove(jobId);
     final Task[] tasks = taskListener
-            .getWithCondition(task -> task.getWorkflowId() == jobId)
-            .toArray(Task[]::new);
+        .getWithCondition(task -> task.getWorkflowId() == jobId)
+        .toArray(Task[]::new);
     final int taskCount = tasks.length;
 
     // unknown

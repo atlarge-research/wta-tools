@@ -4,7 +4,7 @@
   "description": "Processing data for scientific research purposes",
   "logLevel": "INFO",
   "outputPath": "wta-output",
-  "isStageLevel": "false",
+  "isStageLevel": "true",
   "resourcePingInterval": 50,
   "executorSynchronizationInterval": -5
 }

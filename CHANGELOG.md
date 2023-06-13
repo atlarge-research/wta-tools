@@ -51,6 +51,7 @@ For the most part, since we are pre-release this will serve no real purpose, oth
 - Implemented Parent Children fields for Task [@tqu](https://gitlab.ewi.tudelft.nl/tqu)
 - Added automatic Avro record converters for POJOs [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 - Added shading for plugin dependencies [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
+- Added parent-child functionality to Spark stage listeners as well [@pcho](https://gitlab.ewi.tudelft.nl/pcho)
 
 ### Changed
 - Refactored listeners into a generic interface to reduce code duplication and increase cc [@hpage](https://gitlab.ewi.tudelft.nl/hpage)
@@ -75,6 +76,7 @@ For the most part, since we are pre-release this will serve no real purpose, oth
 - Fixed the format of the outputted files [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 - Fixed the type inconsistency in the field types of the WTA Objects [@tqu](https://gitlab.ewi.tudelft.nl/tqu)
 - Fixed iostat partition bug and added support for comma decimal separator [@lyadalachanchu](https://gitlab.ewi.tudelft.nl/lyadalachanchu)
+- Fixed the stage id bug in stage listener [@pcho](https://gitlab.ewi.tudelft.nl/pcho)
 
 ### Deprecated
 

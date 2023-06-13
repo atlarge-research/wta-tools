@@ -8,7 +8,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.Getter;
 import org.apache.spark.SparkContext;
-import org.apache.spark.executor.TaskMetrics;
 import org.apache.spark.scheduler.SparkListenerStageCompleted;
 import org.apache.spark.scheduler.StageInfo;
 import scala.collection.JavaConverters;
@@ -47,7 +46,7 @@ public class StageLevelListener extends TaskStageBaseListener {
     final Integer[] parentIds = JavaConverters.seqAsJavaList(
             curStageInfo.parentIds().toList())
         .stream()
-        .map(x -> (Integer) x)
+        .map(x -> (Integer) x + 1)
         .toArray(Integer[]::new);
     stageToParents.put(stageId, parentIds);
     for (Integer id : parentIds) {
