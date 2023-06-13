@@ -10,7 +10,6 @@ import java.util.Map;
 import org.apache.spark.SparkContext;
 import org.apache.spark.api.plugin.PluginContext;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
 class WtaDriverPluginTest {
 
@@ -18,7 +17,7 @@ class WtaDriverPluginTest {
 
   protected final PluginContext mockedPluginContext = mock(PluginContext.class);
 
-  protected final WtaDriverPlugin sut = Mockito.spy(new WtaDriverPlugin());
+  protected final WtaDriverPlugin sut = spy(new WtaDriverPlugin());
 
   void injectConfig() {
     System.setProperty("configFile", "src/test/resources/config.json");
