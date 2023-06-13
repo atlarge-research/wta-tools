@@ -57,7 +57,13 @@ class ApplicationLevelListenerTest extends BaseLevelListenerTest {
     testTaskInfo4 = new TaskInfo(4, 0, 1, 50L, "testExecutor", "local", TaskLocality.NODE_LOCAL(), false);
     ListBuffer<Object> parents = new ListBuffer<>();
     TaskMetrics mockedMetrics = mock(TaskMetrics.class);
+    TaskMetrics mockedMetrics2 = mock(TaskMetrics.class);
     when(mockedMetrics.executorRunTime()).thenReturn(100L);
+    when(mockedMetrics2.peakExecutionMemory()).thenReturn(100L);
+    when(mockedMetrics2.diskBytesSpilled()).thenReturn(100L);
+    when(mockedMetrics2.peakExecutionMemory()).thenReturn(-1L);
+    when(mockedMetrics2.diskBytesSpilled()).thenReturn(-1L);
+    when(mockedMetrics2.executorRunTime()).thenReturn(-1L);
 
     testStageInfo =
         new StageInfo(5, 0, "test", 50, null, new ListBuffer<>(), "None", mockedMetrics, null, null, 100);
@@ -68,9 +74,9 @@ class ApplicationLevelListenerTest extends BaseLevelListenerTest {
     taskEndEvent2 = new SparkListenerTaskEnd(
         5, 1, "testTaskType", null, testTaskInfo2, new ExecutorMetrics(), mockedMetrics);
     taskEndEvent3 = new SparkListenerTaskEnd(
-        6, 1, "testTaskType", null, testTaskInfo3, new ExecutorMetrics(), mockedMetrics);
+        6, 1, "testTaskType", null, testTaskInfo3, new ExecutorMetrics(), mockedMetrics2);
     taskEndEvent4 = new SparkListenerTaskEnd(
-        6, 1, "testTaskType", null, testTaskInfo4, new ExecutorMetrics(), mockedMetrics);
+        6, 1, "testTaskType", null, testTaskInfo4, new ExecutorMetrics(), mockedMetrics2);
 
     stageCompleted = new SparkListenerStageCompleted(testStageInfo);
     stageCompleted2 = new SparkListenerStageCompleted(testStageInfo2);
@@ -83,6 +89,27 @@ class ApplicationLevelListenerTest extends BaseLevelListenerTest {
     SparkListenerJobStart jobStart = new SparkListenerJobStart(1, 2L, stageBuffer.toList(), new Properties());
     fakeTaskListener.onJobStart(jobStart);
     fakeStageListener.onJobStart(jobStart);
+    fakeApplicationListener.onApplicationEnd(applicationEndObj);
+    Workload workload = fakeApplicationListener.getProcessedObjects().get(0);
+    assertThat(fakeApplicationListener.getProcessedObjects().size()).isEqualTo(1);
+    assertThat(workload.getTotalTasks()).isEqualTo(0);
+    assertThat(workload.getMeanEnergy()).isEqualTo(-1.0);
+    assertThat(workload.getMeanMemory()).isEqualTo(-1.0);
+    assertThat(workload.getMeanResourceTask()).isEqualTo(-1.0);
+    assertThat(workload.getMeanNetworkUsage()).isEqualTo(-1.0);
+    assertThat(workload.getMeanDiskSpaceUsage()).isEqualTo(-1.0);
+  }
+
+  @Test
+  void uninitializedTest() {
+    ListBuffer<StageInfo> stageBuffer = new ListBuffer<>();
+    stageBuffer.$plus$eq(testStageInfo2);
+    SparkListenerJobStart jobStart = new SparkListenerJobStart(1, 2L, stageBuffer.toList(), new Properties());
+    fakeTaskListener.onJobStart(jobStart);
+    fakeStageListener.onJobStart(jobStart);
+    fakeTaskListener.onTaskEnd(taskEndEvent3);
+    fakeTaskListener.onTaskEnd(taskEndEvent4);
+    fakeStageListener.onStageCompleted(stageCompleted2);
     fakeApplicationListener.onApplicationEnd(applicationEndObj);
     Workload workload = fakeApplicationListener.getProcessedObjects().get(0);
     assertThat(fakeApplicationListener.getProcessedObjects().size()).isEqualTo(1);
