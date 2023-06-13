@@ -169,7 +169,7 @@ public class Workload implements BaseTraceObject {
   /**
    * This method should never be called as we do not need to output workloads in Parquet.
    *
-   * @param schema schema The parquet schema
+   * @param schema The parquet schema
    * @throws RuntimeException always
    * @author Atour Mousavi Gourabi
    * @since 1.0.0
