@@ -9,6 +9,7 @@ import com.asml.apa.wta.core.model.ResourceState;
 import com.asml.apa.wta.core.streams.KeyedStream;
 import com.asml.apa.wta.spark.dto.ResourceAndStateWrapper;
 import com.asml.apa.wta.spark.dto.SparkBaseSupplierWrapperDto;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -82,6 +83,7 @@ public class MetricStreamingEngine {
           long transformedId = Math.abs(entry.getKey().hashCode());
           Resource resource = produceResourceFromExecutorInfo(transformedId, entry.getValue());
           List<ResourceState> states = produceResourceStatesFromExecutorInfo(resource, entry.getValue());
+          states.sort(Comparator.comparing(ResourceState::getTimestamp));
           return new ResourceAndStateWrapper(transformedId, resource, states);
         })
         .collect(Collectors.toList());
@@ -100,14 +102,20 @@ public class MetricStreamingEngine {
 
     Optional<OsInfoDto> sampleOsInfo = getFirstAvailable(pings, BaseSupplierDto::getOsInfoDto);
     Optional<JvmFileDto> sampleJvmInfo = getFirstAvailable(pings, BaseSupplierDto::getJvmFileDto);
-    Optional<ProcDto> sampleProcInfo = getFirstAvailable(pings, BaseSupplierDto::getProcDto);
+    // do not sample proc info, later pings might actually have useful information
 
     final String type = "cluster node";
     final String os = sampleOsInfo.map(OsInfoDto::getOs).orElse("unknown");
 
     StringBuilder processorInformation = new StringBuilder();
 
-    final var processorModel = sampleProcInfo.flatMap(ProcDto::getCpuModel).orElse("unknown");
+    final String processorModel = pings.stream()
+        .filter(x -> x.getProcDto().isPresent())
+        .map(x -> x.getProcDto().get())
+        .filter(x -> x.getCpuModel().isPresent())
+        .map(x -> x.getCpuModel().get())
+        .findFirst()
+        .orElse("unknown");
 
     processorInformation.append(processorModel);
     if (sampleOsInfo.map(OsInfoDto::getArchitecture).isPresent()) {
@@ -149,7 +157,7 @@ public class MetricStreamingEngine {
    */
   private List<ResourceState> produceResourceStatesFromExecutorInfo(
       Resource associatedResource, List<SparkBaseSupplierWrapperDto> pings) {
-    return pings.stream()
+    var result = pings.stream()
         .map(ping -> {
           final long timestamp = ping.getTimestamp();
           final String eventType = "resource active";
@@ -203,6 +211,8 @@ public class MetricStreamingEngine {
               .build();
         })
         .collect(Collectors.toList());
+
+    return result;
   }
 
   /**
