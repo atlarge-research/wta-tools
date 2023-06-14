@@ -62,7 +62,7 @@ public class BaseSparkJobIntegrationTest {
     sut = new SparkDataSource(spark.sparkContext(), fakeConfig);
     sut2 = new SparkDataSource(spark.sparkContext(), fakeConfig2);
     String resourcePath = "src/test/resources/wordcount.txt";
-    textFile = JavaSparkContext.fromSparkContext(spark.sparkContext()).textFile(resourcePath);
+    testFile = JavaSparkContext.fromSparkContext(spark.sparkContext()).textFile(resourcePath);
   }
 
   /**
@@ -76,7 +76,7 @@ public class BaseSparkJobIntegrationTest {
    * Method to invoke the Spark operation. Important to invoke collect() to store the metrics.
    */
   protected void invokeJob() {
-    textFile.flatMap(s -> Arrays.asList(s.split(" ")).iterator())
+    testFile.flatMap(s -> Arrays.asList(s.split(" ")).iterator())
         .mapToPair(word -> new Tuple2<>(word, 1))
         .reduceByKey(Integer::sum)
         .collect();
