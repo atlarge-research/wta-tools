@@ -365,4 +365,19 @@ public class Stream<V extends Serializable> {
     tail = null;
     return acc;
   }
+
+  /**
+   * Converts the stream to a list, and consumes the stream.
+   *
+   * @return A list with the stream elements
+   * @author Henry Page
+   * @since 1.0.0
+   */
+  public synchronized List<V> toList() {
+    List<V> ret = new ArrayList<>();
+    while (!isEmpty()) {
+      ret.add(head());
+    }
+    return ret;
+  }
 }

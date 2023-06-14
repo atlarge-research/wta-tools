@@ -71,7 +71,7 @@ public class JobLevelListener extends AbstractListener<Workflow> {
     final String nfrs = "";
 
     // we can also get the mode from the config, if that's what the user wants?
-    final String scheduler = "DAGScheduler";
+    final String scheduler = sparkContext.getConf().get("spark.scheduler.mode", "FIFO");
     final Domain domain = config.getDomain();
     final String appName = sparkContext.appName();
 

@@ -119,9 +119,15 @@ class WtaDriverPluginTest {
     sut.receive(new ResourceCollectionDto(List.of(
         SparkBaseSupplierWrapperDto.builder().executorId("1").build(),
         SparkBaseSupplierWrapperDto.builder().executorId("2").build())));
-    assertThat(sut.getMetricStreamingEngine().getResourceStream().onKey("1").isEmpty())
+    assertThat(sut.getMetricStreamingEngine()
+            .getExecutorResourceStream()
+            .onKey("1")
+            .isEmpty())
         .isFalse();
-    assertThat(sut.getMetricStreamingEngine().getResourceStream().onKey("2").isEmpty())
+    assertThat(sut.getMetricStreamingEngine()
+            .getExecutorResourceStream()
+            .onKey("2")
+            .isEmpty())
         .isFalse();
   }
 }

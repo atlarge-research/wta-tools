@@ -62,6 +62,9 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
    * is needed to determine if applicationEnd is called first or shutdown.
    *
    * @param applicationEnd The event corresponding to the end of the application
+   * @author Henry Page
+   * @author Tianchen Qu
+   * @since 1.0.0
    */
   public void onApplicationEnd(SparkListenerApplicationEnd applicationEnd) {
     // we should never enter this branch, this is a guard since an application only terminates once.

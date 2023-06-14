@@ -2,6 +2,7 @@ package com.asml.apa.wta.core.supplier;
 
 import com.asml.apa.wta.core.dto.PerfDto;
 import com.asml.apa.wta.core.utils.ShellUtils;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import lombok.extern.slf4j.Slf4j;
 
@@ -60,19 +61,20 @@ public class PerfSupplier implements InformationSupplier<PerfDto> {
    * @since 1.0.0
    */
   @Override
-  public CompletableFuture<PerfDto> getSnapshot() {
+  public CompletableFuture<Optional<PerfDto>> getSnapshot() {
     if (!isAvailable) {
       return notAvailableResult();
     }
     return gatherMetrics().handle((value, exception) -> {
       if (exception != null || value == null) {
-        return PerfDto.builder().watt(0.0).build();
+        return Optional.empty();
       } else {
         try {
-          return PerfDto.builder().watt(Double.parseDouble(value)).build();
+          return Optional.of(
+              PerfDto.builder().watt(Double.parseDouble(value)).build());
         } catch (NumberFormatException e) {
           log.error("Error occurred while parsing perf energy metrics");
-          return PerfDto.builder().watt(0.0).build();
+          return Optional.empty();
         }
       }
     });

@@ -7,6 +7,12 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
+/**
+ * A wrapper for {@link BaseSupplierDto} that contains additional Spark related information.
+ *
+ * @author Henry Page
+ * @since 1.0.0
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
