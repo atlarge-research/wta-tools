@@ -164,3 +164,25 @@ e2e-barebones-spark-adapter_2.13:
     paths:
       - wta-output
   cache: []
+
+  mutation-tests-spark-adapter:
+    stage: test
+    allow_failure: true
+
+    needs: [ build-adapters ]
+
+    dependencies:
+      - build-adapters
+
+    script:
+      - echo "Spark adapter mutation tests adapter/spark started"
+      - "mvn -pl adapter/spark $PITEST_OPTS pitest:mutationCoverage"
+      - "cat adapter/spark/reports/pitest/index.html | awk -F '</?td>' 'FNR == 25 { print $2 }' || echo '0%'"
+
+    coverage: /([0-9]{1,3})%/
+    artifacts:
+      name: mutation-tests-spark-adapter
+      expire_in: 3 hours
+      when: always
+      paths:
+        - adapter/spark/reports/pitest/
