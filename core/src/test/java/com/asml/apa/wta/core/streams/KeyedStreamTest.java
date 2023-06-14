@@ -3,6 +3,8 @@ package com.asml.apa.wta.core.streams;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -66,5 +68,44 @@ class KeyedStreamTest {
   void addNullRecordToStream() {
     KeyedStream<Boolean, String> keyedStream = new KeyedStream<>();
     assertThatThrownBy(() -> keyedStream.addToStream(true, null)).isInstanceOf(NullPointerException.class);
+  }
+
+  @Test
+  void testConversionToFullMap() {
+    KeyedStream<String, Integer> keyedStream = new KeyedStream<>();
+    assertThat(keyedStream.collectAll()).isEmpty();
+    keyedStream.addToStream("one", 1);
+    keyedStream.addToStream("one", 1);
+    keyedStream.addToStream("one", 1);
+    keyedStream.addToStream("one", 1);
+    keyedStream.addToStream("one", 1);
+    keyedStream.addToStream("one", 1);
+    keyedStream.addToStream("two", 2);
+    keyedStream.addToStream("two", 2);
+    keyedStream.addToStream("two", 2);
+    keyedStream.addToStream("two", 2);
+    keyedStream.addToStream("two", 2);
+    keyedStream.addToStream("two", 2);
+    keyedStream.addToStream("two", 2);
+    keyedStream.addToStream("three", 3);
+    keyedStream.addToStream("three", 3);
+    keyedStream.addToStream("three", 3);
+    keyedStream.addToStream("three", 3);
+
+    Map<String, List<Integer>> result = keyedStream.collectAll();
+
+    assertThat(result).hasSize(3);
+
+    assertThat(result.get("one")).hasSize(6);
+    assertThat(result.get("two")).hasSize(7);
+    assertThat(result.get("three")).hasSize(4);
+
+    Map<String, List<Integer>> emptyResults = keyedStream.collectAll();
+
+    assertThat(emptyResults).containsKey("one");
+    assertThat(emptyResults).containsKey("two");
+    assertThat(emptyResults).containsKey("three");
+
+    assertThat(emptyResults.values()).allMatch(List::isEmpty);
   }
 }

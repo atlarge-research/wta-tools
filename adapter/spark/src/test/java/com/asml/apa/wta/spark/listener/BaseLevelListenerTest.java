@@ -15,7 +15,7 @@ import scala.Tuple2;
 import scala.collection.immutable.HashMap;
 import scala.collection.immutable.Map;
 
-public class BaseLevelListenerTest {
+class BaseLevelListenerTest {
 
   protected SparkContext mockedSparkContext;
 

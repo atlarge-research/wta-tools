@@ -86,7 +86,7 @@ public class JobLevelListener extends AbstractListener<Workflow> {
         .toArray(Task[]::new);
     final int numTasks = tasks.length;
     // we can also get the mode from the config, if that's what the user wants?
-    final String scheduler = "DAGScheduler";
+    final String scheduler = sparkContext.getConf().get("spark.scheduler.mode", "FIFO");
     final Domain domain = config.getDomain();
     final String appName = sparkContext.appName();
     final int criticalPathTaskCount = criticalPathTasks;

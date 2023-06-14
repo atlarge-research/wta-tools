@@ -4,6 +4,7 @@ import com.asml.apa.wta.core.dto.DstatDto;
 import com.asml.apa.wta.core.utils.ShellUtils;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.regex.Matcher;
@@ -18,8 +19,8 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 public class DstatSupplier implements InformationSupplier<DstatDto> {
-  private ShellUtils shellUtils;
-  private boolean isDstatAvailable;
+  private final ShellUtils shellUtils;
+  private final boolean isDstatAvailable;
 
   public DstatSupplier(ShellUtils shellUtils) {
     this.shellUtils = shellUtils;
@@ -34,37 +35,38 @@ public class DstatSupplier implements InformationSupplier<DstatDto> {
    * @since 1.0.0
    */
   @Override
-  public CompletableFuture<DstatDto> getSnapshot() {
-    if (isDstatAvailable) {
-      CompletableFuture<String> allMetrics = shellUtils.executeCommand("dstat -cdngy 1 -c 1");
-
-      return allMetrics.thenApply(result -> {
-        if (result != null) {
-          List<Integer> metrics = extractNumbers(result);
-          try {
-            return DstatDto.builder()
-                .totalUsageUsr(metrics.get(0))
-                .totalUsageSys(metrics.get(1))
-                .totalUsageIdl(metrics.get(2))
-                .totalUsageWai(metrics.get(3))
-                .totalUsageStl(metrics.get(4))
-                .dskRead(metrics.get(5))
-                .dskWrite(metrics.get(6))
-                .netRecv(metrics.get(7))
-                .netSend(metrics.get(8))
-                .pagingIn(metrics.get(9))
-                .pagingOut(metrics.get(10))
-                .systemInt(metrics.get(11))
-                .systemCsw(metrics.get(12))
-                .build();
-          } catch (Exception e) {
-            log.error("Something went wrong while receiving the dstat shell command outputs.");
-          }
-        }
-        return null;
-      });
+  public CompletableFuture<Optional<DstatDto>> getSnapshot() {
+    if (!isDstatAvailable) {
+      return notAvailableResult();
     }
-    return notAvailableResult();
+
+    CompletableFuture<String> allMetrics = shellUtils.executeCommand("dstat -cdngy 1 -c 1");
+
+    return allMetrics.thenApply(result -> {
+      if (result != null) {
+        List<Integer> metrics = extractNumbers(result);
+        try {
+          return Optional.of(DstatDto.builder()
+              .totalUsageUsr(metrics.get(0))
+              .totalUsageSys(metrics.get(1))
+              .totalUsageIdl(metrics.get(2))
+              .totalUsageWai(metrics.get(3))
+              .totalUsageStl(metrics.get(4))
+              .dskRead(metrics.get(5))
+              .dskWrite(metrics.get(6))
+              .netRecv(metrics.get(7))
+              .netSend(metrics.get(8))
+              .pagingIn(metrics.get(9))
+              .pagingOut(metrics.get(10))
+              .systemInt(metrics.get(11))
+              .systemCsw(metrics.get(12))
+              .build());
+        } catch (Exception e) {
+          log.error("Something went wrong while receiving the dstat bash command outputs.");
+        }
+      }
+      return Optional.empty();
+    });
   }
 
   /**

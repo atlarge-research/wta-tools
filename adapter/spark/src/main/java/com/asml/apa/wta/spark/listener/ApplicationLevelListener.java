@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.spark.SparkContext;
 import org.apache.spark.resource.ResourceProfile;
@@ -32,6 +33,7 @@ import scala.collection.JavaConverters;
  * @since 1.0.0
  */
 @Getter
+@Slf4j
 public class ApplicationLevelListener extends AbstractListener<Workload> {
 
   private final JobLevelListener jobLevelListener;
@@ -130,6 +132,9 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
    * is needed to determine if applicationEnd is called first or shutdown.
    *
    * @param applicationEnd The event corresponding to the end of the application
+   * @author Henry Page
+   * @author Tianchen Qu
+   * @since 1.0.0
    */
   @SuppressWarnings({"CyclomaticComplexity", "MethodLength"})
   public void onApplicationEnd(SparkListenerApplicationEnd applicationEnd) {
@@ -145,6 +150,7 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
     final List<Task> tasks = taskLevelListener.getProcessedObjects();
     List<Workload> processedObjects = this.getProcessedObjects();
     if (!processedObjects.isEmpty()) {
+      log.debug("Application end called twice, this should never happen");
       return;
     }
 

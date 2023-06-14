@@ -52,13 +52,13 @@ public class StageLevelListener extends TaskStageBaseListener {
     stageToResource.put(stageId, curStageInfo.resourceProfileId());
     final Long submitTime = curStageInfo.submissionTime().getOrElse(() -> -1L);
     final long runTime = curStageMetrics.executorRunTime();
-    final int userId = sparkContext.sparkUser().hashCode();
+    final int userId = Math.abs(sparkContext.sparkUser().hashCode());
     final long workflowId = stageIdsToJobs.get(stageId + 1);
 
     final Integer[] parentIds = JavaConverters.seqAsJavaList(
             curStageInfo.parentIds().toList())
         .stream()
-        .map(x -> (Integer) x)
+        .map(parentId -> (Integer) parentId)
         .toArray(size -> new Integer[size]);
     stageToParents.put(stageId, parentIds);
     for (Integer id : parentIds) {
@@ -91,8 +91,6 @@ public class StageLevelListener extends TaskStageBaseListener {
     final double energyConsumption = -1L;
     final long waitTime = -1L;
     final long resourceUsed = -1L;
-
-    // TODO(#61): CALL EXTERNAL DEPENDENCIES
 
     this.getProcessedObjects()
         .add(Task.builder()

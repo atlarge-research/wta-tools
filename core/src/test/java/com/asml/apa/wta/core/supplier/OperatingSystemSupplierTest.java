@@ -51,4 +51,11 @@ class OperatingSystemSupplierTest {
   void getArchitecture() {
     assertThat(sut.getArch()).isNotBlank();
   }
+
+  @Test
+  void getOperatingSystem() {
+    String result = sut.getOperatingSystem();
+    assertThat(result).isNotBlank();
+    assertThat(result.split("\\s+")).hasSizeGreaterThanOrEqualTo(2);
+  }
 }
