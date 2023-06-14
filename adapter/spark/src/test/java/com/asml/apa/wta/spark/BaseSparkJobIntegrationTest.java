@@ -34,11 +34,7 @@ public class BaseSparkJobIntegrationTest {
         .outputPath("src/test/resources/wta-output")
         .build();
 
-    SparkConf conf = new SparkConf()
-        .setAppName("SparkTestRunner")
-        .setMaster("local")
-        .set("spark.executor.instances", "1")
-        .set("spark.executor.cores", "2");
+    SparkConf conf = new SparkConf().setAppName("SparkTestRunner").setMaster("local");
     spark = SparkSession.builder().config(conf).getOrCreate();
     spark.sparkContext().setLogLevel("ERROR");
 
