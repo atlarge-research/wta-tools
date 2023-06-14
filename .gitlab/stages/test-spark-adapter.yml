@@ -166,10 +166,11 @@ e2e-barebones-spark-adapter_2.13:
   cache: []
 
 mutation-tests-spark-adapter:
-  stage: test
+  stage: test-spark-adapter
+  image: $SPARK_BAREBONES_IMAGE_2_13
   allow_failure: true
 
-  needs: [ build-adapters ]
+  needs: [ build-spark-adapter ]
 
   dependencies:
     - build-adapters
