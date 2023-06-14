@@ -31,7 +31,10 @@ class MetricStreamingEngineTest {
         .timestamp(234232L)
         .executorId("executor1")
         .dstatDto(Optional.empty())
-        .iostatDto(Optional.empty())
+        .iostatDto(Optional.of(IostatDto.builder()
+            .kiloByteWrtnPerSec(39321321321321L)
+            .kiloByteReadPerSec(432423432432L)
+            .build()))
         .jvmFileDto(Optional.of(JvmFileDto.builder()
             .freeSpace(50000000000000L)
             .totalSpace(5000000000000342L)
@@ -44,11 +47,7 @@ class MetricStreamingEngineTest {
         .timestamp(23423439L)
         .executorId("executor1")
         .dstatDto(Optional.empty())
-        .iostatDto(Optional.of(IostatDto.builder()
-            .kiloByteDscd(26L)
-            .kiloByteRead(36L)
-            .kiloByteWrtnPerSec(39L)
-            .build()))
+        .iostatDto(Optional.empty())
         .jvmFileDto(Optional.of(JvmFileDto.builder()
             .freeSpace(50000000000000L)
             .totalSpace(5000000000000342L)
@@ -78,7 +77,8 @@ class MetricStreamingEngineTest {
         .iostatDto(Optional.of(IostatDto.builder()
             .kiloByteDscd(26L)
             .kiloByteRead(36L)
-            .kiloByteWrtnPerSec(39L)
+            .kiloByteWrtnPerSec(3913213L)
+            .kiloByteReadPerSec(932423432423L)
             .build()))
         .jvmFileDto(Optional.of(JvmFileDto.builder()
             .freeSpace(50000000000000L)
@@ -160,6 +160,8 @@ class MetricStreamingEngineTest {
     assertThat(executor1.getStates()).hasSize(2);
     assertThat(state1.getTimestamp()).isLessThan(state2.getTimestamp());
     assertThat(state1.getResourceId()).isEqualTo(state2.getResourceId());
+    assertThat(state1.getAvailableDiskIoBandwidth()).isGreaterThan(0);
+    assertThat(state2.getAvailableDiskIoBandwidth()).isEqualTo(-1.0);
 
     assertThat(state1.getTimestamp()).isEqualTo(s1.getTimestamp());
     assertThat(state1.getAvailableResources()).isEqualTo(-1.0);

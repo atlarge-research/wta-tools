@@ -1,6 +1,7 @@
 package com.asml.apa.wta.spark.streams;
 
 import com.asml.apa.wta.core.dto.BaseSupplierDto;
+import com.asml.apa.wta.core.dto.IostatDto;
 import com.asml.apa.wta.core.dto.JvmFileDto;
 import com.asml.apa.wta.core.dto.OsInfoDto;
 import com.asml.apa.wta.core.dto.ProcDto;
@@ -32,6 +33,8 @@ public class MetricStreamingEngine {
   private final KeyedStream<TaskKey, TaskMetricsRecord> taskStream;
 
   private static final long bytesToGbDenom = 1073741824;
+
+  private static final long kBpsToGbpsDenom = 125000;
 
   /**
    * Initializes the streams.
@@ -172,7 +175,13 @@ public class MetricStreamingEngine {
               .map(pg -> (double) pg.getUsableSpace() / bytesToGbDenom)
               .orElse(-1.0);
 
-          final double availableDiskIoBandwith = -1.0;
+          double availableDiskIoBandwith = -1.0;
+
+          if (ping.getIostatDto().isPresent()) {
+            final IostatDto iostatDto = ping.getIostatDto().get();
+            availableDiskIoBandwith = iostatDto.getKiloByteReadPerSec() / kBpsToGbpsDenom
+                + iostatDto.getKiloByteWrtnPerSec() / kBpsToGbpsDenom;
+          }
 
           final double availableNetworkBandwidth = -1.0;
 
