@@ -173,7 +173,7 @@ mutation-tests-spark-adapter:
   needs: [ build-spark-adapter ]
 
   dependencies:
-    - build-adapters
+    - build-spark-adapter
 
   script:
     - echo "Spark adapter mutation tests adapter/spark started"
