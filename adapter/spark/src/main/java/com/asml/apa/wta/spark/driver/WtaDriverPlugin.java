@@ -175,8 +175,11 @@ public class WtaDriverPlugin implements DriverPlugin {
    * @since 1.0.0
    */
   public void removeListeners() {
-    sparkDataSource.removeTaskListener();
-    sparkDataSource.removeTaskListener();
+    if (!sparkDataSource.getRuntimeConfig().isStageLevel()) {
+      sparkDataSource.removeTaskListener();
+    }
+    sparkDataSource.removeStageListener();
+    sparkDataSource.removeJobListener();
     sparkDataSource.removeApplicationListener();
   }
 }
