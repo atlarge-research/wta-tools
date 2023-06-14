@@ -69,12 +69,20 @@ class WtaDriverPluginTest {
   @Test
   void wtaDriverPluginShutdown() {
     injectConfig();
-    sut.init(mock(SparkContext.class), null);
+    sut.init(mockedSparkContext, null);
     assertThat(sut.isError()).isFalse();
     try {
       sut.shutdown();
     } catch (Exception ignored) {
     }
+    verify(mockedSparkContext, times(1))
+        .removeSparkListener(sut.getSparkDataSource().getTaskLevelListener());
+    verify(mockedSparkContext, times(1))
+        .removeSparkListener(sut.getSparkDataSource().getStageLevelListener());
+    verify(mockedSparkContext, times(1))
+        .removeSparkListener(sut.getSparkDataSource().getJobLevelListener());
+    verify(mockedSparkContext, times(1))
+        .removeSparkListener(sut.getSparkDataSource().getApplicationLevelListener());
     verify(sut, times(1)).removeListeners();
   }
 

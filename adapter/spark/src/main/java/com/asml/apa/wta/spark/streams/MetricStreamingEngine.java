@@ -38,16 +38,4 @@ public class MetricStreamingEngine {
   public void addToResourceStream(String resourceKey, SparkBaseSupplierWrapperDto record) {
     resourceStream.addToStream(resourceKey, record);
   }
-
-  /**
-   * Adds task metrics to the task stream.
-   *
-   * @param task the {@link com.asml.apa.wta.spark.streams.TaskKey} of the task
-   * @param record the {@link TaskMetricsRecord} containing the metrics
-   * @author Atour Mousavi Gourabi
-   * @since 1.0.0
-   */
-  public void addToTaskStream(TaskKey task, TaskMetricsRecord record) {
-    taskStream.addToStream(task, record);
-  }
 }
