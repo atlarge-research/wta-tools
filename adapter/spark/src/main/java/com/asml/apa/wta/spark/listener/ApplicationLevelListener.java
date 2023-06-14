@@ -63,6 +63,9 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
    * is needed to determine if applicationEnd is called first or shutdown.
    *
    * @param applicationEnd The event corresponding to the end of the application
+   * @author Henry Page
+   * @author Tianchen Qu
+   * @since 1.0.0
    */
   public void onApplicationEnd(SparkListenerApplicationEnd applicationEnd) {
     // we should never enter this branch, this is a guard since an application only terminates once.
@@ -87,9 +90,9 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
           stageLevelListener.getStageToParents().get(stageId);
       if (parentStages != null) {
         final Long[] parents = Arrays.stream(parentStages)
-            .flatMap(x -> Arrays.stream(taskLevelListener
+            .flatMap(parentId -> Arrays.stream(taskLevelListener
                 .getStageToTasks()
-                .getOrDefault(x, new ArrayList<>())
+                .getOrDefault(parentId, new ArrayList<>())
                 .toArray(new Long[0])))
             .toArray(Long[]::new);
         task.setParents(ArrayUtils.toPrimitive(parents));
@@ -99,8 +102,8 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
           stageLevelListener.getParentToChildren().get(stageId);
       if (childrenStages != null) {
         List<Long> children = new ArrayList<>();
-        childrenStages.forEach(
-            x -> children.addAll(taskLevelListener.getStageToTasks().get(x)));
+        childrenStages.forEach(childStage ->
+            children.addAll(taskLevelListener.getStageToTasks().get(childStage)));
         Long[] temp = children.toArray(new Long[0]);
         task.setChildren(ArrayUtils.toPrimitive(temp));
       }

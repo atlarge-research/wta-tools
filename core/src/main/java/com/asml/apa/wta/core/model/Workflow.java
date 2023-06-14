@@ -57,10 +57,10 @@ public class Workflow implements BaseTraceObject {
    * Converts the POJO object into record object, enabling it to be written by Avro.
    * It will put all fields allowed by the checker into the record.
    *
-   * @param schema schema
-   * @return record
-   * @since 1.0.0
+   * @param schema The parquet schema
+   * @return record The record representing a row in Parquet
    * @author Tianchen Qu
+   * @since 1.0.0
    */
   @Override
   public GenericRecord convertToRecord(ParquetSchema schema) {

@@ -5,6 +5,7 @@ import static org.mockito.Mockito.doReturn;
 
 import com.asml.apa.wta.core.dto.DstatDto;
 import com.asml.apa.wta.core.utils.ShellUtils;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import org.junit.jupiter.api.Test;
@@ -25,7 +26,7 @@ public class DstatSupplierTest {
         .executeCommand("dstat -cdngy 1 -c 1");
     DstatSupplier sut = Mockito.spy(new DstatSupplier(shellUtils));
 
-    var actual = sut.getSnapshot();
+    Optional<DstatDto> actual = sut.getSnapshot().join();
 
     DstatDto expected = DstatDto.builder()
         .totalUsageUsr(0)

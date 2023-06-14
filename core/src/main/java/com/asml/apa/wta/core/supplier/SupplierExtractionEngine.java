@@ -3,14 +3,15 @@ package com.asml.apa.wta.core.supplier;
 import com.asml.apa.wta.core.dto.BaseSupplierDto;
 import com.asml.apa.wta.core.dto.DstatDto;
 import com.asml.apa.wta.core.dto.IostatDto;
+import com.asml.apa.wta.core.dto.JvmFileDto;
 import com.asml.apa.wta.core.dto.OsInfoDto;
 import com.asml.apa.wta.core.dto.PerfDto;
 import com.asml.apa.wta.core.dto.ProcDto;
 import com.asml.apa.wta.core.utils.ShellUtils;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -35,6 +36,8 @@ public abstract class SupplierExtractionEngine<T extends BaseSupplierDto> {
 
   private final PerfSupplier perfSupplier;
 
+  private final JavaFileSupplier javaFileSupplier;
+
   private final int resourcePingInterval;
 
   @Getter
@@ -56,6 +59,7 @@ public abstract class SupplierExtractionEngine<T extends BaseSupplierDto> {
     ShellUtils shellUtils = new ShellUtils();
     this.resourcePingInterval = resourcePingInterval;
     this.operatingSystemSupplier = new OperatingSystemSupplier();
+    this.javaFileSupplier = new JavaFileSupplier();
     this.iostatSupplier = new IostatSupplier(shellUtils);
     this.dstatSupplier = new DstatSupplier(shellUtils);
     this.procSupplier = new ProcSupplier(shellUtils);
@@ -71,27 +75,30 @@ public abstract class SupplierExtractionEngine<T extends BaseSupplierDto> {
    * @since 1.0.0
    */
   protected CompletableFuture<T> ping() {
-    CompletableFuture<OsInfoDto> osInfoDtoCompletableFuture = this.operatingSystemSupplier.getSnapshot();
-    CompletableFuture<IostatDto> iostatDtoCompletableFuture = this.iostatSupplier.getSnapshot();
-    CompletableFuture<DstatDto> dstatDtoCompletableFuture = this.dstatSupplier.getSnapshot();
-    CompletableFuture<ProcDto> procDtoCompletableFuture = this.procSupplier.getSnapshot();
-    CompletableFuture<PerfDto> perfDtoCompletableFuture = this.perfSupplier.getSnapshot();
+    CompletableFuture<Optional<OsInfoDto>> osInfoDtoCompletableFuture = this.operatingSystemSupplier.getSnapshot();
+    CompletableFuture<Optional<IostatDto>> iostatDtoCompletableFuture = this.iostatSupplier.getSnapshot();
+    CompletableFuture<Optional<DstatDto>> dstatDtoCompletableFuture = this.dstatSupplier.getSnapshot();
+    CompletableFuture<Optional<PerfDto>> perfDtoCompletableFuture = this.perfSupplier.getSnapshot();
+    CompletableFuture<Optional<JvmFileDto>> jvmFileDtoCompletableFuture = this.javaFileSupplier.getSnapshot();
+    CompletableFuture<Optional<ProcDto>> procDtoCompletableFuture = this.procSupplier.getSnapshot();
 
     return CompletableFuture.allOf(
             osInfoDtoCompletableFuture,
             iostatDtoCompletableFuture,
             dstatDtoCompletableFuture,
-            procDtoCompletableFuture,
-            perfDtoCompletableFuture)
+            perfDtoCompletableFuture,
+            jvmFileDtoCompletableFuture,
+            procDtoCompletableFuture)
         .thenCompose((v) -> {
-          LocalDateTime timestamp = LocalDateTime.now();
-          OsInfoDto osInfoDto = osInfoDtoCompletableFuture.join();
-          IostatDto iostatDto = iostatDtoCompletableFuture.join();
-          DstatDto dstatDto = dstatDtoCompletableFuture.join();
-          ProcDto procDto = procDtoCompletableFuture.join();
-          PerfDto perfDto = perfDtoCompletableFuture.join();
-          return CompletableFuture.completedFuture(transform(
-              new BaseSupplierDto(timestamp, osInfoDto, iostatDto, dstatDto, procDto, perfDto)));
+          long timestamp = System.currentTimeMillis();
+          Optional<OsInfoDto> osInfoDto = osInfoDtoCompletableFuture.join();
+          Optional<IostatDto> iostatDto = iostatDtoCompletableFuture.join();
+          Optional<DstatDto> dstatDto = dstatDtoCompletableFuture.join();
+          Optional<PerfDto> perfDto = perfDtoCompletableFuture.join();
+          Optional<JvmFileDto> jvmFileDto = jvmFileDtoCompletableFuture.join();
+          Optional<ProcDto> procDto = procDtoCompletableFuture.join();
+          return CompletableFuture.completedFuture(transform(new BaseSupplierDto(
+              timestamp, osInfoDto, iostatDto, dstatDto, perfDto, jvmFileDto, procDto)));
         });
   }
 

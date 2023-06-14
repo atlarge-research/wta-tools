@@ -9,7 +9,7 @@ class TraceObjectTest {
 
   @Test
   void getsCorrectSchemaVersion() {
-    var traceObjectBuilder = Resource.builder();
+    Resource.ResourceBuilder traceObjectBuilder = Resource.builder();
     traceObjectBuilder = traceObjectBuilder
         .id(1L)
         .type("")

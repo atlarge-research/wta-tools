@@ -3,6 +3,7 @@ package com.asml.apa.wta.spark;
 import com.asml.apa.wta.core.config.RuntimeConfig;
 import com.asml.apa.wta.core.model.enums.Domain;
 import com.asml.apa.wta.spark.datasource.SparkDataSource;
+import com.asml.apa.wta.spark.streams.MetricStreamingEngine;
 import java.util.Arrays;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
@@ -20,6 +21,8 @@ public class BaseSparkJobIntegrationTest {
   protected JavaRDD<String> textFile;
 
   RuntimeConfig fakeConfig;
+
+  MetricStreamingEngine fakeMetricStreamingEngine;
 
   @BeforeEach
   void setupBaseIntegrationTest() {
@@ -41,6 +44,8 @@ public class BaseSparkJobIntegrationTest {
         .set("spark.executor.cores", "2");
     spark = SparkSession.builder().config(conf).getOrCreate();
     spark.sparkContext().setLogLevel("ERROR");
+
+    fakeMetricStreamingEngine = new MetricStreamingEngine();
 
     sut = new SparkDataSource(spark.sparkContext(), fakeConfig);
     String resourcePath = "src/test/resources/wordcount.txt";
