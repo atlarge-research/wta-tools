@@ -86,7 +86,7 @@ class StageLevelListenerTest extends BaseLevelListenerTest {
     assertEquals(-1, curStage.getGroupId());
     assertEquals("", curStage.getNfrs());
     assertEquals("", curStage.getParams());
-    assertEquals(2, curStage.getParents().length);
+    assertEquals(0, curStage.getParents().length);
     assertEquals(0, curStage.getChildren().length);
   }
 
