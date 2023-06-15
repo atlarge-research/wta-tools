@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.Getter;
 import org.apache.spark.SparkContext;
@@ -24,7 +25,7 @@ import scala.collection.JavaConverters;
 @Getter
 public class StageLevelListener extends TaskStageBaseListener {
 
-  private final Map<Integer, Integer[]> stageToParents;
+  private final Optional<Map<Integer, Integer[]>> stageToParents;
 
   private final Map<Integer, List<Integer>> parentToChildren = new ConcurrentHashMap<>();
 
@@ -33,9 +34,9 @@ public class StageLevelListener extends TaskStageBaseListener {
   public StageLevelListener(SparkContext sparkContext, RuntimeConfig config) {
     super(sparkContext, config);
     if (!config.isStageLevel()) {
-      stageToParents = new ConcurrentHashMap<>();
+      stageToParents = Optional.of(new ConcurrentHashMap<>());
     } else {
-      stageToParents = null;
+      stageToParents = Optional.empty();
     }
   }
 
@@ -82,7 +83,7 @@ public class StageLevelListener extends TaskStageBaseListener {
       parents = Arrays.stream(parentIds).mapToLong(x -> x + 1).toArray();
     } else {
       parents = new long[0];
-      stageToParents.put(stageId, parentIds);
+      stageToParents.get().put(stageId, parentIds);
     }
     final long[] children = new long[0];
     // dummy values
