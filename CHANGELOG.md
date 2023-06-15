@@ -50,7 +50,9 @@ For the most part, since we are pre-release this will serve no real purpose, oth
 - Added proc metrics data source [@lyadalachanchu](https://gitlab.ewi.tudelft.nl/lyadalachanchu)
 - Implemented Parent Children fields for Task [@tqu](https://gitlab.ewi.tudelft.nl/tqu)
 - Added automatic Avro record converters for POJOs [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
+- Add aggregation for resource related metrics [@hpage](https://gitlab.ewi.tudelft.nl/hpage)
 - Added shading for plugin dependencies [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
+- Added Parquet reader [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 
 ### Changed
 - Refactored listeners into a generic interface to reduce code duplication and increase cc [@hpage](https://gitlab.ewi.tudelft.nl/hpage)
@@ -59,6 +61,7 @@ For the most part, since we are pre-release this will serve no real purpose, oth
 - Modified the config format [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 - Modified the EndToEnd class to inject the WtaPlugin class into a Spark context rather the Spark listener interface by itself [@pcho](https://gitlab.ewi.tudelft.nl/pcho)
 - Reworked the Docker images from the ground up to use Ubuntu Focal [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
+- Changed the suppliers to return optionals whenever source is not available or something goes wrong [@hpage](https://gitlab.ewi.tudelft.nl/hpage)
 - Refactored energy consumption metrics data source to be synchronized with driver [@pcho](https://gitlab.ewi.tudelft.nl/pcho)
 - Updated the DAS-5 script for Spark with Scala 2.12.x and 2.13.x [@pcho](https://gitlab.ewi.tudelft.nl/pcho)
 - Moved away from bash to sh [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
@@ -75,6 +78,7 @@ For the most part, since we are pre-release this will serve no real purpose, oth
 - Fixed the format of the outputted files [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 - Fixed the type inconsistency in the field types of the WTA Objects [@tqu](https://gitlab.ewi.tudelft.nl/tqu)
 - Fixed iostat partition bug and added support for comma decimal separator [@lyadalachanchu](https://gitlab.ewi.tudelft.nl/lyadalachanchu)
+- Fixed the bug that caused the plugin to crash if given invalid configs [@pcho](https://gitlab.ewi.tudelft.nl/pcho)
 
 ### Deprecated
 

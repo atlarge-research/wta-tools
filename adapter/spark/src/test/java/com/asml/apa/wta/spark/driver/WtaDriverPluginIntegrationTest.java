@@ -1,4 +1,4 @@
-package com.asml.apa.wta.spark;
+package com.asml.apa.wta.spark.driver;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -23,7 +23,6 @@ class WtaDriverPluginIntegrationTest {
   private JavaRDD<String> testFile;
 
   private final String resourcePath = "src/test/resources/wordcount.txt";
-  private final String configPath = "src/test/resources/config.json";
 
   private final String pluginClass = "com.asml.apa.wta.spark.WtaPlugin";
 
@@ -55,6 +54,7 @@ class WtaDriverPluginIntegrationTest {
     assertThat(Files.isDirectory(directoryPath)).isTrue();
     assertThat(Files.list(directoryPath).findAny()).isEmpty();
 
+    String configPath = "src/test/resources/config.json";
     System.setProperty("configFile", configPath);
     conf.set("spark.plugins", pluginClass);
     SparkContext sc = SparkSession.builder().config(conf).getOrCreate().sparkContext();

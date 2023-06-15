@@ -54,9 +54,9 @@ public class ProcSupplierTest {
         .build();
 
     if (sut.isAvailable()) {
-      assertEquals(expected, sut.getSnapshot().join());
+      assertEquals(expected, sut.getSnapshot().join().get());
     } else {
-      assertThat(sut.getSnapshot().join()).isNull();
+      assertThat(sut.getSnapshot().join()).isEmpty();
     }
   }
 
@@ -77,9 +77,9 @@ public class ProcSupplierTest {
     ProcDto expected = ProcDto.builder().build();
 
     if (sut.isAvailable()) {
-      assertEquals(expected, sut.getSnapshot().join());
+      assertEquals(expected, sut.getSnapshot().join().get());
     } else {
-      assertEquals(sut.getSnapshot(), CompletableFuture.completedFuture(null));
+      assertThat(sut.getSnapshot().join()).isEmpty();
     }
   }
 }

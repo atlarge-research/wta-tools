@@ -56,6 +56,13 @@ class OperatingSystemSupplierTest {
   }
 
   @Test
+  void getOperatingSystem() {
+    String result = sut.getOperatingSystem();
+    assertThat(result).isNotBlank();
+    assertThat(result.split("\\s+")).hasSizeGreaterThanOrEqualTo(2);
+  }
+
+  @Test
   void getSnapshot() {
     assertNotEquals(sut.getSnapshot(), null);
     assertTrue(sut.getSnapshot().join() instanceof OsInfoDto);

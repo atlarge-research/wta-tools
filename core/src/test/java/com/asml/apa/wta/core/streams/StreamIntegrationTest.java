@@ -6,6 +6,8 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Comparator;
+import java.util.List;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -14,9 +16,11 @@ import org.junit.jupiter.api.Test;
  */
 public class StreamIntegrationTest {
 
-  Stream<Integer> createSerializingStreamOfNaturalNumbers(int size) {
-    Stream<Integer> stream = new Stream<>(0, 10);
-    for (int i = 1; i <= size; i++) {
+  private static final int defaultSerTrigger = 10;
+
+  Stream<Integer> createSerializingStreamOfNaturalNumbers(int positiveSize, int serializationTrigger) {
+    Stream<Integer> stream = new Stream<>(0, serializationTrigger);
+    for (int i = 1; i <= positiveSize; i++) {
       stream.addToStream(i);
     }
     return stream;
@@ -32,7 +36,7 @@ public class StreamIntegrationTest {
 
   @Test
   void streamSerializationWithMap() {
-    Stream<Integer> stream = createSerializingStreamOfNaturalNumbers(10);
+    Stream<Integer> stream = createSerializingStreamOfNaturalNumbers(10, defaultSerTrigger);
     for (int i = 1; i <= 10; i++) {
       stream.addToStream(i);
     }
@@ -95,7 +99,7 @@ public class StreamIntegrationTest {
 
   @Test
   void streamSerializationWithFilter() {
-    Stream<Integer> stream = createSerializingStreamOfNaturalNumbers(10);
+    Stream<Integer> stream = createSerializingStreamOfNaturalNumbers(10, defaultSerTrigger);
     for (int i = 1; i <= 10; i++) {
       stream.addToStream(i);
     }
@@ -140,7 +144,7 @@ public class StreamIntegrationTest {
 
   @Test
   void streamSerializationWithFoldLeft() {
-    Stream<Integer> stream = createSerializingStreamOfNaturalNumbers(11);
+    Stream<Integer> stream = createSerializingStreamOfNaturalNumbers(11, defaultSerTrigger);
     for (int i = 1; i <= 9; i++) {
       stream.addToStream(i);
     }
@@ -152,7 +156,7 @@ public class StreamIntegrationTest {
 
   @Test
   void streamSerializationWithHead() {
-    Stream<Integer> stream = createSerializingStreamOfNaturalNumbers(10);
+    Stream<Integer> stream = createSerializingStreamOfNaturalNumbers(10, defaultSerTrigger);
     for (int i = 1; i <= 9; i++) {
       stream.addToStream(i);
     }
@@ -181,5 +185,22 @@ public class StreamIntegrationTest {
     assertThat(stream.head()).isEqualTo(10);
     assertThat(stream.head()).isEqualTo(5);
     assertThat(stream.isEmpty()).isTrue();
+  }
+
+  @Test
+  void streamWithHugeIntegersGetsRetrievedCorrectlyIntoAList() {
+    Stream<Integer> stream = createSerializingStreamOfNaturalNumbers(0, 100);
+    for (int i = 1; i <= 20000; i++) {
+      stream.addToStream(i);
+    }
+
+    List<Integer> sutList = stream.toList();
+
+    // assert that sutList has numbers from 0 to 20000 in order
+    assertThat(sutList).hasSize(20001);
+    assertThat(sutList).isSortedAccordingTo(Comparator.naturalOrder());
+    for (int i = 0; i <= 20000; i++) {
+      assertThat(sutList.get(i)).isEqualTo(i);
+    }
   }
 }
