@@ -133,10 +133,49 @@ utilisation metrics on the executor side. These metrics are then passed to the d
 
 Aggregation of all the resource utilisation metrics are done at the driver's end.
 
+## Developer Guidelines
 
-## Guidelines for Developers
-- If a new data source is added in the future, be sure to use the existing streaming infrastructure that handles `MetricsRecord`. This helps the driver in terms of memory usage.
+### General Remarks
 - When a resource is not needed anymore, release it in `shutdown()`, within the respective `PluginContext`.
+- The WTA format uses ids in `INT64` format. The Spark API provides some ids (such as `executorID`) in string format. To convert this, we use `Math.abs(id.hashCode())`.
+- All timestamps are in Unix epoch millis.
+
+### Known Limitations
+
+#### Utilisation of the plugin on Windows
+- We don't recommend using the plugin on Windows, although it is possible.
+- The plugin is compatible with Windows; however, the collection of resource utilization metrics is limited.
+    - This limitation arises because the plugin relies on dependencies that are only available on UNIX-based systems.
+- Logs will be generated indicating that certain resource utilization metrics cannot be collected.
+  - This can potentially cause performance issues if the resource ping interval is small since the plugin will write to the log each time a non-available resource is pinged. I/O operations can be expensive.
+
+#### Stage Level Metrics
+- Stage level metrics are only outputted in the trace if they are submitted and successfully completed. The scheduler sometimes creates stages which are later skipped or removed.
+- Stage level metrics are very sparse, this is a limitation with the Spark API itself.
+
+#### Lombok Usage
+- Due to the way Lombok works. It is not possible to call a superclass constructor from a subclass constructor. This is why things like this exist:
+```java
+@Override
+public SparkBaseSupplierWrapperDto transform(BaseSupplierDto record) {
+    return SparkBaseSupplierWrapperDto.builder()
+        .executorId(pluginContext.executorID())
+        .timestamp(record.getTimestamp())
+        .osInfoDto(record.getOsInfoDto())
+        .iostatDto(record.getIostatDto())
+        .dstatDto(record.getDstatDto())
+        .perfDto(record.getPerfDto())
+        .jvmFileDto(record.getJvmFileDto())
+        .procDto(record.getProcDto())
+        .build();
+}
+```
+
+#### Task-Level Resource metrics
+- This is a big area of improvement for the plugin. Due to the limitations of the Spark API, we are not able to easily isolate resource level metrics (such as disk IO time), to specific tasks. We have had to make several compromises
+  - Fields such as `energyConsumption`, relate to the energy consumption of the entire executor (during the lifespan of the task) and not the task itself.
+  - TaskState information is not accurate. Data analysis on this object can produce inaccurate results.
+
 
 ## Benchmarking
 [The benchmarking module](../../submodules/benchmarking/README.md) is used to benchmark the performance of the plugin. Any changes to the plugin should be benchmarked to ensure no significant performance degradation.
