@@ -18,11 +18,9 @@ public class ParquetWriterIntegrationTest {
     OutputFile file = new DiskOutputFile(Path.of("test.parquet"));
     ParquetSchema parquetSchema = new ParquetSchema(Task.class, List.of(task), "tasks");
 
-    ParquetWriter<Task> writer = new ParquetWriter<>(file, parquetSchema);
-
-    writer.write(task);
-
-    writer.close();
+    try (ParquetWriter<Task> writer = new ParquetWriter<>(file, parquetSchema)) {
+      writer.write(task);
+    }
 
     assertThat(new File("test.parquet").exists()).isTrue();
     new File("test.parquet").delete();
