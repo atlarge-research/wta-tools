@@ -66,6 +66,7 @@ build-hadoop-connector:
       paths:
         - .m2/repository
 
+
 package-spark-adapter-e2e_2.12:
   stage: build
   needs: [build-spark-adapter]

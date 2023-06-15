@@ -6,6 +6,7 @@ variables:
   SPARK_BAREBONES_IMAGE_2_12: $CI_REGISTRY_IMAGE/barebones-spark-image_2_12:$IMAGE_RELEASE_TAG
   SPARK_IMAGE_2_13: $CI_REGISTRY_IMAGE/spark-image_2_13:$IMAGE_RELEASE_TAG
   SPARK_BAREBONES_IMAGE_2_13: $CI_REGISTRY_IMAGE/barebones-spark-image_2_13:$IMAGE_RELEASE_TAG
+  HDFS_IMAGE: $CI_REGISTRY_IMAGE/hdfs-image:$IMAGE_RELEASE_TAG
 
 build-base-image:
   stage: images
@@ -18,6 +19,7 @@ build-base-image:
     - docker build -t $BASE_IMAGE .gitlab/dockerfiles/base
     - docker push $BASE_IMAGE
 
+
 build-linux-tooling-image:
   stage: images
   image: docker:20.10.16
@@ -29,6 +31,7 @@ build-linux-tooling-image:
     - if docker manifest inspect $LINUX_TOOLING_IMAGE >/dev/null ; then exit 0 ; fi
     - docker build --build-arg base_image=$BASE_IMAGE -t $LINUX_TOOLING_IMAGE .gitlab/dockerfiles/linux-tooling
     - docker push $LINUX_TOOLING_IMAGE
+
 
 build-barebones-spark-adapter-image_2_12:
   stage: images
@@ -54,6 +57,7 @@ build-spark-adapter-image_2_12:
     - docker build --build-arg base_image=$SPARK_BAREBONES_IMAGE_2_12 -t $SPARK_IMAGE_2_12 .gitlab/dockerfiles/linux-tooling
     - docker push $SPARK_IMAGE_2_12
 
+
 build-barebones-spark-adapter-image_2_13:
   stage: images
   image: docker:20.10.16
@@ -77,3 +81,16 @@ build-spark-adapter-image_2_13:
     - if docker manifest inspect $SPARK_IMAGE_2_13 > /dev/null ; then exit 0 ; fi
     - docker build --build-arg base_image=$SPARK_BAREBONES_IMAGE_2_13 -t $SPARK_IMAGE_2_13 .gitlab/dockerfiles/linux-tooling
     - docker push $SPARK_IMAGE_2_13
+
+
+build-hdfs-connector-image:
+  stage: images
+  image: docker:20.10.16
+  needs: [build-spark-adapter-image_2_12]
+  services:
+    - docker:20.10.16-dind
+  script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - if docker manifest inspect $HDFS_IMAGE > /dev/null ; then exit 0 ; fi
+    - docker build --build-arg base_image=$SPARK_IMAGE_2_13 -t $HDFS_IMAGE .gitlab/dockerfiles/hdfs
+    - docker push $HDFS_IMAGE
