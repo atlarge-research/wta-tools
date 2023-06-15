@@ -33,6 +33,7 @@ public class ParquetReader implements AutoCloseable {
   /**
    * Reads the next record.
    *
+   * @return the next record as a {@link GenericRecord}
    * @throws IOException when something goes wrong when reading
    * @author Atour Mousavi Gourabi
    * @since 1.0.0
