@@ -3,7 +3,7 @@ package com.asml.apa.wta.hadoop.io;
 import com.asml.apa.wta.core.io.OutputFile;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
@@ -16,26 +16,59 @@ import org.apache.hadoop.fs.Path;
  * @since 1.0.0
  */
 @Slf4j
-@RequiredArgsConstructor
+@AllArgsConstructor
 public class HadoopOutputFile implements OutputFile {
 
-  private final Path file;
+  private Path file;
   private final Configuration conf;
-  private final FileSystem fs;
+  private FileSystem fs;
+
+  /**
+   * Default constructor for Java SPI.
+   *
+   * @author Atour Mousavi Gourabi
+   * @since 1.0.0
+   */
+  public HadoopOutputFile() {
+    conf = new Configuration();
+  }
 
   /**
    * Constructs a HadoopOutputFile.
    *
-   * @param path the {@link Path} to construct a {@link HadoopOutputFile} for
-   * @param configuration the {@link Configuration} to use
+   * @param path a {@link String} representation of the {@link Path} to construct a {@link HadoopOutputFile} for
    * @throws IOException when something goes wrong during I/O
    * @author Atour Mousavi Gourabi
    * @since 1.0.0
    */
-  public HadoopOutputFile(Path path, Configuration configuration) throws IOException {
-    file = path;
-    conf = configuration;
-    fs = path.getFileSystem(new Configuration());
+  public HadoopOutputFile(String path) throws IOException {
+    file = new Path(path);
+    conf = new Configuration();
+    fs = file.getFileSystem(conf);
+  }
+
+  /**
+   * Sets the path of the HDFS output file.
+   *
+   * @param path a {@link String} representation of the {@link Path} to point to
+   * @throws IOException when something goes wrong during I/O
+   * @author Atour Mousavi Gourabi
+   * @since 1.0.0
+   */
+  public void setPath(String path) throws IOException {
+    file = new Path(path);
+    fs = file.getFileSystem(conf);
+  }
+
+  /**
+   * Signals whether this implementation can output to the specified location.
+   *
+   * @param path a {@link String} representation of the location to point to
+   * @return a {@code boolean} indicating whether the implementation can handle the given location
+   */
+  @Override
+  public boolean acceptsLocation(String path) {
+    return path.startsWith("hdfs://");
   }
 
   /**

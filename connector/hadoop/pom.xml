@@ -11,7 +11,7 @@
     <relativePath>../../pom.xml</relativePath>
   </parent>
 
-  <artifactId>hadoop-connector</artifactId>
+  <artifactId>hdfs-connector</artifactId>
   <packaging>jar</packaging>
 
   <properties>
@@ -25,12 +25,14 @@
       <groupId>org.apache.hadoop</groupId>
       <artifactId>hadoop-client-api</artifactId>
       <version>${hadoop.version}</version>
+      <scope>provided</scope>
     </dependency>
     <!-- https://mvnrepository.com/artifact/org.apache.hadoop/hadoop-client-runtime -->
     <dependency>
       <groupId>org.apache.hadoop</groupId>
       <artifactId>hadoop-client-runtime</artifactId>
       <version>${hadoop.version}</version>
+      <scope>provided</scope>
     </dependency>
     <!-- https://mvnrepository.com/artifact/org.apache.parquet/parquet-hadoop -->
     <dependency>
@@ -49,6 +51,7 @@
       <groupId>com.asml.apa.wta</groupId>
       <artifactId>core</artifactId>
       <version>${project.version}</version>
+      <scope>provided</scope>
     </dependency>
   </dependencies>
 </project>
