@@ -154,8 +154,7 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
       log.debug("Application end called twice, this should never happen");
       return;
     }
-
-    Workload.WorkloadBuilder builder = Workload.builder();
+    
     final Workflow[] workflows = jobLevelListener.getProcessedObjects().toArray(new Workflow[0]);
     final int numWorkflows = workflows.length;
     final int totalTasks =
