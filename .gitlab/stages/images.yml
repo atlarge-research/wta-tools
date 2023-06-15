@@ -92,5 +92,5 @@ build-hdfs-connector-image:
   script:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
     - if docker manifest inspect $HDFS_IMAGE > /dev/null ; then exit 0 ; fi
-    - docker build --build-arg base_image=$SPARK_IMAGE_2_13 -t $HDFS_IMAGE .gitlab/dockerfiles/hdfs
+    - docker build --build-arg base_image=$SPARK_IMAGE_2_12 -t $HDFS_IMAGE .gitlab/dockerfiles/hdfs
     - docker push $HDFS_IMAGE

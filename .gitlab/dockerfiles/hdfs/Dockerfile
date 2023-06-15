@@ -1,7 +1,7 @@
 ARG base_image
 FROM ${base_image}
 
-RUN     wget https://www.apache.org/dyn/closer.cgi/hadoop/common/hadoop-3.3.5/hadoop-3.3.5.tar.gz && \
+RUN     wget https://dlcdn.apache.org/hadoop/common/hadoop-3.3.5/hadoop-3.3.5.tar.gz && \
         tar xvzf hadoop-3.3.5.tar.gz && \
         rm -rf hadoop-3.3.5.tar.gz && \
         mkdir -p /opt/hadoop/3.3.5 && \
