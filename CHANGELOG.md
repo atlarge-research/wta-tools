@@ -52,6 +52,7 @@ For the most part, since we are pre-release this will serve no real purpose, oth
 - Added automatic Avro record converters for POJOs [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 - Add aggregation for resource related metrics [@hpage](https://gitlab.ewi.tudelft.nl/hpage)
 - Added shading for plugin dependencies [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
+- Added Parquet reader [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 - Set up SPI for the connector output file implementations [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 
 ### Changed
