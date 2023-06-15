@@ -130,6 +130,16 @@
             <include>**/*IntegrationTest.java</include>
           </includes>
         </configuration>
+        <executions>
+          <execution>
+            <id>integration-tests</id>
+            <phase>integration-test</phase>
+            <goals>
+              <goal>integration-test</goal>
+              <goal>verify</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
