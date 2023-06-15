@@ -24,7 +24,7 @@ import scala.collection.JavaConverters;
 @Getter
 public class StageLevelListener extends TaskStageBaseListener {
 
-  private final Map<Integer, Integer[]> stageToParents = new ConcurrentHashMap<>();
+  private final Map<Integer, Integer[]> stageToParents;
 
   private final Map<Integer, List<Integer>> parentToChildren = new ConcurrentHashMap<>();
 
@@ -32,6 +32,11 @@ public class StageLevelListener extends TaskStageBaseListener {
 
   public StageLevelListener(SparkContext sparkContext, RuntimeConfig config) {
     super(sparkContext, config);
+    if (!config.isStageLevel()) {
+      stageToParents = new ConcurrentHashMap<>();
+    } else {
+      stageToParents = null;
+    }
   }
 
   /**
@@ -60,7 +65,6 @@ public class StageLevelListener extends TaskStageBaseListener {
         .stream()
         .map(parentId -> (Integer) parentId)
         .toArray(size -> new Integer[size]);
-    stageToParents.put(stageId, parentIds);
     for (Integer id : parentIds) {
       List<Integer> children = parentToChildren.get(id);
       if (children == null) {
@@ -73,7 +77,13 @@ public class StageLevelListener extends TaskStageBaseListener {
     }
     final double diskSpaceRequested = curStageMetrics.diskBytesSpilled();
     final double memoryRequested = curStageMetrics.peakExecutionMemory();
-    final long[] parents = Arrays.stream(parentIds).mapToLong(x -> x + 1).toArray();
+    long[] parents;
+    if (config.isStageLevel()) {
+      parents = Arrays.stream(parentIds).mapToLong(x -> x + 1).toArray();
+    } else {
+      parents = new long[0];
+      stageToParents.put(stageId, parentIds);
+    }
     final long[] children = new long[0];
     // dummy values
     final String type = "";
