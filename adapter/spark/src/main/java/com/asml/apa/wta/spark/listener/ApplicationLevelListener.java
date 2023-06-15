@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.spark.SparkContext;
 import org.apache.spark.scheduler.SparkListenerApplicationEnd;
@@ -25,6 +26,7 @@ import org.apache.spark.scheduler.SparkListenerApplicationStart;
  * @since 1.0.0
  */
 @Getter
+@Slf4j
 public class ApplicationLevelListener extends AbstractListener<Workload> {
 
   private final JobLevelListener jobLevelListener;
@@ -61,13 +63,15 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
    * is needed to determine if applicationEnd is called first or shutdown.
    *
    * @param applicationEnd The event corresponding to the end of the application
+   * @author Henry Page
+   * @author Tianchen Qu
+   * @since 1.0.0
    */
   public void onApplicationEnd(SparkListenerApplicationEnd applicationEnd) {
-
-    // we should enver enter this branch, this is a guard since an application
-    // only terminates once.
+    // we should never enter this branch, this is a guard since an application only terminates once.
     List<Workload> processedObjects = this.getProcessedObjects();
     if (!processedObjects.isEmpty()) {
+      log.debug("Application end called twice, this should never happen");
       return;
     }
 
@@ -86,11 +90,11 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
           stageLevelListener.getStageToParents().get(stageId);
       if (parentStages != null) {
         final Long[] parents = Arrays.stream(parentStages)
-            .flatMap(x -> Arrays.stream(taskLevelListener
+            .flatMap(parentId -> Arrays.stream(taskLevelListener
                 .getStageToTasks()
-                .getOrDefault(x, new ArrayList<>())
+                .getOrDefault(parentId, new ArrayList<>())
                 .toArray(new Long[0])))
-            .toArray(size -> new Long[size]);
+            .toArray(Long[]::new);
         task.setParents(ArrayUtils.toPrimitive(parents));
       }
 
@@ -98,8 +102,8 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
           stageLevelListener.getParentToChildren().get(stageId);
       if (childrenStages != null) {
         List<Long> children = new ArrayList<>();
-        childrenStages.forEach(
-            x -> children.addAll(taskLevelListener.getStageToTasks().get(x)));
+        childrenStages.forEach(childStage ->
+            children.addAll(taskLevelListener.getStageToTasks().get(childStage)));
         Long[] temp = children.toArray(new Long[0]);
         task.setChildren(ArrayUtils.toPrimitive(temp));
       }

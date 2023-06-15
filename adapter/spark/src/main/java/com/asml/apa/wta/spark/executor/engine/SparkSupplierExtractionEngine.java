@@ -79,7 +79,7 @@ public class SparkSupplierExtractionEngine extends SupplierExtractionEngine<Spar
     try {
       this.pluginContext.send(bufferSnapshot);
     } catch (IOException e) {
-      log.error("Failed to send buffer: ", bufferSnapshot, e);
+      log.error("Failed to send buffer: {}.", bufferSnapshot, e);
     }
   }
 
@@ -134,6 +134,7 @@ public class SparkSupplierExtractionEngine extends SupplierExtractionEngine<Spar
         .iostatDto(record.getIostatDto())
         .dstatDto(record.getDstatDto())
         .perfDto(record.getPerfDto())
+        .jvmFileDto(record.getJvmFileDto())
         .procDto(record.getProcDto())
         .build();
   }

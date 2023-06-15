@@ -61,7 +61,7 @@ public class MultithreadTest {
     SparkBaseSupplierWrapperDto testObj = buffer.get(0);
 
     assertThat(testObj.getExecutorId()).isEqualTo("test-executor-id");
-    assertThat(testObj.getOsInfoDto().getAvailableProcessors()).isGreaterThanOrEqualTo(1);
+    assertThat(testObj.getOsInfoDto().get().getAvailableProcessors()).isGreaterThanOrEqualTo(1);
   }
 
   @Test
@@ -99,7 +99,14 @@ public class MultithreadTest {
   @Timeout(value = 5000L, unit = TimeUnit.MILLISECONDS)
   void pingsGetSentToDriver() throws IOException {
     sutExecutorPlugin.init(
-        mockPluginContext, Map.of("executorSynchronizationInterval", "2000", "resourcePingInterval", "1000"));
+        mockPluginContext,
+        Map.of(
+            "resourcePingInterval",
+            "1000",
+            "executorSynchronizationInterval",
+            "2000",
+            "errorStatus",
+            "false"));
     verify(mockPluginContext, timeout(10000L).atLeastOnce()).send(any());
     sutExecutorPlugin.shutdown();
   }

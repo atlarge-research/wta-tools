@@ -1,21 +1,22 @@
 package com.asml.apa.wta.core.supplier;
 
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import com.asml.apa.wta.core.dto.DstatDto;
 import com.asml.apa.wta.core.utils.ShellUtils;
+import java.util.Optional;
 import org.junit.jupiter.api.Test;
 
 public class DstatSupplierIntegrationTest {
   @Test
   public void DstatSupplierSuccessfullyReturnsADtoObject() {
     DstatSupplier a = new DstatSupplier(new ShellUtils());
-    var actual = a.getSnapshot().join();
+    Optional<DstatDto> actual = a.getSnapshot().join();
     if (a.isAvailable()) {
-      assertTrue(actual instanceof DstatDto);
+      assertThat(actual).isPresent();
+      assertThat(actual.get()).isInstanceOf(DstatDto.class);
     } else {
-      assertNull(actual);
+      assertThat(actual).isEmpty();
     }
   }
 }

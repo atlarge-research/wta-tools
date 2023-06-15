@@ -20,7 +20,8 @@ public class Resource implements BaseTraceObject {
 
   public final long id;
 
-  public final String type;
+  @Builder.Default
+  public final String type = "cluster node";
 
   public final double numResources;
 
@@ -34,7 +35,8 @@ public class Resource implements BaseTraceObject {
 
   public final String os;
 
-  public final String details;
+  @Builder.Default
+  public final String details = "";
 
   /**
    * All WTA objects that are stored as Parquet files rely on this method to convert the object to a record.

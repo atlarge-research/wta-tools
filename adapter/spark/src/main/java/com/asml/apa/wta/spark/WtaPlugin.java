@@ -20,6 +20,8 @@ public class WtaPlugin implements SparkPlugin {
    * Returns the driver-side component of the plugin.
    *
    * @return The driver-side component initialised at startup
+   * @author Henry Page
+   * @since 1.0.0
    */
   @Override
   public DriverPlugin driverPlugin() {
@@ -30,6 +32,8 @@ public class WtaPlugin implements SparkPlugin {
    * Returns the executor-side component of the plugin.
    *
    * @return The executor-side component initialised at startup
+   * @author Henry Page
+   * @since 1.0.0
    */
   @Override
   public ExecutorPlugin executorPlugin() {

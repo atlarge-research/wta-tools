@@ -5,6 +5,7 @@ import static org.mockito.Mockito.doReturn;
 
 import com.asml.apa.wta.core.dto.IostatDto;
 import com.asml.apa.wta.core.utils.ShellUtils;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -42,9 +43,9 @@ public class IostatSupplierTest {
         .kiloByteDscd(7.0)
         .build();
 
-    IostatDto result = sut.getSnapshot().join();
+    Optional<IostatDto> result = sut.getSnapshot().join();
 
-    assertEquals(expected, result);
+    assertEquals(expected, result.get());
   }
 
   @Test
@@ -53,9 +54,9 @@ public class IostatSupplierTest {
 
     IostatDto expected = IostatDto.builder().build();
 
-    IostatDto result = sut.getSnapshot().join();
+    Optional<IostatDto> result = sut.getSnapshot().join();
 
-    assertEquals(expected, result);
+    assertEquals(expected, result.get());
   }
 
   @Test
@@ -69,8 +70,8 @@ public class IostatSupplierTest {
 
     IostatDto expected = IostatDto.builder().build();
 
-    IostatDto result = sut.getSnapshot().join();
+    Optional<IostatDto> result = sut.getSnapshot().join();
 
-    assertEquals(expected, result);
+    assertEquals(expected, result.get());
   }
 }
