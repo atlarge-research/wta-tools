@@ -37,7 +37,7 @@ public class Workflow implements BaseTraceObject {
 
   public final String scheduler;
 
-  private final Domain domain;
+  public final Domain domain;
 
   public final String applicationName;
 
