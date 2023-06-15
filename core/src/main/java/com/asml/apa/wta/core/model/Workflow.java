@@ -1,13 +1,9 @@
 package com.asml.apa.wta.core.model;
 
+import com.asml.apa.wta.core.io.ParquetSchema;
 import com.asml.apa.wta.core.model.enums.Domain;
-import java.util.Arrays;
-import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Data;
-import lombok.Getter;
-import org.apache.avro.Schema;
-import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.GenericRecord;
 
 /**
@@ -18,111 +14,56 @@ import org.apache.avro.generic.GenericRecord;
  */
 @Data
 @Builder
+@SuppressWarnings("VisibilityModifier")
 public class Workflow implements BaseTraceObject {
 
   private static final long serialVersionUID = 9065743819019553490L;
 
-  @Getter(value = AccessLevel.NONE)
-  private final String schemaVersion = this.getSchemaVersion();
+  public final long id;
 
-  private final long id;
+  public final long tsSubmit;
 
-  private final long submitTime;
+  public final Task[] tasks;
 
-  private final Task[] tasks;
+  public final int taskCount;
 
-  private final int numberOfTasks;
+  public final long criticalPathLength;
 
-  private final long criticalPathLength;
+  public final int criticalPathTaskCount;
 
-  private final int criticalPathTaskCount;
+  public final int maxConcurrentTasks;
 
-  private final int maxNumberOfConcurrentTasks;
+  public final String nfrs;
 
-  private final String nfrs;
+  public final String scheduler;
 
-  private final String scheduler;
+  public final Domain domain;
 
-  private final Domain domain;
+  public final String applicationName;
 
-  private final String applicationName;
+  public final String applicationField;
 
-  private final String applicationField;
+  public final double totalResources;
 
-  private final double totalResources;
+  public final double totalMemoryUsage;
 
-  private final double totalMemoryUsage;
+  public final long totalNetworkUsage;
 
-  private final long totalNetworkUsage;
+  public final double totalDiskSpaceUsage;
 
-  private final double totalDiskSpaceUsage;
-
-  private final double totalEnergyConsumption;
+  public final double totalEnergyConsumption;
 
   /**
    * Converts the POJO object into record object, enabling it to be written by Avro.
    * It will put all fields allowed by the checker into the record.
    *
-   * @param checker checker for which column to skip
-   * @param schema schema
-   * @return record
-   * @since 1.0.0
+   * @param schema The parquet schema
+   * @return record The record representing a row in Parquet
    * @author Tianchen Qu
+   * @since 1.0.0
    */
-  @SuppressWarnings("CyclomaticComplexity")
-  public GenericRecord convertToRecord(Boolean[] checker, Schema schema) {
-    GenericData.Record record = new GenericData.Record(schema);
-    if (checker[0]) {
-      record.put("id", this.id);
-    }
-    if (checker[1]) {
-      record.put("ts_submit", this.submitTime);
-    }
-    if (checker[2]) {
-      record.put("tasks", Arrays.stream(this.tasks).map(Task::getId).toArray());
-    }
-    if (checker[3]) {
-      record.put("task_count", this.numberOfTasks);
-    }
-    if (checker[4]) {
-      record.put("critical_path_length", this.criticalPathLength);
-    }
-    if (checker[5]) {
-      record.put("critical_path_task_count", this.criticalPathTaskCount);
-    }
-    if (checker[6]) {
-      record.put("max_concurrent_tasks", this.maxNumberOfConcurrentTasks);
-    }
-    if (checker[7]) {
-      record.put("nfrs", this.nfrs);
-    }
-    if (checker[8]) {
-      record.put("scheduler", this.scheduler);
-    }
-    if (checker[9]) {
-      record.put("domain", this.domain);
-    }
-    if (checker[10]) {
-      record.put("application_name", this.applicationName);
-    }
-    if (checker[11]) {
-      record.put("application_field", this.applicationField);
-    }
-    if (checker[12]) {
-      record.put("total_resources", this.totalResources);
-    }
-    if (checker[13]) {
-      record.put("total_memory_usage", this.totalMemoryUsage);
-    }
-    if (checker[14]) {
-      record.put("total_network_usage", this.totalNetworkUsage);
-    }
-    if (checker[15]) {
-      record.put("total_disk_space_usage", this.totalDiskSpaceUsage);
-    }
-    if (checker[16]) {
-      record.put("total_energy_consumption", this.totalEnergyConsumption);
-    }
-    return record;
+  @Override
+  public GenericRecord convertToRecord(ParquetSchema schema) {
+    return schema.convertFromPojo(this, Workflow.class);
   }
 }

@@ -1,8 +1,10 @@
 package com.asml.apa.wta.core.streams;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 import lombok.NonNull;
 
 /**
@@ -11,6 +13,7 @@ import lombok.NonNull;
  * @param <K> the key
  * @param <V> the class to hold, to extend {@link java.io.Serializable}
  * @author Atour Mousavi Gourabi
+ * @author Henry Page
  * @since 1.0.0
  */
 public class KeyedStream<K, V extends Serializable> {
@@ -44,5 +47,17 @@ public class KeyedStream<K, V extends Serializable> {
   public Stream<V> onKey(K key) {
     streams.putIfAbsent(key, new Stream<>());
     return streams.get(key);
+  }
+
+  /**
+   * Consumes all the streams and returns a map that maps keys to a list representation.
+   *
+   * @return a map that maps keys to a list representation of the stream
+   * @author Henry Page
+   * @since 1.0.0
+   */
+  public Map<K, List<V>> collectAll() {
+    return streams.entrySet().stream()
+        .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().toList()));
   }
 }

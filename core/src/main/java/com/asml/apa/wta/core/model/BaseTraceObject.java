@@ -1,7 +1,7 @@
 package com.asml.apa.wta.core.model;
 
+import com.asml.apa.wta.core.io.ParquetSchema;
 import java.io.Serializable;
-import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericRecord;
 
 /**
@@ -11,6 +11,8 @@ import org.apache.avro.generic.GenericRecord;
  * @since 1.0.0
  */
 public interface BaseTraceObject extends Serializable {
+
+  long getId();
 
   /**
    * Returns a hardcoded schema version.
@@ -27,9 +29,19 @@ public interface BaseTraceObject extends Serializable {
    * All WTA objects that are stored as Parquet files rely on this method to convert the object to a record.
    * It should build the record object based on the checker and the schema provided.
    *
-   * @param checker array indicating what column to ignore
    * @param schema schema for the output object
    * @return record of the object
    */
-  GenericRecord convertToRecord(Boolean[] checker, Schema schema);
+  GenericRecord convertToRecord(ParquetSchema schema);
+
+  /**
+   * Creates a simple {@link RuntimeException}.
+   *
+   * @return a {@link RuntimeException} with a simple error message
+   * @author Atour Mousavi Gourabi
+   * @since 1.0.0
+   */
+  default RuntimeException accessError() {
+    return new RuntimeException("Something went wrong, this method shouldn't be called!");
+  }
 }

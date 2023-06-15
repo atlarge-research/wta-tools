@@ -4,10 +4,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
 import com.asml.apa.wta.core.dto.BaseSupplierDto;
+import com.asml.apa.wta.core.dto.DstatDto;
 import com.asml.apa.wta.core.dto.IostatDto;
+import com.asml.apa.wta.core.dto.JvmFileDto;
 import com.asml.apa.wta.core.dto.OsInfoDto;
+import com.asml.apa.wta.core.dto.PerfDto;
+import com.asml.apa.wta.core.dto.ProcDto;
 import com.asml.apa.wta.spark.dto.SparkBaseSupplierWrapperDto;
-import java.time.LocalDateTime;
+import java.util.Optional;
 import org.apache.spark.api.plugin.PluginContext;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -33,12 +37,24 @@ class SparkSupplierExtractionEngineTest {
 
   @Test
   void correctDtoGetsReturnedWhenBaseInformationIsTransformed() {
-    OsInfoDto fakeOsInfo = OsInfoDto.builder().availableProcessors(1).build();
-    IostatDto fakeIoStatDto = IostatDto.builder().kiloByteRead(40).build();
+    Optional<OsInfoDto> fakeOsInfo =
+        Optional.of(OsInfoDto.builder().availableProcessors(1).build());
+    Optional<IostatDto> fakeIoStatDto =
+        Optional.of(IostatDto.builder().kiloByteRead(40).build());
+    Optional<DstatDto> fakeDstatDto =
+        Optional.of(DstatDto.builder().netSend(1).build());
+    Optional<PerfDto> fakePerfDto =
+        Optional.of(PerfDto.builder().watt(30.12).build());
+    Optional<ProcDto> fakeProcDto =
+        Optional.of(ProcDto.builder().active(Optional.of(1L)).build());
 
-    LocalDateTime fakeTime = LocalDateTime.of(2000, 1, 1, 0, 0);
+    Optional<JvmFileDto> fakeJvmFileDto =
+        Optional.of(JvmFileDto.builder().freeSpace(11L).build());
 
-    BaseSupplierDto baseSupplierDto = new BaseSupplierDto(fakeTime, fakeOsInfo, fakeIoStatDto);
+    long fakeTime = System.currentTimeMillis();
+
+    BaseSupplierDto baseSupplierDto = new BaseSupplierDto(
+        fakeTime, fakeOsInfo, fakeIoStatDto, fakeDstatDto, fakePerfDto, fakeJvmFileDto, fakeProcDto);
 
     SparkBaseSupplierWrapperDto result = sutSupplierExtractionEngine.transform(baseSupplierDto);
 
@@ -47,6 +63,10 @@ class SparkSupplierExtractionEngineTest {
             .timestamp(fakeTime)
             .osInfoDto(fakeOsInfo)
             .iostatDto(fakeIoStatDto)
+            .dstatDto(fakeDstatDto)
+            .perfDto(fakePerfDto)
+            .jvmFileDto(fakeJvmFileDto)
+            .procDto(fakeProcDto)
             .executorId("test-executor-id")
             .build());
   }

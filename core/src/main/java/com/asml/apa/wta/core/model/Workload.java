@@ -1,9 +1,10 @@
 package com.asml.apa.wta.core.model;
 
+import com.asml.apa.wta.core.io.ParquetSchema;
 import com.asml.apa.wta.core.model.enums.Domain;
 import lombok.Builder;
 import lombok.Data;
-import org.apache.avro.Schema;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.avro.generic.GenericRecord;
 
 /**
@@ -11,11 +12,14 @@ import org.apache.avro.generic.GenericRecord;
  *
  * @author Lohithsai Yadala Chanchu
  * @author Atour Mousavi Gourabi
+ * @author Tianchen Qu
  * @since 1.0.0
  */
+@Slf4j
 @Data
 @Builder
 public class Workload implements BaseTraceObject {
+
   private static final long serialVersionUID = -4547341610378381743L;
 
   private final long totalWorkflows;
@@ -163,13 +167,30 @@ public class Workload implements BaseTraceObject {
   private final String workloadDescription;
 
   /**
-   * This method shouldn't be called as it will be output into json file that doesn't require conversion to Record.
-   * @param checker checker
-   * @param schema schema
-   * @throws RuntimeException exception since this shouldn't be called
+   * This method should never be called as we do not need to output workloads in Parquet.
+   *
+   * @param schema The parquet schema
+   * @throws RuntimeException always
+   * @author Atour Mousavi Gourabi
+   * @since 1.0.0
    */
   @Override
-  public GenericRecord convertToRecord(Boolean[] checker, Schema schema) {
-    throw new RuntimeException("Something went wrong, this method shouldn't be called!");
+  public final GenericRecord convertToRecord(ParquetSchema schema) {
+    log.error(
+        "The application attempted to convert a Workload to parquet, this is illegal and should never happen.");
+    throw accessError();
+  }
+
+  /**
+   * This method should never be called as we do not need to ever fetch its ID.
+   *
+   * @throws RuntimeException always
+   * @author Atour Mousavi Gourabi
+   * @since 1.0.0
+   */
+  @Override
+  public final long getId() {
+    log.error("The application attempted to get the id of a Workload, this is illegal and should never happen.");
+    throw accessError();
   }
 }

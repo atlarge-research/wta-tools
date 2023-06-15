@@ -64,7 +64,7 @@ public class JobLevelListener extends AbstractListener<Workflow> {
         .toArray(Task[]::new);
     final int numTasks = tasks.length;
     // we can also get the mode from the config, if that's what the user wants?
-    final String scheduler = "DAGScheduler";
+    final String scheduler = sparkContext.getConf().get("spark.scheduler.mode", "FIFO");
     final Domain domain = config.getDomain();
     final String appName = sparkContext.appName();
 
@@ -79,25 +79,26 @@ public class JobLevelListener extends AbstractListener<Workflow> {
     final long totalNetworkUsage = -1L;
     final double totalDiskSpaceUsage = -1.0;
     final double totalEnergyConsumption = -1.0;
-    processedObjects.add(Workflow.builder()
-        .id(jobId)
-        .submitTime(submitTime)
-        .tasks(tasks)
-        .numberOfTasks(numTasks)
-        .criticalPathLength(criticalPathLength)
-        .criticalPathTaskCount(criticalPathTaskCount)
-        .maxNumberOfConcurrentTasks(maxNumberOfConcurrentTasks)
-        .nfrs(nfrs)
-        .scheduler(scheduler)
-        .domain(domain)
-        .applicationName(appName)
-        .applicationField(applicationField)
-        .totalResources(totalResources)
-        .totalMemoryUsage(totalMemoryUsage)
-        .totalNetworkUsage(totalNetworkUsage)
-        .totalDiskSpaceUsage(totalDiskSpaceUsage)
-        .totalEnergyConsumption(totalEnergyConsumption)
-        .build());
+    this.getProcessedObjects()
+        .add(Workflow.builder()
+            .id(jobId)
+            .tsSubmit(submitTime)
+            .tasks(tasks)
+            .taskCount(numTasks)
+            .criticalPathLength(criticalPathLength)
+            .criticalPathTaskCount(criticalPathTaskCount)
+            .maxConcurrentTasks(maxNumberOfConcurrentTasks)
+            .nfrs(nfrs)
+            .scheduler(scheduler)
+            .domain(domain)
+            .applicationName(appName)
+            .applicationField(applicationField)
+            .totalResources(totalResources)
+            .totalMemoryUsage(totalMemoryUsage)
+            .totalNetworkUsage(totalNetworkUsage)
+            .totalDiskSpaceUsage(totalDiskSpaceUsage)
+            .totalEnergyConsumption(totalEnergyConsumption)
+            .build());
 
     jobSubmitTimes.remove(jobId);
   }

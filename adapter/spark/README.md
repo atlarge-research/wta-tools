@@ -2,7 +2,7 @@
 
 ## Overview
 
-![img.png](./src/main/resources/architecture.png)
+![img.png](architecture.png)
 
 The Spark Adapter is responsible for parsing Spark execution information into WTA objects.
 The diagram above illustrates the workflow of the adapter.
@@ -16,12 +16,48 @@ The diagram above illustrates the workflow of the adapter.
 - **Label 4:** Once the job has ended, all objects will be serialised into parquet format.
 
 ## Installation and Usage
-- Clone the repository
-- Optional (if more I/O metrics are needed): Install sysstat by running the following bash command:
+1.  Clone the repository
+2.  Optional (if more I/O metrics are needed):
+   - Install the sysstat package by running the following command in the terminal:
+     ```bash
+     sudo apt install sysstat
+     ```
 
-```bash
-sudo apt install sysstat
-```
+   - Install the dstat package by running the following command in the terminal:
+    ```bash
+    sudo apt install dstat
+    ```
+
+3.  To allow advanced performance metrics to be gathered, you can opt to make the `perf` utility available.
+    To do this, you need to do the following:
+
+    On Ubuntu:
+
+    ```bash
+    apt-get install linux-tools-common
+    apt-get install linux-tools-generic
+    apt-get install linux-tools-`uname -r`
+    ```
+
+    On Debian:
+
+    ```bash
+    apt-get install linux-perf
+    ```
+
+    On CentOS / RHEL:
+
+    ```bash
+    yum install perf
+    ```
+
+    Followed by setting `perf_event_paranoid` to 0:
+
+    ```bash
+    sysctl -w kernel.perf_event_paranoid=0
+    ```
+
+    It is important to note that the installed version of `perf` must be compatible with the kernel. Especially for containerised environments, this could be an issue.
 
 There are two ways to make use of the plugin
 1. Integrate the plugin into the Spark application source code
@@ -100,3 +136,8 @@ Aggregation of all the resource utilisation metrics are done at the driver's end
 ## Guidelines for Developers
 - If a new data source is added in the future, be sure to use the existing streaming infrastructure that handles `MetricsRecord`. This helps the driver in terms of memory usage.
 - When a resource is not needed anymore, release it in `shutdown()`, within the respective `PluginContext`.
+
+## Benchmarking
+[The benchmarking module](../../submodules/benchmarking/README.md) is used to benchmark the performance of the plugin. Any changes to the plugin should be benchmarked to ensure no significant performance degradation.
+
+It is important to note that the benchmarking module is not part of the plugin itself but a separate tool.

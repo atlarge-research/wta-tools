@@ -1,11 +1,16 @@
 package com.asml.apa.wta.spark.listener;
 
 import com.asml.apa.wta.core.config.RuntimeConfig;
+import com.asml.apa.wta.core.model.Task;
 import com.asml.apa.wta.core.model.Workflow;
 import com.asml.apa.wta.core.model.Workload;
 import com.asml.apa.wta.core.model.enums.Domain;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.spark.SparkContext;
 import org.apache.spark.scheduler.SparkListenerApplicationEnd;
 import org.apache.spark.scheduler.SparkListenerApplicationStart;
@@ -17,12 +22,18 @@ import org.apache.spark.scheduler.SparkListenerApplicationStart;
  *
  * @author Pil Kyu Cho
  * @author Henry Page
+ * @author Tianchen Qu
  * @since 1.0.0
  */
 @Getter
+@Slf4j
 public class ApplicationLevelListener extends AbstractListener<Workload> {
 
-  private final AbstractListener<Workflow> jobLevelListener;
+  private final JobLevelListener jobLevelListener;
+
+  private final TaskLevelListener taskLevelListener;
+
+  private final StageLevelListener stageLevelListener;
 
   /**
    * Constructor for the application-level listener.
@@ -30,13 +41,21 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
    * @param sparkContext The current spark context
    * @param config Additional config specified by the user for the plugin
    * @param jobLevelListener The job-level listener to be used by this listener
+   * @param taskLevelListener The task-level listener to be used by this listener
+   * @param stageLevelListener The stage-level listener to be used by this listener
    * @author Henry Page
    * @since 1.0.0
    */
   public ApplicationLevelListener(
-      SparkContext sparkContext, RuntimeConfig config, AbstractListener<Workflow> jobLevelListener) {
+      SparkContext sparkContext,
+      RuntimeConfig config,
+      JobLevelListener jobLevelListener,
+      TaskLevelListener taskLevelListener,
+      StageLevelListener stageLevelListener) {
     super(sparkContext, config);
     this.jobLevelListener = jobLevelListener;
+    this.taskLevelListener = taskLevelListener;
+    this.stageLevelListener = stageLevelListener;
   }
 
   /**
@@ -44,24 +63,51 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
    * is needed to determine if applicationEnd is called first or shutdown.
    *
    * @param applicationEnd The event corresponding to the end of the application
+   * @author Henry Page
+   * @author Tianchen Qu
+   * @since 1.0.0
    */
   public void onApplicationEnd(SparkListenerApplicationEnd applicationEnd) {
-
-    // we should enver enter this branch, this is a guard since an application
-    // only terminates once.
+    // we should never enter this branch, this is a guard since an application only terminates once.
+    List<Workload> processedObjects = this.getProcessedObjects();
     if (!processedObjects.isEmpty()) {
+      log.debug("Application end called twice, this should never happen");
       return;
     }
 
     final Workflow[] workflows = jobLevelListener.getProcessedObjects().toArray(new Workflow[0]);
     final int numWorkflows = workflows.length;
     final int totalTasks =
-        Arrays.stream(workflows).mapToInt(Workflow::getNumberOfTasks).sum();
+        Arrays.stream(workflows).mapToInt(Workflow::getTaskCount).sum();
     final Domain domain = config.getDomain();
     final long startDate = sparkContext.startTime();
     final long endDate = applicationEnd.time();
     final String[] authors = config.getAuthors();
     final String workloadDescription = config.getDescription();
+    for (Task task : taskLevelListener.getProcessedObjects()) {
+      final int stageId = taskLevelListener.getTaskToStage().get(task.getId());
+      final Integer[] parentStages =
+          stageLevelListener.getStageToParents().get(stageId);
+      if (parentStages != null) {
+        final Long[] parents = Arrays.stream(parentStages)
+            .flatMap(parentId -> Arrays.stream(taskLevelListener
+                .getStageToTasks()
+                .getOrDefault(parentId, new ArrayList<>())
+                .toArray(new Long[0])))
+            .toArray(Long[]::new);
+        task.setParents(ArrayUtils.toPrimitive(parents));
+      }
+
+      List<Integer> childrenStages =
+          stageLevelListener.getParentToChildren().get(stageId);
+      if (childrenStages != null) {
+        List<Long> children = new ArrayList<>();
+        childrenStages.forEach(childStage ->
+            children.addAll(taskLevelListener.getStageToTasks().get(childStage)));
+        Long[] temp = children.toArray(new Long[0]);
+        task.setChildren(ArrayUtils.toPrimitive(temp));
+      }
+    }
 
     // unknown
     final long numSites = -1L;

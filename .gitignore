@@ -64,10 +64,6 @@ reports
 # application configuration
 config.json
 
-# big files for benchmarking
-benchmarking/spark-benchmark/src/main/resources/sql_files
-benchmarking/spark-benchmark/src/main/resources/tpcds_parquet_data
-
 # serialization files
 *.ser
 tmp
@@ -77,13 +73,24 @@ tmp
 
 # logs
 logs
-
-# DAS config files
-*.pyc
-benchmarking/das-config-scripts/frameworks
+*.log
 
 # test output
 core/src/test/resources/WTA
 core/src/test/resources/AvroOutput
 adapter/spark/src/test/resources/WTA
 wta-output
+test.json
+test.parquet
+
+# DAS config files
+*.pyc
+submodules/benchmarking/das-bigdata-deployment/frameworks
+
+# wta-tools
+venv
+__pycache__
+*.cfg
+include
+lib
+bin

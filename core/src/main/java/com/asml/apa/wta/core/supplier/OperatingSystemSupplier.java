@@ -3,6 +3,7 @@ package com.asml.apa.wta.core.supplier;
 import com.asml.apa.wta.core.dto.OsInfoDto;
 import com.sun.management.OperatingSystemMXBean;
 import java.lang.management.ManagementFactory;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -144,6 +145,15 @@ public class OperatingSystemSupplier implements InformationSupplier<OsInfoDto> {
   }
 
   /**
+   * Retrieves the operating system name and version.
+   *
+   * @return The operating system name and version e.g. Windows 10.0 or Linux 4.4.0-18362-Microsoft
+   */
+  public String getOperatingSystem() {
+    return bean.getName() + " " + bean.getVersion();
+  }
+
+  /**
    * Gathers the metrics the supplier provides (computed asynchronously).
    *
    * @return an {@link OsInfoDto} containing the gathered metrics
@@ -151,7 +161,7 @@ public class OperatingSystemSupplier implements InformationSupplier<OsInfoDto> {
    * @since 1.0.0
    */
   @Override
-  public CompletableFuture<OsInfoDto> getSnapshot() {
+  public CompletableFuture<Optional<OsInfoDto>> getSnapshot() {
     if (!isAvailable) {
       return notAvailableResult();
     }
@@ -165,7 +175,8 @@ public class OperatingSystemSupplier implements InformationSupplier<OsInfoDto> {
       int availableProc = getAvailableProcessors();
       double systemLoadAverage = getSystemLoadAverage();
       String architecture = getArch();
-      return new OsInfoDto(
+      String os = getOperatingSystem();
+      return Optional.of(new OsInfoDto(
           vMemSize,
           freeMemSize,
           cpuLoad,
@@ -173,7 +184,8 @@ public class OperatingSystemSupplier implements InformationSupplier<OsInfoDto> {
           totalMemSize,
           availableProc,
           systemLoadAverage,
-          architecture);
+          architecture,
+          os));
     });
   }
 }
