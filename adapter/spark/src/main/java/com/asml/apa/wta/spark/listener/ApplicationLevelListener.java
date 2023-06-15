@@ -79,8 +79,8 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
             .flatMap(x ->
                 Arrays.stream(listener.getStageToTasks().getOrDefault(x, new ArrayList<>()).stream()
                     .map(Task::getId)
-                    .toArray(size -> new Long[size])))
-            .toArray(size -> new Long[size]);
+                    .toArray(Long[]::new)))
+            .toArray(Long[]::new);
         task.setParents(ArrayUtils.toPrimitive(parents));
       }
 
@@ -125,7 +125,7 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
           .map(Task::getResourceAmountRequested)
           .filter(x -> x >= 0.0)
           .reduce(Double::sum)
-          .orElseGet(() -> -1.0));
+          .orElse(-1.0));
     }
   }
 
@@ -154,7 +154,7 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
       log.debug("Application end called twice, this should never happen");
       return;
     }
-    
+
     final Workflow[] workflows = jobLevelListener.getProcessedObjects().toArray(new Workflow[0]);
     final int numWorkflows = workflows.length;
     final int totalTasks =
@@ -428,7 +428,7 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
   private double mean(Stream<Double> data, long size) {
     double mean = -1.0;
     if (size != 0) {
-      mean = (double) data.filter(x -> x >= 0.0).reduce(Double::sum).get() / size;
+      mean = data.filter(x -> x >= 0.0).reduce(Double::sum).get() / size;
     }
     return mean;
   }

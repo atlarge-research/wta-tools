@@ -70,6 +70,7 @@ public class TaskLevelListener extends TaskStageBaseListener {
     final long diskIoTime =
         curTaskMetrics.executorDeserializeTime() + curTaskMetrics.resultSerializationTime(); // unsure
     final long resourceUsed = Math.abs(curTaskInfo.executorId().hashCode());
+
     // unknown
     final int submissionSite = -1;
     final int groupId = -1;
