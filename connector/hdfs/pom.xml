@@ -16,7 +16,6 @@
 
   <properties>
     <hadoop.version>3.3.5</hadoop.version>
-    <parquet.version>1.12.2</parquet.version>
   </properties>
 
   <dependencies>
@@ -45,6 +44,13 @@
       <groupId>org.apache.parquet</groupId>
       <artifactId>parquet-common</artifactId>
       <version>${parquet.version}</version>
+    </dependency>
+    <!--  https://mvnrepository.com/artifact/org.apache.hadoop/hadoop-minicluster  -->
+    <dependency>
+      <groupId>org.apache.hadoop</groupId>
+      <artifactId>hadoop-minicluster</artifactId>
+      <version>${hadoop.version}</version>
+      <scope>test</scope>
     </dependency>
     <!-- internal dependency -->
     <dependency>

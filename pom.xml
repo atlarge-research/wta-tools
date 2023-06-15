@@ -44,6 +44,7 @@
     <log4j2.version>2.20.0</log4j2.version>
     <dependency-plugin.version>3.6.0</dependency-plugin.version>
     <awaitility.version>4.2.0</awaitility.version>
+    <parquet.version>1.12.2</parquet.version>
   </properties>
 
   <modules>
@@ -291,11 +292,11 @@
           <relocations>
             <relocation>
               <pattern>com.google.gson</pattern>
-              <shadedPattern>shaded.com.google.gson</shadedPattern>
+              <shadedPattern>com.asml.apa.wta.shaded.com.google.gson</shadedPattern>
             </relocation>
             <relocation>
               <pattern>org.apache.parquet.avro</pattern>
-              <shadedPattern>shaded.org.apache.parquet.avro</shadedPattern>
+              <shadedPattern>com.asml.apa.wta.shaded.org.apache.parquet.avro</shadedPattern>
             </relocation>
           </relocations>
         </configuration>
