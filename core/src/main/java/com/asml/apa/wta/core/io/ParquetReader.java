@@ -1,6 +1,5 @@
 package com.asml.apa.wta.core.io;
 
-import com.asml.apa.wta.core.model.BaseTraceObject;
 import java.io.IOException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.avro.generic.GenericData;
@@ -14,14 +13,14 @@ import org.apache.parquet.avro.AvroParquetReader;
  * @since 1.0.0
  */
 @Slf4j
-public class ParquetReader<T extends BaseTraceObject> implements AutoCloseable {
+public class ParquetReader implements AutoCloseable {
 
   private final org.apache.parquet.hadoop.ParquetReader<GenericRecord> reader;
 
   /**
-   * Constructs a writer to read records from Parquet.
+   * Constructs a reader to read records from Parquet.
    *
-   * @param path the {@link OutputFile} to write to
+   * @param path the {@link DiskParquetInputFile} to read from
    * @author Atour Mousavi Gourabi
    * @since 1.0.0
    */
