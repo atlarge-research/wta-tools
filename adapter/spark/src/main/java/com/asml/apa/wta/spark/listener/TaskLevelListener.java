@@ -104,6 +104,7 @@ public class TaskLevelListener extends TaskStageBaseListener {
         .energyConsumption(energyConsumption)
         .resourceUsed(resourceUsed)
         .build();
+
     final List<Task> tasks = stageToTasks.get(stageId);
     if (tasks == null) {
       List<Task> newTasks = new ArrayList<>();
