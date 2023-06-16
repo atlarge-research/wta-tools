@@ -126,8 +126,12 @@ public class ParquetSchema {
     GenericData.Record record = new GenericData.Record(avroSchema);
     try {
       for (Field field : fields) {
-        if (Modifier.isPublic(field.getModifiers()) && fieldsToSchema.containsKey(field.getName())) {
-          Object object = field.get(pojo);
+        MethodHandles.Lookup lookup = MethodHandles.privateLookupIn(clazz, MethodHandles.lookup());
+        MethodHandle handle = lookup.unreflectGetter(field);
+        if (!Modifier.isStatic(field.getModifiers())
+            && fieldsToSchema.containsKey(
+                lookup.revealDirect(handle).getName())) {
+          Object object = handle.invoke(pojo);
           if (object instanceof BaseTraceObject[]) {
             object = Arrays.stream((BaseTraceObject[]) object)
                 .map(BaseTraceObject::getId)
@@ -149,17 +153,20 @@ public class ParquetSchema {
                 break;
               default:
                 object = "";
-                log.error("Failed to properly serialise {} for value {}.", field.getName(), domain);
+                log.error(
+                    "Failed to properly serialise {} for value {}.",
+                    lookup.revealDirect(handle).getName(),
+                    domain);
                 break;
             }
           } else if (object instanceof BaseTraceObject) {
             BaseTraceObject traceObject = (BaseTraceObject) object;
             object = traceObject.getId();
           }
-          record.put(fieldsToSchema.get(field.getName()), object);
+          record.put(fieldsToSchema.get(lookup.revealDirect(handle).getName()), object);
         }
       }
-    } catch (IllegalAccessException e) {
+    } catch (Throwable e) {
       log.error("Could not convert to Avro record {}.", e.getMessage());
     }
     log.debug("Converted record {}.", record);
