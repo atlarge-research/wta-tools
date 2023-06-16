@@ -89,7 +89,7 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
         List<Task> children = new ArrayList<>();
         childrenStages.forEach(
             x -> children.addAll(listener.getStageToTasks().get(x)));
-        Long[] temp = children.stream().map(Task::getId).toArray(size -> new Long[size]);
+        Long[] temp = children.stream().map(Task::getId).toArray(Long[]::new);
         task.setChildren(ArrayUtils.toPrimitive(temp));
       }
 

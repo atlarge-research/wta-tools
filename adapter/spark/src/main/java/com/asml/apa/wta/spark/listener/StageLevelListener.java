@@ -70,8 +70,16 @@ public class StageLevelListener extends TaskStageBaseListener {
         children.add(stageId);
       }
     }
-    final double diskSpaceRequested = curStageMetrics.diskBytesSpilled();
-    final double memoryRequested = curStageMetrics.peakExecutionMemory();
+    final double diskSpaceRequested = (double) curStageMetrics.diskBytesSpilled()
+        + curStageMetrics.shuffleWriteMetrics().bytesWritten();
+    // final double memoryRequested = curTaskMetrics.peakExecutionMemory();
+    /**
+     *  peakExecutionMemory is the peak memory used by internal data structures created during shuffles, aggregations and joins.
+     *  The value of this accumulator should be approximately the sum of the peak sizes across all such data structures created in this task.
+     *  It is thus only an upper bound of the actual peak memory for the task.
+     *  For SQL jobs, this only tracks all unsafe operators and ExternalSort
+     */
+    final double memoryRequested = -1.0;
     long[] parents;
     if (config.isStageLevel()) {
       parents = Arrays.stream(parentIds).mapToLong(x -> x + 1).toArray();
