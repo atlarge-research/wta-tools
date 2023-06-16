@@ -113,6 +113,10 @@ This module listens to events from the Spark job that is being carrying out. It 
 The SparkListenerInterface listens to the Spark events and collects the metrics. As part of the
 standard instrumentation of Spark, metrics are transmitted from the executor to the driver as part of a heartbeat. The listener interface
 intercepts these events. Examples of how we use it, and what metrics we collect for the different WTA objects can be seen [here](/src/main/java/com/asml/apa/wta/spark/listener).
+The heartbeat interval can be modified by modifying `spark.executor.heartbeatInterval`
+> ExecutorMetrics are updated as part of heartbeat processes scheduled for the executors and for the driver at regular intervals: spark.executor.heartbeatInterval (default value is 10 seconds)
+
+More information can be found [here](https://spark.apache.org/docs/latest/monitoring.html)
 
 It also allows us to define custom behaviour when certain events are intercepted, such as tracking the various stage ids for a Spark job.
 
@@ -136,9 +140,9 @@ Aggregation of all the resource utilisation metrics are done at the driver's end
 ## Developer Guidelines
 
 ### General Remarks
-- When a resource is not needed anymore, release it in `shutdown()`, within the respective `PluginContext`.
 - The WTA format uses ids in `INT64` format. The Spark API provides some ids (such as `executorID`) in string format. To convert this, we use `Math.abs(id.hashCode())`.
 - All timestamps are in Unix epoch millis.
+- When a resource is not needed anymore, release it in `shutdown()`, within the respective `PluginContext`.
 
 ### Known Limitations
 
@@ -153,28 +157,50 @@ Aggregation of all the resource utilisation metrics are done at the driver's end
 - Stage level metrics are only outputted in the trace if they are submitted and successfully completed. The scheduler sometimes creates stages which are later skipped or removed.
 - Stage level metrics are very sparse, this is a limitation with the Spark API itself.
 
-#### Lombok Usage
-- Due to the way Lombok works. It is not possible to call a superclass constructor from a subclass constructor. This is why things like this exist:
-```java
-@Override
-public SparkBaseSupplierWrapperDto transform(BaseSupplierDto record) {
-    return SparkBaseSupplierWrapperDto.builder()
-        .executorId(pluginContext.executorID())
-        .timestamp(record.getTimestamp())
-        .osInfoDto(record.getOsInfoDto())
-        .iostatDto(record.getIostatDto())
-        .dstatDto(record.getDstatDto())
-        .perfDto(record.getPerfDto())
-        .jvmFileDto(record.getJvmFileDto())
-        .procDto(record.getProcDto())
-        .build();
-}
-```
-
 #### Task-Level Resource metrics
 - This is a big area of improvement for the plugin. Due to the limitations of the Spark API, we are not able to easily isolate resource level metrics (such as disk IO time), to specific tasks. We have had to make several compromises
   - Fields such as `energyConsumption`, relate to the energy consumption of the entire executor (during the lifespan of the task) and not the task itself.
   - TaskState information is not accurate. Data analysis on this object can produce inaccurate results.
+
+#### Interaction between the SparkListenerInterface and the Spark Plugin API
+- The SparkListenerInterface and the Spark Plugin API are two separate components. Using certain lifecycle callbacks such as `onTaskEnd` and `onTaskSucceeded` can cause issues if they are used whilst depending on one another. 
+  - An example of this is trying to aggregate task-level metrics on the driver with `onTaskEnd`, whilst sending them from the executor to the driver using `onTaskSucceeded`
+- The SparkListenerInterface is not guaranteed to be called in the same order as the Spark Plugin API. This is because the SparkListenerInterface is called asynchronously, whereas the Spark Plugin API is called synchronously.
+  - This can cause issues when trying to aggregate task-level metrics on the driver. For example, if the SparkListenerInterface is called before the Spark Plugin API, then the driver will not have the task-level metrics to aggregate.
+  - This can also cause issues when trying to send task-level metrics from the executor to the driver. For example, if the Spark Plugin API is called before the SparkListenerInterface, then the executor will not have the task-level metrics to send.
+- Certain lifecycle callbacks in the SparkListenerInterface do **NOT** suppress exceptions, whilst the Spark Plugin API does.
+
+## Metric Calculation Clarification
+For some metrics, it is not immediately clear how they are calculated. This section aims to clarify this.
+
+
+### Resource
+
+### ResourceState
+#### availableDiskIoBandwidth
+- To calculate the available Disk I/O bandwidth, we rely on some metrics provided by `iostat -d`. We consider `kB_read/s` and `kb_wrtb/s` across all block partitions. We convert it to Gbps and then sum it in the following way.
+```java
+if (ping.getIostatDto().isPresent()) {
+    final IostatDto iostatDto = ping.getIostatDto().get();
+    availableDiskIoBandwith = iostatDto.getKiloByteReadPerSec() / kBpsToGbpsDenom
+        + iostatDto.getKiloByteWrtnPerSec() / kBpsToGbpsDenom;
+}
+```
+
+#### averageUtilizationXMinute
+- By using the information provided by `cat /proc/loadavg`, we can obtain the average utilization of the CPU over the last X minutes, as mentioned [here](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/4/html/reference_guide/s2-proc-loadavg).
+- We also consider the number of cores available on the executor, which is provided by the Spark API, this calculation is inspired from the following [source](https://superuser.com/questions/1402079/linux-understanding-load-average-and-cpu).
+```java
+final double averageUtilization1Minute = ping.getProcDto()
+              .flatMap(ProcDto::getLoadAvgOneMinute)
+              .map(loadAvg -> loadAvg / numCores)
+              .orElse(-1.0);
+```
+
+
+
+
+
 
 
 ## Benchmarking
