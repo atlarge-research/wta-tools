@@ -5,6 +5,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.nio.file.InvalidPathException;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledOnOs;
+import org.junit.jupiter.api.condition.OS;
 
 class OutputFileFactoryTest {
 
@@ -16,6 +18,7 @@ class OutputFileFactoryTest {
   }
 
   @Test
+  @EnabledOnOs(OS.WINDOWS)
   void createHdfsLocationWithoutHdfs() {
     OutputFileFactory factory = new OutputFileFactory();
     assertThatThrownBy(() -> factory.create("hdfs://path/to/output")).isInstanceOf(InvalidPathException.class);
