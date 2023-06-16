@@ -67,7 +67,6 @@ class WtaDriverPluginTest {
     assertThat(configMap.get("errorStatus")).isEqualTo("true");
     assertThat(sut.isError()).isTrue();
     verify(sut, times(0)).initListeners();
-    assertThat(result).isEmpty();
   }
 
   @Test

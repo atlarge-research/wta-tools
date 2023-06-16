@@ -65,6 +65,6 @@ class OperatingSystemSupplierTest {
   @Test
   void getSnapshot() {
     assertNotEquals(sut.getSnapshot(), null);
-    assertTrue(sut.getSnapshot().join() instanceof OsInfoDto);
+    assertTrue(sut.getSnapshot().join().get() instanceof OsInfoDto);
   }
 }
