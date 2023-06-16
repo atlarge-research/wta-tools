@@ -91,9 +91,10 @@ branch-coverage-spark-adapter:
 
 enforce-coverage-spark-adapter:
   stage: test-spark-adapter
-  needs: [line-coverage-spark-adapter]
+  needs: [line-coverage-spark-adapter, build-spark-adapter]
   dependencies:
     - line-coverage-spark-adapter
+    - build-spark-adapter
   script:
     - echo "Started enforcing Spark adapter test coverage"
     - "mvn -pl adapter/spark jacoco:check"

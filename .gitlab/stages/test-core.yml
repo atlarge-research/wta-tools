@@ -91,9 +91,10 @@ branch-coverage-core:
 
 enforce-coverage-core:
   stage: test-core
-  needs: [line-coverage-core]
+  needs: [line-coverage-core, build-core]
   dependencies:
     - line-coverage-core
+    - build-core
   script:
     - echo "Started enforcing core test coverage"
     - "mvn -pl core jacoco:check"
