@@ -98,7 +98,7 @@ It is recommended to always use HDFS as running Spark on DAS-5 generates a lot o
 Check the HDFS NameNode's hostname by going into the hadoop frameworks and checking the **core-site.xml** file:
 ```bash
 cd das-bigdata-deployment/frameworks/hadoop-<version>/etc/hadoop
-vim core-site.xml
+vim hdfs-site.xml
 ```
 
 Look for **fs.defaultFS** or **fs.default.name** property, which should have a value similar to **hdfs://<namenode-hostname>:<port>**
