@@ -7,7 +7,6 @@ import com.asml.apa.wta.core.io.ParquetReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Arrays;
 import org.apache.avro.generic.GenericRecord;
 import org.apache.spark.SparkConf;
@@ -69,40 +68,30 @@ class WtaDriverPluginIntegrationTest {
     sc.stop();
     assertThat(Files.list(directoryPath).findAny()).isNotEmpty();
 
-    Path taskPath =
-        Paths.get("/home/lyadalachanchu/asml-dev/adapter/spark/wta-output/tasks/schema-1.0/tasks.parquet");
-    Path resourcesPath = Paths.get(
-        "/home/lyadalachanchu/asml-dev/adapter/spark/wta-output/resources/schema-1.0/resources.parquet");
-    Path resourceStatesPath = Paths.get(
-        "/home/lyadalachanchu/asml-dev/adapter/spark/wta-output/resource_states/schema-1.0/resource_states.parquet");
-    Path workflowPath = Paths.get(
-        "/home/lyadalachanchu/asml-dev/adapter/spark/wta-output/workflows/schema-1.0/workflows.parquet");
+    Path taskPath = Path.of("wta-output", "tasks", "schema-1.0", "tasks.parquet");
+    Path resourcesPath = Path.of("wta-output", "resources", "schema-1.0", "resources.parquet");
+    Path resourceStatesPath = Path.of("wta-output", "resource_states", "schema-1.0", "resource_states.parquet");
+    Path workflowPath = Path.of("wta-output", "workflows", "schema-1.0", "workflows.parquet");
 
     try (ParquetReader reader = new ParquetReader(new DiskParquetInputFile(taskPath))) {
       GenericRecord result = reader.read();
-      System.out.println(result.toString());
       AssertionsForClassTypes.assertThat(result.get("id")).isEqualTo(1L);
       result = reader.read();
-      System.out.println(result.toString());
       AssertionsForClassTypes.assertThat(result.get("id")).isEqualTo(2L);
     }
 
     try (ParquetReader reader = new ParquetReader(new DiskParquetInputFile(resourcesPath))) {
       GenericRecord result = reader.read();
-      System.out.println(result.toString());
       AssertionsForClassTypes.assertThat(result.get("id")).isEqualTo(1323526104L);
     }
 
     try (ParquetReader reader = new ParquetReader(new DiskParquetInputFile(resourceStatesPath))) {
       GenericRecord result = reader.read();
-      System.out.println(result.toString());
-      AssertionsForClassTypes.assertThat(result.get("available_disk_io_bandwidth"))
-          .isEqualTo(0.0);
+      AssertionsForClassTypes.assertThat(result.get("resource_id")).isEqualTo(1323526104L);
     }
 
     try (ParquetReader reader = new ParquetReader(new DiskParquetInputFile(workflowPath))) {
       GenericRecord result = reader.read();
-      System.out.println(result.toString());
       AssertionsForClassTypes.assertThat(result.get("id")).isEqualTo(1L);
     }
   }
