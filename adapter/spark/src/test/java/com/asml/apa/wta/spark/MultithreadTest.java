@@ -96,21 +96,6 @@ public class MultithreadTest {
   }
 
   @Test
-  void pingAndBufferWithANegativeOrZeroExecutorSynchronizationIntervalDoesNotBuffer1() throws IOException {
-    SparkSupplierExtractionEngine testEngine = spy(new SparkSupplierExtractionEngine(2000, mockPluginContext, 0));
-
-    testEngine.startPinging();
-    testEngine.startSynchonizing();
-    testEngine.pingAndBuffer().join();
-
-    // Executor synchronization interval is 0, expect immediate sendBuffer() call
-    verify(mockPluginContext, atLeastOnce()).send(isA(ResourceCollectionDto.class));
-
-    testEngine.stopPinging();
-    testEngine.stopSynchronizing();
-  }
-
-  @Test
   @Timeout(value = 5000L, unit = TimeUnit.MILLISECONDS)
   void pingsGetSentToDriver() throws IOException {
     sutExecutorPlugin.init(

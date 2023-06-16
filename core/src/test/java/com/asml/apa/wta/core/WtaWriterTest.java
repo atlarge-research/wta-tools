@@ -2,6 +2,7 @@ package com.asml.apa.wta.core;
 
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import com.asml.apa.wta.core.io.DiskOutputFile;
 import com.asml.apa.wta.core.io.JsonWriter;
@@ -13,10 +14,10 @@ import org.mockito.Mockito;
 
 public class WtaWriterTest {
   @Test
-  void test1() throws IOException {
+  void workloadWriterWasActuallyCalled() throws IOException {
     JsonWriter<Workload> workloadWriterMock = Mockito.mock(JsonWriter.class);
-    WtaWriter sut =
-        Mockito.spy(new WtaWriter(new DiskOutputFile(Path.of("wta-output")), "schema-1.0", workloadWriterMock));
+    WtaWriter sut = Mockito.spy(new WtaWriter(new DiskOutputFile(Path.of("wta-output")), "schema-1.0"));
+    when(sut.createWorkloadWriter()).thenReturn(workloadWriterMock);
     sut.write(Workload.builder().build());
     verify(workloadWriterMock, times(1)).write(Workload.builder().build());
   }

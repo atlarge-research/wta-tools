@@ -32,35 +32,20 @@ public class WtaWriter {
       ResourceState.class, "resource_states",
       Task.class, "tasks",
       Workflow.class, "workflows");
-  private JsonWriter<Workload> workloadWriter;
 
   /**
    * Sets up a WTA writer for the specified output path and version.
    *
    * @param path the output path to write to
    * @param version the version of files to write
-   * @param workloadWriter jsonWorkloadWriter dependency injected for increased testability
    * @author Atour Mousavi Gourabi
    * @since 1.0.0
    */
-  public WtaWriter(@NonNull OutputFile path, String version, JsonWriter<Workload> workloadWriter) {
-    file = path;
-    schemaVersion = version;
-    setupDirectories(path, version);
-    this.workloadWriter = workloadWriter;
-  }
-
   public WtaWriter(@NonNull OutputFile path, String version) {
     file = path;
     schemaVersion = version;
     setupDirectories(path, version);
     OutputFile jsonPath = file.resolve("workload").resolve(schemaVersion).resolve("generic_information.json");
-    try {
-      this.workloadWriter = new JsonWriter<>(jsonPath);
-    } catch (IOException e) {
-      log.error("Could not write workload to file.");
-      this.workloadWriter = null;
-    }
   }
 
   /**
@@ -71,12 +56,10 @@ public class WtaWriter {
    * @since 1.0.0
    */
   public void write(Workload workload) {
-    if (this.workloadWriter != null) {
-      try {
-        this.workloadWriter.write(workload);
-      } catch (IOException e) {
-        log.error("Could not write workload to file.");
-      }
+    try (JsonWriter<Workload> workloadWriter = createWorkloadWriter()) {
+      workloadWriter.write(workload);
+    } catch (IOException e) {
+      log.error("Could not write workload to file.");
     }
   }
 
@@ -118,5 +101,17 @@ public class WtaWriter {
     } catch (IOException e) {
       log.error("Could not create directory structure for the output.");
     }
+  }
+
+  /**
+   * Creates a Workload json writer.
+   *
+   * @return JsonWriter a json writer that writes the workload json file
+   * @author Lohithsai Yadala Chanchu
+   * @since 1.0.0
+   */
+  protected JsonWriter<Workload> createWorkloadWriter() throws IOException {
+    OutputFile path = file.resolve("workload").resolve(schemaVersion).resolve("generic_information.json");
+    return new JsonWriter<>(path);
   }
 }
