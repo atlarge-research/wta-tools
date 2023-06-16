@@ -66,7 +66,8 @@ public class ParquetSchema {
         if (!sparseField) {
           VarHandle typeInfoHandle = lookup.unreflectVarHandle(field);
           Class<?> fieldType = typeInfoHandle.varType();
-          String fieldName = field.getName()
+          String fieldName = lookup.revealDirect(handle)
+              .getName()
               .replaceAll(followedByCapitalized, replacement)
               .replaceAll(followedByDigit, replacement)
               .toLowerCase();
@@ -100,7 +101,7 @@ public class ParquetSchema {
             log.error("Could not create a valid encoding for {}.", fieldType);
             throw new IllegalAccessException(fieldType.toString());
           }
-          fieldsToSchema.put(field.getName(), fieldName);
+          fieldsToSchema.put(lookup.revealDirect(handle).getName(), fieldName);
         }
       }
       avroSchema = schemaBuilder.endRecord();
