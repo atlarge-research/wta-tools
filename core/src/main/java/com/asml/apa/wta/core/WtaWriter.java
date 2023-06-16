@@ -42,9 +42,9 @@ public class WtaWriter {
    * @since 1.0.0
    */
   public WtaWriter(@NonNull OutputFile path, String version) {
-    file = path;
+    file = path.resolve("spark-wta-generator-1_0");
     schemaVersion = version;
-    setupDirectories(path, version);
+    setupDirectories(file, version);
   }
 
   /**

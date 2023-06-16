@@ -1,6 +1,7 @@
 package com.asml.apa.wta.core.model;
 
 import com.asml.apa.wta.core.io.ParquetSchema;
+import java.util.Map;
 import lombok.Builder;
 import lombok.Data;
 import org.apache.avro.generic.GenericRecord;
@@ -37,6 +38,8 @@ public class Resource implements BaseTraceObject {
 
   @Builder.Default
   public final String details = "";
+
+  public final Map<String, String> events;
 
   /**
    * All WTA objects that are stored as Parquet files rely on this method to convert the object to a record.

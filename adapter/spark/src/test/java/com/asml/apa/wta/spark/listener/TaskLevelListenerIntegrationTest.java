@@ -18,8 +18,7 @@ class TaskLevelListenerIntegrationTest extends BaseSparkJobIntegrationTest {
   void runningAJobShouldClearTheMapOfEntriesAfterStageIsDoneWorkflowIdShouldBeInitialised() {
     sut.registerTaskListener();
     invokeJob();
-    assertThat(((TaskLevelListener) sut.getTaskLevelListener()).getStageIdsToJobs())
-        .isEmpty();
+    assertThat(sut.getTaskLevelListener().getStageIdsToJobs()).isEmpty();
     assertThat(sut.getTaskLevelListener().getProcessedObjects()).hasSizeGreaterThanOrEqualTo(1);
     assertThat(sut.getTaskLevelListener().getProcessedObjects().get(0).getWorkflowId())
         .isInstanceOf(Long.class)

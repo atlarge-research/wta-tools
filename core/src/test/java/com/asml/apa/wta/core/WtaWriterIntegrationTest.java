@@ -40,7 +40,7 @@ class WtaWriterIntegrationTest {
   void writeWorkload() {
     Workload workload = Workload.builder().build();
     sut.write(workload);
-    assertThat(new File("wta-output/workload/schema-1.0/generic_information.json").exists())
+    assertThat(new File("wta-output/spark-wta-generator-1_0/workload/schema-1.0/generic_information.json").exists())
         .isTrue();
   }
 
@@ -48,7 +48,7 @@ class WtaWriterIntegrationTest {
   void writeWorkflows() {
     Workflow workflow = Workflow.builder().build();
     sut.write(Workflow.class, List.of(workflow));
-    assertThat(new File("wta-output/workflows/schema-1.0/workflows.parquet").exists())
+    assertThat(new File("wta-output/spark-wta-generator-1_0/workflows/schema-1.0/workflows.parquet").exists())
         .isTrue();
   }
 
@@ -56,7 +56,7 @@ class WtaWriterIntegrationTest {
   void writeTasks() {
     Task task = Task.builder().build();
     sut.write(Task.class, List.of(task));
-    assertThat(new File("wta-output/tasks/schema-1.0/tasks.parquet").exists())
+    assertThat(new File("wta-output/spark-wta-generator-1_0/tasks/schema-1.0/tasks.parquet").exists())
         .isTrue();
   }
 
@@ -64,7 +64,7 @@ class WtaWriterIntegrationTest {
   void writeResources() {
     Resource resource = Resource.builder().build();
     sut.write(Resource.class, List.of(resource));
-    assertThat(new File("wta-output/resources/schema-1.0/resources.parquet").exists())
+    assertThat(new File("wta-output/spark-wta-generator-1_0/resources/schema-1.0/resources.parquet").exists())
         .isTrue();
   }
 
@@ -72,7 +72,8 @@ class WtaWriterIntegrationTest {
   void writeResourceStates() {
     ResourceState resourceState = ResourceState.builder().build();
     sut.write(ResourceState.class, List.of(resourceState));
-    assertThat(new File("wta-output/resource_states/schema-1.0/resource_states.parquet").exists())
+    assertThat(new File("wta-output/spark-wta-generator-1_0/resource_states/schema-1.0/resource_states.parquet")
+            .exists())
         .isTrue();
   }
 
