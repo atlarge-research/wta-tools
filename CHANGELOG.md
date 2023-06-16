@@ -53,6 +53,7 @@ For the most part, since we are pre-release this will serve no real purpose, oth
 - Add aggregation for resource related metrics [@hpage](https://gitlab.ewi.tudelft.nl/hpage)
 - Added shading for plugin dependencies [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 - Added Parquet reader [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
+- Brought mutation testing coverage up to 80% and add mutation testing coverage to pipeline [@lyadalachanchu](https://gitlab.ewi.tudelft.nl/lyadalachanchu)
 - Added Spark aggregations [@tqu](https://gitlab.ewi.tudelft.nl/tqu)
 
 ### Changed
@@ -72,6 +73,7 @@ For the most part, since we are pre-release this will serve no real purpose, oth
 - Restructured the benchmarking directory into a submodule directory [@pcho](https://gitlab.ewi.tudelft.nl/pcho)
 - Updated the Spark method in EndToEnd class to cover more broad shuffling operations [@pcho](https://gitlab.ewi.tudelft.nl/pcho)
 - Added Dockerfiles for the user to deploy more easily for containerized environments [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
+- Changed the pipeline to enforce code coverage [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 
 ### Fixed
 - Fixed the slf4j logging module to allow use in testing and `adapter/spark` [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)

@@ -55,8 +55,7 @@ public class WtaWriter {
    * @since 1.0.0
    */
   public void write(Workload workload) {
-    OutputFile path = file.resolve("workload").resolve(schemaVersion).resolve("generic_information.json");
-    try (JsonWriter<Workload> workloadWriter = new JsonWriter<>(path)) {
+    try (JsonWriter<Workload> workloadWriter = createWorkloadWriter()) {
       workloadWriter.write(workload);
     } catch (IOException e) {
       log.error("Could not write workload to file.");
@@ -92,7 +91,7 @@ public class WtaWriter {
    * @author Atour Mousavi Gourabi
    * @since 1.0.0
    */
-  private void setupDirectories(OutputFile path, String version) {
+  protected void setupDirectories(OutputFile path, String version) {
     try {
       path.resolve("workload").resolve(version).resolve(".temp").clearDirectory();
       for (String directory : parquetLabels.values()) {
@@ -101,5 +100,17 @@ public class WtaWriter {
     } catch (IOException e) {
       log.error("Could not create directory structure for the output.");
     }
+  }
+
+  /**
+   * Creates a Workload json writer.
+   *
+   * @return JsonWriter a json writer that writes the workload json file
+   * @author Lohithsai Yadala Chanchu
+   * @since 1.0.0
+   */
+  protected JsonWriter<Workload> createWorkloadWriter() throws IOException {
+    OutputFile path = file.resolve("workload").resolve(schemaVersion).resolve("generic_information.json");
+    return new JsonWriter<>(path);
   }
 }
