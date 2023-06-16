@@ -68,10 +68,10 @@ class WtaDriverPluginIntegrationTest {
     sc.stop();
     assertThat(Files.list(directoryPath).findAny()).isNotEmpty();
 
-    Path taskPath = Path.of("wta-output", "tasks", "schema-1.0", "tasks.parquet");
-    Path resourcesPath = Path.of("wta-output", "resources", "schema-1.0", "resources.parquet");
-    Path resourceStatesPath = Path.of("wta-output", "resource_states", "schema-1.0", "resource_states.parquet");
-    Path workflowPath = Path.of("wta-output", "workflows", "schema-1.0", "workflows.parquet");
+    Path taskPath = Path.of("wta-output", "spark-wta-generator-1_0", "tasks", "schema-1.0", "tasks.parquet");
+    Path resourcesPath = Path.of("wta-output", "spark-wta-generator-1_0", "resources", "schema-1.0", "resources.parquet");
+    Path resourceStatesPath = Path.of("wta-output", "spark-wta-generator-1_0", "resource_states", "schema-1.0", "resource_states.parquet");
+    Path workflowPath = Path.of("wta-output", "spark-wta-generator-1_0", "workflows", "schema-1.0", "workflows.parquet");
 
     try (ParquetReader reader = new ParquetReader(new DiskParquetInputFile(taskPath))) {
       GenericRecord result = reader.read();
