@@ -276,6 +276,7 @@
           <excludedTestClasses>
             <param>com.asml.apa.wta.spark.MultithreadTest</param>
           </excludedTestClasses>
+          <mutationThreshold>60</mutationThreshold>
         </configuration>
         <dependencies>
           <!-- https://mvnrepository.com/artifact/org.pitest/pitest-junit5-plugin -->
