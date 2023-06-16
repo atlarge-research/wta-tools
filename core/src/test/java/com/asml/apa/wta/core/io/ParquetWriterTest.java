@@ -1,5 +1,6 @@
 package com.asml.apa.wta.core.io;
 
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
@@ -13,15 +14,13 @@ public class ParquetWriterTest {
   @Test
   void testWriteMethodCalled() throws IOException {
     org.apache.parquet.hadoop.ParquetWriter<GenericRecord> writerMock =
-        Mockito.mock(org.apache.parquet.hadoop.ParquetWriter.class);
+        mock(org.apache.parquet.hadoop.ParquetWriter.class);
 
-    ParquetSchema schemaMock = Mockito.mock(ParquetSchema.class);
-
-    OutputFile pathMock = Mockito.mock(OutputFile.class);
+    ParquetSchema schemaMock = mock(ParquetSchema.class);
 
     ParquetWriter<BaseTraceObject> sut = new ParquetWriter<>(schemaMock, writerMock);
 
-    BaseTraceObject recordMock = Mockito.mock(BaseTraceObject.class);
+    BaseTraceObject recordMock = mock(BaseTraceObject.class);
 
     sut.write(recordMock);
     sut.close();

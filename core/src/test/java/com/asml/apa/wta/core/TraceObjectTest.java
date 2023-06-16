@@ -2,6 +2,7 @@ package com.asml.apa.wta.core;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.mock;
 
 import com.asml.apa.wta.core.io.ParquetSchema;
 import com.asml.apa.wta.core.model.Resource;
@@ -29,7 +30,7 @@ class TraceObjectTest {
 
   @Test
   void testWorkloadReturnsException() {
-    ParquetSchema schemaMock = Mockito.mock(ParquetSchema.class);
+    ParquetSchema schemaMock = mock(ParquetSchema.class);
     Workload sut = Mockito.spy(Workload.builder().build());
     assertThatThrownBy(() -> sut.convertToRecord(schemaMock))
         .isInstanceOf(RuntimeException.class)
