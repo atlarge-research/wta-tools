@@ -16,7 +16,7 @@ found in `submodules/dockerfiles`, under their respective distro names (`alpine`
 To layer them on top of existing images, please run the following command, after setting the base image and generated
 image tags, and defining the Linux distro to use the `Dockerfile` of.
 
-```bash
+```shell
 docker build --build-arg base_image=[BASE IMAGE TAG] -t [IMAGE TAG] path/to/repository/submodules/dockerfiles/[DISTRO]
 ```
 
@@ -32,7 +32,7 @@ to the application. This means the application will either have to be run with `
 needs to be set to 0. Even when layering one of the provided `Dockerfiles`, this will still have to be set. This can
 be done by running the following command:
 
-```bash
+```shell
 sysctl -w kernel.perf_event_paranoid=0
 ```
 

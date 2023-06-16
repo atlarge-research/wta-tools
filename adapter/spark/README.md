@@ -19,12 +19,12 @@ The diagram above illustrates the workflow of the adapter.
 1.  Clone the repository
 2.  Optional (if more I/O metrics are needed):
    - Install the sysstat package by running the following command in the terminal:
-     ```bash
+     ```shell
      sudo apt install sysstat
      ```
 
    - Install the dstat package by running the following command in the terminal:
-    ```bash
+    ```shell
     sudo apt install dstat
     ```
 
@@ -33,7 +33,7 @@ The diagram above illustrates the workflow of the adapter.
 
     On Ubuntu:
 
-    ```bash
+    ```shell
     apt-get install linux-tools-common
     apt-get install linux-tools-generic
     apt-get install linux-tools-`uname -r`
@@ -41,19 +41,19 @@ The diagram above illustrates the workflow of the adapter.
 
     On Debian:
 
-    ```bash
+    ```shell
     apt-get install linux-perf
     ```
 
     On CentOS / RHEL:
 
-    ```bash
+    ```shell
     yum install perf
     ```
 
     Followed by setting `perf_event_paranoid` to 0:
 
-    ```bash
+    ```shell
     sysctl -w kernel.perf_event_paranoid=0
     ```
 
@@ -81,7 +81,7 @@ For the second approach, create a JAR file of the plugin and run it alongside th
 - Copy the resulting jar file from `adapter/spark/target`.
 - Execute the following command in the directory where the jar file is located:
 
-```bash
+```shell
 spark-submit --class <main class path to spark application> --master local[1]
 --conf spark.plugins=com.asml.apa.wta.spark.WtaPlugin
 --conf "spark.driver.extraJavaOptions=-DconfigFile=<config.json_location>"
