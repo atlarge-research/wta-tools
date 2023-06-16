@@ -3,6 +3,7 @@ package com.asml.apa.wta.core.model;
 import com.asml.apa.wta.core.io.ParquetSchema;
 import lombok.Builder;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.avro.generic.GenericRecord;
 
 /**
@@ -13,6 +14,7 @@ import org.apache.avro.generic.GenericRecord;
  */
 @Data
 @Builder
+@Slf4j
 @SuppressWarnings("VisibilityModifier")
 public class Resource implements BaseTraceObject {
 
@@ -47,6 +49,7 @@ public class Resource implements BaseTraceObject {
    */
   @Override
   public GenericRecord convertToRecord(ParquetSchema schema) {
+    log.trace("Converting Resource with id {} to record", this.id);
     return schema.convertFromPojo(this, Resource.class);
   }
 }

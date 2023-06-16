@@ -18,6 +18,7 @@ public class ShellUtils {
    * @since 1.0.0
    */
   public CompletableFuture<String> executeCommand(String command) {
+    log.debug("Executing shell command: {}", command);
     return CompletableFuture.supplyAsync(() -> {
       try {
         String[] commands = {"sh", "-c", command};
@@ -45,6 +46,7 @@ public class ShellUtils {
    * @since 1.0.0
    */
   private String readProcessOutput(Process process) {
+    log.trace("Reading shell command outputs.");
     try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
       StringBuilder output = new StringBuilder();
       String line;

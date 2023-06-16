@@ -60,6 +60,7 @@ public class RuntimeConfig {
    */
   @SuppressWarnings("CyclomaticComplexity")
   public static RuntimeConfig readConfig(String configDir) {
+    log.trace("Reading config file from {}.", configDir);
     try (FileReader reader = new FileReader(configDir)) {
       Gson gson = new Gson();
       RuntimeConfig config = gson.fromJson(reader, RuntimeConfig.class);
@@ -80,6 +81,7 @@ public class RuntimeConfig {
         log.error("Resource ping interval must be greater than 0");
         throw new IllegalArgumentException("Resource ping interval must be greater than 0");
       }
+      log.trace("Successfully read config file from {}.", configDir);
       return config;
     } catch (JsonParseException e) {
       log.error("The config file has invalid fields");

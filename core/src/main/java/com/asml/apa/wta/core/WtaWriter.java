@@ -55,6 +55,7 @@ public class WtaWriter {
    * @since 1.0.0
    */
   public void write(Workload workload) {
+    log.debug("Writing workload to file.");
     OutputFile path = file.resolve("workload").resolve(schemaVersion).resolve("generic_information.json");
     try (JsonWriter<Workload> workloadWriter = new JsonWriter<>(path)) {
       workloadWriter.write(workload);
@@ -73,6 +74,7 @@ public class WtaWriter {
    * @since 1.0.0
    */
   public <T extends BaseTraceObject> void write(Class<T> clazz, List<T> wtaObjects) {
+    log.debug("Writing objects of type {} to file.", clazz.getSimpleName());
     String label = parquetLabels.get(clazz);
     ParquetSchema schema = new ParquetSchema(clazz, wtaObjects, label);
     OutputFile path = file.resolve(label).resolve(schemaVersion).resolve(label + ".parquet");
@@ -93,6 +95,7 @@ public class WtaWriter {
    * @since 1.0.0
    */
   private void setupDirectories(OutputFile path, String version) {
+    log.debug("Setting up directory structure for the output.");
     try {
       path.resolve("workload").resolve(version).resolve(".temp").clearDirectory();
       for (String directory : parquetLabels.values()) {
