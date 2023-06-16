@@ -2,6 +2,9 @@ package com.asml.apa.wta.core.io;
 
 import com.asml.apa.wta.core.model.BaseTraceObject;
 import com.asml.apa.wta.core.model.enums.Domain;
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.VarHandle;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
@@ -52,14 +55,17 @@ public class ParquetSchema {
     try {
       for (Field field : fields) {
         boolean sparseField = false;
+        MethodHandles.Lookup lookup = MethodHandles.privateLookupIn(clazz, MethodHandles.lookup());
+        MethodHandle handle = lookup.unreflectGetter(field);
         for (T o : objects) {
-          if (!Modifier.isPublic(field.getModifiers()) || field.get(o) == null) {
+          if (Modifier.isStatic(field.getModifiers()) || handle.invoke(o) == null) {
             sparseField = true;
             break;
           }
         }
         if (!sparseField) {
-          Class<?> fieldType = field.getType();
+          VarHandle typeInfoHandle = lookup.unreflectVarHandle(field);
+          Class<?> fieldType = typeInfoHandle.varType();
           String fieldName = field.getName()
               .replaceAll(followedByCapitalized, replacement)
               .replaceAll(followedByDigit, replacement)
@@ -98,7 +104,7 @@ public class ParquetSchema {
         }
       }
       avroSchema = schemaBuilder.endRecord();
-    } catch (IllegalAccessException e) {
+    } catch (Throwable e) {
       log.error("Could not create a valid schema for {} in {}.", e.getMessage(), clazz);
       throw new RuntimeException("Could not create a valid schema for " + clazz, e);
     }
