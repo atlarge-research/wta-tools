@@ -30,7 +30,6 @@ public class BaseSparkJobIntegrationTest {
         .authors(new String[] {"Harry Potter"})
         .domain(Domain.SCIENTIFIC)
         .description("Yer a wizard harry")
-        .logLevel("INFO")
         .isStageLevel(false)
         .resourcePingInterval(500)
         .executorSynchronizationInterval(-100)
