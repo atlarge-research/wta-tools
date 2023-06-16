@@ -36,7 +36,7 @@ public class RuntimeConfig {
 
   @Builder.Default
   private String description = "";
-  
+
   @Builder.Default
   private boolean isStageLevel = false;
 
