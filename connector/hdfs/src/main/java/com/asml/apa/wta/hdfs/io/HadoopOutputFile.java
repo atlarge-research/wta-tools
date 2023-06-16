@@ -1,4 +1,4 @@
-package com.asml.apa.wta.hadoop.io;
+package com.asml.apa.wta.hdfs.io;
 
 import com.asml.apa.wta.core.io.OutputFile;
 import java.io.BufferedOutputStream;
@@ -68,7 +68,7 @@ public class HadoopOutputFile implements OutputFile {
    */
   @Override
   public boolean acceptsLocation(String path) {
-    return path.startsWith("hdfs://");
+    return true;
   }
 
   /**

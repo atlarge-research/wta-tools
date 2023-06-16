@@ -1,1 +1,1 @@
-com.asml.apa.wta.hadoop.io.HadoopOutputFile
+com.asml.apa.wta.hdfs.io.HadoopOutputFile
