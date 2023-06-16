@@ -45,7 +45,6 @@ public class WtaWriter {
     file = path;
     schemaVersion = version;
     setupDirectories(path, version);
-    OutputFile jsonPath = file.resolve("workload").resolve(schemaVersion).resolve("generic_information.json");
   }
 
   /**
