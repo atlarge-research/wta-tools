@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.Getter;
 import org.apache.spark.SparkContext;
+import org.apache.spark.executor.ShuffleWriteMetrics;
 import org.apache.spark.executor.TaskMetrics;
 import org.apache.spark.scheduler.SparkListenerTaskEnd;
 import org.apache.spark.scheduler.TaskInfo;
@@ -62,8 +63,8 @@ public class TaskLevelListener extends TaskStageBaseListener {
     final long[] parents = new long[0];
     final long[] children = new long[0];
     taskToStage.put(taskId, stageId);
-    final double diskSpaceRequested = (double) curTaskMetrics.diskBytesSpilled()
-        + curTaskMetrics.shuffleWriteMetrics().bytesWritten();
+    ShuffleWriteMetrics temp = curTaskMetrics.shuffleWriteMetrics();
+    final double diskSpaceRequested = (double) curTaskMetrics.diskBytesSpilled() + temp.bytesWritten();
     // final double memoryRequested = curTaskMetrics.peakExecutionMemory();
     /**
      *  peakExecutionMemory is the peak memory used by internal data structures created during shuffles, aggregations and joins.

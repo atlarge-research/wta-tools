@@ -318,26 +318,78 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
         .build());
   }
 
+  /**
+   * This return the size of the data after filtering for positive ones.
+   * It is needed for calculation of mean and standard deviation.
+   *
+   * @param data stream of data
+   * @return the size of positive elements
+   * @author Tianchen Qu
+   * @since 1.0.0
+   */
   private long size(Stream<Double> data) {
     return data.filter(x -> x >= 0.0).count();
   }
 
+  /**
+   * Find the maximum element inside the double valued stream and give it to the field of the builder.
+   *
+   * @param data data
+   * @param builder builder
+   * @author Tianchen Qu
+   * @since 1.0.0
+   */
   private void max(Stream<Double> data, Function<Double, Workload.WorkloadBuilder> builder) {
     builder.apply(data.filter(x -> x >= 0.0).reduce(Double::max).orElse(-1.0));
   }
 
+  /**
+   * Find the minimum element of the double valued stream and set the corresponding field in the builder as that value.
+   *
+   * @param data data stream
+   * @param builder builder
+   * @author Tianchen Qu
+   * @since 1.0.0
+   */
   private void min(Stream<Double> data, Function<Double, Workload.WorkloadBuilder> builder) {
     builder.apply(data.filter(x -> x >= 0.0).reduce(Double::min).orElse(-1.0));
   }
 
+  /**
+   * Maximum function for long value.
+   *
+   * @param data data stream
+   * @param builder builder
+   * @author Tianchen Qu
+   * @since 1.0.0
+   */
   private void maxLong(Stream<Long> data, Function<Long, Workload.WorkloadBuilder> builder) {
     builder.apply(data.filter(x -> x >= 0).reduce(Long::max).orElse(-1L));
   }
 
+  /**
+   * Minimum function for long value.
+   *
+   * @param data data stream
+   * @param builder builder
+   * @author Tianchen Qu
+   * @since 1.0.0
+   */
   private void minLong(Stream<Long> data, Function<Long, Workload.WorkloadBuilder> builder) {
     builder.apply(data.filter(x -> x >= 0).reduce(Long::min).orElse(-1L));
   }
 
+  /**
+   * Mean value for the data stream with invalid stream handling.
+   * Will set up the corresponding field with the builder parameter that is passed.
+   *
+   * @param data data stream
+   * @param size size of the stream
+   * @param builder builder
+   * @return the mean value
+   * @author Tianchen Qu
+   * @since 1.0.0
+   */
   private double mean(Stream<Double> data, long size, Function<Double, Workload.WorkloadBuilder> builder) {
     double mean = -1.0;
     if (size != 0) {
@@ -347,6 +399,17 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
     return mean;
   }
 
+  /**
+   *  Standard deviation value and normalized standard deviation value for the data stream with invalid stream handling.
+   *
+   * @param data data stream
+   * @param mean mean value from previous method
+   * @param size size from previous method
+   * @param std the builder for the standard deviation field
+   * @param cov the builder for the normalized standard deviation field
+   * @author Tianchen Qu
+   * @since 1.0.0
+   */
   private void stdAndCov(
       Stream<Double> data,
       Double mean,
@@ -368,6 +431,18 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
     }
   }
 
+  /**
+   * This method will set the median, first quartile and third quartile elements for the given data list.
+   *
+   * @param data data list
+   * @param defaultValue the default median,first quartile, third quartile value given invalid list
+   * @param median builder for median value
+   * @param firstQuartile builder for first quartile value
+   * @param thirdQuartile builder for third quartile value
+   * @param <T> the type of the list, needs to be comparable to sort the list
+   * @author Tianchen Qu
+   * @since 1.0.0
+   */
   private <T extends Comparable> void medianAndQuartiles(
       List<T> data,
       T defaultValue,

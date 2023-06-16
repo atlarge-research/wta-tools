@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import java.util.stream.Collectors;
+import org.apache.spark.executor.ShuffleWriteMetrics;
 import org.apache.spark.executor.TaskMetrics;
 import org.apache.spark.scheduler.SparkListenerJobStart;
 import org.apache.spark.scheduler.SparkListenerStageCompleted;
@@ -33,7 +34,12 @@ class StageLevelListenerTest extends BaseLevelListenerTest {
   void setup() {
     TaskMetrics mockedMetrics = mock(TaskMetrics.class);
     when(mockedMetrics.executorRunTime()).thenReturn(100L);
-
+    ShuffleWriteMetrics mockedShuffleMetrics = mock(ShuffleWriteMetrics.class);
+    when(mockedMetrics.executorRunTime()).thenReturn(100L);
+    when(mockedMetrics.peakExecutionMemory()).thenReturn(100L);
+    when(mockedMetrics.diskBytesSpilled()).thenReturn(100L);
+    when(mockedMetrics.shuffleWriteMetrics()).thenReturn(mockedShuffleMetrics);
+    when(mockedShuffleMetrics.bytesWritten()).thenReturn(100L);
     ListBuffer<Integer> parents = new ListBuffer<>();
     parents.$plus$eq(1);
     parents.$plus$eq(2);
@@ -78,8 +84,8 @@ class StageLevelListenerTest extends BaseLevelListenerTest {
     assertEquals(-1, curStage.getSubmissionSite());
     assertEquals("N/A", curStage.getResourceType());
     assertEquals(-1.0, curStage.getResourceAmountRequested());
-    assertEquals(0.0, curStage.getMemoryRequested());
-    assertEquals(0.0, curStage.getDiskSpaceRequested());
+    assertEquals(-1.0, curStage.getMemoryRequested());
+    assertEquals(200.0, curStage.getDiskSpaceRequested());
     assertEquals(-1L, curStage.getEnergyConsumption());
     assertEquals(-1L, curStage.getNetworkIoTime());
     assertEquals(-1L, curStage.getDiskIoTime());

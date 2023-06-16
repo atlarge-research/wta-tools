@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.stream.Collectors;
 import org.apache.spark.executor.ExecutorMetrics;
+import org.apache.spark.executor.ShuffleWriteMetrics;
 import org.apache.spark.executor.TaskMetrics;
 import org.apache.spark.scheduler.SparkListenerJobStart;
 import org.apache.spark.scheduler.SparkListenerStageCompleted;
@@ -47,6 +48,9 @@ class TaskLevelListenerTest extends BaseLevelListenerTest {
     parents.$plus$eq(0);
     parents.$plus$eq(1);
     TaskMetrics mockedMetrics = mock(TaskMetrics.class);
+    ShuffleWriteMetrics mockedShuffleMetrics = mock(ShuffleWriteMetrics.class);
+    when(mockedMetrics.shuffleWriteMetrics()).thenReturn(mockedShuffleMetrics);
+    when(mockedShuffleMetrics.bytesWritten()).thenReturn(100L);
     when(mockedMetrics.executorRunTime()).thenReturn(100L);
     when(mockedMetrics.peakExecutionMemory()).thenReturn(-1L);
     when(mockedMetrics.diskBytesSpilled()).thenReturn(-1L);
@@ -121,7 +125,7 @@ class TaskLevelListenerTest extends BaseLevelListenerTest {
     assertEquals("N/A", curTask.getResourceType());
     assertEquals(-1.0, curTask.getResourceAmountRequested());
     assertEquals(-1.0, curTask.getMemoryRequested());
-    assertEquals(-1.0, curTask.getDiskSpaceRequested());
+    assertEquals(99.0, curTask.getDiskSpaceRequested());
     assertEquals(-1L, curTask.getEnergyConsumption());
     assertEquals(-1L, curTask.getNetworkIoTime());
     assertEquals(-1L, curTask.getDiskIoTime());

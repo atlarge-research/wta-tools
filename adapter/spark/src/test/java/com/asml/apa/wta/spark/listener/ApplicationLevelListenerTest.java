@@ -8,6 +8,7 @@ import com.asml.apa.wta.core.model.Task;
 import com.asml.apa.wta.core.model.Workload;
 import java.util.Properties;
 import org.apache.spark.executor.ExecutorMetrics;
+import org.apache.spark.executor.ShuffleWriteMetrics;
 import org.apache.spark.executor.TaskMetrics;
 import org.apache.spark.scheduler.SparkListenerApplicationEnd;
 import org.apache.spark.scheduler.SparkListenerJobStart;
@@ -56,14 +57,20 @@ class ApplicationLevelListenerTest extends BaseLevelListenerTest {
     testTaskInfo4 = new TaskInfo(4, 0, 1, 50L, "testExecutor", "local", TaskLocality.NODE_LOCAL(), false);
     ListBuffer<Object> parents = new ListBuffer<>();
     TaskMetrics mockedMetrics = mock(TaskMetrics.class);
-    TaskMetrics mockedMetrics2 = mock(TaskMetrics.class);
+    ShuffleWriteMetrics mockedShuffleMetrics = mock(ShuffleWriteMetrics.class);
     when(mockedMetrics.executorRunTime()).thenReturn(100L);
-    when(mockedMetrics2.peakExecutionMemory()).thenReturn(100L);
-    when(mockedMetrics2.diskBytesSpilled()).thenReturn(100L);
+    when(mockedMetrics.peakExecutionMemory()).thenReturn(100L);
+    when(mockedMetrics.diskBytesSpilled()).thenReturn(100L);
+    when(mockedMetrics.shuffleWriteMetrics()).thenReturn(mockedShuffleMetrics);
+    when(mockedShuffleMetrics.bytesWritten()).thenReturn(100L);
+
+    TaskMetrics mockedMetrics2 = mock(TaskMetrics.class);
+    ShuffleWriteMetrics mockedShuffleMetrics2 = mock(ShuffleWriteMetrics.class);
     when(mockedMetrics2.peakExecutionMemory()).thenReturn(-1L);
     when(mockedMetrics2.diskBytesSpilled()).thenReturn(-1L);
     when(mockedMetrics2.executorRunTime()).thenReturn(-1L);
-
+    when(mockedMetrics2.shuffleWriteMetrics()).thenReturn(mockedShuffleMetrics2);
+    when(mockedShuffleMetrics2.bytesWritten()).thenReturn(-1L);
     testStageInfo =
         new StageInfo(5, 0, "test", 50, null, new ListBuffer<>(), "None", mockedMetrics, null, null, 100);
     parents.$plus$eq(5);
