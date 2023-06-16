@@ -86,3 +86,26 @@ branch-coverage-core:
     - echo "Started generating core branch coverage"
     - "cat core/reports/jacoco/index.html | grep -Po '%.*?of.*?([0-9]{1,3})%' || echo '0%'"
   coverage: /([0-9]{1,3})%/
+
+mutation-tests-core:
+  stage: test-core
+  image: $LINUX_TOOLING_IMAGE
+  allow_failure: true
+
+  needs: [ build-core, build-linux-tooling-image ]
+
+  dependencies:
+    - build-core
+
+  script:
+    - echo "Core mutation tests core started"
+    - "mvn -pl core $PITEST_OPTS pitest:mutationCoverage"
+    - "cat core/reports/pitest/index.html | awk -F '</?td>' 'FNR == 25 { print $2 }' || echo '0%'"
+
+  coverage: /([0-9]{1,3})%/
+  artifacts:
+    name: mutation-tests-core
+    expire_in: 3 hours
+    when: always
+    paths:
+      - core/reports/pitest/

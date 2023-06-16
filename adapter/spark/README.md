@@ -163,7 +163,7 @@ Aggregation of all the resource utilisation metrics are done at the driver's end
   - TaskState information is not accurate. Data analysis on this object can produce inaccurate results.
 
 #### Interaction between the SparkListenerInterface and the Spark Plugin API
-- The SparkListenerInterface and the Spark Plugin API are two separate components. Using certain lifecycle callbacks such as `onTaskEnd` and `onTaskSucceeded` can cause issues if they are used whilst depending on one another. 
+- The SparkListenerInterface and the Spark Plugin API are two separate components. Using certain lifecycle callbacks such as `onTaskEnd` and `onTaskSucceeded` can cause issues if they are used whilst depending on one another.
   - An example of this is trying to aggregate task-level metrics on the driver with `onTaskEnd`, whilst sending them from the executor to the driver using `onTaskSucceeded`
 - The SparkListenerInterface is not guaranteed to be called in the same order as the Spark Plugin API. This is because the SparkListenerInterface is called asynchronously, whereas the Spark Plugin API is called synchronously.
   - This can cause issues when trying to aggregate task-level metrics on the driver. For example, if the SparkListenerInterface is called before the Spark Plugin API, then the driver will not have the task-level metrics to aggregate.
