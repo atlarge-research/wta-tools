@@ -71,10 +71,10 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
    * @since 1.0.0
    */
   public ApplicationLevelListener(
-          SparkContext sparkContext,
-          RuntimeConfig config,
-          JobLevelListener jobLevelListener,
-          StageLevelListener stageLevelListener) {
+      SparkContext sparkContext,
+      RuntimeConfig config,
+      JobLevelListener jobLevelListener,
+      StageLevelListener stageLevelListener) {
     super(sparkContext, config);
     this.jobLevelListener = jobLevelListener;
     this.taskLevelListener = stageLevelListener;
