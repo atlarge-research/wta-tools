@@ -43,7 +43,19 @@
     <slf4j.version>2.0.7</slf4j.version>
     <dependency-plugin.version>3.6.0</dependency-plugin.version>
     <awaitility.version>4.2.0</awaitility.version>
+    <site-plugin.version>3.12.1</site-plugin.version>
+    <javadoc-plugin.version>3.5.0</javadoc-plugin.version>
+    <build-helper.version>3.4.0</build-helper.version>
+    <project-info-reports.version>3.4.5</project-info-reports.version>
+    <rat.version>0.15</rat.version>
+    <enforcer.version>3.3.0</enforcer.version>
   </properties>
+
+  <inceptionYear>2023</inceptionYear>
+
+  <organization>
+    <name>ASML</name>
+  </organization>
 
   <modules>
     <module>core</module>
@@ -333,8 +345,84 @@
         <artifactId>maven-dependency-plugin</artifactId>
         <version>${dependency-plugin.version}</version>
       </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-site-plugin</artifactId>
+        <version>${site-plugin.version}</version>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>build-helper-maven-plugin</artifactId>
+        <version>${build-helper.version}</version>
+        <executions>
+          <execution>
+            <id>timestamp-property</id>
+            <goals>
+              <goal>timestamp-property</goal>
+            </goals>
+            <phase>validate</phase>
+            <configuration>
+              <timeZone>UTC</timeZone>
+              <name>currentYear</name>
+              <pattern>yyyy</pattern>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.rat</groupId>
+        <artifactId>apache-rat-plugin</artifactId>
+        <version>${rat.version}</version>
+        <executions>
+          <execution>
+            <phase>verify</phase>
+            <goals>
+              <goal>check</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-enforcer-plugin</artifactId>
+        <version>${enforcer.version}</version>
+        <configuration>
+          <rules>
+            <requireMavenVersion>
+              <version>3.0.0</version>
+            </requireMavenVersion>
+            <requireJavaVersion>
+              <version>11</version>
+            </requireJavaVersion>
+          </rules>
+        </configuration>
+      </plugin>
     </plugins>
   </build>
+
+  <reporting>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <version>${javadoc-plugin.version}</version>
+        <configuration>
+          <show>private</show>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-project-info-reports-plugin</artifactId>
+        <version>${project-info-reports.version}</version>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.rat</groupId>
+        <artifactId>apache-rat-plugin</artifactId>
+        <version>${rat.version}</version>
+      </plugin>
+    </plugins>
+  </reporting>
+
   <profiles>
     <profile>
       <id>default</id>
