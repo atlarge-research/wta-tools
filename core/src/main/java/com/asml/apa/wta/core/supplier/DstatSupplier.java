@@ -112,7 +112,7 @@ public class DstatSupplier implements InformationSupplier<DstatDto> {
       log.error("Something went wrong while receiving the dstat shell command outputs.");
       return false;
     }
-    log.info("System does not have the necessary dependencies (sysstat) to run dstat.");
+    log.info("System does not have the necessary dependencies to run dstat.");
     return false;
   }
 }

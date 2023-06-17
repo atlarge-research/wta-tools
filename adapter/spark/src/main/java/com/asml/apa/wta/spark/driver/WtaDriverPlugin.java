@@ -38,6 +38,8 @@ import org.apache.spark.api.plugin.PluginContext;
 @Slf4j
 public class WtaDriverPlugin implements DriverPlugin {
 
+  private static final String TOOL_VERSION = "spark-wta-generator-1_0";
+
   private MetricStreamingEngine metricStreamingEngine;
 
   private SparkDataSource sparkDataSource;
@@ -144,7 +146,7 @@ public class WtaDriverPlugin implements DriverPlugin {
         .getApplicationLevelListener()
         .getProcessedObjects()
         .get(0);
-    WtaWriter wtaWriter = new WtaWriter(outputFile, "schema-1.0");
+    WtaWriter wtaWriter = new WtaWriter(outputFile, "schema-1.0", TOOL_VERSION);
     wtaWriter.write(Task.class, tasks);
     wtaWriter.write(Resource.class, resources);
     wtaWriter.write(Workflow.class, workflows);

@@ -13,36 +13,35 @@ import org.apache.avro.generic.GenericRecord;
  * @since 1.0.0
  */
 @Data
-@Builder
 @Slf4j
-@SuppressWarnings("VisibilityModifier")
+@Builder
 public class ResourceState implements BaseTraceObject {
 
   private static final long serialVersionUID = 8912154769719138654L;
 
-  public final Resource resourceId;
+  private final Resource resourceId;
 
-  public final long timestamp;
+  private final long timestamp;
 
-  public final String eventType;
+  private final String eventType;
 
-  public final long platformId;
+  private final long platformId;
 
-  public final double availableResources;
+  private final double availableResources;
 
-  public final double availableMemory;
+  private final double availableMemory;
 
-  public final double availableDiskSpace;
+  private final double availableDiskSpace;
 
-  public final double availableDiskIoBandwidth;
+  private final double availableDiskIoBandwidth;
 
-  public final double availableNetworkBandwidth;
+  private final double availableNetworkBandwidth;
 
-  public final double averageUtilization1Minute;
+  private final double averageUtilization1Minute;
 
-  public final double averageUtilization5Minute;
+  private final double averageUtilization5Minute;
 
-  public final double averageUtilization15Minute;
+  private final double averageUtilization15Minute;
 
   /**
    * This method should never be called as we do not need to ever fetch its ID.
