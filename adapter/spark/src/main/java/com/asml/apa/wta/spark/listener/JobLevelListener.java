@@ -108,7 +108,7 @@ public class JobLevelListener extends AbstractListener<Workflow> {
         .filter(energy -> energy >= 0.0)
         .reduce(Double::sum)
         .orElse(-1.0);
-    final long jobRunTime = jobEnd.time() - jobSubmitTimes.get(jobId + 1);
+    final long jobRunTime = jobEnd.time() - jobSubmitTimes.get(jobId);
     final long driverTime = jobRunTime
         - stageLevelListener.getProcessedObjects().stream()
             .filter(stage -> jobStages.contains(Math.toIntExact(stage.getId())))
