@@ -61,6 +61,27 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
   }
 
   /**
+   * Constructor for the application-level listener at stage level.
+   *
+   * @param sparkContext The current spark context
+   * @param config Additional config specified by the user for the plugin
+   * @param jobLevelListener The job-level listener to be used by this listener
+   * @param stageLevelListener The stage-level listener to be used by this listener
+   * @author Tianchen Qu
+   * @since 1.0.0
+   */
+  public ApplicationLevelListener(
+          SparkContext sparkContext,
+          RuntimeConfig config,
+          JobLevelListener jobLevelListener,
+          StageLevelListener stageLevelListener) {
+    super(sparkContext, config);
+    this.jobLevelListener = jobLevelListener;
+    this.taskLevelListener = stageLevelListener;
+    this.stageLevelListener = stageLevelListener;
+  }
+
+  /**
    * Callback function that is called right at the end of the application. Further experimentation
    * is needed to determine if applicationEnd is called first or shutdown.
    *
