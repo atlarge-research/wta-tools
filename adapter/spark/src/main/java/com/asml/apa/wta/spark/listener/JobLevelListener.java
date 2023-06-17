@@ -108,10 +108,10 @@ public class JobLevelListener extends AbstractListener<Workflow> {
     final String appName = sparkContext.appName();
     final int criticalPathTaskCount = criticalPathTasks.remove(jobId);
     final double totalResources = -1.0;
-    final double totalMemoryUsage = sumDouble(Arrays.stream(tasks).map(Task::getMemoryRequested));
-    final long totalNetworkUsage = sumLong(Arrays.stream(tasks).map(Task::getNetworkIoTime));
-    final double totalDiskSpaceUsage = sumDouble(Arrays.stream(tasks).map(Task::getDiskSpaceRequested));
-    final double totalEnergyConsumption = sumDouble(Arrays.stream(tasks).map(Task::getEnergyConsumption));
+    final double totalMemoryUsage = doubleSum(Arrays.stream(tasks).map(Task::getMemoryRequested));
+    final long totalNetworkUsage = longSum(Arrays.stream(tasks).map(Task::getNetworkIoTime));
+    final double totalDiskSpaceUsage = doubleSum(Arrays.stream(tasks).map(Task::getDiskSpaceRequested));
+    final double totalEnergyConsumption = doubleSum(Arrays.stream(tasks).map(Task::getEnergyConsumption));
     final long jobRunTime = jobEnd.time() - jobSubmitTimes.get(jobId);
     final long driverTime = jobRunTime
         - stageLevelListener.getProcessedObjects().stream()
@@ -176,7 +176,7 @@ public class JobLevelListener extends AbstractListener<Workflow> {
    * @author Tianchen Qu
    * @since 1.0.0
    */
-  private double sumDouble(Stream<Double> data) {
+  private double doubleSum(Stream<Double> data) {
     return data.filter(task -> task >= 0.0).reduce(Double::sum).orElse(-1.0);
   }
 
@@ -188,7 +188,7 @@ public class JobLevelListener extends AbstractListener<Workflow> {
    * @author Tianchen Qu
    * @since 1.0.0
    */
-  private long sumLong(Stream<Long> data) {
+  private long longSum(Stream<Long> data) {
     return data.filter(task -> task >= 0).reduce(Long::sum).orElse(-1L);
   }
 
