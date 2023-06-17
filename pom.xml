@@ -143,10 +143,16 @@
         </configuration>
         <executions>
           <execution>
-            <id>integration-tests</id>
+            <id>integration-test-run</id>
             <phase>integration-test</phase>
             <goals>
               <goal>integration-test</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>integration-test-verify</id>
+            <phase>verify</phase>
+            <goals>
               <goal>verify</goal>
             </goals>
           </execution>
@@ -210,6 +216,15 @@
             </indent>
           </java>
         </configuration>
+        <executions>
+          <execution>
+            <id>spotless-check</id>
+            <phase>verify</phase>
+            <goals>
+              <goal>check</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
       <plugin>
         <groupId>com.gemnasium</groupId>
@@ -229,6 +244,15 @@
           <minimumTokens>100</minimumTokens>
           <targetDirectory>reports/pmd</targetDirectory>
         </configuration>
+        <executions>
+          <execution>
+            <id>pmd-check</id>
+            <phase>verify</phase>
+            <goals>
+              <goal>check</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
       <plugin>
         <groupId>org.jacoco</groupId>
@@ -265,6 +289,36 @@
             </rule>
           </rules>
         </configuration>
+        <executions>
+          <execution>
+            <id>prepare-jacoco-integration-test</id>
+            <phase>pre-integration-test</phase>
+            <goals>
+              <goal>prepare-agent-integration</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>prepare-jacoco-test</id>
+            <phase>initialize</phase>
+            <goals>
+              <goal>prepare-agent</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>merge-jacoco</id>
+            <phase>post-integration-test</phase>
+            <goals>
+              <goal>merge</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>verify-jacoco</id>
+            <phase>verify</phase>
+            <goals>
+              <goal>check</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
       <plugin>
         <groupId>org.pitest</groupId>
@@ -289,6 +343,18 @@
           </excludedTestClasses>
           <mutationThreshold>60</mutationThreshold>
         </configuration>
+        <executions>
+          <execution>
+            <id>pitest-mutation-coverage</id>
+            <phase>integration-test</phase>
+            <configuration>
+              <withHistory>true</withHistory>
+            </configuration>
+            <goals>
+              <goal>mutationCoverage</goal>
+            </goals>
+          </execution>
+        </executions>
         <dependencies>
           <!-- https://mvnrepository.com/artifact/org.pitest/pitest-junit5-plugin -->
           <dependency>
@@ -303,12 +369,21 @@
         <artifactId>maven-checkstyle-plugin</artifactId>
         <version>${checkstyle.version}</version>
         <configuration>
-          <configLocation>config/checkstyle.xml</configLocation>
+          <configLocation>/config/checkstyle.xml</configLocation>
           <consoleOutput>false</consoleOutput>
           <failsOnError>true</failsOnError>
           <outputFile>reports/checkstyle/violations.txt</outputFile>
           <outputFileFormat>plain</outputFileFormat>
         </configuration>
+        <executions>
+          <execution>
+            <id>checkstyle-verify</id>
+            <phase>verify</phase>
+            <goals>
+              <goal>check</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -356,7 +431,7 @@
         <version>${build-helper.version}</version>
         <executions>
           <execution>
-            <id>timestamp-property</id>
+            <id>current-year</id>
             <goals>
               <goal>timestamp-property</goal>
             </goals>
@@ -375,6 +450,7 @@
         <version>${rat.version}</version>
         <executions>
           <execution>
+            <id>rat-verify</id>
             <phase>verify</phase>
             <goals>
               <goal>check</goal>
@@ -396,6 +472,15 @@
             </requireJavaVersion>
           </rules>
         </configuration>
+        <executions>
+          <execution>
+            <id>enforcer-enforce</id>
+            <phase>validate</phase>
+            <goals>
+              <goal>enforce</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>
@@ -441,6 +526,7 @@
             <version>${maven.shade.plugin.version}</version>
             <executions>
               <execution>
+                <id>package-shade</id>
                 <phase>package</phase>
                 <goals>
                   <goal>shade</goal>
