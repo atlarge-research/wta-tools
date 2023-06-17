@@ -143,7 +143,6 @@ public class StageLevelListener extends TaskStageBaseListener {
    */
   public void setStages() {
     final List<Task> stages = this.getProcessedObjects();
-    Map<Integer, List<Integer>> parentToChildren = this.getParentToChildren();
     for (Task stage : stages) {
       stage.setChildren(parentToChildren.getOrDefault(Math.toIntExact(stage.getId()), new ArrayList<>()).stream()
           .mapToLong(childrenId -> childrenId + 1)

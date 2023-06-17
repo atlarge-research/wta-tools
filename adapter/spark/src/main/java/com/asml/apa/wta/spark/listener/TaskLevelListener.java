@@ -146,8 +146,8 @@ public class TaskLevelListener extends TaskStageBaseListener {
       final Integer[] parentStages = stageListener.getStageToParents().get(stageId);
       if (parentStages != null) {
         final Long[] parents = Arrays.stream(parentStages)
-            .flatMap(parentStage -> Arrays.stream(
-                this.getStageToTasks().getOrDefault(parentStage, new ArrayList<>()).stream()
+            .flatMap(parentStage ->
+                Arrays.stream(stageToTasks.getOrDefault(parentStage, new ArrayList<>()).stream()
                     .map(Task::getId)
                     .toArray(Long[]::new)))
             .toArray(Long[]::new);
@@ -157,8 +157,7 @@ public class TaskLevelListener extends TaskStageBaseListener {
       List<Integer> childrenStages = stageListener.getParentToChildren().get(stageId);
       if (childrenStages != null) {
         List<Task> children = new ArrayList<>();
-        childrenStages.forEach(
-            childrenStage -> children.addAll(this.getStageToTasks().get(childrenStage)));
+        childrenStages.forEach(childrenStage -> children.addAll(stageToTasks.get(childrenStage)));
         Long[] temp = children.stream().map(Task::getId).toArray(Long[]::new);
         task.setChildren(ArrayUtils.toPrimitive(temp));
       }

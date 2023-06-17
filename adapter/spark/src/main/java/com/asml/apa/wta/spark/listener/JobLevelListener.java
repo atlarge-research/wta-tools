@@ -183,7 +183,7 @@ public class JobLevelListener extends AbstractListener<Workflow> {
    * @since 1.0.0
    */
   public void setWorkflows() {
-    final List<Workflow> workflows = this.getProcessedObjects();
+    final List<Workflow> workflows = getProcessedObjects();
     for (Workflow workflow : workflows) {
       workflow.setTotalResources(Arrays.stream(workflow.getTasks())
           .map(Task::getResourceAmountRequested)
