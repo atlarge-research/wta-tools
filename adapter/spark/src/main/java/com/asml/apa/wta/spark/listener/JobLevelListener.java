@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import lombok.Getter;
 import org.apache.spark.SparkContext;
 import org.apache.spark.scheduler.SparkListenerJobEnd;
@@ -91,26 +92,10 @@ public class JobLevelListener extends AbstractListener<Workflow> {
     final String appName = sparkContext.appName();
     final int criticalPathTaskCount = criticalPathTasks;
     final double totalResources = -1.0;
-    final double totalMemoryUsage = Arrays.stream(tasks)
-        .map(Task::getMemoryRequested)
-        .filter(memory -> memory >= 0.0)
-        .reduce(Double::sum)
-        .orElse(-1.0);
-    final long totalNetworkUsage = Arrays.stream(tasks)
-        .map(Task::getNetworkIoTime)
-        .filter(networkIo -> networkIo >= 0)
-        .reduce(Long::sum)
-        .orElse(-1L);
-    final double totalDiskSpaceUsage = Arrays.stream(tasks)
-        .map(Task::getDiskSpaceRequested)
-        .filter(diskSpace -> diskSpace >= 0.0)
-        .reduce(Double::sum)
-        .orElse(-1.0);
-    final double totalEnergyConsumption = Arrays.stream(tasks)
-        .map(Task::getEnergyConsumption)
-        .filter(energy -> energy >= 0.0)
-        .reduce(Double::sum)
-        .orElse(-1.0);
+    final double totalMemoryUsage = sumDouble(Arrays.stream(tasks).map(Task::getMemoryRequested));
+    final long totalNetworkUsage = sumLong(Arrays.stream(tasks).map(Task::getNetworkIoTime));
+    final double totalDiskSpaceUsage = sumDouble(Arrays.stream(tasks).map(Task::getDiskSpaceRequested));
+    final double totalEnergyConsumption = sumDouble(Arrays.stream(tasks).map(Task::getEnergyConsumption));
     final long jobRunTime = jobEnd.time() - jobSubmitTimes.get(jobId);
     final long driverTime = jobRunTime
         - stageLevelListener.getProcessedObjects().stream()
@@ -165,6 +150,30 @@ public class JobLevelListener extends AbstractListener<Workflow> {
             .build());
 
     jobSubmitTimes.remove(jobId);
+  }
+
+  /**
+   * Summation for Double stream for positive terms.
+   *
+   * @param data data stream
+   * @return summation
+   * @author Tianchen Qu
+   * @since 1.0.0
+   */
+  private double sumDouble(Stream<Double> data) {
+    return data.filter(task -> task >= 0.0).reduce(Double::sum).orElse(-1.0);
+  }
+
+  /**
+   * Summation for Long stream for positive terms.
+   *
+   * @param data data stream
+   * @return summation
+   * @author Tianchen Qu
+   * @since 1.0.0
+   */
+  private long sumLong(Stream<Long> data) {
+    return data.filter(task -> task >= 0).reduce(Long::sum).orElse(-1L);
   }
 
   /**
