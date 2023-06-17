@@ -137,7 +137,7 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
    * @author Tianchen Qu
    * @since 1.0.0
    */
-  @SuppressWarnings({"CyclomaticComplexity", "MethodLength"})
+  @SuppressWarnings("MethodLength")
   public void onApplicationEnd(SparkListenerApplicationEnd applicationEnd) {
     Workload.WorkloadBuilder builder = Workload.builder();
     if (config.isStageLevel()) {
@@ -443,7 +443,7 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
    * @author Tianchen Qu
    * @since 1.0.0
    */
-  private <T extends Comparable> void medianAndQuartiles(
+  private <T extends Comparable<T>> void medianAndQuartiles(
       List<T> data,
       T defaultValue,
       Function<T, Workload.WorkloadBuilder> median,
