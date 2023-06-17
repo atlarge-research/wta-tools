@@ -9,6 +9,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
+
 import lombok.Getter;
 import org.apache.spark.SparkContext;
 import org.apache.spark.scheduler.SparkListenerJobEnd;
@@ -24,17 +26,17 @@ import scala.collection.JavaConverters;
 @Getter
 public class JobLevelListener extends AbstractListener<Workflow> {
 
-  private final TaskStageBaseListener taskListener;
+  private final TaskStageBaseListener wtaTaskListener;
 
   private final StageLevelListener stageLevelListener;
 
-  private final Map<Integer, Long> jobSubmitTimes = new ConcurrentHashMap<>();
+  private final Map<Long, Long> jobSubmitTimes = new ConcurrentHashMap<>();
 
-  private int criticalPathTasks = -1;
+  private int criticalPathTaskCount = -1;
 
   private long jobStartTime = -1L;
 
-  private List<Object> jobStages;
+  private List<Long> stageIds = new ArrayList<>();
 
   /**
    * Constructor for the job-level listener.
@@ -53,8 +55,43 @@ public class JobLevelListener extends AbstractListener<Workflow> {
       TaskStageBaseListener taskListener,
       StageLevelListener stageLevelListener) {
     super(sparkContext, config);
-    this.taskListener = taskListener;
+    this.wtaTaskListener = taskListener;
     this.stageLevelListener = stageLevelListener;
+  }
+
+  /**
+   * Computes the critical path length.
+   * @return    Critical path length
+   * @author Tianchen Qu
+   * @author Pil Kyu Cho
+   * @since 1.0.0
+   */
+  private long computeCriticalPathLength() {
+    final long jobRunTime = System.currentTimeMillis() - jobStartTime;
+    final long driverTime = jobRunTime
+            - stageLevelListener.getProcessedObjects().stream()
+            .filter(wtaTask -> stageIds.contains(wtaTask.getId()))
+            .map(Task::getRuntime)
+            .reduce(Long::sum)
+            .orElse(0L);
+
+    long criticalPathLength = -1L;
+    if (!config.isStageLevel()) {
+      TaskLevelListener taskLevelListener = (TaskLevelListener) wtaTaskListener;
+      final Map<Long, List<Task>> stageToTasks = taskLevelListener.getStageToTasks();
+      List<Long> stageMaximumTaskTime = new ArrayList<>();
+      stageIds.stream()
+              .filter(stageToTasks::containsKey)
+              .forEach(stageId -> stageMaximumTaskTime.add(
+                      stageToTasks.get(stageId)
+                              .stream()
+                              .map(Task::getRuntime)
+                              .max(Long::compareTo)
+                              .orElse(0L)));
+      criticalPathLength =
+              driverTime + stageMaximumTaskTime.stream().reduce(Long::sum).orElse(0L);
+    }
+    return criticalPathLength;
   }
 
   /**
@@ -62,13 +99,14 @@ public class JobLevelListener extends AbstractListener<Workflow> {
    *
    * @param jobStart The SparkListenerJobStart event object containing information upon job start.
    * @author Henry Page
+   * @since 1.0.0
    */
   @Override
   public void onJobStart(SparkListenerJobStart jobStart) {
-    jobSubmitTimes.put(jobStart.jobId() + 1, jobStart.time());
-    criticalPathTasks = jobStart.stageIds().length();
+    jobSubmitTimes.put((long)jobStart.jobId() + 1, jobStart.time());
     jobStartTime = System.currentTimeMillis();
-    jobStages = JavaConverters.seqAsJavaList(jobStart.stageIds());
+    stageIds = JavaConverters.seqAsJavaList(jobStart.stageIds()).stream().map(obj -> ((Long) obj) + 1).collect(Collectors.toList());
+    criticalPathTaskCount = jobStart.stageIds().length();
   }
 
   /**
@@ -76,38 +114,55 @@ public class JobLevelListener extends AbstractListener<Workflow> {
    *
    * @param jobEnd The job end event object containing information upon job end
    * @author Henry Page
+   * @author Tianchen Qu
+   * @since 1.0.0
    */
   @Override
   public void onJobEnd(SparkListenerJobEnd jobEnd) {
-    final int jobId = jobEnd.jobId() + 1;
-    final long submitTime = jobSubmitTimes.remove(jobId);
-    final Task[] tasks = taskListener
+    final long jobId = jobEnd.jobId() + 1;
+    final long tsSubmit = jobSubmitTimes.remove(jobId);
+    final Task[] tasks = wtaTaskListener
         .getWithCondition(task -> task.getWorkflowId() == jobId)
         .toArray(Task[]::new);
-    final int numTasks = tasks.length;
+    final int taskCount = tasks.length;
 
+    long criticalPathLength = computeCriticalPathLength();
+
+    final int maxNumberOfConcurrentTasks = -1;
+    final String nfrs = "";
     // we can also get the mode from the config, if that's what the user wants?
     final String scheduler = sparkContext.getConf().get("spark.scheduler.mode", "FIFO");
     final Domain domain = config.getDomain();
     final String appName = sparkContext.appName();
-
-    // unknown
-    final long criticalPathLength = -1;
-    final int criticalPathTaskCount = -1;
-    final int maxNumberOfConcurrentTasks = -1;
-    final String nfrs = "";
     final String applicationField = "ETL";
     final double totalResources = -1.0;
-    final double totalMemoryUsage = -1.0;
-    final long totalNetworkUsage = -1L;
-    final double totalDiskSpaceUsage = -1.0;
-    final double totalEnergyConsumption = -1.0;
+    final double totalMemoryUsage = Arrays.stream(tasks)
+            .map(Task::getMemoryRequested)
+            .filter(x -> x >= 0.0)
+            .reduce(Double::sum)
+            .orElseGet(() -> -1.0);
+    final long totalNetworkUsage = Arrays.stream(tasks)
+            .map(Task::getNetworkIoTime)
+            .filter(x -> x >= 0)
+            .reduce(Long::sum)
+            .orElse(-1L);
+    final double totalDiskSpaceUsage = Arrays.stream(tasks)
+            .map(Task::getDiskSpaceRequested)
+            .filter(x -> x >= 0.0)
+            .reduce(Double::sum)
+            .orElseGet(() -> -1.0);
+    final double totalEnergyConsumption = Arrays.stream(tasks)
+            .map(Task::getEnergyConsumption)
+            .filter(x -> x >= 0.0)
+            .reduce(Double::sum)
+            .orElse(-1.0);
+
     this.getProcessedObjects()
         .add(Workflow.builder()
             .id(jobId)
-            .tsSubmit(submitTime)
+            .tsSubmit(tsSubmit)
             .tasks(tasks)
-            .taskCount(numTasks)
+            .taskCount(taskCount)
             .criticalPathLength(criticalPathLength)
             .criticalPathTaskCount(criticalPathTaskCount)
             .maxConcurrentTasks(maxNumberOfConcurrentTasks)
