@@ -92,10 +92,7 @@ public class ParquetSchema {
           } else if (Map.class.isAssignableFrom(fieldType)) {
             schemaBuilder = schemaBuilder
                 .name(fieldName)
-                .type()
-                .map()
-                .values()
-                .stringType()
+                .type(SchemaBuilder.map().values().stringType())
                 .noDefault();
           } else {
             log.error("Could not create a valid encoding for {}.", fieldType);
