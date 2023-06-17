@@ -147,7 +147,7 @@ public class Stream<V extends Serializable> {
     } else {
       current = deserializationEnd;
     }
-    String filePath = this.tempSerDir + id + "-" + System.currentTimeMillis() + "-"
+    String filePath = Stream.tempSerDir + id + "-" + System.currentTimeMillis() + "-"
         + Instant.now().getNano() + ".ser";
     List<StreamNode<V>> toSerialize = new ArrayList<>();
     while (current != tail && current != null) {
