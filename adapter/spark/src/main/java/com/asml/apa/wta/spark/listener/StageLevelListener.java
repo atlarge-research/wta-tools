@@ -3,11 +3,13 @@ package com.asml.apa.wta.spark.listener;
 import com.asml.apa.wta.core.config.RuntimeConfig;
 import com.asml.apa.wta.core.model.Task;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.Getter;
 import org.apache.spark.SparkContext;
+import org.apache.spark.executor.TaskMetrics;
 import org.apache.spark.scheduler.SparkListenerStageCompleted;
 import org.apache.spark.scheduler.StageInfo;
 import scala.collection.JavaConverters;
@@ -22,17 +24,65 @@ import scala.collection.JavaConverters;
 @Getter
 public class StageLevelListener extends TaskStageBaseListener {
 
-  private final Map<Integer, Integer[]> stageToParents = new ConcurrentHashMap<>();
+  private final Map<Long, Long[]> stageToParents = new ConcurrentHashMap<>();
 
-  private final Map<Integer, List<Integer>> parentToChildren = new ConcurrentHashMap<>();
+  private final Map<Long, List<Long>> parentStageToChildrenStages = new ConcurrentHashMap<>();
 
+  private final Map<Long, Integer> stageToResource = new ConcurrentHashMap<>();
+
+  /**
+   * Constructor for the stage-level listener from Spark datasource class.
+   *
+   * @param sparkContext       The current spark context
+   * @param config             Additional config specified by the user for the plugin
+   * @author Pil Kyu Cho
+   * @since 1.0.0
+   */
   public StageLevelListener(SparkContext sparkContext, RuntimeConfig config) {
     super(sparkContext, config);
   }
 
   /**
-   * This method will store the stage hierarchy information from the callback.
-   * This class is a stage-level listener for the Spark data source.
+   * This method will store the stage hierarchy information from the callback, depending on the isStageLevel config.
+   * Only the parents of the current stage is determined here. The children are determined on application end in
+   * ApplicationLevelListener.
+   * @param stageId           Current stage id
+   * @param task              Task object of current stage metrics
+   * @param curStageInfo      Current stage info
+   * @author Pil Kyu Cho
+   * @since 1.0.0
+   */
+  public void fillInParentChildMaps(long stageId, Task task,  StageInfo curStageInfo) {
+    final long[] parentStageIds = JavaConverters.seqAsJavaList(
+                    curStageInfo.parentIds().toList())
+            .stream()
+            .mapToLong(parentId -> (Integer)parentId + 1L).toArray();
+    if (config.isStageLevel()) {
+      task.setParents(parentStageIds);
+    } else {
+      stageToParents.put(stageId, Arrays.stream(parentStageIds).boxed().toArray(Long[]::new));
+    }
+
+    // Add current task as child to its parent stages
+    for (Long parentStageId : parentStageIds) {
+      List<Long> childrenStages = parentStageToChildrenStages.get(parentStageId);
+      if (childrenStages == null) {
+        childrenStages = new ArrayList<>();
+        childrenStages.add(stageId);
+        parentStageToChildrenStages.put(parentStageId, childrenStages);
+      } else {
+        childrenStages.add(stageId);
+      }
+    }
+  }
+
+  /**
+   * This method is called every time a stage is completed. Stage-level metrics are collected, aggregated, and added here.
+   * Note:
+   * peakExecutionMemory is the peak memory used by internal data structures created during shuffles, aggregations
+   * and joins. The value of this accumulator should be approximately the sum of the peak sizes across all such
+   * data structures created in this task. It is thus only an upper bound of the actual peak memory for the task.
+   * For SQL jobs, this only tracks all unsafe operators and ExternalSort
    *
    * @param stageCompleted   SparkListenerStageCompleted The object corresponding to information on stage completion
    * @author Tianchen Qu
@@ -42,30 +92,19 @@ public class StageLevelListener extends TaskStageBaseListener {
   @Override
   public void onStageCompleted(SparkListenerStageCompleted stageCompleted) {
     final StageInfo curStageInfo = stageCompleted.stageInfo();
-    final int stageId = curStageInfo.stageId() + 1;
-    final Integer[] parentIds = JavaConverters.seqAsJavaList(
-            curStageInfo.parentIds().toList())
-        .stream()
-        .map(parentId -> (Integer) parentId + 1)
-        .toArray(Integer[]::new);
-    stageToParents.put(stageId, parentIds);
-    for (Integer id : parentIds) {
-      List<Integer> children = parentToChildren.get(id);
-      if (children == null) {
-        children = new ArrayList<>();
-        children.add(stageId);
-        parentToChildren.put(id, children);
-      } else {
-        children.add(stageId);
-      }
-    }
+    final TaskMetrics curStageMetrics = curStageInfo.taskMetrics();
+    final long stageId = curStageInfo.stageId() + 1;
+    stageToResource.put(stageId, curStageInfo.resourceProfileId());
 
     final Long tsSubmit = curStageInfo.submissionTime().getOrElse(() -> -1L);
     final long runtime = curStageInfo.taskMetrics().executorRunTime();
     final long[] parents = new long[0];
     final long[] children = new long[0];
     final int userId = Math.abs(sparkContext.sparkUser().hashCode());
-    final long workflowId = stageIdsToJobs.remove(stageId);
+    final long workflowId = stageToJob.get(stageId);
+    final double diskSpaceRequested = (double) curStageMetrics.diskBytesSpilled()
+        + curStageMetrics.shuffleWriteMetrics().bytesWritten();
+    // final double memoryRequested = curTaskMetrics.peakExecutionMemory();
 
     // dummy values
     final String type = "";
@@ -74,17 +113,15 @@ public class StageLevelListener extends TaskStageBaseListener {
     final double resourceAmountRequested = -1.0;
     final int groupId = -1;
     final String nfrs = "";
+    final long waitTime = -1L;
     final String params = "";
     final double memoryRequested = -1.0;
     final long networkIoTime = -1L;
     final long diskIoTime = -1L;
-    final double diskSpaceRequested = -1.0;
     final double energyConsumption = -1L;
-    final long waitTime = -1L;
     final long resourceUsed = -1L;
 
-    this.getProcessedObjects()
-        .add(Task.builder()
+    Task task = Task.builder()
             .id(stageId)
             .type(type)
             .submissionSite(submissionSite)
@@ -106,6 +143,8 @@ public class StageLevelListener extends TaskStageBaseListener {
             .diskSpaceRequested(diskSpaceRequested)
             .energyConsumption(energyConsumption)
             .resourceUsed(resourceUsed)
-            .build());
+            .build();
+    fillInParentChildMaps(stageId, task, curStageInfo);
+    this.getProcessedObjects().add(task);
   }
 }

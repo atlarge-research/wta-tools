@@ -107,8 +107,8 @@ class StageLevelListenerTest extends BaseLevelListenerTest {
     assertThat(fakeStageListener.getStageToParents().size()).isEqualTo(1);
     List<Integer> childrenStages = new ArrayList<>();
     childrenStages.add(1);
-    assertThat(fakeStageListener.getParentToChildren()).containsEntry(2, childrenStages);
-    assertThat(fakeStageListener.getParentToChildren()).containsEntry(3, childrenStages);
-    assertThat(fakeStageListener.getParentToChildren().size()).isEqualTo(2);
+    assertThat(fakeStageListener.getParentStageToChildrenStages()).containsEntry(2, childrenStages);
+    assertThat(fakeStageListener.getParentStageToChildrenStages()).containsEntry(3, childrenStages);
+    assertThat(fakeStageListener.getParentStageToChildrenStages().size()).isEqualTo(2);
   }
 }

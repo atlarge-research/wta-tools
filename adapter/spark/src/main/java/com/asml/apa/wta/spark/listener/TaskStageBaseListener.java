@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.Getter;
 import org.apache.spark.SparkContext;
+import org.apache.spark.scheduler.SparkListenerJobEnd;
 import org.apache.spark.scheduler.SparkListenerJobStart;
 import org.apache.spark.scheduler.SparkListenerStageCompleted;
 
@@ -18,7 +19,7 @@ import org.apache.spark.scheduler.SparkListenerStageCompleted;
 public abstract class TaskStageBaseListener extends AbstractListener<Task> {
 
   @Getter
-  protected final Map<Integer, Integer> stageIdsToJobs = new ConcurrentHashMap<>();
+  protected final Map<Long, Long> stageToJob = new ConcurrentHashMap<>();
 
   /**
    * Constructor for the stage-level listener.
@@ -33,8 +34,7 @@ public abstract class TaskStageBaseListener extends AbstractListener<Task> {
   }
 
   /**
-   * This method is called every time a job starts.
-   * In the context of the WTA, this is a workflow.
+   * This method is called every time a job starts. In the context of the WTA, this is a workflow.
    *
    * @param jobStart The object corresponding to information on job start.
    * @author Henry Page
@@ -42,20 +42,20 @@ public abstract class TaskStageBaseListener extends AbstractListener<Task> {
    */
   @Override
   public void onJobStart(SparkListenerJobStart jobStart) {
-    // stage ids are always unique
-    jobStart.stageInfos().foreach(stageInfo -> stageIdsToJobs.put(stageInfo.stageId() + 1, jobStart.jobId() + 1));
+    long jobId = jobStart.jobId() + 1;
+    jobStart.stageInfos().foreach(stageInfo -> stageToJob.put((long) stageInfo.stageId() + 1, jobId));
   }
 
   /**
-   * Callback for when a stage ends.
-   *
-   * @param stageCompleted The stage completion event
-   * @author Henry Page
+   * Stage to Job mapping needs to be removed in onJobEnd callback as some stages are created at job start but never
+   * submitted. For ConcurrentHashMap, most thread-safe and performance-optimized way to remove entries based
+   * on values is using entrySet() in combination with removeIf().
+   * @author Pil Kyu Cho
    * @since 1.0.0
    */
   @Override
-  public void onStageCompleted(SparkListenerStageCompleted stageCompleted) {
-    // all tasks are guaranteed to be completed, so we can remove the stage id to reduce memory usage??
-    stageIdsToJobs.remove(stageCompleted.stageInfo().stageId() + 1);
+  public void onJobEnd(SparkListenerJobEnd jobEnd) {
+    long jobId = jobEnd.jobId() + 1;
+    stageToJob.entrySet().removeIf(entry -> entry.getValue().equals(jobId));
   }
 }

@@ -18,9 +18,13 @@ public class BaseSparkJobIntegrationTest {
 
   protected SparkDataSource sut;
 
+  protected SparkDataSource sut2;
+
   protected JavaRDD<String> textFile;
 
   RuntimeConfig fakeConfig;
+
+  RuntimeConfig fakeConfig2;
 
   MetricStreamingEngine fakeMetricStreamingEngine;
 
@@ -30,19 +34,31 @@ public class BaseSparkJobIntegrationTest {
         .authors(new String[] {"Harry Potter"})
         .domain(Domain.SCIENTIFIC)
         .description("Yer a wizard harry")
+        .logLevel("INFO")
         .isStageLevel(false)
         .resourcePingInterval(500)
         .executorSynchronizationInterval(-100)
         .outputPath("src/test/resources/wta-output")
         .build();
 
-    SparkConf conf = new SparkConf().setAppName("SparkTestRunner").setMaster("local");
+    fakeConfig2 = RuntimeConfig.builder()
+        .authors(new String[] {"Harry Potter"})
+        .isStageLevel(true)
+        .domain(Domain.SCIENTIFIC)
+        .description("Yer a wizard harry")
+        .outputPath("src/test/resources/WTA")
+        .build();
+
+    SparkConf conf = new SparkConf()
+        .setAppName("SparkTestRunner")
+        .setMaster("local");
     spark = SparkSession.builder().config(conf).getOrCreate();
     spark.sparkContext().setLogLevel("ERROR");
 
     fakeMetricStreamingEngine = new MetricStreamingEngine();
 
     sut = new SparkDataSource(spark.sparkContext(), fakeConfig);
+    sut2 = new SparkDataSource(spark.sparkContext(), fakeConfig2);
     String resourcePath = "src/test/resources/wordcount.txt";
     textFile = JavaSparkContext.fromSparkContext(spark.sparkContext()).textFile(resourcePath);
   }
