@@ -19,7 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public class DiskOutputFile implements OutputFile {
 
-  private Path file;
+  private Path outputFile;
 
   /**
    * Resolves a path in the current location.
@@ -31,9 +31,9 @@ public class DiskOutputFile implements OutputFile {
    */
   @Override
   public OutputFile resolve(String path) {
-    Path resolved = file.resolve(path);
+    Path resolved = outputFile.resolve(path);
     log.debug("Resolves {} and {} to {}.", this, path, resolved);
-    return new DiskOutputFile(file.resolve(path));
+    return new DiskOutputFile(outputFile.resolve(path));
   }
 
   /**
@@ -56,7 +56,7 @@ public class DiskOutputFile implements OutputFile {
    * @since 1.0.0
    */
   public void setPath(String path) {
-    file = Path.of(path);
+    outputFile = Path.of(path);
   }
 
   /**
@@ -69,8 +69,8 @@ public class DiskOutputFile implements OutputFile {
    */
   @Override
   public BufferedOutputStream open() throws IOException {
-    log.debug("Open stream at {}.", file);
-    return new BufferedOutputStream(Files.newOutputStream(file));
+    log.debug("Open stream at {}.", outputFile);
+    return new BufferedOutputStream(Files.newOutputStream(outputFile));
   }
 
   /**
@@ -99,11 +99,11 @@ public class DiskOutputFile implements OutputFile {
    */
   @Override
   public void clearDirectory() throws IOException {
-    Files.createDirectories(file);
-    try (Stream<Path> paths = Files.walk(file)) {
+    Files.createDirectories(outputFile);
+    try (Stream<Path> paths = Files.walk(outputFile)) {
       paths.sorted(Comparator.reverseOrder()).forEach(this::deleteFile);
     }
-    log.debug("Cleared the directory at {}.", file);
+    log.debug("Cleared the directory at {}.", outputFile);
   }
 
   /**
@@ -116,7 +116,7 @@ public class DiskOutputFile implements OutputFile {
   @Override
   public org.apache.parquet.io.OutputFile wrap() {
     log.debug("Wrapping {} with org.apache.parquet.io.OutputFile.", this);
-    return new DiskParquetOutputFile(file);
+    return new DiskParquetOutputFile(outputFile);
   }
 
   /**
@@ -128,6 +128,6 @@ public class DiskOutputFile implements OutputFile {
    */
   @Override
   public String toString() {
-    return file.toString();
+    return outputFile.toString();
   }
 }
