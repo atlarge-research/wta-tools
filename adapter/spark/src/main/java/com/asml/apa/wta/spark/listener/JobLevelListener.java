@@ -106,7 +106,7 @@ public class JobLevelListener extends AbstractListener<Workflow> {
     final String scheduler = sparkContext.getConf().get("spark.scheduler.mode", "FIFO");
     final Domain domain = config.getDomain();
     final String appName = sparkContext.appName();
-    final int criticalPathTaskCount = criticalPathTasks.get(jobId);
+    final int criticalPathTaskCount = criticalPathTasks.remove(jobId);
     final double totalResources = -1.0;
     final double totalMemoryUsage = sumDouble(Arrays.stream(tasks).map(Task::getMemoryRequested));
     final long totalNetworkUsage = sumLong(Arrays.stream(tasks).map(Task::getNetworkIoTime));
