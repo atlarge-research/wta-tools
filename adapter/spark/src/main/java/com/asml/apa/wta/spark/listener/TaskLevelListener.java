@@ -85,8 +85,13 @@ public class TaskLevelListener extends TaskStageBaseListener {
     final double memoryRequested = -1.0;
     final String resourceType = "N/A";
     final double resourceAmountRequested = -1.0;
-    final long diskIoTime =
-        curTaskMetrics.executorDeserializeTime() + curTaskMetrics.resultSerializationTime(); // unsure
+    final long diskIoTime = -1L;
+    /**
+     * alternative:
+     *
+     * final long diskIoTime =
+     *         curTaskMetrics.executorDeserializeTime() + curTaskMetrics.resultSerializationTime();
+     */
     final long resourceUsed = Math.abs(curTaskInfo.executorId().hashCode());
 
     // unknown
