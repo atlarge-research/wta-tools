@@ -10,7 +10,7 @@ Warning: The scripts assume ownership of the `/local/$USER/` directory on every 
 1. Git clone this repository to your home directory on DAS-5. The resulting directory will be referred to as `$DEPLOYER_HOME` throughout this manual.
 2. Set the environment path variable to the `$DEPLOYER_HOME` and other required tools:
 
-```bash
+```shell
 export PATH=$PATH:`<path_to_$DEPLOYER_HOME>`
 export JAVA_HOME=`<path_to_JAVA>`
 export PATH=$JAVA_HOME/bin:$PATH
@@ -24,7 +24,7 @@ Optional if space in your home directory is limited (deployments are likely to g
 ## Reserving nodes on DAS-5
 The deployer can create a new reservation via `preserve` or you may use existing reservations. To create a reservation run:
 
-```bash
+```shell
 module load prun
 deployer preserve create-reservation -q -t "$TIMEOUT" $MACHINES
 ```
@@ -33,13 +33,13 @@ where `$TIMEOUT` should be the duration of the reservation in `hh:mm:ss` format 
 
 Use the following (substituting your reservation ID) to check the status of your reservation:
 
-```bash
+```shell
 preserve -list 
 ```
 
 or
 
-```bash
+```shell
 deployer preserve fetch-reservation $RESERVATION_ID
 ```
 
@@ -47,20 +47,20 @@ The first compute node specified is the master node.
 
 To kill a specific reservation:
 
-```bash
+```shell
 preserve -c $RESERVATION_ID
 ```
 
 ## Deploying frameworks
 To get a list of supported frameworks and versions, run:
 
-```bash
+```shell
 deployer list-frameworks --versions
 ```
 
 Before a framework can be deployed, it must be "installed". This only needs to be done once. After installing, the framework can be repeatedly deployed. In the following command, substitute a framework name and version as output by the `deployer list-frameworks` command.
 
-```bash
+```shell
 deployer install $FRAMEWORK $VERSION
 ```
 
@@ -69,7 +69,7 @@ To deploy a framework, use the `deployer deploy -h` command for help, or use one
 ### Deploying Hadoop
 Before deploying hadoop, add the following environment path variables:
 
-```bash
+```shell
 export HADOOP_HOME=`<path_to_installed_hadoop>`
 export HADOOP_CONF_DIR=$HADOOP_HOME/etc/hadoop
 export YARN_CONF_DIR=$HADOOP_HOME/etc/hadoop
@@ -77,7 +77,7 @@ export YARN_CONF_DIR=$HADOOP_HOME/etc/hadoop
 
 To deploy Hadoop (HDFS and YARN) with sensible defaults, run the following command (substituting your reservation ID):
 
-```bash
+```shell
 cd das-bigdata-deployment
 deployer deploy --preserve-id $RESERVATION_ID -s env/das5-hadoop.settings hadoop 3.2.4
 ```
@@ -87,7 +87,7 @@ If you do not need HDFS or YARN append the `hdfs_enable=false` or `yarn_enable=f
 ### Deploying Spark
 To deploy Spark with sensible defaults, run the following command (substituting your reservation ID):
 
-```bash
+```shell
 cd das-bigdata-deployment
 deployer deploy --preserve-id $RESERVATION_ID -s env/das5-spark.settings spark 3.2.4
 ```
@@ -96,7 +96,7 @@ deployer deploy --preserve-id $RESERVATION_ID -s env/das5-spark.settings spark 3
 It is recommended to always use HDFS as running Spark on DAS-5 generates a lot of small files. While the main file-server is mounted on every compute node of the cluster, it is still recommended to put any necessary files for the Spark job in HDFS.
 
 Check the HDFS NameNode's hostname by going into the hadoop frameworks and checking the **core-site.xml** file:
-```bash
+```shell
 cd das-bigdata-deployment/frameworks/hadoop-<version>/etc/hadoop
 vim hdfs-site.xml
 ```
@@ -107,7 +107,7 @@ ex) hdfs://node339.ib.cluster:9000
 
 Once you have confirmed the HDFS hostname add the necessary files to HDFS:
 
-```bash
+```shell
 cd das-bigdata-deployment
 
 ./frameworks/hadoop-3.2.4/bin/hadoop fs -mkdir -p hdfs://node339.ib.cluster:9000/jars

@@ -38,13 +38,14 @@ public class WtaWriter {
    *
    * @param path the output path to write to
    * @param version the version of files to write
+   * @param toolVersion the version of the tool that writes to file
    * @author Atour Mousavi Gourabi
    * @since 1.0.0
    */
-  public WtaWriter(@NonNull OutputFile path, String version) {
-    file = path;
+  public WtaWriter(@NonNull OutputFile path, String version, String toolVersion) {
+    file = path.resolve(toolVersion);
     schemaVersion = version;
-    setupDirectories(path, version);
+    setupDirectories(file, version);
   }
 
   /**

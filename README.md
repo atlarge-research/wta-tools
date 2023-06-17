@@ -16,7 +16,7 @@ found in `submodules/dockerfiles`, under their respective distro names (`alpine`
 To layer them on top of existing images, please run the following command, after setting the base image and generated
 image tags, and defining the Linux distro to use the `Dockerfile` of.
 
-```bash
+```shell
 docker build --build-arg base_image=[BASE IMAGE TAG] -t [IMAGE TAG] path/to/repository/submodules/dockerfiles/[DISTRO]
 ```
 
@@ -32,7 +32,7 @@ to the application. This means the application will either have to be run with `
 needs to be set to 0. Even when layering one of the provided `Dockerfiles`, this will still have to be set. This can
 be done by running the following command:
 
-```bash
+```shell
 sysctl -w kernel.perf_event_paranoid=0
 ```
 
@@ -47,28 +47,61 @@ An example of a valid configuration can be seen here:
   "description": "Processing data for scientific research purposes",
   "logLevel": "INFO",
   "outputPath": "wta-output",
-  "resourcePingInterval": 1000,
-  "executorSynchronizationInterval": 2000
+  "resourcePingInterval": 500,
+  "executorSynchronizationInterval": -1
 }
 
 ```
 
 ### Configuration Description
-Below is an explanation of each field and their expected types.
+Below is an explanation of each field and their expected types. The default values for certain fields were determined by running
 
-| Field                           |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      Description |    Expected Type     | Mandatory          |
-|---------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|:--------------------:|--------------------|
-| authors                         |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 The author(s) of the trace. Even if there is 1 author, they must still be specified in an array. |   `ARRAY[STRING]`    | :heavy_check_mark: |
-| domain                          |                                                                                                                                                                                                                                                                                                                                                                                                                                                           The domain that the job corresponds to. This must be either 'Biomedical', 'Engineering', 'Industrial' or 'Scientific'. This is a case-sensitive field. |       `STRING`       | :heavy_check_mark: |
-| description                     |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      The description of the job. |       `STRING`       |                    |
-| logLevel                        |                                                                                                                                                                                                                                                                                                                                                                                                                                           The granularity of which the events/errors should be logged. This is one of `OFF`,`ALL`,`TRACE`,`DEBUG`,`FATAL`,`WARN`,`INFO` or`ERROR`. This field is case-sensitive. |       `STRING`       |                    |
-| outputPath                      |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          The output path of the generated trace. |       `STRING`       | :heavy_check_mark: |
-| resourcePingInterval            |                                                                                                                                                                                                     How often the resources are pinged for metrics in milliseconds. By default this is set to 1000 and it is encouraged that the user does not modify this unless they know exactly what they are doing, as modifying this in a naive manner can introduce unforeseen effects. If this parameter is too large, metrics will not be captured for tasks that have a lifespan shorter than the respective interval. |       `INT32`        |                    |
-| executorSynchronizationInterval | How often executors/slaves send their captured resource metrics to the driver/master in milliseconds. By default this is set to 2000 and it is encouraged that the user does not modify this unless they know exactly what they are doing, as modifying this in a naive manner can introduce unforeseen effects. If resources are pinged and a task subsequently ends before a buffer synchronization tick, the respective resources will not be included in the aggregated metrics. If this value is negative, resource information will be sent immediately after it is collected and it will not be buffered. |       `INT32`        |                    |
+| Field                           |                                                                                                                                                                                                                                                                                                                                                                                                                                                           Description |  Expected Type  | Mandatory          |
+|---------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|:---------------:|--------------------|
+| authors                         |                                                                                                                                                                                                                                                                                                                                                                      The author(s) of the trace. Even if there is 1 author, they must still be specified in an array. | `ARRAY[STRING]` | :heavy_check_mark: |
+| domain                          |                                                                                                                                                                                                                                                                                                                The domain that the job corresponds to. This must be either 'Biomedical', 'Engineering', 'Industrial' or 'Scientific'. This is a case-sensitive field. |    `STRING`     | :heavy_check_mark: |
+| description                     |                                                                                                                                                                                                                                                                                                                                                                                                                                           The description of the job. |    `STRING`     |                    |
+| logLevel                        |                                                                                                                                                                                                                                                                                                The granularity of which the events/errors should be logged. This is one of `OFF`,`ALL`,`TRACE`,`DEBUG`,`FATAL`,`WARN`,`INFO` or`ERROR`. This field is case-sensitive. |    `STRING`     |                    |
+| outputPath                      |                                                                                                                                                                                                                                                                                                                                                                                                                               The output path of the generated trace. |    `STRING`     | :heavy_check_mark: |
+| resourcePingInterval            |                                                       How often the resources are pinged for metrics in milliseconds. By default this is set to 500 and it is encouraged that the user does not modify this unless they know exactly what they are doing, as modifying this in a naive manner can introduce unforeseen effects. If this parameter is too large, metrics will not be captured for executors that have a lifespan shorter than the respective interval. |     `INT32`     |                    |
+| executorSynchronizationInterval | How often executors/slaves send their captured resource metrics to the driver/master in milliseconds. By default this is set to -1.  If the resources are pinged and the executor subsequently ends before a buffer synchronization tick, the respective resources will not be included in the aggregated metrics on the driver side. If this value is non-positive, resource information will be sent immediately after it is collected and it will not be buffered. |     `INT32`     |                    |
 
 
 ### Configuration per Application
 [Spark Plugin](/adapter/spark/README.md#configuration)
+
+
+## Developer Guidelines
+
+### General Architecture (TL;DR)
+
+The structure of this framework is split into two modules. Namely, `core` and `adapter`.
+#### Core
+The `core` module contains logic and information which is agnostic to the application that is being traced. This includes, but is not limited to:
+- DTOs (Data Transfer Object) which are used to represent the events and resources that are captured.
+- Exceptions which can be generalized to any application.
+- I/O logic which is used to convert the execution trace to Parquet.
+- WTA models.
+- Application agnostic resource utilisation metrics including the extraction engine.
+- General utility classes.
+
+More information can be found in the [core](./core/README.md) module.
+
+#### Adapter
+The `adapter` module contains logic and information which is specific to the application that is being traced. This includes, but is not limited to:
+- Application specific functionality (e.g. listening to Spark events).
+- Application specific information that needs to be tracked (e.g. `executorId`).
+- Additional DTOs that are specific to the application.
+- Anything that extends the functionality of classes in the `core` module, to make it tailored to the application.
+
+More information can be found in the [adapter](./adapter/README.md) module.
+
+Additional modules can be found in the submodules directory. Currently they include the following things
+- Benchmarking
+  - Contains scripts to benchmark the performance of the framework against The Distributed ASCI Supercomputer 5 (DAS-5). More information can be found in the [here](./submodules/benchmarking/README.md).
+- wta-tools
+  - Instructions to use validation scripts. More information can be found in [here](./submodules/wta-tools/README.md).
+
 
 
 
