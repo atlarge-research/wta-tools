@@ -1,10 +1,7 @@
 package com.asml.apa.wta.spark.datasource;
 
 import com.asml.apa.wta.core.config.RuntimeConfig;
-import com.asml.apa.wta.spark.listener.ApplicationLevelListener;
-import com.asml.apa.wta.spark.listener.JobLevelListener;
-import com.asml.apa.wta.spark.listener.StageLevelListener;
-import com.asml.apa.wta.spark.listener.TaskLevelListener;
+import com.asml.apa.wta.spark.listener.*;
 import lombok.Getter;
 import org.apache.spark.SparkContext;
 
@@ -46,11 +43,11 @@ public class SparkDataSource {
     if (config.isStageLevel()) {
       jobLevelListener = new JobLevelListener(sparkContext, config, stageLevelListener, stageLevelListener);
       applicationLevelListener = new ApplicationLevelListener(
-          sparkContext, config, jobLevelListener, stageLevelListener, stageLevelListener);
+          sparkContext, config, stageLevelListener, stageLevelListener, jobLevelListener);
     } else {
       jobLevelListener = new JobLevelListener(sparkContext, config, taskLevelListener, stageLevelListener);
       applicationLevelListener = new ApplicationLevelListener(
-          sparkContext, config, jobLevelListener, taskLevelListener, stageLevelListener);
+          sparkContext, config, taskLevelListener, stageLevelListener, jobLevelListener);
     }
 
     runtimeConfig = config;

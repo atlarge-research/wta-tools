@@ -43,7 +43,7 @@ public class JobLevelListener extends AbstractListener<Workflow> {
    *
    * @param sparkContext       The current spark context
    * @param config             Additional config specified by the user for the plugin
-   * @param taskListener       The task-level listener to be used by this listener
+   * @param wtaTaskListener       The task-level listener to be used by this listener
    * @param stageLevelListener The stage-level listener
    * @author Henry Page
    * @author Tianchen Qu
@@ -52,10 +52,10 @@ public class JobLevelListener extends AbstractListener<Workflow> {
   public JobLevelListener(
       SparkContext sparkContext,
       RuntimeConfig config,
-      TaskStageBaseListener taskListener,
+      TaskStageBaseListener wtaTaskListener,
       StageLevelListener stageLevelListener) {
     super(sparkContext, config);
-    this.wtaTaskListener = taskListener;
+    this.wtaTaskListener = wtaTaskListener;
     this.stageLevelListener = stageLevelListener;
   }
 
