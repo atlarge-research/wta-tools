@@ -52,11 +52,12 @@ public class StageLevelListener extends TaskStageBaseListener {
    * @author Pil Kyu Cho
    * @since 1.0.0
    */
-  public void fillInParentChildMaps(long stageId, Task task,  StageInfo curStageInfo) {
+  public void fillInParentChildMaps(long stageId, Task task, StageInfo curStageInfo) {
     final long[] parentStageIds = JavaConverters.seqAsJavaList(
-                    curStageInfo.parentIds().toList())
-            .stream()
-            .mapToLong(parentId -> (Integer)parentId + 1).toArray();
+            curStageInfo.parentIds().toList())
+        .stream()
+        .mapToLong(parentId -> (Integer) parentId + 1)
+        .toArray();
     if (config.isStageLevel()) {
       task.setParents(parentStageIds);
     } else {
@@ -77,12 +78,13 @@ public class StageLevelListener extends TaskStageBaseListener {
   }
 
   /**
-   * This method is called every time a stage is completed. Stage-level metrics are collected, aggregated, and added here.
-   * Note:
-   * peakExecutionMemory is the peak memory used by internal data structures created during shuffles, aggregations
-   * and joins. The value of this accumulator should be approximately the sum of the peak sizes across all such
-   * data structures created in this task. It is thus only an upper bound of the actual peak memory for the task.
-   * For SQL jobs, this only tracks all unsafe operators and ExternalSort
+   * This method is called every time a stage is completed. Stage-level metrics are collected, aggregated,
+   * and added here.
+   * Note: peakExecutionMemory is the peak memory used by internal data structures created during
+   * shuffles, aggregations and joins. The value of this accumulator should be approximately the sum of
+   * the peak sizes across all such data structures created in this task. It is thus only an upper
+   * bound of the actual peak memory for the task. For SQL jobs, this only tracks all unsafe operators
+   * and ExternalSort
    *
    * @param stageCompleted   SparkListenerStageCompleted The object corresponding to information on stage completion
    * @author Tianchen Qu
@@ -122,28 +124,28 @@ public class StageLevelListener extends TaskStageBaseListener {
     final long resourceUsed = -1L;
 
     Task task = Task.builder()
-            .id(stageId)
-            .type(type)
-            .submissionSite(submissionSite)
-            .tsSubmit(tsSubmit)
-            .runtime(runtime)
-            .resourceType(resourceType)
-            .resourceAmountRequested(resourceAmountRequested)
-            .parents(parents)
-            .children(children)
-            .userId(userId)
-            .groupId(groupId)
-            .nfrs(nfrs)
-            .workflowId(workflowId)
-            .waitTime(waitTime)
-            .params(params)
-            .memoryRequested(memoryRequested)
-            .networkIoTime(networkIoTime)
-            .diskIoTime(diskIoTime)
-            .diskSpaceRequested(diskSpaceRequested)
-            .energyConsumption(energyConsumption)
-            .resourceUsed(resourceUsed)
-            .build();
+        .id(stageId)
+        .type(type)
+        .submissionSite(submissionSite)
+        .tsSubmit(tsSubmit)
+        .runtime(runtime)
+        .resourceType(resourceType)
+        .resourceAmountRequested(resourceAmountRequested)
+        .parents(parents)
+        .children(children)
+        .userId(userId)
+        .groupId(groupId)
+        .nfrs(nfrs)
+        .workflowId(workflowId)
+        .waitTime(waitTime)
+        .params(params)
+        .memoryRequested(memoryRequested)
+        .networkIoTime(networkIoTime)
+        .diskIoTime(diskIoTime)
+        .diskSpaceRequested(diskSpaceRequested)
+        .energyConsumption(energyConsumption)
+        .resourceUsed(resourceUsed)
+        .build();
     fillInParentChildMaps(stageId, task, curStageInfo);
     this.getProcessedObjects().add(task);
   }

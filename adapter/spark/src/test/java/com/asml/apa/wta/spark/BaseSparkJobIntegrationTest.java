@@ -50,9 +50,7 @@ public class BaseSparkJobIntegrationTest {
         .outputPath("src/test/resources/wta-output")
         .build();
 
-    SparkConf conf = new SparkConf()
-        .setAppName("SparkTestRunner")
-        .setMaster("local");
+    SparkConf conf = new SparkConf().setAppName("SparkTestRunner").setMaster("local");
     spark = SparkSession.builder().config(conf).getOrCreate();
     spark.sparkContext().setLogLevel("ERROR");
 

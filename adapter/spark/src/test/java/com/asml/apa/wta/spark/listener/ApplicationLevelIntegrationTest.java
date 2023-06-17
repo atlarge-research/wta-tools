@@ -20,11 +20,11 @@ class ApplicationLevelIntegrationTest extends BaseSparkJobIntegrationTest {
     assertThat(sut1.getTaskLevelListener().getProcessedObjects().get(0).getParents())
         .isEqualTo(new long[0]);
     assertThat(sut1.getTaskLevelListener().getProcessedObjects().get(0).getChildren())
-        .isEqualTo(new long[]{2});
+        .isEqualTo(new long[] {2});
     assertThat(sut1.getTaskLevelListener().getProcessedObjects().get(1).getParents())
-            .isEqualTo(new long[]{1});
+        .isEqualTo(new long[] {1});
     assertThat(sut1.getTaskLevelListener().getProcessedObjects().get(1).getChildren())
-            .isEqualTo(new long[0]);
+        .isEqualTo(new long[0]);
   }
 
   @Test
@@ -40,10 +40,10 @@ class ApplicationLevelIntegrationTest extends BaseSparkJobIntegrationTest {
     assertThat(sut2.getStageLevelListener().getProcessedObjects().get(0).getParents())
         .isEqualTo(new long[0]);
     assertThat(sut2.getStageLevelListener().getProcessedObjects().get(0).getChildren())
-        .isEqualTo(new long[]{2});
+        .isEqualTo(new long[] {2});
     assertThat(sut2.getStageLevelListener().getProcessedObjects().get(1).getParents())
-            .isEqualTo(new long[]{1});
+        .isEqualTo(new long[] {1});
     assertThat(sut2.getStageLevelListener().getProcessedObjects().get(1).getChildren())
-            .isEqualTo(new long[0]);
+        .isEqualTo(new long[0]);
   }
 }

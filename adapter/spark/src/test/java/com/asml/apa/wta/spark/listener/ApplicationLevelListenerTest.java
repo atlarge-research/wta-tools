@@ -82,8 +82,7 @@ class ApplicationLevelListenerTest extends BaseLevelListenerTest {
     testStageInfo1 =
         new StageInfo(2, 0, "test", 50, null, new ListBuffer<>(), "None", mockedMetrics1, null, null, 100);
     parents.$plus$eq(testStageInfo1.stageId());
-    testStageInfo2 =
-            new StageInfo(10, 0, "test", 50, null, parents, "None", mockedMetrics1, null, null, 100);
+    testStageInfo2 = new StageInfo(10, 0, "test", 50, null, parents, "None", mockedMetrics1, null, null, 100);
     taskEndEvent1 = new SparkListenerTaskEnd(
         2, 1, "testTaskType", null, testTaskInfo1, new ExecutorMetrics(), mockedMetrics1);
     taskEndEvent2 = new SparkListenerTaskEnd(

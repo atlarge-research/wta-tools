@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
-
 import lombok.Getter;
 import org.apache.spark.SparkContext;
 import org.apache.spark.scheduler.SparkListenerJobEnd;
@@ -69,7 +68,7 @@ public class JobLevelListener extends AbstractListener<Workflow> {
   private long computeCriticalPathLength() {
     final long jobRunTime = System.currentTimeMillis() - jobStartTime;
     final long driverTime = jobRunTime
-            - stageLevelListener.getProcessedObjects().stream()
+        - stageLevelListener.getProcessedObjects().stream()
             .filter(wtaTask -> stageIds.contains(wtaTask.getId()))
             .map(Task::getRuntime)
             .reduce(Long::sum)
@@ -81,15 +80,13 @@ public class JobLevelListener extends AbstractListener<Workflow> {
       final Map<Long, List<Task>> stageToTasks = taskLevelListener.getStageToTasks();
       List<Long> stageMaximumTaskTime = new ArrayList<>();
       stageIds.stream()
-              .filter(stageToTasks::containsKey)
-              .forEach(stageId -> stageMaximumTaskTime.add(
-                      stageToTasks.get(stageId)
-                              .stream()
-                              .map(Task::getRuntime)
-                              .max(Long::compareTo)
-                              .orElse(0L)));
+          .filter(stageToTasks::containsKey)
+          .forEach(stageId -> stageMaximumTaskTime.add(stageToTasks.get(stageId).stream()
+              .map(Task::getRuntime)
+              .max(Long::compareTo)
+              .orElse(0L)));
       criticalPathLength =
-              driverTime + stageMaximumTaskTime.stream().reduce(Long::sum).orElse(0L);
+          driverTime + stageMaximumTaskTime.stream().reduce(Long::sum).orElse(0L);
     }
     return criticalPathLength;
   }
@@ -103,9 +100,11 @@ public class JobLevelListener extends AbstractListener<Workflow> {
    */
   @Override
   public void onJobStart(SparkListenerJobStart jobStart) {
-    jobSubmitTimes.put((long)jobStart.jobId() + 1, jobStart.time());
+    jobSubmitTimes.put((long) jobStart.jobId() + 1, jobStart.time());
     jobStartTime = System.currentTimeMillis();
-    stageIds = JavaConverters.seqAsJavaList(jobStart.stageIds()).stream().map(obj -> ((Long) obj) + 1).collect(Collectors.toList());
+    stageIds = JavaConverters.seqAsJavaList(jobStart.stageIds()).stream()
+        .map(obj -> ((Long) obj) + 1)
+        .collect(Collectors.toList());
     criticalPathTaskCount = jobStart.stageIds().length();
   }
 
@@ -137,25 +136,25 @@ public class JobLevelListener extends AbstractListener<Workflow> {
     final String applicationField = "ETL";
     final double totalResources = -1.0;
     final double totalMemoryUsage = Arrays.stream(tasks)
-            .map(Task::getMemoryRequested)
-            .filter(x -> x >= 0.0)
-            .reduce(Double::sum)
-            .orElseGet(() -> -1.0);
+        .map(Task::getMemoryRequested)
+        .filter(x -> x >= 0.0)
+        .reduce(Double::sum)
+        .orElseGet(() -> -1.0);
     final long totalNetworkUsage = Arrays.stream(tasks)
-            .map(Task::getNetworkIoTime)
-            .filter(x -> x >= 0)
-            .reduce(Long::sum)
-            .orElse(-1L);
+        .map(Task::getNetworkIoTime)
+        .filter(x -> x >= 0)
+        .reduce(Long::sum)
+        .orElse(-1L);
     final double totalDiskSpaceUsage = Arrays.stream(tasks)
-            .map(Task::getDiskSpaceRequested)
-            .filter(x -> x >= 0.0)
-            .reduce(Double::sum)
-            .orElseGet(() -> -1.0);
+        .map(Task::getDiskSpaceRequested)
+        .filter(x -> x >= 0.0)
+        .reduce(Double::sum)
+        .orElseGet(() -> -1.0);
     final double totalEnergyConsumption = Arrays.stream(tasks)
-            .map(Task::getEnergyConsumption)
-            .filter(x -> x >= 0.0)
-            .reduce(Double::sum)
-            .orElse(-1.0);
+        .map(Task::getEnergyConsumption)
+        .filter(x -> x >= 0.0)
+        .reduce(Double::sum)
+        .orElse(-1.0);
 
     this.getProcessedObjects()
         .add(Workflow.builder()
