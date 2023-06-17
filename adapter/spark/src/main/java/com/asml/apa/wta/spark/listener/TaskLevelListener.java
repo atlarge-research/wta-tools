@@ -91,6 +91,10 @@ public class TaskLevelListener extends TaskStageBaseListener {
      *
      * final long diskIoTime =
      *         curTaskMetrics.executorDeserializeTime() + curTaskMetrics.resultSerializationTime();
+     *
+     * This is not totally accurate as diskIoTime also includes time accessing the disk in case of a spill.
+     * Also, the deserialization/serialization time in spark is not completely clear if it also considers the time spent
+     * on the operating system side.
      */
     final long resourceUsed = Math.abs(curTaskInfo.executorId().hashCode());
 
