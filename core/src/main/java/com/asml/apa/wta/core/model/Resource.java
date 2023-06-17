@@ -40,7 +40,7 @@ public class Resource implements BaseTraceObject {
   private final String details = "";
 
   @Builder.Default
-  private final Map<String, String> events = new HashMap<>(Map.of("1", "2", "3", "4"));
+  private final Map<String, String> events = new HashMap<>();
 
   /**
    * All WTA objects that are stored as Parquet files rely on this method to convert the object to a record.
