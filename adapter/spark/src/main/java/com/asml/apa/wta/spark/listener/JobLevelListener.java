@@ -32,7 +32,7 @@ public class JobLevelListener extends AbstractListener<Workflow> {
 
   private final Map<Integer, Long> jobSubmitTimes = new ConcurrentHashMap<>();
 
-  private int criticalPathTasks = -1;
+  private final Map<Integer, Integer> criticalPathTasks = new ConcurrentHashMap<>();
 
   private List<Integer> jobStages;
 
@@ -58,6 +58,22 @@ public class JobLevelListener extends AbstractListener<Workflow> {
   }
 
   /**
+   * Constructor for the job-level listener.
+   * This constructor is for stage-level plugin.
+   *
+   * @param sparkContext       The current spark context
+   * @param config             Additional config specified by the user for the plugin
+   * @param stageLevelListener The stage-level listener
+   * @author Tianchen Qu
+   * @since 1.0.0
+   */
+  public JobLevelListener(SparkContext sparkContext, RuntimeConfig config, StageLevelListener stageLevelListener) {
+    super(sparkContext, config);
+    this.taskListener = stageLevelListener;
+    this.stageLevelListener = stageLevelListener;
+  }
+
+  /**
    * Callback for job start event, tracks the submit time of the job.
    *
    * @param jobStart The jobstart event object containing information upon job start.
@@ -66,7 +82,7 @@ public class JobLevelListener extends AbstractListener<Workflow> {
   @Override
   public void onJobStart(SparkListenerJobStart jobStart) {
     jobSubmitTimes.put(jobStart.jobId() + 1, jobStart.time());
-    criticalPathTasks = jobStart.stageIds().length();
+    criticalPathTasks.put(jobStart.jobId() + 1, jobStart.stageIds().length());
     jobStages = JavaConverters.seqAsJavaList(jobStart.stageIds()).stream()
         .map(stageId -> (int) stageId)
         .collect(Collectors.toList());
@@ -90,7 +106,7 @@ public class JobLevelListener extends AbstractListener<Workflow> {
     final String scheduler = sparkContext.getConf().get("spark.scheduler.mode", "FIFO");
     final Domain domain = config.getDomain();
     final String appName = sparkContext.appName();
-    final int criticalPathTaskCount = criticalPathTasks;
+    final int criticalPathTaskCount = criticalPathTasks.get(jobId);
     final double totalResources = -1.0;
     final double totalMemoryUsage = sumDouble(Arrays.stream(tasks).map(Task::getMemoryRequested));
     final long totalNetworkUsage = sumLong(Arrays.stream(tasks).map(Task::getNetworkIoTime));

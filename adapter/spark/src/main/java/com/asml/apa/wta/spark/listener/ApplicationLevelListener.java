@@ -130,16 +130,6 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
         builder::stdResourceTask,
         builder::covResourceTask);
 
-    medianAndQuartiles(
-        tasks.stream()
-            .map(Task::getResourceAmountRequested)
-            .filter(resourceAmount -> resourceAmount >= 0.0)
-            .collect(Collectors.toList()),
-        -1.0,
-        builder::medianResourceTask,
-        builder::firstQuartileResourceTask,
-        builder::thirdQuartileResourceTask);
-
     min(tasks.stream().map(Task::getMemoryRequested), builder::minMemory);
 
     max(tasks.stream().map(Task::getMemoryRequested), builder::maxMemory);
@@ -154,16 +144,6 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
         memorySize,
         builder::stdMemory,
         builder::covMemory);
-
-    medianAndQuartiles(
-        tasks.stream()
-            .map(Task::getMemoryRequested)
-            .filter(memory -> memory >= 0.0)
-            .collect(Collectors.toList()),
-        -1.0,
-        builder::medianMemory,
-        builder::firstQuartileMemory,
-        builder::thirdQuartileMemory);
 
     minLong(tasks.stream().map(Task::getNetworkIoTime), builder::minNetworkUsage);
 
@@ -186,16 +166,6 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
         builder::stdNetworkUsage,
         builder::covNetworkUsage);
 
-    medianAndQuartiles(
-        tasks.stream()
-            .map(Task::getNetworkIoTime)
-            .filter(networkIo -> networkIo >= 0)
-            .collect(Collectors.toList()),
-        -1L,
-        builder::medianNetworkUsage,
-        builder::firstQuartileNetworkUsage,
-        builder::thirdQuartileNetworkUsage);
-
     min(tasks.stream().map(Task::getDiskSpaceRequested), builder::minDiskSpaceUsage);
 
     max(tasks.stream().map(Task::getDiskSpaceRequested), builder::maxDiskSpaceUsage);
@@ -211,16 +181,6 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
         builder::stdDiskSpaceUsage,
         builder::covDiskSpaceUsage);
 
-    medianAndQuartiles(
-        tasks.stream()
-            .map(Task::getDiskSpaceRequested)
-            .filter(diskSpace -> diskSpace >= 0.0)
-            .collect(Collectors.toList()),
-        -1.0,
-        builder::medianDiskSpaceUsage,
-        builder::firstQuartileDiskSpaceUsage,
-        builder::thirdQuartileDiskSpaceUsage);
-
     min(tasks.stream().map(Task::getEnergyConsumption), builder::minEnergy);
     max(tasks.stream().map(Task::getEnergyConsumption), builder::maxEnergy);
     final long energySize = validSize(tasks.stream().map(Task::getEnergyConsumption));
@@ -233,15 +193,7 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
         builder::stdEnergy,
         builder::covEnergy);
 
-    medianAndQuartiles(
-        tasks.stream()
-            .map(Task::getEnergyConsumption)
-            .filter(energy -> energy >= 0.0)
-            .collect(Collectors.toList()),
-        -1.0,
-        builder::medianEnergy,
-        builder::firstQuartileEnergy,
-        builder::thirdQuartileEnergy);
+    setMedianAndQuartiles(tasks, builder);
 
     processedObjects.add(builder.totalWorkflows(numWorkflows)
         .totalTasks(totalTasks)
@@ -256,6 +208,58 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
         .numGroups(numGroups)
         .totalResourceSeconds(totalResourceSeconds)
         .build());
+  }
+
+  private void setMedianAndQuartiles(List<Task> tasks, Workload.WorkloadBuilder builder) {
+    medianAndQuartiles(
+        tasks.stream()
+            .map(Task::getResourceAmountRequested)
+            .filter(resourceAmount -> resourceAmount >= 0.0)
+            .collect(Collectors.toList()),
+        -1.0,
+        builder::medianResourceTask,
+        builder::firstQuartileResourceTask,
+        builder::thirdQuartileResourceTask);
+
+    medianAndQuartiles(
+        tasks.stream()
+            .map(Task::getMemoryRequested)
+            .filter(memory -> memory >= 0.0)
+            .collect(Collectors.toList()),
+        -1.0,
+        builder::medianMemory,
+        builder::firstQuartileMemory,
+        builder::thirdQuartileMemory);
+
+    medianAndQuartiles(
+        tasks.stream()
+            .map(Task::getNetworkIoTime)
+            .filter(networkIo -> networkIo >= 0)
+            .collect(Collectors.toList()),
+        -1L,
+        builder::medianNetworkUsage,
+        builder::firstQuartileNetworkUsage,
+        builder::thirdQuartileNetworkUsage);
+
+    medianAndQuartiles(
+        tasks.stream()
+            .map(Task::getDiskSpaceRequested)
+            .filter(diskSpace -> diskSpace >= 0.0)
+            .collect(Collectors.toList()),
+        -1.0,
+        builder::medianDiskSpaceUsage,
+        builder::firstQuartileDiskSpaceUsage,
+        builder::thirdQuartileDiskSpaceUsage);
+
+    medianAndQuartiles(
+        tasks.stream()
+            .map(Task::getEnergyConsumption)
+            .filter(energy -> energy >= 0.0)
+            .collect(Collectors.toList()),
+        -1.0,
+        builder::medianEnergy,
+        builder::firstQuartileEnergy,
+        builder::thirdQuartileEnergy);
   }
 
   /**
@@ -324,16 +328,16 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
    * Will set up the corresponding field with the builder parameter that is passed.
    *
    * @param data data stream
-   * @param size size of the stream
+   * @param validSize size of the stream
    * @param builder builder
    * @return the mean value
    * @author Tianchen Qu
    * @since 1.0.0
    */
-  private double mean(Stream<Double> data, long size, Function<Double, Workload.WorkloadBuilder> builder) {
+  private double mean(Stream<Double> data, long validSize, Function<Double, Workload.WorkloadBuilder> builder) {
     double mean = -1.0;
-    if (size != 0) {
-      mean = data.filter(x -> x >= 0.0).reduce(Double::sum).orElse((double) -size) / size;
+    if (validSize != 0) {
+      mean = data.filter(x -> x >= 0.0).reduce(Double::sum).orElse((double) -validSize) / validSize;
     }
     builder.apply(mean);
     return mean;
@@ -344,7 +348,7 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
    *
    * @param data data stream
    * @param mean mean value from previous method
-   * @param size size from previous method
+   * @param validSize size from previous method
    * @param std the builder for the standard deviation field
    * @param cov the builder for the normalized standard deviation field
    * @author Tianchen Qu
@@ -353,15 +357,15 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
   private void stdAndCov(
       Stream<Double> data,
       Double mean,
-      long size,
+      long validSize,
       Function<Double, Workload.WorkloadBuilder> std,
       Function<Double, Workload.WorkloadBuilder> cov) {
-    if (size == 0 || mean == -1.0) {
+    if (validSize == 0 || mean == -1.0) {
       std.apply(-1.0);
       cov.apply(-1.0);
     } else {
       double temp = data.map(x -> x * x).reduce(Double::sum).orElse(-1.0);
-      temp = Math.pow(temp / size - mean * mean, 0.5);
+      temp = Math.pow(temp / validSize - mean * mean, 0.5);
       std.apply(temp);
       if (mean == 0.0) {
         cov.apply(-1.0);
