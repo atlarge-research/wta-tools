@@ -7,6 +7,7 @@ This module consists of:
  - Model objects (e.g., Resource, Task, Workflow, Workload)
  - Stream Infrastructure for the smart serialisation/deserialisation of objects to prevent the driver from running out of memory.
  - Functionality for serialising into Parquet
+ - Logic to collect resource utilization metrics.
 
 ## Streaming infrastructure
 The general streaming infrastructure is used to store intermediate metrics before aggregation.
@@ -26,6 +27,16 @@ It is important that when using the `core` module to build adapter layers, `Log4
 is invoked early to set the user-defined part of the logging configuration.
 As of now, the user can define one part of the logging configuration using `core` logging, the log level. This
 is set to `ERROR` by default, but the user can exert full control over this using the `config.json` file.
+
+### SupplierExtractionEngine - Resource Utilization Metrics
+The SupplierExtractionEngine is a class that is used to extract data from some suppliers. A `supplier` is an object that collects resource-utilization information
+from a given source, such as the JVM or the command line.
+
+#### Resource Utilization Metrics
+- Create a new supplier class that implements the `InformationSupplier` interface. You can add logic to collect information from a new source.
+- Add the supplier as a new dependency in `SupplierExtractionEngine`, if it is application specific, you may have to add the dependency in the application specific extraction engine, such as `SparkSupplierExtractionEngine`.
+- Modify the `ping()` and `transform()` method in `SupplierExtractionEngine` to include information from the new supplier.
+- Modify any relevant DTOs as necessary.
 
 ### Hadoop Dependency on Windows
 Avro uses Hadoop internally. If you want to run the plugin in Windows, you need
