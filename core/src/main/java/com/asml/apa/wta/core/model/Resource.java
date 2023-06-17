@@ -1,6 +1,8 @@
 package com.asml.apa.wta.core.model;
 
 import com.asml.apa.wta.core.io.ParquetSchema;
+import java.util.HashMap;
+import java.util.Map;
 import lombok.Builder;
 import lombok.Data;
 import org.apache.avro.generic.GenericRecord;
@@ -13,32 +15,31 @@ import org.apache.avro.generic.GenericRecord;
  */
 @Data
 @Builder
-@SuppressWarnings("VisibilityModifier")
 public class Resource implements BaseTraceObject {
 
   private static final long serialVersionUID = 3002249398331752973L;
 
-  public final long id;
+  private final long id;
 
   @Builder.Default
   private final String type = "cluster node";
 
-  public final double numResources;
+  private final double numResources;
 
-  public final String procModel;
+  private final String procModel;
 
-  public final long memory;
+  private final long memory;
 
-  public final long diskSpace;
+  private final long diskSpace;
 
-  public final long network;
+  private final long network;
 
-  public final String os;
+  private final String os;
 
   @Builder.Default
-  public final String details = "";
+  private final String details = "";
 
-  //  public final Map<String, String> events = new HashMap<>();
+  private final Map<String, String> events = new HashMap<>();
 
   /**
    * All WTA objects that are stored as Parquet files rely on this method to convert the object to a record.
