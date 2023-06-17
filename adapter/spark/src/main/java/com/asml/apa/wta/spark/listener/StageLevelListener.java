@@ -72,8 +72,11 @@ public class StageLevelListener extends TaskStageBaseListener {
     }
     final double diskSpaceRequested = (double) curStageMetrics.diskBytesSpilled()
         + curStageMetrics.shuffleWriteMetrics().bytesWritten();
-    // final double memoryRequested = curTaskMetrics.peakExecutionMemory();
     /**
+     * alternative:
+     *
+     * final double memoryRequested = curTaskMetrics.peakExecutionMemory();
+     *
      *  peakExecutionMemory is the peak memory used by internal data structures created during shuffles,
      *  aggregations and joins.
      *  The value of this accumulator should be approximately the sum of the peak sizes across all such data structures

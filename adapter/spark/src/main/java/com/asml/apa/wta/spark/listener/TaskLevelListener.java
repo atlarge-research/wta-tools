@@ -70,8 +70,11 @@ public class TaskLevelListener extends TaskStageBaseListener {
 
     final double diskSpaceRequested = (double) curTaskMetrics.diskBytesSpilled()
         + curTaskMetrics.shuffleWriteMetrics().bytesWritten();
-    // final double memoryRequested = curTaskMetrics.peakExecutionMemory();
     /**
+     * alternative:
+     *
+     * final double memoryRequested = curTaskMetrics.peakExecutionMemory();
+     *
      *  peakExecutionMemory is the peak memory used by internal data structures created during shuffles, aggregations
      *  and joins.
      *  The value of this accumulator should be approximately the sum of the peak sizes across all such data structures
@@ -163,7 +166,7 @@ public class TaskLevelListener extends TaskStageBaseListener {
       }
 
       // resource related fields
-      final int resourceProfileId = stageListener.getStageToResource().getOrDefault(stageId, -1);
+      final int resourceProfileId = stageListener.getStageToResource().get(stageId);
       final ResourceProfile resourceProfile =
           sparkContext.resourceProfileManager().resourceProfileFromId(resourceProfileId);
       final List<TaskResourceRequest> resources = JavaConverters.seqAsJavaList(
