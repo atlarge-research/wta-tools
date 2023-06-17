@@ -93,28 +93,28 @@ public class JobLevelListener extends AbstractListener<Workflow> {
     final double totalResources = -1.0;
     final double totalMemoryUsage = Arrays.stream(tasks)
         .map(Task::getMemoryRequested)
-        .filter(x -> x >= 0.0)
+        .filter(memory -> memory >= 0.0)
         .reduce(Double::sum)
-        .orElseGet(() -> -1.0);
+        .orElse(-1.0);
     final long totalNetworkUsage = Arrays.stream(tasks)
         .map(Task::getNetworkIoTime)
-        .filter(x -> x >= 0)
+        .filter(networkIo -> networkIo >= 0)
         .reduce(Long::sum)
         .orElse(-1L);
     final double totalDiskSpaceUsage = Arrays.stream(tasks)
         .map(Task::getDiskSpaceRequested)
-        .filter(x -> x >= 0.0)
+        .filter(diskSpace -> diskSpace >= 0.0)
         .reduce(Double::sum)
-        .orElseGet(() -> -1.0);
+        .orElse(-1.0);
     final double totalEnergyConsumption = Arrays.stream(tasks)
         .map(Task::getEnergyConsumption)
-        .filter(x -> x >= 0.0)
+        .filter(energy -> energy >= 0.0)
         .reduce(Double::sum)
         .orElse(-1.0);
     final long jobRunTime = System.currentTimeMillis() - jobStartTime;
     final long driverTime = jobRunTime
         - stageLevelListener.getProcessedObjects().stream()
-            .filter(x -> jobStages.contains(Math.toIntExact(x.getId())))
+            .filter(stage -> jobStages.contains(Math.toIntExact(stage.getId())))
             .map(Task::getRuntime)
             .reduce(Long::sum)
             .orElse(0L);
@@ -165,5 +165,22 @@ public class JobLevelListener extends AbstractListener<Workflow> {
             .build());
 
     jobSubmitTimes.remove(jobId);
+  }
+
+  /**
+   * This is a method called on application end. it sets up the resources used in the spark workflow.
+   *
+   * @author Tianchen Qu
+   * @since 1.0.0
+   */
+  public void setWorkflows() {
+    final List<Workflow> workflows = this.getProcessedObjects();
+    for (Workflow workflow : workflows) {
+      workflow.setTotalResources(Arrays.stream(workflow.getTasks())
+          .map(Task::getResourceAmountRequested)
+          .filter(resourceAmount -> resourceAmount >= 0.0)
+          .reduce(Double::sum)
+          .orElse(-1.0));
+    }
   }
 }

@@ -3,14 +3,19 @@ package com.asml.apa.wta.spark.listener;
 import com.asml.apa.wta.core.config.RuntimeConfig;
 import com.asml.apa.wta.core.model.Task;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.Getter;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.spark.SparkContext;
 import org.apache.spark.executor.TaskMetrics;
+import org.apache.spark.resource.ResourceProfile;
+import org.apache.spark.resource.TaskResourceRequest;
 import org.apache.spark.scheduler.SparkListenerTaskEnd;
 import org.apache.spark.scheduler.TaskInfo;
+import scala.collection.JavaConverters;
 
 /**
  * This class is a task-level listener for the Spark data source.
@@ -91,7 +96,6 @@ public class TaskLevelListener extends TaskStageBaseListener {
     final double energyConsumption = -1L;
     final long waitTime = -1L;
 
-    // TODO(#61): CALL EXTERNAL DEPENDENCIES
     Task task = Task.builder()
         .id(taskId)
         .type(type)
@@ -125,5 +129,50 @@ public class TaskLevelListener extends TaskStageBaseListener {
       tasks.add(task);
     }
     this.getProcessedObjects().add(task);
+  }
+
+  /**
+   * This method set up the parents and children of all tasks as well as the resources used by all tasks.
+   *
+   * @param stageListener stage level listener to get resource bindings
+   * @author Tianchen Qu
+   * @since 1.0.0
+   */
+  public void setTasks(StageLevelListener stageListener) {
+    final List<Task> tasks = this.getProcessedObjects();
+    for (Task task : tasks) {
+      // parent children fields
+      final int stageId = this.getTaskToStage().get(task.getId());
+      final Integer[] parentStages = stageListener.getStageToParents().get(stageId);
+      if (parentStages != null) {
+        final Long[] parents = Arrays.stream(parentStages)
+            .flatMap(parentStage -> Arrays.stream(
+                this.getStageToTasks().getOrDefault(parentStage, new ArrayList<>()).stream()
+                    .map(Task::getId)
+                    .toArray(Long[]::new)))
+            .toArray(Long[]::new);
+        task.setParents(ArrayUtils.toPrimitive(parents));
+      }
+
+      List<Integer> childrenStages = stageListener.getParentToChildren().get(stageId);
+      if (childrenStages != null) {
+        List<Task> children = new ArrayList<>();
+        childrenStages.forEach(
+            childrenStage -> children.addAll(this.getStageToTasks().get(childrenStage)));
+        Long[] temp = children.stream().map(Task::getId).toArray(Long[]::new);
+        task.setChildren(ArrayUtils.toPrimitive(temp));
+      }
+
+      // resource related fields
+      final int resourceProfileId = stageListener.getStageToResource().getOrDefault(stageId, -1);
+      final ResourceProfile resourceProfile =
+          sparkContext.resourceProfileManager().resourceProfileFromId(resourceProfileId);
+      final List<TaskResourceRequest> resources = JavaConverters.seqAsJavaList(
+          resourceProfile.taskResources().values().toList());
+      if (resources.size() > 0) {
+        task.setResourceType(resources.get(0).resourceName());
+        task.setResourceAmountRequested(resources.get(0).amount());
+      }
+    }
   }
 }

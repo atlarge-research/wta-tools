@@ -5,23 +5,17 @@ import com.asml.apa.wta.core.model.Task;
 import com.asml.apa.wta.core.model.Workflow;
 import com.asml.apa.wta.core.model.Workload;
 import com.asml.apa.wta.core.model.enums.Domain;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.spark.SparkContext;
-import org.apache.spark.resource.ResourceProfile;
-import org.apache.spark.resource.TaskResourceRequest;
 import org.apache.spark.scheduler.SparkListenerApplicationEnd;
 import org.apache.spark.scheduler.SparkListenerApplicationStart;
-import scala.collection.JavaConverters;
 
 /**
  * This class is an application-level listener for the Spark data source.
@@ -66,68 +60,6 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
     this.stageLevelListener = stageLevelListener;
   }
 
-  private void setTasks(TaskStageBaseListener taskListener, StageLevelListener stageListener) {
-    TaskLevelListener listener = (TaskLevelListener) taskListener;
-    final List<Task> tasks = taskListener.getProcessedObjects();
-    for (Task task : tasks) {
-      // parent children fields
-      final int stageId = listener.getTaskToStage().get(task.getId());
-      final Integer[] parentStages = stageListener.getStageToParents().get(stageId);
-      if (parentStages != null) {
-        final Long[] parents = Arrays.stream(parentStages)
-            .flatMap(x ->
-                Arrays.stream(listener.getStageToTasks().getOrDefault(x, new ArrayList<>()).stream()
-                    .map(Task::getId)
-                    .toArray(Long[]::new)))
-            .toArray(Long[]::new);
-        task.setParents(ArrayUtils.toPrimitive(parents));
-      }
-
-      List<Integer> childrenStages =
-          stageLevelListener.getParentToChildren().get(stageId);
-      if (childrenStages != null) {
-        List<Task> children = new ArrayList<>();
-        childrenStages.forEach(
-            x -> children.addAll(listener.getStageToTasks().get(x)));
-        Long[] temp = children.stream().map(Task::getId).toArray(Long[]::new);
-        task.setChildren(ArrayUtils.toPrimitive(temp));
-      }
-
-      // resource related fields
-      final int resourceProfileId =
-          stageLevelListener.getStageToResource().getOrDefault(stageId, -1);
-      final ResourceProfile resourceProfile =
-          sparkContext.resourceProfileManager().resourceProfileFromId(resourceProfileId);
-      final List<TaskResourceRequest> resources = JavaConverters.seqAsJavaList(
-          resourceProfile.taskResources().values().toList());
-      if (resources.size() > 0) {
-        task.setResourceType(resources.get(0).resourceName());
-        task.setResourceAmountRequested(resources.get(0).amount());
-      }
-    }
-  }
-
-  private void setStages(StageLevelListener stageListener) {
-    final List<Task> stages = stageListener.getProcessedObjects();
-    Map<Integer, List<Integer>> parentToChildren = stageListener.getParentToChildren();
-    for (Task stage : stages) {
-      stage.setChildren(parentToChildren.getOrDefault(Math.toIntExact(stage.getId()), new ArrayList<>()).stream()
-          .mapToLong(x -> x + 1)
-          .toArray());
-    }
-  }
-
-  private void setWorkflows(JobLevelListener jobListener) {
-    final List<Workflow> workflows = jobListener.getProcessedObjects();
-    for (Workflow workflow : workflows) {
-      workflow.setTotalResources(Arrays.stream(workflow.getTasks())
-          .map(Task::getResourceAmountRequested)
-          .filter(x -> x >= 0.0)
-          .reduce(Double::sum)
-          .orElse(-1.0));
-    }
-  }
-
   /**
    * Callback function that is called right at the end of the application. Further experimentation
    * is needed to determine if applicationEnd is called first or shutdown.
@@ -141,15 +73,15 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
   public void onApplicationEnd(SparkListenerApplicationEnd applicationEnd) {
     Workload.WorkloadBuilder builder = Workload.builder();
     if (config.isStageLevel()) {
-      setStages(stageLevelListener);
+      stageLevelListener.setStages();
     } else {
-      setTasks(taskLevelListener, stageLevelListener);
+      TaskLevelListener listener = (TaskLevelListener) taskLevelListener;
+      listener.setTasks(stageLevelListener);
     }
-    setWorkflows(jobLevelListener);
+    jobLevelListener.setWorkflows();
     final List<Task> tasks = taskLevelListener.getProcessedObjects();
     List<Workload> processedObjects = this.getProcessedObjects();
-    // we should enver enter this branch, this is a guard since an application
-    // only terminates once.
+
     if (!processedObjects.isEmpty()) {
       log.debug("Application end called twice, this should never happen");
       return;
@@ -166,31 +98,33 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
     final String workloadDescription = config.getDescription();
 
     final long numSites =
-        tasks.stream().filter(x -> x.getSubmissionSite() != -1).count();
+        tasks.stream().filter(task -> task.getSubmissionSite() != -1).count();
     final long numResources = tasks.stream()
         .map(Task::getResourceAmountRequested)
-        .filter(x -> x >= 0.0)
+        .filter(task -> task >= 0.0)
         .reduce(Double::sum)
         .orElseGet(() -> -1.0)
         .longValue();
-    final long numUsers = tasks.stream().filter(x -> x.getUserId() != -1).count();
-    final long numGroups = tasks.stream().filter(x -> x.getGroupId() != -1).count();
+    final long numUsers =
+        tasks.stream().filter(task -> task.getUserId() != -1).count();
+    final long numGroups =
+        tasks.stream().filter(task -> task.getGroupId() != -1).count();
     final double totalResourceSeconds = tasks.stream()
-        .filter(x -> x.getRuntime() >= 0 && x.getResourceAmountRequested() >= 0.0)
-        .map(x -> x.getResourceAmountRequested() * x.getRuntime())
+        .filter(task -> task.getRuntime() >= 0 && task.getResourceAmountRequested() >= 0.0)
+        .map(task -> task.getResourceAmountRequested() * task.getRuntime())
         .reduce(Double::sum)
         .orElse(-1.0);
 
     min(tasks.stream().map(Task::getResourceAmountRequested), builder::minResourceTask);
     max(tasks.stream().map(Task::getResourceAmountRequested), builder::maxResourceTask);
 
-    final long resourceTaskSize = size(tasks.stream().map(Task::getResourceAmountRequested));
+    final long resourceTaskSize = validSize(tasks.stream().map(Task::getResourceAmountRequested));
 
     final double meanResourceTask =
         mean(tasks.stream().map(Task::getResourceAmountRequested), resourceTaskSize, builder::meanResourceTask);
 
     stdAndCov(
-        tasks.stream().map(Task::getResourceAmountRequested).filter(x -> x >= 0.0),
+        tasks.stream().map(Task::getResourceAmountRequested).filter(resourceAmount -> resourceAmount >= 0.0),
         meanResourceTask,
         resourceTaskSize,
         builder::stdResourceTask,
@@ -199,7 +133,7 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
     medianAndQuartiles(
         tasks.stream()
             .map(Task::getResourceAmountRequested)
-            .filter(x -> x >= 0.0)
+            .filter(resourceAmount -> resourceAmount >= 0.0)
             .collect(Collectors.toList()),
         -1.0,
         builder::medianResourceTask,
@@ -210,12 +144,12 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
 
     max(tasks.stream().map(Task::getMemoryRequested), builder::maxMemory);
 
-    long memorySize = size(tasks.stream().map(Task::getMemoryRequested));
+    long memorySize = validSize(tasks.stream().map(Task::getMemoryRequested));
 
     final double meanMemory = mean(tasks.stream().map(Task::getMemoryRequested), memorySize, builder::meanMemory);
 
     stdAndCov(
-        tasks.stream().map(Task::getMemoryRequested).filter(x -> x >= 0.0),
+        tasks.stream().map(Task::getMemoryRequested).filter(memory -> memory >= 0.0),
         meanMemory,
         memorySize,
         builder::stdMemory,
@@ -224,7 +158,7 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
     medianAndQuartiles(
         tasks.stream()
             .map(Task::getMemoryRequested)
-            .filter(x -> x >= 0.0)
+            .filter(memory -> memory >= 0.0)
             .collect(Collectors.toList()),
         -1.0,
         builder::medianMemory,
@@ -236,21 +170,27 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
     maxLong(tasks.stream().map(Task::getNetworkIoTime), builder::maxNetworkUsage);
 
     final long networkUsageSize =
-        size(tasks.stream().mapToDouble(Task::getNetworkIoTime).boxed());
+        validSize(tasks.stream().mapToDouble(Task::getNetworkIoTime).boxed());
     final double meanNetworkUsage = mean(
         tasks.stream().mapToDouble(Task::getNetworkIoTime).boxed(),
         networkUsageSize,
         builder::meanNetworkUsage);
 
     stdAndCov(
-        tasks.stream().map(Task::getNetworkIoTime).filter(x -> x >= 0.0).map(Long::doubleValue),
+        tasks.stream()
+            .map(Task::getNetworkIoTime)
+            .filter(networkIo -> networkIo >= 0.0)
+            .map(Long::doubleValue),
         meanNetworkUsage,
         networkUsageSize,
         builder::stdNetworkUsage,
         builder::covNetworkUsage);
 
     medianAndQuartiles(
-        tasks.stream().map(Task::getNetworkIoTime).filter(x -> x >= 0).collect(Collectors.toList()),
+        tasks.stream()
+            .map(Task::getNetworkIoTime)
+            .filter(networkIo -> networkIo >= 0)
+            .collect(Collectors.toList()),
         -1L,
         builder::medianNetworkUsage,
         builder::firstQuartileNetworkUsage,
@@ -260,12 +200,12 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
 
     max(tasks.stream().map(Task::getDiskSpaceRequested), builder::maxDiskSpaceUsage);
 
-    final long diskSpaceSize = size(tasks.stream().map(Task::getDiskSpaceRequested));
+    final long diskSpaceSize = validSize(tasks.stream().map(Task::getDiskSpaceRequested));
     final double meanDiskSpaceUsage =
         mean(tasks.stream().map(Task::getDiskSpaceRequested), diskSpaceSize, builder::meanDiskSpaceUsage);
 
     stdAndCov(
-        tasks.stream().map(Task::getDiskSpaceRequested).filter(x -> x >= 0.0),
+        tasks.stream().map(Task::getDiskSpaceRequested).filter(diskSpace -> diskSpace >= 0.0),
         meanDiskSpaceUsage,
         diskSpaceSize,
         builder::stdDiskSpaceUsage,
@@ -274,7 +214,7 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
     medianAndQuartiles(
         tasks.stream()
             .map(Task::getDiskSpaceRequested)
-            .filter(x -> x >= 0.0)
+            .filter(diskSpace -> diskSpace >= 0.0)
             .collect(Collectors.toList()),
         -1.0,
         builder::medianDiskSpaceUsage,
@@ -283,11 +223,11 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
 
     min(tasks.stream().map(Task::getEnergyConsumption), builder::minEnergy);
     max(tasks.stream().map(Task::getEnergyConsumption), builder::maxEnergy);
-    final long energySize = size(tasks.stream().map(Task::getEnergyConsumption));
+    final long energySize = validSize(tasks.stream().map(Task::getEnergyConsumption));
     final double meanEnergy = mean(tasks.stream().map(Task::getEnergyConsumption), energySize, builder::meanEnergy);
 
     stdAndCov(
-        tasks.stream().map(Task::getEnergyConsumption).filter(x -> x >= 0.0),
+        tasks.stream().map(Task::getEnergyConsumption).filter(energy -> energy >= 0.0),
         meanEnergy,
         energySize,
         builder::stdEnergy,
@@ -296,7 +236,7 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
     medianAndQuartiles(
         tasks.stream()
             .map(Task::getEnergyConsumption)
-            .filter(x -> x >= 0.0)
+            .filter(energy -> energy >= 0.0)
             .collect(Collectors.toList()),
         -1.0,
         builder::medianEnergy,
@@ -327,7 +267,7 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
    * @author Tianchen Qu
    * @since 1.0.0
    */
-  private long size(Stream<Double> data) {
+  private long validSize(Stream<Double> data) {
     return data.filter(x -> x >= 0.0).count();
   }
 

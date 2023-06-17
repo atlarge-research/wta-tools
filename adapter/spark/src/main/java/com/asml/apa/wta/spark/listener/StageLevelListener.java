@@ -59,7 +59,7 @@ public class StageLevelListener extends TaskStageBaseListener {
             curStageInfo.parentIds().toList())
         .stream()
         .map(parentId -> (Integer) parentId)
-        .toArray(size -> new Integer[size]);
+        .toArray(Integer[]::new);
     for (Integer id : parentIds) {
       List<Integer> children = parentToChildren.get(id);
       if (children == null) {
@@ -84,7 +84,8 @@ public class StageLevelListener extends TaskStageBaseListener {
     final double memoryRequested = -1.0;
     long[] parents;
     if (config.isStageLevel()) {
-      parents = Arrays.stream(parentIds).mapToLong(x -> x + 1).toArray();
+      parents =
+          Arrays.stream(parentIds).mapToLong(parentId -> parentId + 1).toArray();
     } else {
       parents = new long[0];
       stageToParents.put(stageId, parentIds);
@@ -132,5 +133,21 @@ public class StageLevelListener extends TaskStageBaseListener {
             .resourceUsed(resourceUsed)
             .build());
     stageIdsToJobs.remove(stageCompleted.stageInfo().stageId() + 1);
+  }
+
+  /**
+   * This method sets up the stage children, and it shall be called on application end.
+   *
+   * @author Tianchen Qu
+   * @since 1.0.0
+   */
+  public void setStages() {
+    final List<Task> stages = this.getProcessedObjects();
+    Map<Integer, List<Integer>> parentToChildren = this.getParentToChildren();
+    for (Task stage : stages) {
+      stage.setChildren(parentToChildren.getOrDefault(Math.toIntExact(stage.getId()), new ArrayList<>()).stream()
+          .mapToLong(childrenId -> childrenId + 1)
+          .toArray());
+    }
   }
 }
