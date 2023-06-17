@@ -2,9 +2,8 @@
   "authors": ["John Doe", "Jane Doe"],
   "domain": "Scientific",
   "description": "Processing data for scientific research purposes",
-  "logLevel": "INFO",
   "outputPath": "wta-output",
-  "isStageLevel": "true",
+  "isStageLevel": "false",
   "resourcePingInterval": 500,
   "executorSynchronizationInterval": -1
 }

@@ -6,7 +6,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Comparator;
 import java.util.stream.Stream;
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -16,10 +16,10 @@ import lombok.extern.slf4j.Slf4j;
  * @since 1.0.0
  */
 @Slf4j
-@RequiredArgsConstructor
+@AllArgsConstructor
 public class DiskOutputFile implements OutputFile {
 
-  private final Path file;
+  private Path file;
 
   /**
    * Resolves a path in the current location.
@@ -34,6 +34,29 @@ public class DiskOutputFile implements OutputFile {
     Path resolved = file.resolve(path);
     log.debug("Resolves {} and {} to {}.", this, path, resolved);
     return new DiskOutputFile(file.resolve(path));
+  }
+
+  /**
+   * Signals whether this implementation can output to the specified location.
+   *
+   * @param path a {@link String} representation of the location to point to
+   * @return a {@code boolean} indicating whether the implementation can handle the given location
+   */
+  @Override
+  public boolean acceptsLocation(String path) {
+    return true;
+  }
+
+  /**
+   * Sets the path of the disk output file.
+   *
+   * @param path a {@link String} representation of the {@link Path} to point to
+   * @throws IOException when something goes wrong during I/O
+   * @author Atour Mousavi Gourabi
+   * @since 1.0.0
+   */
+  public void setPath(String path) {
+    file = Path.of(path);
   }
 
   /**
