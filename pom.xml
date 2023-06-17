@@ -9,6 +9,8 @@
   <version>1.0-SNAPSHOT</version>
   <packaging>pom</packaging>
 
+  <description>Extensible Java project to facilitate the generation of WTA traces for big data frameworks.</description>
+
   <licenses>
     <license>
       <name>Apache-2.0</name>
