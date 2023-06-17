@@ -8,19 +8,19 @@ import org.junit.jupiter.api.Test;
 public class StageLevelListenerIntegrationTest extends BaseSparkJobIntegrationTest {
   @Test
   void testGetStageMetricsHasTasksAfterSparkJobAndYieldsNoErrors() {
-    sut.registerStageListener();
+    sut1.registerStageListener();
     invokeJob();
-    assertThat(sut.getStageLevelListener().getProcessedObjects()).isNotEmpty();
+    assertThat(sut1.getStageLevelListener().getProcessedObjects()).isNotEmpty();
   }
 
   @Test
   void runningAJobShouldClearTheMapOfEntriesAfterStageIsDoneWorkflowIdShouldBeInitialised() {
-    sut.registerStageListener();
+    sut1.registerStageListener();
     invokeJob();
-    assertThat(((StageLevelListener) sut.getStageLevelListener()).getStageToJob())
+    assertThat(((StageLevelListener) sut1.getStageLevelListener()).getStageToJob())
         .isEmpty();
-    assertThat(sut.getStageLevelListener().getProcessedObjects()).hasSizeGreaterThanOrEqualTo(1);
-    assertThat(sut.getStageLevelListener().getProcessedObjects().get(0).getWorkflowId())
+    assertThat(sut1.getStageLevelListener().getProcessedObjects()).hasSizeGreaterThanOrEqualTo(1);
+    assertThat(sut1.getStageLevelListener().getProcessedObjects().get(0).getWorkflowId())
         .isInstanceOf(Long.class)
         .isNotNull();
   }

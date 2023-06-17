@@ -16,7 +16,7 @@ public class BaseSparkJobIntegrationTest {
 
   protected SparkSession spark;
 
-  protected SparkDataSource sut;
+  protected SparkDataSource sut1;
 
   protected SparkDataSource sut2;
 
@@ -44,8 +44,10 @@ public class BaseSparkJobIntegrationTest {
         .authors(new String[] {"Harry Potter"})
         .isStageLevel(true)
         .domain(Domain.SCIENTIFIC)
+        .resourcePingInterval(500)
+        .executorSynchronizationInterval(-100)
         .description("Yer a wizard harry")
-        .outputPath("src/test/resources/WTA")
+        .outputPath("src/test/resources/wta-output")
         .build();
 
     SparkConf conf = new SparkConf()
@@ -56,7 +58,7 @@ public class BaseSparkJobIntegrationTest {
 
     fakeMetricStreamingEngine = new MetricStreamingEngine();
 
-    sut = new SparkDataSource(spark.sparkContext(), fakeConfig);
+    sut1 = new SparkDataSource(spark.sparkContext(), fakeConfig);
     sut2 = new SparkDataSource(spark.sparkContext(), fakeConfig2);
     String resourcePath = "src/test/resources/wordcount.txt";
     textFile = JavaSparkContext.fromSparkContext(spark.sparkContext()).textFile(resourcePath);

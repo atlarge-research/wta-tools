@@ -108,11 +108,11 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
   }
 
   private void setStageFields(StageLevelListener stageListener) {
-    Map<Long, List<Long>> parentToChildren = stageListener.getParentStageToChildrenStages();
     final List<Task> stages = stageListener.getProcessedObjects();
     stages.forEach(stage -> stage.setChildren(
-            parentToChildren.getOrDefault(stage.getId(), new ArrayList<>()).stream()
-                    .mapToLong(x -> x + 1)
+            stageListener.getParentStageToChildrenStages().getOrDefault(stage.getId(), new ArrayList<>())
+                    .stream()
+                    .mapToLong(Long::longValue)
                     .toArray()));
   }
 
@@ -174,34 +174,29 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
         .orElse(-1.0);
 
     // resource
-    Stream<Double> resourceStream = tasks.stream().map(Task::getResourceAmountRequested);
     List<Double> positiveResourceList = tasks.stream().map(Task::getResourceAmountRequested).filter(x -> x >= 0.0).collect(Collectors.toList());
-    final double meanResourceTask = computeMean(resourceStream, positiveResourceList.size());
-    final double stdResourceTask = computeStd(resourceStream.filter(x -> x >= 0.0), meanResourceTask, positiveResourceList.size());
+    final double meanResourceTask = computeMean(tasks.stream().map(Task::getResourceAmountRequested), positiveResourceList.size());
+    final double stdResourceTask = computeStd(tasks.stream().map(Task::getResourceAmountRequested).filter(x -> x >= 0.0), meanResourceTask, positiveResourceList.size());
 
     // memory
-    Stream<Double> memoryStream = tasks.stream().map(Task::getMemoryRequested);
     List<Double> positiveMemoryList = tasks.stream().map(Task::getMemoryRequested).filter(x -> x >= 0.0).collect(Collectors.toList());
-    final double meanMemory = computeMean(memoryStream, positiveMemoryList.size());
-    final double stdMemory = computeStd(memoryStream.filter(x -> x >= 0.0), meanMemory, positiveMemoryList.size());
+    final double meanMemory = computeMean(tasks.stream().map(Task::getMemoryRequested), positiveMemoryList.size());
+    final double stdMemory = computeStd(tasks.stream().map(Task::getMemoryRequested).filter(x -> x >= 0.0), meanMemory, positiveMemoryList.size());
 
     // network io
-    Stream<Double> networkIoStream = tasks.stream().map(task -> (double) task.getNetworkIoTime());
     List<Double> positiveNetworkIoList = tasks.stream().map(task -> (double) task.getNetworkIoTime()).filter(x -> x >= 0.0).collect(Collectors.toList());
-    final double meanNetworkIo = computeMean(networkIoStream, positiveNetworkIoList.size());
-    final double stdNetworkIo = computeStd(networkIoStream.filter(x -> x >= 0.0), meanNetworkIo, positiveNetworkIoList.size());
+    final double meanNetworkIo = computeMean(tasks.stream().map(task -> (double) task.getNetworkIoTime()), positiveNetworkIoList.size());
+    final double stdNetworkIo = computeStd(tasks.stream().map(task -> (double) task.getNetworkIoTime()).filter(x -> x >= 0.0), meanNetworkIo, positiveNetworkIoList.size());
 
     // disk space
-    Stream<Double> diskSpaceStream = tasks.stream().map(Task::getDiskSpaceRequested);
     List<Double> positiveDiskSpaceList = tasks.stream().map(Task::getDiskSpaceRequested).filter(x -> x >= 0.0).collect(Collectors.toList());
-    final double meanDiskSpace = computeMean(diskSpaceStream, positiveDiskSpaceList.size());
-    final double stdDiskSpace = computeStd(diskSpaceStream.filter(x -> x >= 0.0), meanDiskSpace, positiveDiskSpaceList.size());
+    final double meanDiskSpace = computeMean(tasks.stream().map(Task::getDiskSpaceRequested), positiveDiskSpaceList.size());
+    final double stdDiskSpace = computeStd(tasks.stream().map(Task::getDiskSpaceRequested).filter(x -> x >= 0.0), meanDiskSpace, positiveDiskSpaceList.size());
 
     // energy
-    Stream<Double> energyStream = tasks.stream().map(Task::getEnergyConsumption);
     List<Double> positiveEnergyList = tasks.stream().map(Task::getEnergyConsumption).filter(x -> x >= 0.0).collect(Collectors.toList());
-    final double meanEnergy = computeMean(energyStream, positiveEnergyList.size());
-    final double stdEnergy = computeStd(energyStream.filter(x -> x >= 0.0), meanEnergy, positiveEnergyList.size());
+    final double meanEnergy = computeMean(tasks.stream().map(Task::getEnergyConsumption), positiveEnergyList.size());
+    final double stdEnergy = computeStd(tasks.stream().map(Task::getEnergyConsumption).filter(x -> x >= 0.0), meanEnergy, positiveEnergyList.size());
 
     this.getProcessedObjects().add(Workload.builder()
                     .totalWorkflows(numWorkflows)
@@ -218,8 +213,8 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
                     .workloadDescription(workloadDescription)
 
                     // resources
-                    .minResourceTask(computeMin(resourceStream))
-                    .maxResourceTask(computeMax(resourceStream))
+                    .minResourceTask(computeMin(tasks.stream().map(Task::getResourceAmountRequested)))
+                    .maxResourceTask(computeMax(tasks.stream().map(Task::getResourceAmountRequested)))
                     .meanResourceTask(meanResourceTask)
                     .stdResourceTask(stdResourceTask)
                     .covResourceTask(computeCov(meanResourceTask, stdResourceTask))
@@ -228,8 +223,8 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
                     .thirdQuartileResourceTask(positiveResourceList.isEmpty() ? -1.0 : computeThirdQuantile(positiveResourceList))
 
                     // memory
-                    .minMemory(computeMin(memoryStream))
-                    .maxMemory(computeMax(memoryStream))
+                    .minMemory(computeMin(tasks.stream().map(Task::getMemoryRequested)))
+                    .maxMemory(computeMax(tasks.stream().map(Task::getMemoryRequested)))
                     .meanMemory(meanMemory)
                     .stdMemory(stdMemory)
                     .covMemory(computeCov(meanMemory, stdMemory))
@@ -238,8 +233,8 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
                     .thirdQuartileMemory(positiveMemoryList.isEmpty() ? -1.0 : computeThirdQuantile(positiveMemoryList))
 
                     // network io
-                    .minNetworkUsage((long) computeMin(networkIoStream))
-                    .maxNetworkUsage((long) computeMax(networkIoStream))
+                    .minNetworkUsage((long) computeMin(tasks.stream().map(task -> (double) task.getNetworkIoTime())))
+                    .maxNetworkUsage((long) computeMax(tasks.stream().map(task -> (double) task.getNetworkIoTime())))
                     .meanNetworkUsage(meanNetworkIo)
                     .stdNetworkUsage(stdNetworkIo)
                     .covNetworkUsage(computeCov(meanMemory, stdMemory))
@@ -248,8 +243,8 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
                     .thirdQuartileNetworkUsage(positiveNetworkIoList.isEmpty() ? -1L : (long) computeThirdQuantile(positiveNetworkIoList))
 
                     // disk space
-                    .minDiskSpaceUsage(computeMin(diskSpaceStream))
-                    .maxDiskSpaceUsage(computeMax(diskSpaceStream))
+                    .minDiskSpaceUsage(computeMin(tasks.stream().map(Task::getDiskSpaceRequested)))
+                    .maxDiskSpaceUsage(computeMax(tasks.stream().map(Task::getDiskSpaceRequested)))
                     .meanDiskSpaceUsage(meanDiskSpace)
                     .stdDiskSpaceUsage(stdDiskSpace)
                     .covDiskSpaceUsage(computeCov(meanDiskSpace, stdDiskSpace))
@@ -258,8 +253,8 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
                     .thirdQuartileDiskSpaceUsage(positiveDiskSpaceList.isEmpty() ? -1.0 : computeThirdQuantile(positiveDiskSpaceList))
 
                     // energy
-                    .minEnergy(computeMin(energyStream))
-                    .maxEnergy(computeMax(energyStream))
+                    .minEnergy(computeMin(tasks.stream().map(Task::getEnergyConsumption)))
+                    .maxEnergy(computeMax(tasks.stream().map(Task::getEnergyConsumption)))
                     .meanEnergy(meanEnergy)
                     .stdEnergy(stdEnergy)
                     .covEnergy(computeCov(meanEnergy, stdEnergy))
@@ -267,20 +262,6 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
                     .firstQuartileEnergy(positiveEnergyList.isEmpty() ? -1.0 : computeFirstQuantile(positiveEnergyList))
                     .thirdQuartileEnergy(positiveEnergyList.isEmpty() ? -1.0 : computeThirdQuantile(positiveEnergyList))
                     .build());
-  }
-
-  /**
-   * Calculates the size of the  data after filtering for positive ones. This is needed for
-   * calculation of mean and standard deviation.
-   *
-   * @param data              stream of data
-   * @return                  size of positive elements
-   * @author Tianchen Qu
-   * @author Pil Kyu Cho
-   * @since 1.0.0
-   */
-  private long positiveDataSize(Stream<Double> data) {
-    return data.filter(x -> x >= 0.0).count();
   }
 
   /**
@@ -331,7 +312,7 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
    *
    * @param data              stream of data
    * @param mean              mean value from {@link #computeMean(Stream, long)}
-   * @param size              size from {@link #positiveDataSize(Stream)}
+   * @param size              size from data
    * @return                  standard deviation value from data or -1.0
    * @author Tianchen Qu
    * @author Pil Kyu Cho
@@ -344,8 +325,8 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
     if (size == 0 || mean == -1.0) {
       return -1.0;
     }
-    double numerator = data.map(x -> x * x).reduce(Double::sum).orElse(-1.0);
-    return Math.pow(numerator / size - mean * mean, 0.5);
+    double numerator = data.map(x -> Math.pow(x - mean, 2)).reduce(Double::sum).orElse(-1.0);
+    return Math.pow(numerator / size, 0.5);
   }
 
   /**
@@ -361,7 +342,7 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
   private double computeCov(
           double mean,
           double std) {
-    if (mean == 0.0) {
+    if (mean == 0.0 || mean == -1.0) {
       return -1.0;
     }
     return std / mean;
@@ -405,4 +386,5 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
   private double computeThirdQuantile(List<Double> data) {
     return data.get(data.size() * 3 / 4);
   }
+
 }

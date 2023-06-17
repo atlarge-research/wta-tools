@@ -12,14 +12,14 @@ class JobLevelListenerIntegrationTest extends BaseSparkJobIntegrationTest {
 
   @Test
   void testGetJobMetricsHasJobsAfterSparkJobAndYieldsNoErrors() {
-    sut.registerTaskListener();
-    sut.registerJobListener();
+    sut1.registerTaskListener();
+    sut1.registerJobListener();
     invokeJob();
     invokeJob();
-    assertThat(((JobLevelListener) sut.getJobLevelListener()).getJobSubmitTimes())
+    assertThat(((JobLevelListener) sut1.getJobLevelListener()).getJobSubmitTimes())
         .isEmpty();
 
-    Workflow workflow = sut.getJobLevelListener().getProcessedObjects().get(1);
+    Workflow workflow = sut1.getJobLevelListener().getProcessedObjects().get(1);
     assertThat(workflow.getId()).isGreaterThan(0L);
     assertThat(workflow.getTsSubmit()).isGreaterThan(0L);
     assertThat(workflow.getApplicationName())
@@ -27,17 +27,17 @@ class JobLevelListenerIntegrationTest extends BaseSparkJobIntegrationTest {
     assertThat(workflow.getScheduler()).isEqualTo("FIFO");
 
     assertThat(workflow.getTasks()).isNotEmpty().isSortedAccordingTo(Comparator.comparing(Task::getTsSubmit));
-    assertThat(sut.getJobLevelListener().getProcessedObjects())
+    assertThat(sut1.getJobLevelListener().getProcessedObjects())
         .hasSize(2)
         .isSortedAccordingTo(Comparator.comparing(Workflow::getTsSubmit));
   }
 
   @Test
   void jobsHaveNoTasksIfTaskListenerNotInvoked() {
-    sut.registerJobListener();
+    sut1.registerJobListener();
     invokeJob();
     invokeJob();
-    assertThat(sut.getJobLevelListener().getProcessedObjects())
+    assertThat(sut1.getJobLevelListener().getProcessedObjects())
         .hasSize(2)
         .allMatch(wf -> wf.getTasks().length == 0);
   }

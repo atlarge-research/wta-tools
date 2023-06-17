@@ -25,7 +25,7 @@ class ApplicationLevelListenerTest extends BaseLevelListenerTest {
 
   SparkListenerApplicationEnd applicationEndObj;
 
-  TaskInfo testTaskInfo;
+  TaskInfo testTaskInfo1;
 
   TaskInfo testTaskInfo2;
 
@@ -33,11 +33,11 @@ class ApplicationLevelListenerTest extends BaseLevelListenerTest {
 
   TaskInfo testTaskInfo4;
 
-  StageInfo testStageInfo;
+  StageInfo testStageInfo1;
 
   StageInfo testStageInfo2;
 
-  SparkListenerTaskEnd taskEndEvent;
+  SparkListenerTaskEnd taskEndEvent1;
 
   SparkListenerTaskEnd taskEndEvent2;
 
@@ -45,22 +45,22 @@ class ApplicationLevelListenerTest extends BaseLevelListenerTest {
 
   SparkListenerTaskEnd taskEndEvent4;
 
-  SparkListenerStageCompleted stageCompleted;
+  SparkListenerStageCompleted stageCompleted1;
 
   SparkListenerStageCompleted stageCompleted2;
 
   @BeforeEach
   void setup() {
-    testTaskInfo = new TaskInfo(1, 0, 1, 50L, "testExecutor", "local", TaskLocality.NODE_LOCAL(), false);
-    testTaskInfo2 = new TaskInfo(2, 0, 1, 50L, "testExecutor", "local", TaskLocality.NODE_LOCAL(), false);
-    testTaskInfo3 = new TaskInfo(3, 0, 1, 50L, "testExecutor", "local", TaskLocality.NODE_LOCAL(), false);
-    testTaskInfo4 = new TaskInfo(4, 0, 1, 50L, "testExecutor", "local", TaskLocality.NODE_LOCAL(), false);
+    testTaskInfo1 = new TaskInfo(0, 0, 1, 50L, "testExecutor", "local", TaskLocality.NODE_LOCAL(), false);
+    testTaskInfo2 = new TaskInfo(1, 0, 1, 50L, "testExecutor", "local", TaskLocality.NODE_LOCAL(), false);
+    testTaskInfo3 = new TaskInfo(2, 0, 1, 50L, "testExecutor", "local", TaskLocality.NODE_LOCAL(), false);
+    testTaskInfo4 = new TaskInfo(3, 0, 1, 50L, "testExecutor", "local", TaskLocality.NODE_LOCAL(), false);
     ListBuffer<Object> parents = new ListBuffer<>();
-    TaskMetrics mockedMetrics = mock(TaskMetrics.class);
+    TaskMetrics mockedMetrics1 = mock(TaskMetrics.class);
     ShuffleWriteMetrics mockedShuffleMetrics = mock(ShuffleWriteMetrics.class);
-    when(mockedMetrics.executorRunTime()).thenReturn(100L);
-    when(mockedMetrics.diskBytesSpilled()).thenReturn(100L);
-    when(mockedMetrics.shuffleWriteMetrics()).thenReturn(mockedShuffleMetrics);
+    when(mockedMetrics1.executorRunTime()).thenReturn(100L);
+    when(mockedMetrics1.diskBytesSpilled()).thenReturn(100L);
+    when(mockedMetrics1.shuffleWriteMetrics()).thenReturn(mockedShuffleMetrics);
     when(mockedShuffleMetrics.bytesWritten()).thenReturn(100L);
 
     TaskMetrics mockedMetrics2 = mock(TaskMetrics.class);
@@ -79,28 +79,27 @@ class ApplicationLevelListenerTest extends BaseLevelListenerTest {
     when(mockedMetrics3.shuffleWriteMetrics()).thenReturn(mockedShuffleMetrics2);
     when(mockedShuffleMetrics3.bytesWritten()).thenReturn(0L);
 
-    testStageInfo =
-        new StageInfo(5, 0, "test", 50, null, new ListBuffer<>(), "None", mockedMetrics, null, null, 100);
-    parents.$plus$eq(5);
-    testStageInfo2 = new StageInfo(6, 0, "test", 50, null, parents, "None", mockedMetrics, null, null, 100);
-    taskEndEvent = new SparkListenerTaskEnd(
-        5, 1, "testTaskType", null, testTaskInfo, new ExecutorMetrics(), mockedMetrics);
+    testStageInfo1 =
+        new StageInfo(2, 0, "test", 50, null, new ListBuffer<>(), "None", mockedMetrics1, null, null, 100);
+    parents.$plus$eq(testStageInfo1.stageId());
+    testStageInfo2 =
+            new StageInfo(10, 0, "test", 50, null, parents, "None", mockedMetrics1, null, null, 100);
+    taskEndEvent1 = new SparkListenerTaskEnd(
+        2, 1, "testTaskType", null, testTaskInfo1, new ExecutorMetrics(), mockedMetrics1);
     taskEndEvent2 = new SparkListenerTaskEnd(
-        5, 1, "testTaskType", null, testTaskInfo2, new ExecutorMetrics(), mockedMetrics);
+        2, 1, "testTaskType", null, testTaskInfo2, new ExecutorMetrics(), mockedMetrics1);
     taskEndEvent3 = new SparkListenerTaskEnd(
-        6, 1, "testTaskType", null, testTaskInfo3, new ExecutorMetrics(), mockedMetrics2);
+        10, 1, "testTaskType", null, testTaskInfo3, new ExecutorMetrics(), mockedMetrics2);
     taskEndEvent4 = new SparkListenerTaskEnd(
-        6, 1, "testTaskType", null, testTaskInfo4, new ExecutorMetrics(), mockedMetrics3);
+        10, 1, "testTaskType", null, testTaskInfo4, new ExecutorMetrics(), mockedMetrics3);
 
-    stageCompleted = new SparkListenerStageCompleted(testStageInfo);
+    stageCompleted1 = new SparkListenerStageCompleted(testStageInfo1);
     stageCompleted2 = new SparkListenerStageCompleted(testStageInfo2);
     applicationEndObj = new SparkListenerApplicationEnd(mockedSparkContext.startTime() + 1000L);
   }
 
   @Test
   void doingNothingTest() {
-    ListBuffer<StageInfo> stageBuffer = new ListBuffer<>();
-    SparkListenerJobStart jobStart = new SparkListenerJobStart(1, 2L, stageBuffer.toList(), new Properties());
     fakeApplicationListener.onApplicationEnd(applicationEndObj);
     Workload workload = fakeApplicationListener.getProcessedObjects().get(0);
     assertThat(fakeApplicationListener.getProcessedObjects().size()).isEqualTo(1);
@@ -247,14 +246,14 @@ class ApplicationLevelListenerTest extends BaseLevelListenerTest {
   @Test
   void parentChildrenAggregationTest() {
     ListBuffer<StageInfo> stageBuffer = new ListBuffer<>();
-    stageBuffer.$plus$eq(testStageInfo);
+    stageBuffer.$plus$eq(testStageInfo1);
     stageBuffer.$plus$eq(testStageInfo2);
-    SparkListenerJobStart jobStart = new SparkListenerJobStart(1, 2L, stageBuffer.toList(), new Properties());
+    SparkListenerJobStart jobStart = new SparkListenerJobStart(0, 2L, stageBuffer.toList(), new Properties());
     fakeTaskListener.onJobStart(jobStart);
     fakeStageListener.onJobStart(jobStart);
-    fakeTaskListener.onTaskEnd(taskEndEvent);
+    fakeTaskListener.onTaskEnd(taskEndEvent1);
     fakeTaskListener.onTaskEnd(taskEndEvent2);
-    fakeStageListener.onStageCompleted(stageCompleted);
+    fakeStageListener.onStageCompleted(stageCompleted1);
     fakeTaskListener.onTaskEnd(taskEndEvent3);
     fakeTaskListener.onTaskEnd(taskEndEvent4);
     fakeStageListener.onStageCompleted(stageCompleted2);
@@ -262,18 +261,18 @@ class ApplicationLevelListenerTest extends BaseLevelListenerTest {
     Task task = fakeTaskListener.getProcessedObjects().get(0);
     assertThat(task.getParents().length).isEqualTo(0);
     assertThat(task.getChildren().length).isEqualTo(2);
-    assertThat(task.getChildren()).contains(4, 5);
+    assertThat(task.getChildren()).contains(3L, 4L);
     task = fakeTaskListener.getProcessedObjects().get(1);
     assertThat(task.getParents().length).isEqualTo(0);
     assertThat(task.getChildren().length).isEqualTo(2);
-    assertThat(task.getChildren()).contains(4, 5);
+    assertThat(task.getChildren()).contains(3L, 4L);
     task = fakeTaskListener.getProcessedObjects().get(2);
     assertThat(task.getParents().length).isEqualTo(2);
-    assertThat(task.getParents()).contains(2, 3);
+    assertThat(task.getParents()).contains(1L, 2L);
     assertThat(task.getChildren().length).isEqualTo(0);
     task = fakeTaskListener.getProcessedObjects().get(3);
     assertThat(task.getParents().length).isEqualTo(2);
-    assertThat(task.getParents()).contains(2, 3);
+    assertThat(task.getParents()).contains(1L, 2L);
     assertThat(task.getChildren().length).isEqualTo(0);
     Workload workload = fakeApplicationListener.getProcessedObjects().get(0);
     assertThat(fakeApplicationListener.getProcessedObjects().size()).isEqualTo(1);
@@ -298,14 +297,14 @@ class ApplicationLevelListenerTest extends BaseLevelListenerTest {
   @Test
   void parentChildrenAggregationAltTest() {
     ListBuffer<StageInfo> stageBuffer = new ListBuffer<>();
-    stageBuffer.$plus$eq(testStageInfo);
+    stageBuffer.$plus$eq(testStageInfo1);
     stageBuffer.$plus$eq(testStageInfo2);
     SparkListenerJobStart jobStart = new SparkListenerJobStart(1, 2L, stageBuffer.toList(), new Properties());
     fakeTaskListener2.onJobStart(jobStart);
     fakeStageListener2.onJobStart(jobStart);
-    fakeTaskListener2.onTaskEnd(taskEndEvent);
+    fakeTaskListener2.onTaskEnd(taskEndEvent1);
     fakeTaskListener2.onTaskEnd(taskEndEvent2);
-    fakeStageListener2.onStageCompleted(stageCompleted);
+    fakeStageListener2.onStageCompleted(stageCompleted1);
     fakeTaskListener2.onTaskEnd(taskEndEvent3);
     fakeTaskListener2.onTaskEnd(taskEndEvent4);
     fakeStageListener2.onStageCompleted(stageCompleted2);

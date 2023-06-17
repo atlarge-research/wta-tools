@@ -44,8 +44,8 @@ class TaskLevelListenerTest extends BaseLevelListenerTest {
     testTaskInfo2 = new TaskInfo(1, 0, 1, 50L, "testExecutor", "local", TaskLocality.NODE_LOCAL(), false);
 
     ListBuffer<Integer> parents = new ListBuffer<>();
-    parents.$plus$eq(0);
     parents.$plus$eq(1);
+    parents.$plus$eq(2);
     TaskMetrics mockedMetrics = mock(TaskMetrics.class);
     ShuffleWriteMetrics mockedShuffleMetrics = mock(ShuffleWriteMetrics.class);
     when(mockedMetrics.shuffleWriteMetrics()).thenReturn(mockedShuffleMetrics);
@@ -57,7 +57,7 @@ class TaskLevelListenerTest extends BaseLevelListenerTest {
     when(mockedMetrics.executorDeserializeTime()).thenReturn(0L);
 
     testStageInfo = new StageInfo(
-        3,
+        2,
         0,
         "test",
         50,
@@ -73,9 +73,9 @@ class TaskLevelListenerTest extends BaseLevelListenerTest {
         100);
     parents.$plus$eq(3);
     taskEndEvent = new SparkListenerTaskEnd(
-        3, 1, "testTaskType", null, testTaskInfo1, new ExecutorMetrics(), mockedMetrics);
+        2, 1, "testTaskType", null, testTaskInfo1, new ExecutorMetrics(), mockedMetrics);
     taskEndEvent2 = new SparkListenerTaskEnd(
-        3, 1, "testTaskType", null, testTaskInfo2, new ExecutorMetrics(), mockedMetrics);
+        2, 1, "testTaskType", null, testTaskInfo2, new ExecutorMetrics(), mockedMetrics);
     stageCompleted = new SparkListenerStageCompleted(testStageInfo);
   }
 
@@ -84,24 +84,24 @@ class TaskLevelListenerTest extends BaseLevelListenerTest {
     ListBuffer<StageInfo> stageBuffer = new ListBuffer<>();
     stageBuffer.$plus$eq(testStageInfo);
 
-    fakeTaskListener.onJobStart(new SparkListenerJobStart(1, 2L, stageBuffer.toList(), new Properties()));
+    fakeTaskListener.onJobStart(new SparkListenerJobStart(0, 2L, stageBuffer.toList(), new Properties()));
     fakeTaskListener.onTaskEnd(taskEndEvent);
     assertThat(fakeTaskListener.getStageToTasks().size()).isEqualTo(1);
     List<Task> list = new ArrayList<>();
     list.add(Task.builder().id(1L).build());
-    assertThat(fakeTaskListener.getStageToTasks().get(3).size()).isEqualTo(1);
-    assertThat(fakeTaskListener.getStageToTasks().get(3).get(0).getId()).isEqualTo(1);
+    assertThat(fakeTaskListener.getStageToTasks().get(3L).size()).isEqualTo(1);
+    assertThat(fakeTaskListener.getStageToTasks().get(3L).get(0).getId()).isEqualTo(1);
     assertThat(fakeTaskListener.getTaskToStage().size()).isEqualTo(1);
-    assertThat(fakeTaskListener.getTaskToStage()).containsEntry(1L, 4);
+    assertThat(fakeTaskListener.getTaskToStage()).containsEntry(1L, 3L);
     fakeTaskListener.onTaskEnd(taskEndEvent2);
     assertThat(fakeTaskListener.getStageToTasks().size()).isEqualTo(1);
     list.add(Task.builder().id(2L).build());
-    assertThat(fakeTaskListener.getStageToTasks().get(3).size()).isEqualTo(2);
-    assertThat(fakeTaskListener.getStageToTasks().get(3).get(0).getId()).isEqualTo(1);
-    assertThat(fakeTaskListener.getStageToTasks().get(3).get(1).getId()).isEqualTo(2);
+    assertThat(fakeTaskListener.getStageToTasks().get(3L).size()).isEqualTo(2);
+    assertThat(fakeTaskListener.getStageToTasks().get(3L).get(0).getId()).isEqualTo(1);
+    assertThat(fakeTaskListener.getStageToTasks().get(3L).get(1).getId()).isEqualTo(2);
     assertThat(fakeTaskListener.getTaskToStage().size()).isEqualTo(2);
-    assertThat(fakeTaskListener.getTaskToStage()).containsEntry(1L, 4);
-    assertThat(fakeTaskListener.getTaskToStage()).containsEntry(2L, 4);
+    assertThat(fakeTaskListener.getTaskToStage()).containsEntry(1L, 3L);
+    assertThat(fakeTaskListener.getTaskToStage()).containsEntry(2L, 3L);
   }
 
   @Test

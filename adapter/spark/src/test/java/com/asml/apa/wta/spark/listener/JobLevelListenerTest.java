@@ -17,7 +17,7 @@ class JobLevelListenerTest extends BaseLevelListenerTest {
   void recordsTheTimeWhenJobIsSubmittedInMap() {
     fakeJobListener.onJobStart(
         new SparkListenerJobStart(559, 40L, new ListBuffer<StageInfo>().toList(), new Properties()));
-    assertThat(fakeJobListener.getJobSubmitTimes()).containsEntry(560, 40L);
+    assertThat(fakeJobListener.getJobSubmitTimes()).containsEntry(560L, 40L);
   }
 
   @Test
