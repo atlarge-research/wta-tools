@@ -55,6 +55,7 @@ For the most part, since we are pre-release this will serve no real purpose, oth
 - Added Parquet reader [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 - Brought mutation testing coverage up to 80% and add mutation testing coverage to pipeline [@lyadalachanchu](https://gitlab.ewi.tudelft.nl/lyadalachanchu)
 - Enhanced documentation relating to Spark [@hpage](https://gitlab.ewi.tudelft.nl/hpage)
+- Added Spark aggregations [@tqu](https://gitlab.ewi.tudelft.nl/tqu)
 - Set up SPI for the connector output file implementations [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 
 ### Changed
@@ -87,6 +88,7 @@ For the most part, since we are pre-release this will serve no real purpose, oth
 - Fixed the bug that caused the plugin to crash if given invalid configs [@pcho](https://gitlab.ewi.tudelft.nl/pcho)
 - Fixed the Maven configuration by binding failsafe to the integration-test goals [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 - Delete the serialized files left behind by unconsumed streams on application end [@lyadalachanchu](https://gitlab.ewi.tudelft.nl/lyadalachanchu)
+- Fixed the shading to be more specific in the shaded locations to avoid dependency hell for users [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 
 ### Deprecated
 

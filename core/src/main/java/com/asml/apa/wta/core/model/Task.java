@@ -27,9 +27,9 @@ public class Task implements BaseTraceObject {
 
   private final long runtime;
 
-  private final String resourceType;
+  private String resourceType;
 
-  private final double resourceAmountRequested;
+  private double resourceAmountRequested;
 
   private long[] parents;
 
