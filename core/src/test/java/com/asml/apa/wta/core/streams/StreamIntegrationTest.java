@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Comparator;
 import java.util.List;
 import org.junit.jupiter.api.BeforeAll;
@@ -28,8 +29,8 @@ public class StreamIntegrationTest {
 
   @BeforeAll
   static void setUpTmpDirectory() throws IOException {
-    new File("tmp").mkdirs();
-    if (!Files.exists(Path.of("tmp"))) {
+    new File("serTmp").mkdirs();
+    if (!Files.exists(Path.of("serTmp"))) {
       throw new IOException();
     }
   }
@@ -202,5 +203,24 @@ public class StreamIntegrationTest {
     for (int i = 0; i <= 20000; i++) {
       assertThat(sutList.get(i)).isEqualTo(i);
     }
+  }
+
+  @Test
+  void serializationFilesActuallyGetGeneratedAndDeleted() throws IOException, InterruptedException {
+    Stream<Integer> stream = createSerializingStreamOfNaturalNumbers(10, 10);
+    for (int i = 1; i <= 10; i++) {
+      stream.addToStream(i);
+    }
+    for (int i = 1; i <= 10; i++) {
+      stream.addToStream(i);
+    }
+    for (int i = 1; i <= 10; i++) {
+      stream.addToStream(i);
+    }
+    Path directory = Paths.get("serTmp");
+    long fileCount = Files.list(directory).count();
+    assertThat(fileCount).isEqualTo(3);
+    Stream.deleteAllSerializedFiles();
+    assertThat(!Files.exists(Path.of("serTmp"))).isTrue();
   }
 }

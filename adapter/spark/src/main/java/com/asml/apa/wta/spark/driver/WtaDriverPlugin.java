@@ -9,6 +9,7 @@ import com.asml.apa.wta.core.model.ResourceState;
 import com.asml.apa.wta.core.model.Task;
 import com.asml.apa.wta.core.model.Workflow;
 import com.asml.apa.wta.core.model.Workload;
+import com.asml.apa.wta.core.streams.Stream;
 import com.asml.apa.wta.spark.datasource.SparkDataSource;
 import com.asml.apa.wta.spark.dto.ResourceAndStateWrapper;
 import com.asml.apa.wta.spark.dto.ResourceCollectionDto;
@@ -149,6 +150,8 @@ public class WtaDriverPlugin implements DriverPlugin {
     wtaWriter.write(Workflow.class, workflows);
     wtaWriter.write(ResourceState.class, resourceStates);
     wtaWriter.write(workload);
+
+    Stream.deleteAllSerializedFiles();
   }
 
   /**
