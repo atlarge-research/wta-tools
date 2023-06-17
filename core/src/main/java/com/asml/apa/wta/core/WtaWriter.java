@@ -38,6 +38,7 @@ public class WtaWriter {
    *
    * @param path the output path to write to
    * @param version the version of files to write
+   * @param toolVersion the version of the tool that writes to file
    * @author Atour Mousavi Gourabi
    * @since 1.0.0
    */
