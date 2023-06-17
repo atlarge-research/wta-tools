@@ -68,8 +68,7 @@ class BaseLevelListenerTest {
     mockedSparkContext2 = mock(SparkContext.class);
     mockedResourceProfileManager2 = mock(ResourceProfileManager.class);
     mockedResource2 = mock(ResourceProfile.class);
-    mapResource2 = new HashMap<String, TaskResourceRequest>()
-        .$plus(new Tuple2<>("this", new TaskResourceRequest("this", -1)));
+    mapResource2 = new HashMap<String, TaskResourceRequest>();
     SparkConf conf2 = new SparkConf().set("spark.app.name", "testApp");
     when(mockedSparkContext2.sparkUser()).thenReturn("testUser");
     when(mockedSparkContext2.getConf()).thenReturn(conf);

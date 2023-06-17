@@ -92,8 +92,6 @@ class ApplicationLevelListenerTest extends BaseLevelListenerTest {
   void doingNothingTest() {
     ListBuffer<StageInfo> stageBuffer = new ListBuffer<>();
     SparkListenerJobStart jobStart = new SparkListenerJobStart(1, 2L, stageBuffer.toList(), new Properties());
-    fakeTaskListener.onJobStart(jobStart);
-    fakeStageListener.onJobStart(jobStart);
     fakeApplicationListener.onApplicationEnd(applicationEndObj);
     Workload workload = fakeApplicationListener.getProcessedObjects().get(0);
     assertThat(fakeApplicationListener.getProcessedObjects().size()).isEqualTo(1);
@@ -125,6 +123,38 @@ class ApplicationLevelListenerTest extends BaseLevelListenerTest {
     fakeTaskListener.onTaskEnd(taskEndEvent3);
     fakeTaskListener.onTaskEnd(taskEndEvent4);
     fakeStageListener.onStageCompleted(stageCompleted2);
+    fakeApplicationListener.onApplicationEnd(applicationEndObj);
+    Workload workload = fakeApplicationListener.getProcessedObjects().get(0);
+    assertThat(fakeApplicationListener.getProcessedObjects().size()).isEqualTo(1);
+    assertThat(workload.getFirstQuartileResourceTask()).isEqualTo(20);
+    assertThat(workload.getMaxResourceTask()).isEqualTo(20);
+    assertThat(workload.getCovResourceTask()).isEqualTo(0);
+    assertThat(workload.getCovDiskSpaceUsage()).isEqualTo(-1);
+    assertThat(workload.getFirstQuartileDiskSpaceUsage()).isEqualTo(-1);
+    assertThat(workload.getMinDiskSpaceUsage()).isEqualTo(-1);
+    assertThat(workload.getStdMemory()).isEqualTo(-1);
+    assertThat(workload.getMedianMemory()).isEqualTo(-1);
+    assertThat(workload.getMinMemory()).isEqualTo(-1);
+    assertThat(workload.getTotalTasks()).isEqualTo(0);
+    assertThat(workload.getMeanEnergy()).isEqualTo(-1.0);
+    assertThat(workload.getMeanMemory()).isEqualTo(-1.0);
+    assertThat(workload.getMeanResourceTask()).isEqualTo(20);
+    assertThat(workload.getMeanNetworkUsage()).isEqualTo(-1.0);
+    assertThat(workload.getMeanDiskSpaceUsage()).isEqualTo(-1.0);
+    assertThat(workload.getTotalResourceSeconds()).isEqualTo(-1);
+  }
+
+  @Test
+  void applicationEndTwoTimesTest() {
+    ListBuffer<StageInfo> stageBuffer = new ListBuffer<>();
+    stageBuffer.$plus$eq(testStageInfo2);
+    SparkListenerJobStart jobStart = new SparkListenerJobStart(1, 2L, stageBuffer.toList(), new Properties());
+    fakeTaskListener.onJobStart(jobStart);
+    fakeStageListener.onJobStart(jobStart);
+    fakeTaskListener.onTaskEnd(taskEndEvent3);
+    fakeTaskListener.onTaskEnd(taskEndEvent4);
+    fakeStageListener.onStageCompleted(stageCompleted2);
+    fakeApplicationListener.onApplicationEnd(applicationEndObj);
     fakeApplicationListener.onApplicationEnd(applicationEndObj);
     Workload workload = fakeApplicationListener.getProcessedObjects().get(0);
     assertThat(fakeApplicationListener.getProcessedObjects().size()).isEqualTo(1);
