@@ -54,6 +54,7 @@ For the most part, since we are pre-release this will serve no real purpose, oth
 - Added shading for plugin dependencies [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 - Added Parquet reader [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 - Brought mutation testing coverage up to 80% and add mutation testing coverage to pipeline [@lyadalachanchu](https://gitlab.ewi.tudelft.nl/lyadalachanchu)
+- Added Spark aggregations [@tqu](https://gitlab.ewi.tudelft.nl/tqu)
 - Set up SPI for the connector output file implementations [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 - Added parent-child functionality to Spark stage listeners as well [@pcho](https://gitlab.ewi.tudelft.nl/pcho)
 

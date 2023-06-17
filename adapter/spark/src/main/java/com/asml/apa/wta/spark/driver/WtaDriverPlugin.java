@@ -13,7 +13,6 @@ import com.asml.apa.wta.spark.datasource.SparkDataSource;
 import com.asml.apa.wta.spark.dto.ResourceAndStateWrapper;
 import com.asml.apa.wta.spark.dto.ResourceCollectionDto;
 import com.asml.apa.wta.spark.streams.MetricStreamingEngine;
-
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.List;

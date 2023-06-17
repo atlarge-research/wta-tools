@@ -28,15 +28,16 @@ class WtaDriverPluginTest {
    */
   private Map<String, String> createSparkConfAndInitialize(String configFile) {
     when(mockedSparkContext.getConf()).thenReturn(new SparkConf());
-    mockedSparkContext.getConf()
-          .setAppName("SystemTest")
-          .setMaster("local")
-          .set("spark.driver.extraJavaOptions", "-DconfigFile=" + configFile);
-    when(mockedSparkContext.conf()).thenReturn(
-            new SparkConf()
-                    .setAppName("SystemTest")
-                    .setMaster("local")
-                    .set("spark.driver.extraJavaOptions", "-DconfigFile=" + configFile));
+    mockedSparkContext
+        .getConf()
+        .setAppName("SystemTest")
+        .setMaster("local")
+        .set("spark.driver.extraJavaOptions", "-DconfigFile=" + configFile);
+    when(mockedSparkContext.conf())
+        .thenReturn(new SparkConf()
+            .setAppName("SystemTest")
+            .setMaster("local")
+            .set("spark.driver.extraJavaOptions", "-DconfigFile=" + configFile));
     assertThat(sut.isError()).isFalse();
     return sut.init(mockedSparkContext, mockedPluginContext);
   }
@@ -46,13 +47,9 @@ class WtaDriverPluginTest {
    */
   private Map<String, String> createSparkConfWithNoConfig() {
     when(mockedSparkContext.getConf()).thenReturn(new SparkConf());
-    mockedSparkContext.getConf()
-            .setAppName("SystemTest")
-            .setMaster("local");
-    when(mockedSparkContext.conf()).thenReturn(
-            new SparkConf()
-                    .setAppName("SystemTest")
-                    .setMaster("local"));
+    mockedSparkContext.getConf().setAppName("SystemTest").setMaster("local");
+    when(mockedSparkContext.conf())
+        .thenReturn(new SparkConf().setAppName("SystemTest").setMaster("local"));
     assertThat(sut.isError()).isFalse();
     return sut.init(mockedSparkContext, mockedPluginContext);
   }
@@ -66,13 +63,13 @@ class WtaDriverPluginTest {
     verify(sut, times(0)).removeListeners();
 
     verify(mockedSparkContext, times(1))
-            .addSparkListener(sut.getSparkDataSource().getTaskLevelListener());
+        .addSparkListener(sut.getSparkDataSource().getTaskLevelListener());
     verify(mockedSparkContext, times(1))
-            .addSparkListener(sut.getSparkDataSource().getStageLevelListener());
+        .addSparkListener(sut.getSparkDataSource().getStageLevelListener());
     verify(mockedSparkContext, times(1))
-            .addSparkListener(sut.getSparkDataSource().getJobLevelListener());
+        .addSparkListener(sut.getSparkDataSource().getJobLevelListener());
     verify(mockedSparkContext, times(1))
-            .addSparkListener(sut.getSparkDataSource().getApplicationLevelListener());
+        .addSparkListener(sut.getSparkDataSource().getApplicationLevelListener());
     try {
       sut.shutdown();
     } catch (Exception ignored) {
@@ -80,13 +77,13 @@ class WtaDriverPluginTest {
 
     verify(sut, times(1)).removeListeners();
     verify(mockedSparkContext, times(1))
-            .removeSparkListener(sut.getSparkDataSource().getTaskLevelListener());
+        .removeSparkListener(sut.getSparkDataSource().getTaskLevelListener());
     verify(mockedSparkContext, times(1))
-            .removeSparkListener(sut.getSparkDataSource().getStageLevelListener());
+        .removeSparkListener(sut.getSparkDataSource().getStageLevelListener());
     verify(mockedSparkContext, times(1))
-            .removeSparkListener(sut.getSparkDataSource().getJobLevelListener());
+        .removeSparkListener(sut.getSparkDataSource().getJobLevelListener());
     verify(mockedSparkContext, times(1))
-            .removeSparkListener(sut.getSparkDataSource().getApplicationLevelListener());
+        .removeSparkListener(sut.getSparkDataSource().getApplicationLevelListener());
   }
 
   @Test
@@ -99,13 +96,13 @@ class WtaDriverPluginTest {
     verify(sut, times(0)).removeListeners();
 
     verify(mockedSparkContext, times(0))
-            .addSparkListener(sut.getSparkDataSource().getTaskLevelListener());
+        .addSparkListener(sut.getSparkDataSource().getTaskLevelListener());
     verify(mockedSparkContext, times(1))
-            .addSparkListener(sut.getSparkDataSource().getStageLevelListener());
+        .addSparkListener(sut.getSparkDataSource().getStageLevelListener());
     verify(mockedSparkContext, times(1))
-            .addSparkListener(sut.getSparkDataSource().getJobLevelListener());
+        .addSparkListener(sut.getSparkDataSource().getJobLevelListener());
     verify(mockedSparkContext, times(1))
-            .addSparkListener(sut.getSparkDataSource().getApplicationLevelListener());
+        .addSparkListener(sut.getSparkDataSource().getApplicationLevelListener());
     try {
       sut.shutdown();
     } catch (Exception ignored) {
@@ -113,15 +110,14 @@ class WtaDriverPluginTest {
 
     verify(sut, times(1)).removeListeners();
     verify(mockedSparkContext, times(0))
-            .removeSparkListener(sut.getSparkDataSource().getTaskLevelListener());
+        .removeSparkListener(sut.getSparkDataSource().getTaskLevelListener());
     verify(mockedSparkContext, times(1))
-            .removeSparkListener(sut.getSparkDataSource().getStageLevelListener());
+        .removeSparkListener(sut.getSparkDataSource().getStageLevelListener());
     verify(mockedSparkContext, times(1))
-            .removeSparkListener(sut.getSparkDataSource().getJobLevelListener());
+        .removeSparkListener(sut.getSparkDataSource().getJobLevelListener());
     verify(mockedSparkContext, times(1))
-            .removeSparkListener(sut.getSparkDataSource().getApplicationLevelListener());
+        .removeSparkListener(sut.getSparkDataSource().getApplicationLevelListener());
   }
-
 
   @Test
   void wtaDriverPluginInitialized() {
@@ -149,7 +145,8 @@ class WtaDriverPluginTest {
 
   @Test
   void wtaDriverPluginDoesNotInitializeWithNegativeResourceTimer() {
-    Map<String, String> configMap = createSparkConfAndInitialize("src/test/resources/testConfigNegativeResourcePingInterval.json");
+    Map<String, String> configMap =
+        createSparkConfAndInitialize("src/test/resources/testConfigNegativeResourcePingInterval.json");
     assertThat(sut.isError()).isTrue();
     assertThat(configMap).containsKeys("errorStatus");
     assertThat(configMap.get("errorStatus")).isEqualTo("true");

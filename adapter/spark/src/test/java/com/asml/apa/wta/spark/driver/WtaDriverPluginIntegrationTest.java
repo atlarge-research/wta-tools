@@ -1,7 +1,6 @@
 package com.asml.apa.wta.spark.driver;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.when;
 
 import com.asml.apa.wta.core.io.DiskParquetInputFile;
 import com.asml.apa.wta.core.io.ParquetReader;
@@ -9,8 +8,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
-import java.util.Map;
-
 import org.apache.avro.generic.GenericRecord;
 import org.apache.spark.SparkConf;
 import org.apache.spark.SparkContext;
