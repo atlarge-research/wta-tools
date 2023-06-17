@@ -9,6 +9,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 import lombok.Getter;
 import org.apache.spark.SparkContext;
 import org.apache.spark.scheduler.SparkListenerJobEnd;
@@ -32,7 +33,7 @@ public class JobLevelListener extends AbstractListener<Workflow> {
 
   private int criticalPathTasks = -1;
 
-  private List<Object> jobStages;
+  private List<Integer> jobStages;
 
   /**
    * Constructor for the job-level listener.
@@ -65,7 +66,9 @@ public class JobLevelListener extends AbstractListener<Workflow> {
   public void onJobStart(SparkListenerJobStart jobStart) {
     jobSubmitTimes.put(jobStart.jobId() + 1, jobStart.time());
     criticalPathTasks = jobStart.stageIds().length();
-    jobStages = JavaConverters.seqAsJavaList(jobStart.stageIds());
+    jobStages = JavaConverters.seqAsJavaList(jobStart.stageIds()).stream()
+        .map(stageId -> (int) stageId)
+        .collect(Collectors.toList());
   }
 
   /**
