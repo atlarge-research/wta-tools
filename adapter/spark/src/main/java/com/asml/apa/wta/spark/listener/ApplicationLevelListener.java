@@ -69,7 +69,6 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
    * @author Tianchen Qu
    * @since 1.0.0
    */
-  @SuppressWarnings("MethodLength")
   public void onApplicationEnd(SparkListenerApplicationEnd applicationEnd) {
     Workload.WorkloadBuilder builder = Workload.builder();
     if (config.isStageLevel()) {
