@@ -93,7 +93,7 @@ class BaseLevelListenerTest {
     fakeJobListener = new JobLevelListener(mockedSparkContext, fakeConfig, fakeTaskListener, fakeStageListener);
 
     fakeApplicationListener = new ApplicationLevelListener(
-        mockedSparkContext, fakeConfig, fakeJobListener, fakeTaskListener, fakeStageListener);
+        mockedSparkContext, fakeConfig, fakeTaskListener, fakeStageListener, fakeJobListener);
 
     fakeStageListener2 = new StageLevelListener(mockedSparkContext2, fakeConfig);
 
@@ -104,6 +104,6 @@ class BaseLevelListenerTest {
     fakeJobListener2 = new JobLevelListener(mockedSparkContext2, fakeConfig, fakeTaskListener2, fakeStageListener2);
 
     fakeApplicationListener2 = new ApplicationLevelListener(
-        mockedSparkContext2, fakeConfig, fakeJobListener2, fakeTaskListener2, fakeStageListener2);
+        mockedSparkContext2, fakeConfig, fakeTaskListener2, fakeStageListener2, fakeJobListener2);
   }
 }

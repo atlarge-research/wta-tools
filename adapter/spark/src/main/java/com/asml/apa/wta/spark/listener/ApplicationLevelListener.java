@@ -25,8 +25,9 @@ import scala.collection.JavaConverters;
 
 /**
  * This class is an application-level listener for the Spark data source.
- * It's important that one does not override {@link org.apache.spark.scheduler.SparkListenerInterface#onApplicationStart(SparkListenerApplicationStart)} here, as the event is already sent
- * before the listener is registered unless the listener is explicitly registered in the Spark configuration as per <a href="https://stackoverflow.com/questions/36401238/spark-onapplicationstart-is-never-gets-called">SO</a>
+ * It's important that one does not override {@link org.apache.spark.scheduler.SparkListenerInterface#onApplicationStart(SparkListenerApplicationStart)}
+ * here, as the event is already sent before the listener is registered unless the listener is explicitly registered in
+ * the Spark configuration as per <a href="https://stackoverflow.com/questions/36401238/spark-onapplicationstart-is-never-gets-called">SO</a>
  *
  * @author Pil Kyu Cho
  * @author Henry Page
@@ -37,13 +38,11 @@ import scala.collection.JavaConverters;
 @Slf4j
 public class ApplicationLevelListener extends AbstractListener<Workload> {
 
-
   private final TaskStageBaseListener wtaTaskListener;
 
   private final StageLevelListener stageLevelListener;
 
   private final JobLevelListener jobLevelListener;
-
 
   /**
    * Constructor for the application-level listener.
@@ -66,37 +65,37 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
     this.wtaTaskListener = wtaTaskListener;
     this.stageLevelListener = stageLevelListener;
     this.jobLevelListener = jobLevelListener;
-
   }
 
-  private void setTasks(TaskStageBaseListener wtaTaskListener, StageLevelListener stageListener) {
-    TaskLevelListener listener = (TaskLevelListener) wtaTaskListener;
-    final List<Task> tasks = wtaTaskListener.getProcessedObjects();
+  private void setTaskFields(TaskStageBaseListener wtaTaskListener, StageLevelListener stageListener) {
+    TaskLevelListener taskLevelListener = (TaskLevelListener) wtaTaskListener;
+    final List<Task> tasks = taskLevelListener.getProcessedObjects();
     for (Task task : tasks) {
-      // parent children fields
-      final int stageId = listener.getTaskToStage().get(task.getId());
-      final Integer[] parentStages = stageListener.getStageToParents().get(stageId);
+      // set parent field
+      final long stageId = taskLevelListener.getTaskToStage().get(task.getId());
+      final Long[] parentStages = stageListener.getStageToParents().get(stageId);
       if (parentStages != null) {
         final Long[] parents = Arrays.stream(parentStages)
             .flatMap(x ->
-                Arrays.stream(listener.getStageToTasks().getOrDefault(x, new ArrayList<>()).stream()
+                Arrays.stream(taskLevelListener.getStageToTasks().getOrDefault(x, new ArrayList<>()).stream()
                     .map(Task::getId)
                     .toArray(Long[]::new)))
             .toArray(Long[]::new);
         task.setParents(ArrayUtils.toPrimitive(parents));
       }
 
-      List<Integer> childrenStages =
+      // set children field
+      List<Long> childrenStages =
           stageLevelListener.getParentStageToChildrenStages().get(stageId);
       if (childrenStages != null) {
         List<Task> children = new ArrayList<>();
         childrenStages.forEach(
-            x -> children.addAll(listener.getStageToTasks().get(x)));
+            x -> children.addAll(taskLevelListener.getStageToTasks().get(x)));
         Long[] temp = children.stream().map(Task::getId).toArray(Long[]::new);
         task.setChildren(ArrayUtils.toPrimitive(temp));
       }
 
-      // resource related fields
+      // set resource related fields
       final int resourceProfileId =
           stageLevelListener.getStageToResource().getOrDefault(stageId, -1);
       final ResourceProfile resourceProfile =
@@ -110,25 +109,22 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
     }
   }
 
-  private void setStages(StageLevelListener stageListener) {
+  private void setStageFields(StageLevelListener stageListener) {
+    Map<Long, List<Long>> parentToChildren = stageListener.getParentStageToChildrenStages();
     final List<Task> stages = stageListener.getProcessedObjects();
-    Map<Integer, List<Integer>> parentToChildren = stageListener.getParentStageToChildrenStages();
-    for (Task stage : stages) {
-      stage.setChildren(parentToChildren.getOrDefault(Math.toIntExact(stage.getId()), new ArrayList<>()).stream()
-          .mapToLong(x -> x + 1)
-          .toArray());
-    }
+    stages.forEach(stage -> stage.setChildren(
+            parentToChildren.getOrDefault(stage.getId(), new ArrayList<>()).stream()
+                    .mapToLong(x -> x + 1)
+                    .toArray()));
   }
 
-  private void setWorkflows(JobLevelListener jobListener) {
+  private void setWorkflowFields(JobLevelListener jobListener) {
     final List<Workflow> workflows = jobListener.getProcessedObjects();
-    for (Workflow workflow : workflows) {
-      workflow.setTotalResources(Arrays.stream(workflow.getTasks())
-          .map(Task::getResourceAmountRequested)
-          .filter(x -> x >= 0.0)
-          .reduce(Double::sum)
-          .orElse(-1.0));
-    }
+    workflows.forEach(workflow -> workflow.setTotalResources(Arrays.stream(workflow.getTasks())
+        .map(Task::getResourceAmountRequested)
+        .filter(x -> x >= 0.0)
+        .reduce(Double::sum)
+        .orElse(-1.0)));
   }
 
   /**
@@ -142,21 +138,23 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
    */
   @SuppressWarnings("MethodLength")
   public void onApplicationEnd(SparkListenerApplicationEnd applicationEnd) {
-    Workload.WorkloadBuilder builder = Workload.builder();
-    if (config.isStageLevel()) {
-      setStages(stageLevelListener);
-    } else {
-      setTasks(wtaTaskListener, stageLevelListener);
-    }
-    setWorkflows(jobLevelListener);
-    final List<Task> tasks = wtaTaskListener.getProcessedObjects();
-    List<Workload> processedObjects = this.getProcessedObjects();
-    // we should enver enter this branch, this is a guard since an application
-    // only terminates once.
-    if (!processedObjects.isEmpty()) {
+    // we should never enter this branch, this is a guard since an application only terminates once.
+    if (!this.getProcessedObjects().isEmpty()) {
       log.debug("Application end called twice, this should never happen");
       return;
     }
+
+    if (config.isStageLevel()) {
+      setStageFields(stageLevelListener);
+    } else {
+      setTaskFields(wtaTaskListener, stageLevelListener);
+    }
+    setWorkflowFields(jobLevelListener);
+
+
+
+    Workload.WorkloadBuilder workloadBuilder = Workload.builder();
+    final List<Task> tasks = wtaTaskListener.getProcessedObjects();
 
     final Workflow[] workflows = jobLevelListener.getProcessedObjects().toArray(new Workflow[0]);
     final int numWorkflows = workflows.length;
@@ -176,137 +174,135 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
         .reduce(Double::sum)
         .orElseGet(() -> -1.0)
         .longValue();
+
     final long numUsers = tasks.stream().filter(x -> x.getUserId() != -1).count();
     final long numGroups = tasks.stream().filter(x -> x.getGroupId() != -1).count();
     final double totalResourceSeconds = tasks.stream()
-        .filter(x -> x.getRuntime() >= 0 && x.getResourceAmountRequested() >= 0.0)
-        .map(x -> x.getResourceAmountRequested() * x.getRuntime())
+        .filter(task -> task.getRuntime() >= 0 && task.getResourceAmountRequested() >= 0.0)
+        .map(task -> task.getResourceAmountRequested() * task.getRuntime())
         .reduce(Double::sum)
         .orElse(-1.0);
 
-    min(tasks.stream().map(Task::getResourceAmountRequested), builder::minResourceTask);
-    max(tasks.stream().map(Task::getResourceAmountRequested), builder::maxResourceTask);
+    computeDoubleMin(tasks.stream().map(Task::getResourceAmountRequested), workloadBuilder::minResourceTask);
+    computeDoubleMax(tasks.stream().map(Task::getResourceAmountRequested), workloadBuilder::maxResourceTask);
 
-    final long resourceTaskSize = size(tasks.stream().map(Task::getResourceAmountRequested));
+    final long resourceTaskSize = positiveDataSize(tasks.stream().map(Task::getResourceAmountRequested));
 
     final double meanResourceTask =
-        mean(tasks.stream().map(Task::getResourceAmountRequested), resourceTaskSize, builder::meanResourceTask);
+        computeMean(tasks.stream().map(Task::getResourceAmountRequested), resourceTaskSize, workloadBuilder::meanResourceTask);
 
-    stdAndCov(
+    computeStdAndCov(
         tasks.stream().map(Task::getResourceAmountRequested).filter(x -> x >= 0.0),
         meanResourceTask,
         resourceTaskSize,
-        builder::stdResourceTask,
-        builder::covResourceTask);
+        workloadBuilder::stdResourceTask,
+        workloadBuilder::covResourceTask);
 
-    medianAndQuartiles(
+    computeMedianAndQuantile(
         tasks.stream()
             .map(Task::getResourceAmountRequested)
             .filter(x -> x >= 0.0)
             .collect(Collectors.toList()),
         -1.0,
-        builder::medianResourceTask,
-        builder::firstQuartileResourceTask,
-        builder::thirdQuartileResourceTask);
+        workloadBuilder::medianResourceTask,
+        workloadBuilder::firstQuartileResourceTask,
+        workloadBuilder::thirdQuartileResourceTask);
 
-    min(tasks.stream().map(Task::getMemoryRequested), builder::minMemory);
+    computeDoubleMin(tasks.stream().map(Task::getMemoryRequested), workloadBuilder::minMemory);
+    computeDoubleMax(tasks.stream().map(Task::getMemoryRequested), workloadBuilder::maxMemory);
 
-    max(tasks.stream().map(Task::getMemoryRequested), builder::maxMemory);
+    long memorySize = positiveDataSize(tasks.stream().map(Task::getMemoryRequested));
 
-    long memorySize = size(tasks.stream().map(Task::getMemoryRequested));
+    final double meanMemory = computeMean(tasks.stream().map(Task::getMemoryRequested), memorySize, workloadBuilder::meanMemory);
 
-    final double meanMemory = mean(tasks.stream().map(Task::getMemoryRequested), memorySize, builder::meanMemory);
-
-    stdAndCov(
+    computeStdAndCov(
         tasks.stream().map(Task::getMemoryRequested).filter(x -> x >= 0.0),
         meanMemory,
         memorySize,
-        builder::stdMemory,
-        builder::covMemory);
+        workloadBuilder::stdMemory,
+        workloadBuilder::covMemory);
 
-    medianAndQuartiles(
+    computeMedianAndQuantile(
         tasks.stream()
             .map(Task::getMemoryRequested)
             .filter(x -> x >= 0.0)
             .collect(Collectors.toList()),
         -1.0,
-        builder::medianMemory,
-        builder::firstQuartileMemory,
-        builder::thirdQuartileMemory);
+        workloadBuilder::medianMemory,
+        workloadBuilder::firstQuartileMemory,
+        workloadBuilder::thirdQuartileMemory);
 
-    minLong(tasks.stream().map(Task::getNetworkIoTime), builder::minNetworkUsage);
-
-    maxLong(tasks.stream().map(Task::getNetworkIoTime), builder::maxNetworkUsage);
+    computeLongMin(tasks.stream().map(Task::getNetworkIoTime), workloadBuilder::minNetworkUsage);
+    computeLongMax(tasks.stream().map(Task::getNetworkIoTime), workloadBuilder::maxNetworkUsage);
 
     final long networkUsageSize =
-        size(tasks.stream().mapToDouble(Task::getNetworkIoTime).boxed());
-    final double meanNetworkUsage = mean(
+        positiveDataSize(tasks.stream().mapToDouble(Task::getNetworkIoTime).boxed());
+    final double meanNetworkUsage = computeMean(
         tasks.stream().mapToDouble(Task::getNetworkIoTime).boxed(),
         networkUsageSize,
-        builder::meanNetworkUsage);
+        workloadBuilder::meanNetworkUsage);
 
-    stdAndCov(
+    computeStdAndCov(
         tasks.stream().map(Task::getNetworkIoTime).filter(x -> x >= 0.0).map(Long::doubleValue),
         meanNetworkUsage,
         networkUsageSize,
-        builder::stdNetworkUsage,
-        builder::covNetworkUsage);
+        workloadBuilder::stdNetworkUsage,
+        workloadBuilder::covNetworkUsage);
 
-    medianAndQuartiles(
+    computeMedianAndQuantile(
         tasks.stream().map(Task::getNetworkIoTime).filter(x -> x >= 0).collect(Collectors.toList()),
         -1L,
-        builder::medianNetworkUsage,
-        builder::firstQuartileNetworkUsage,
-        builder::thirdQuartileNetworkUsage);
+        workloadBuilder::medianNetworkUsage,
+        workloadBuilder::firstQuartileNetworkUsage,
+        workloadBuilder::thirdQuartileNetworkUsage);
 
-    min(tasks.stream().map(Task::getDiskSpaceRequested), builder::minDiskSpaceUsage);
+    computeDoubleMin(tasks.stream().map(Task::getDiskSpaceRequested), workloadBuilder::minDiskSpaceUsage);
+    computeDoubleMax(tasks.stream().map(Task::getDiskSpaceRequested), workloadBuilder::maxDiskSpaceUsage);
 
-    max(tasks.stream().map(Task::getDiskSpaceRequested), builder::maxDiskSpaceUsage);
-
-    final long diskSpaceSize = size(tasks.stream().map(Task::getDiskSpaceRequested));
+    final long diskSpaceSize = positiveDataSize(tasks.stream().map(Task::getDiskSpaceRequested));
     final double meanDiskSpaceUsage =
-        mean(tasks.stream().map(Task::getDiskSpaceRequested), diskSpaceSize, builder::meanDiskSpaceUsage);
+        computeMean(tasks.stream().map(Task::getDiskSpaceRequested), diskSpaceSize, workloadBuilder::meanDiskSpaceUsage);
 
-    stdAndCov(
+    computeStdAndCov(
         tasks.stream().map(Task::getDiskSpaceRequested).filter(x -> x >= 0.0),
         meanDiskSpaceUsage,
         diskSpaceSize,
-        builder::stdDiskSpaceUsage,
-        builder::covDiskSpaceUsage);
+        workloadBuilder::stdDiskSpaceUsage,
+        workloadBuilder::covDiskSpaceUsage);
 
-    medianAndQuartiles(
+    computeMedianAndQuantile(
         tasks.stream()
             .map(Task::getDiskSpaceRequested)
             .filter(x -> x >= 0.0)
             .collect(Collectors.toList()),
         -1.0,
-        builder::medianDiskSpaceUsage,
-        builder::firstQuartileDiskSpaceUsage,
-        builder::thirdQuartileDiskSpaceUsage);
+        workloadBuilder::medianDiskSpaceUsage,
+        workloadBuilder::firstQuartileDiskSpaceUsage,
+        workloadBuilder::thirdQuartileDiskSpaceUsage);
 
-    min(tasks.stream().map(Task::getEnergyConsumption), builder::minEnergy);
-    max(tasks.stream().map(Task::getEnergyConsumption), builder::maxEnergy);
-    final long energySize = size(tasks.stream().map(Task::getEnergyConsumption));
-    final double meanEnergy = mean(tasks.stream().map(Task::getEnergyConsumption), energySize, builder::meanEnergy);
+    computeDoubleMin(tasks.stream().map(Task::getEnergyConsumption), workloadBuilder::minEnergy);
+    computeDoubleMax(tasks.stream().map(Task::getEnergyConsumption), workloadBuilder::maxEnergy);
+    final long energySize = positiveDataSize(tasks.stream().map(Task::getEnergyConsumption));
+    final double meanEnergy = computeMean(tasks.stream().map(Task::getEnergyConsumption), energySize, workloadBuilder::meanEnergy);
 
-    stdAndCov(
+    computeStdAndCov(
         tasks.stream().map(Task::getEnergyConsumption).filter(x -> x >= 0.0),
         meanEnergy,
         energySize,
-        builder::stdEnergy,
-        builder::covEnergy);
+        workloadBuilder::stdEnergy,
+        workloadBuilder::covEnergy);
 
-    medianAndQuartiles(
+    computeMedianAndQuantile(
         tasks.stream()
             .map(Task::getEnergyConsumption)
             .filter(x -> x >= 0.0)
             .collect(Collectors.toList()),
         -1.0,
-        builder::medianEnergy,
-        builder::firstQuartileEnergy,
-        builder::thirdQuartileEnergy);
+        workloadBuilder::medianEnergy,
+        workloadBuilder::firstQuartileEnergy,
+        workloadBuilder::thirdQuartileEnergy);
 
-    processedObjects.add(builder.totalWorkflows(numWorkflows)
+    this.getProcessedObjects().add(workloadBuilder.totalWorkflows(numWorkflows)
         .totalTasks(totalTasks)
         .domain(domain)
         .dateStart(startDate)
@@ -325,111 +321,111 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
    * This return the size of the data after filtering for positive ones.
    * It is needed for calculation of mean and standard deviation.
    *
-   * @param data stream of data
-   * @return the size of positive elements
+   * @param data              stream of data
+   * @return                  size of positive elements
    * @author Tianchen Qu
    * @since 1.0.0
    */
-  private long size(Stream<Double> data) {
+  private long positiveDataSize(Stream<Double> data) {
     return data.filter(x -> x >= 0.0).count();
   }
 
   /**
-   * Find the maximum element inside the double valued stream and give it to the field of the builder.
+   * Find the maximum element inside the double valued stream and give it to the field of the workloadBuilder.
    *
-   * @param data data
-   * @param builder builder
+   * @param data              stream of data
+   * @param maxFunction       Function object that is applied to the given data
    * @author Tianchen Qu
    * @since 1.0.0
    */
-  private void max(Stream<Double> data, Function<Double, Workload.WorkloadBuilder> builder) {
-    builder.apply(data.filter(x -> x >= 0.0).reduce(Double::max).orElse(-1.0));
+  private void computeDoubleMax(Stream<Double> data, Function<Double, Workload.WorkloadBuilder> maxFunction) {
+    maxFunction.apply(data.filter(x -> x >= 0.0).reduce(Double::max).orElse(-1.0));
   }
 
   /**
-   * Find the minimum element of the double valued stream and set the corresponding field in the builder as that value.
+   * Find the minimum element of the double valued stream and set the corresponding field in the workloadBuilder as that value.
    *
-   * @param data data stream
-   * @param builder builder
+   * @param data              stream of data
+   * @param minFunction       Function object that is applied to the given data
    * @author Tianchen Qu
    * @since 1.0.0
    */
-  private void min(Stream<Double> data, Function<Double, Workload.WorkloadBuilder> builder) {
-    builder.apply(data.filter(x -> x >= 0.0).reduce(Double::min).orElse(-1.0));
+  private void computeDoubleMin(Stream<Double> data, Function<Double, Workload.WorkloadBuilder> minFunction) {
+    minFunction.apply(data.filter(x -> x >= 0.0).reduce(Double::min).orElse(-1.0));
   }
 
   /**
    * Maximum function for long value.
    *
-   * @param data data stream
-   * @param builder builder
+   * @param data              stream of data
+   * @param maxFunction       Function object that is applied to the given data
    * @author Tianchen Qu
    * @since 1.0.0
    */
-  private void maxLong(Stream<Long> data, Function<Long, Workload.WorkloadBuilder> builder) {
-    builder.apply(data.filter(x -> x >= 0).reduce(Long::max).orElse(-1L));
+  private void computeLongMax(Stream<Long> data, Function<Long, Workload.WorkloadBuilder> maxFunction) {
+    maxFunction.apply(data.filter(x -> x >= 0).reduce(Long::max).orElse(-1L));
   }
 
   /**
    * Minimum function for long value.
    *
-   * @param data data stream
-   * @param builder builder
+   * @param data              stream of data
+   * @param minFunction       Function object that is applied to the given data
    * @author Tianchen Qu
    * @since 1.0.0
    */
-  private void minLong(Stream<Long> data, Function<Long, Workload.WorkloadBuilder> builder) {
-    builder.apply(data.filter(x -> x >= 0).reduce(Long::min).orElse(-1L));
+  private void computeLongMin(Stream<Long> data, Function<Long, Workload.WorkloadBuilder> minFunction) {
+    minFunction.apply(data.filter(x -> x >= 0).reduce(Long::min).orElse(-1L));
   }
 
   /**
    * Mean value for the data stream with invalid stream handling.
    * Will set up the corresponding field with the builder parameter that is passed.
    *
-   * @param data data stream
-   * @param size size of the stream
-   * @param builder builder
-   * @return the mean value
+   * @param data              stream of data
+   * @param size              size of the stream
+   * @param meanFunction      Function object that is applied to the given data
+   * @return                  mean value
    * @author Tianchen Qu
    * @since 1.0.0
    */
-  private double mean(Stream<Double> data, long size, Function<Double, Workload.WorkloadBuilder> builder) {
+  private double computeMean(Stream<Double> data, long size, Function<Double, Workload.WorkloadBuilder> meanFunction) {
     double mean = -1.0;
     if (size != 0) {
       mean = data.filter(x -> x >= 0.0).reduce(Double::sum).orElse((double) -size) / size;
     }
-    builder.apply(mean);
+    meanFunction.apply(mean);
     return mean;
   }
 
   /**
-   *  Standard deviation value and normalized standard deviation value for the data stream with invalid stream handling.
+   * Standard deviation value and normalized standard deviation value for the data stream with invalid stream handling.
    *
-   * @param data data stream
-   * @param mean mean value from previous method
-   * @param size size from previous method
-   * @param std the builder for the standard deviation field
-   * @param cov the builder for the normalized standard deviation field
+   * @param data              stream of data
+   * @param mean              mean value from {@link #computeMean(Stream, long, Function)}
+   * @param size              size from {@link #positiveDataSize(Stream)}
+   * @param stdFunction       standard deviation Function object that is applied to the given data
+   * @param covFunction       covariance Function object that is applied to the given data
    * @author Tianchen Qu
    * @since 1.0.0
    */
-  private void stdAndCov(
+  private void computeStdAndCov(
       Stream<Double> data,
       Double mean,
       long size,
-      Function<Double, Workload.WorkloadBuilder> std,
-      Function<Double, Workload.WorkloadBuilder> cov) {
+      Function<Double, Workload.WorkloadBuilder> stdFunction,
+      Function<Double, Workload.WorkloadBuilder> covFunction) {
     if (size == 0 || mean == -1.0) {
-      std.apply(-1.0);
-      cov.apply(-1.0);
+      stdFunction.apply(-1.0);
+      covFunction.apply(-1.0);
     } else {
       double temp = data.map(x -> x * x).reduce(Double::sum).orElse(-1.0);
       temp = Math.pow(temp / size - mean * mean, 0.5);
-      std.apply(temp);
+      stdFunction.apply(temp);
       if (mean == 0.0) {
-        cov.apply(-1.0);
+        covFunction.apply(-1.0);
       } else {
-        cov.apply(temp / mean);
+        covFunction.apply(temp / mean);
       }
     }
   }
@@ -437,30 +433,30 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
   /**
    * This method will set the median, first quartile and third quartile elements for the given data list.
    *
-   * @param data data list
-   * @param defaultValue the default median,first quartile, third quartile value given invalid list
-   * @param median builder for median value
-   * @param firstQuartile builder for first quartile value
-   * @param thirdQuartile builder for third quartile value
-   * @param <T> the type of the list, needs to be comparable to sort the list
+   * @param data                    list of metrics
+   * @param defaultValue            default median, first quartile, third quartile value given invalid list
+   * @param medianFunction          median Function object that is applied to the given data
+   * @param firstQuantileFunction   first quantile Function object that is applied to the given data
+   * @param thirdQuantileFunction   third quantile Function object that is applied to the given data
+   * @param <T>                     type of the list, needs to be comparable for sorting
    * @author Tianchen Qu
    * @since 1.0.0
    */
-  private <T extends Comparable<T>> void medianAndQuartiles(
+  private <T extends Comparable<T>> void computeMedianAndQuantile(
       List<T> data,
       T defaultValue,
-      Function<T, Workload.WorkloadBuilder> median,
-      Function<T, Workload.WorkloadBuilder> firstQuartile,
-      Function<T, Workload.WorkloadBuilder> thirdQuartile) {
+      Function<T, Workload.WorkloadBuilder> medianFunction,
+      Function<T, Workload.WorkloadBuilder> firstQuantileFunction,
+      Function<T, Workload.WorkloadBuilder> thirdQuantileFunction) {
     if (data.size() == 0) {
-      median.apply(defaultValue);
-      firstQuartile.apply(defaultValue);
-      thirdQuartile.apply(defaultValue);
+      medianFunction.apply(defaultValue);
+      firstQuantileFunction.apply(defaultValue);
+      thirdQuantileFunction.apply(defaultValue);
     } else {
       Collections.sort(data);
-      median.apply(data.get(data.size() / 2));
-      firstQuartile.apply(data.get(data.size() / 4));
-      thirdQuartile.apply(data.get(data.size() * 3 / 4));
+      medianFunction.apply(data.get(data.size() / 2));
+      firstQuantileFunction.apply(data.get(data.size() / 4));
+      thirdQuantileFunction.apply(data.get(data.size() * 3 / 4));
     }
   }
 }

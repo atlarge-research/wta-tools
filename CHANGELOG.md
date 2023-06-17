@@ -76,6 +76,7 @@ For the most part, since we are pre-release this will serve no real purpose, oth
 - Updated the Spark method in EndToEnd class to cover more broad shuffling operations [@pcho](https://gitlab.ewi.tudelft.nl/pcho)
 - Added Dockerfiles for the user to deploy more easily for containerized environments [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 - Changed the pipeline to enforce code coverage [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
+- Refactored the Spark listeners to improve readability and maintainability [@pcho](https://gitlab.ewi.tudelft.nl/pcho)
 
 ### Fixed
 - Fixed the slf4j logging module to allow use in testing and `adapter/spark` [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
