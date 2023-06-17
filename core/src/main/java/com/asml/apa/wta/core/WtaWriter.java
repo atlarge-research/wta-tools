@@ -25,6 +25,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class WtaWriter {
 
+  private static final String WTA_SPARK_PLUGIN_VERSION = "spark-wta-generator-1_0";
+
   private final OutputFile file;
   private final String schemaVersion;
   private final Map<Class<? extends BaseTraceObject>, String> parquetLabels = Map.of(
@@ -42,7 +44,7 @@ public class WtaWriter {
    * @since 1.0.0
    */
   public WtaWriter(@NonNull OutputFile path, String version) {
-    file = path.resolve("spark-wta-generator-1_0");
+    file = path.resolve(WTA_SPARK_PLUGIN_VERSION);
     schemaVersion = version;
     setupDirectories(file, version);
   }
