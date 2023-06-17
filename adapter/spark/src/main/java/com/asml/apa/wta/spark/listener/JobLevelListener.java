@@ -32,8 +32,6 @@ public class JobLevelListener extends AbstractListener<Workflow> {
 
   private int criticalPathTasks = -1;
 
-  private long jobStartTime = -1L;
-
   private List<Object> jobStages;
 
   /**
@@ -67,7 +65,6 @@ public class JobLevelListener extends AbstractListener<Workflow> {
   public void onJobStart(SparkListenerJobStart jobStart) {
     jobSubmitTimes.put(jobStart.jobId() + 1, jobStart.time());
     criticalPathTasks = jobStart.stageIds().length();
-    jobStartTime = System.currentTimeMillis();
     jobStages = JavaConverters.seqAsJavaList(jobStart.stageIds());
   }
 
@@ -111,7 +108,7 @@ public class JobLevelListener extends AbstractListener<Workflow> {
         .filter(energy -> energy >= 0.0)
         .reduce(Double::sum)
         .orElse(-1.0);
-    final long jobRunTime = System.currentTimeMillis() - jobStartTime;
+    final long jobRunTime = jobEnd.time() - jobSubmitTimes.get(jobId + 1);
     final long driverTime = jobRunTime
         - stageLevelListener.getProcessedObjects().stream()
             .filter(stage -> jobStages.contains(Math.toIntExact(stage.getId())))
