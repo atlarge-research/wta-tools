@@ -193,6 +193,6 @@ class MetricStreamingEngineTest {
 
     List<ResourceAndStateWrapper> result = sut.collectResourceInformation();
     assertThat(result).hasSize(1);
-    assertThat(result.get(0).getResource().os).isEqualTo("asfasdfjasfsadfasfasdfsa");
+    assertThat(result.get(0).getResource().getOs()).isEqualTo("asfasdfjasfsadfasfasdfsa");
   }
 }

@@ -23,24 +23,26 @@ import org.junit.jupiter.api.Test;
 
 class WtaWriterIntegrationTest {
 
+  private static final String TOOL_VERSION = "spark-wta-generator-1_0";
+
   private static WtaWriter sut;
 
   @BeforeAll
   static void setUp() {
     OutputFile file = new DiskOutputFile(Path.of("wta-output"));
-    sut = new WtaWriter(file, "schema-1.0");
+    sut = new WtaWriter(file, "schema-1.0", TOOL_VERSION);
   }
 
   @Test
   void emptyOutputFile() {
-    assertThatThrownBy(() -> new WtaWriter(null, "schema-1.0"));
+    assertThatThrownBy(() -> new WtaWriter(null, "schema-1.0", TOOL_VERSION));
   }
 
   @Test
   void writeWorkload() {
     Workload workload = Workload.builder().build();
     sut.write(workload);
-    assertThat(new File("wta-output/workload/schema-1.0/generic_information.json").exists())
+    assertThat(new File("wta-output/" + TOOL_VERSION + "/workload/schema-1.0/generic_information.json").exists())
         .isTrue();
   }
 
@@ -48,7 +50,7 @@ class WtaWriterIntegrationTest {
   void writeWorkflows() {
     Workflow workflow = Workflow.builder().build();
     sut.write(Workflow.class, List.of(workflow));
-    assertThat(new File("wta-output/workflows/schema-1.0/workflows.parquet").exists())
+    assertThat(new File("wta-output/" + TOOL_VERSION + "/workflows/schema-1.0/workflows.parquet").exists())
         .isTrue();
   }
 
@@ -56,7 +58,7 @@ class WtaWriterIntegrationTest {
   void writeTasks() {
     Task task = Task.builder().build();
     sut.write(Task.class, List.of(task));
-    assertThat(new File("wta-output/tasks/schema-1.0/tasks.parquet").exists())
+    assertThat(new File("wta-output/" + TOOL_VERSION + "/tasks/schema-1.0/tasks.parquet").exists())
         .isTrue();
   }
 
@@ -64,7 +66,7 @@ class WtaWriterIntegrationTest {
   void writeResources() {
     Resource resource = Resource.builder().build();
     sut.write(Resource.class, List.of(resource));
-    assertThat(new File("wta-output/resources/schema-1.0/resources.parquet").exists())
+    assertThat(new File("wta-output/" + TOOL_VERSION + "/resources/schema-1.0/resources.parquet").exists())
         .isTrue();
   }
 
@@ -72,7 +74,8 @@ class WtaWriterIntegrationTest {
   void writeResourceStates() {
     ResourceState resourceState = ResourceState.builder().build();
     sut.write(ResourceState.class, List.of(resourceState));
-    assertThat(new File("wta-output/resource_states/schema-1.0/resource_states.parquet").exists())
+    assertThat(new File("wta-output/" + TOOL_VERSION + "/resource_states/schema-1.0/resource_states.parquet")
+            .exists())
         .isTrue();
   }
 

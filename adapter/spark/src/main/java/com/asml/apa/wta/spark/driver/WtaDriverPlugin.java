@@ -9,6 +9,7 @@ import com.asml.apa.wta.core.model.ResourceState;
 import com.asml.apa.wta.core.model.Task;
 import com.asml.apa.wta.core.model.Workflow;
 import com.asml.apa.wta.core.model.Workload;
+import com.asml.apa.wta.core.streams.Stream;
 import com.asml.apa.wta.spark.datasource.SparkDataSource;
 import com.asml.apa.wta.spark.dto.ResourceAndStateWrapper;
 import com.asml.apa.wta.spark.dto.ResourceCollectionDto;
@@ -36,6 +37,8 @@ import org.apache.spark.api.plugin.PluginContext;
 @Getter
 @Slf4j
 public class WtaDriverPlugin implements DriverPlugin {
+
+  private static final String TOOL_VERSION = "spark-wta-generator-1_0";
 
   private MetricStreamingEngine metricStreamingEngine;
 
@@ -143,12 +146,14 @@ public class WtaDriverPlugin implements DriverPlugin {
         .getApplicationLevelListener()
         .getProcessedObjects()
         .get(0);
-    WtaWriter wtaWriter = new WtaWriter(outputFile, "schema-1.0");
+    WtaWriter wtaWriter = new WtaWriter(outputFile, "schema-1.0", TOOL_VERSION);
     wtaWriter.write(Task.class, tasks);
     wtaWriter.write(Resource.class, resources);
     wtaWriter.write(Workflow.class, workflows);
     wtaWriter.write(ResourceState.class, resourceStates);
     wtaWriter.write(workload);
+
+    Stream.deleteAllSerializedFiles();
   }
 
   /**
