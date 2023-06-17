@@ -10,7 +10,6 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.Instant;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -70,8 +69,7 @@ public class Stream<V extends Serializable> {
   private int additionsSinceLastWriteToDisk;
   private final int serializationTrigger;
 
-  @Getter
-  private static final String tempSerDir = "serTmp/";
+  private static final String TEMP_SERIALIZATION_DIRECTORY = "tmp/wta/streams/serialization/";
 
   private StreamNode<V> deserializationStart;
   private StreamNode<V> deserializationEnd;
@@ -147,7 +145,7 @@ public class Stream<V extends Serializable> {
     } else {
       current = deserializationEnd;
     }
-    String filePath = Stream.tempSerDir + id + "-" + System.currentTimeMillis() + "-"
+    String filePath = Stream.TEMP_SERIALIZATION_DIRECTORY + id + "-" + System.currentTimeMillis() + "-"
         + Instant.now().getNano() + ".ser";
     List<StreamNode<V>> toSerialize = new ArrayList<>();
     while (current != tail && current != null) {
@@ -395,7 +393,7 @@ public class Stream<V extends Serializable> {
    */
   public static synchronized void deleteAllSerializedFiles() {
     try {
-      Files.walk(Paths.get(Stream.tempSerDir))
+      Files.walk(Path.of(Stream.TEMP_SERIALIZATION_DIRECTORY))
           .sorted(java.util.Comparator.reverseOrder())
           .map(Path::toFile)
           .forEach(File::delete);
