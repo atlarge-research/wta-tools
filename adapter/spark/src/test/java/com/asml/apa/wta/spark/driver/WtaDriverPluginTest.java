@@ -10,67 +10,135 @@ import java.util.Map;
 import org.apache.spark.SparkConf;
 import org.apache.spark.SparkContext;
 import org.apache.spark.api.plugin.PluginContext;
-import org.apache.spark.sql.SparkSession;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
 class WtaDriverPluginTest {
 
-  protected SparkContext sc;
+  private final SparkContext mockedSparkContext = mock(SparkContext.class);
 
-  protected final PluginContext mockedPluginContext = mock(PluginContext.class);
+  private final PluginContext mockedPluginContext = mock(PluginContext.class);
 
-  protected WtaDriverPlugin sut = spy(WtaDriverPlugin.class);
+  private final WtaDriverPlugin sut = spy(WtaDriverPlugin.class);
 
   /**
-   * Creates a SparkConf object with the given config file. Needed to set the config file path as a
+   * Creates a SparkConf object with the given config file. Needed to set the config filepath as a
    * Spark driver option.
    *
    * @param configFile The path to the config file.
    */
-  private void createSparkConf(String configFile) {
-    SparkConf conf = new SparkConf()
-        .setAppName("SystemTest")
-        .setMaster("local")
-        .set("spark.driver.extraJavaOptions", "-DconfigFile=" + configFile);
-    sc = SparkSession.builder().config(conf).getOrCreate().sparkContext();
+  private Map<String, String> createSparkConfAndInitialize(String configFile) {
+    when(mockedSparkContext.getConf()).thenReturn(new SparkConf());
+    mockedSparkContext.getConf()
+          .setAppName("SystemTest")
+          .setMaster("local")
+          .set("spark.driver.extraJavaOptions", "-DconfigFile=" + configFile);
+    when(mockedSparkContext.conf()).thenReturn(
+            new SparkConf()
+                    .setAppName("SystemTest")
+                    .setMaster("local")
+                    .set("spark.driver.extraJavaOptions", "-DconfigFile=" + configFile));
+    assertThat(sut.isError()).isFalse();
+    return sut.init(mockedSparkContext, mockedPluginContext);
   }
 
   /**
-   * Clears the SparkContext of all SparkConf after each test.
+   * Creates a SparkConf object with no config options set.
    */
-  @AfterEach
-  void tearDown() {
-    sc.stop();
+  private Map<String, String> createSparkConfWithNoConfig() {
+    when(mockedSparkContext.getConf()).thenReturn(new SparkConf());
+    mockedSparkContext.getConf()
+            .setAppName("SystemTest")
+            .setMaster("local");
+    when(mockedSparkContext.conf()).thenReturn(
+            new SparkConf()
+                    .setAppName("SystemTest")
+                    .setMaster("local"));
+    assertThat(sut.isError()).isFalse();
+    return sut.init(mockedSparkContext, mockedPluginContext);
   }
 
   @Test
-  void wtaDriverPluginInitialized() {
-    createSparkConf("src/test/resources/config.json");
+  void wtaDriverPluginRegistersAndRemovesTaskLevelListeners() {
+    createSparkConfAndInitialize("src/test/resources/config.json");
     assertThat(sut.isError()).isFalse();
-    Map<String, String> configMap = sut.init(sc, mockedPluginContext);
-    assertThat(configMap).containsKeys("executorSynchronizationInterval", "resourcePingInterval", "errorStatus");
-    assertThat(configMap.get("errorStatus")).isEqualTo("false");
-    assertThat(sut.getSparkDataSource()).isNotNull();
-    assertThat(sut.isError()).isFalse();
+    assertThat(sut.getSparkDataSource().getRuntimeConfig().isStageLevel()).isFalse();
     verify(sut, times(1)).initListeners();
     verify(sut, times(0)).removeListeners();
+
+    verify(mockedSparkContext, times(1))
+            .addSparkListener(sut.getSparkDataSource().getTaskLevelListener());
+    verify(mockedSparkContext, times(1))
+            .addSparkListener(sut.getSparkDataSource().getStageLevelListener());
+    verify(mockedSparkContext, times(1))
+            .addSparkListener(sut.getSparkDataSource().getJobLevelListener());
+    verify(mockedSparkContext, times(1))
+            .addSparkListener(sut.getSparkDataSource().getApplicationLevelListener());
     try {
       sut.shutdown();
     } catch (Exception ignored) {
     }
+
     verify(sut, times(1)).removeListeners();
+    verify(mockedSparkContext, times(1))
+            .removeSparkListener(sut.getSparkDataSource().getTaskLevelListener());
+    verify(mockedSparkContext, times(1))
+            .removeSparkListener(sut.getSparkDataSource().getStageLevelListener());
+    verify(mockedSparkContext, times(1))
+            .removeSparkListener(sut.getSparkDataSource().getJobLevelListener());
+    verify(mockedSparkContext, times(1))
+            .removeSparkListener(sut.getSparkDataSource().getApplicationLevelListener());
+  }
+
+  @Test
+  void wtaDriverPluginRegistersAndRemovesStageLevelListeners() {
+    createSparkConfAndInitialize("src/test/resources/config-stage.json");
+    assertThat(sut.isError()).isFalse();
+
+    assertThat(sut.getSparkDataSource().getRuntimeConfig().isStageLevel()).isTrue();
+    verify(sut, times(1)).initListeners();
+    verify(sut, times(0)).removeListeners();
+
+    verify(mockedSparkContext, times(0))
+            .addSparkListener(sut.getSparkDataSource().getTaskLevelListener());
+    verify(mockedSparkContext, times(1))
+            .addSparkListener(sut.getSparkDataSource().getStageLevelListener());
+    verify(mockedSparkContext, times(1))
+            .addSparkListener(sut.getSparkDataSource().getJobLevelListener());
+    verify(mockedSparkContext, times(1))
+            .addSparkListener(sut.getSparkDataSource().getApplicationLevelListener());
+    try {
+      sut.shutdown();
+    } catch (Exception ignored) {
+    }
+
+    verify(sut, times(1)).removeListeners();
+    verify(mockedSparkContext, times(0))
+            .removeSparkListener(sut.getSparkDataSource().getTaskLevelListener());
+    verify(mockedSparkContext, times(1))
+            .removeSparkListener(sut.getSparkDataSource().getStageLevelListener());
+    verify(mockedSparkContext, times(1))
+            .removeSparkListener(sut.getSparkDataSource().getJobLevelListener());
+    verify(mockedSparkContext, times(1))
+            .removeSparkListener(sut.getSparkDataSource().getApplicationLevelListener());
+  }
+
+
+  @Test
+  void wtaDriverPluginInitialized() {
+    Map<String, String> configMap = createSparkConfAndInitialize("src/test/resources/config.json");
+    assertThat(sut.isError()).isFalse();
+    assertThat(configMap).containsKeys("executorSynchronizationInterval", "resourcePingInterval", "errorStatus");
+    assertThat(configMap.get("errorStatus")).isEqualTo("false");
+    assertThat(sut.getSparkDataSource()).isNotNull();
   }
 
   @Test
   void wtaDriverPluginDoesNotInitializeWithNonExistingConfigFilepath() {
-    createSparkConf("non-existing-file.json");
-    assertThat(sut.isError()).isFalse();
-    Map<String, String> configMap = sut.init(sc, mockedPluginContext);
+    Map<String, String> configMap = createSparkConfAndInitialize("non-existing-file.json");
+    assertThat(sut.isError()).isTrue();
     assertThat(configMap).containsKeys("errorStatus");
     assertThat(configMap.get("errorStatus")).isEqualTo("true");
     assertThat(sut.getSparkDataSource()).isNull();
-    assertThat(sut.isError()).isTrue();
     verify(sut, times(0)).initListeners();
     try {
       sut.shutdown();
@@ -81,12 +149,10 @@ class WtaDriverPluginTest {
 
   @Test
   void wtaDriverPluginDoesNotInitializeWithNegativeResourceTimer() {
-    createSparkConf("src/test/resources/testConfigNegativeResourcePingInterval.json");
-    assertThat(sut.isError()).isFalse();
-    Map<String, String> configMap = sut.init(sc, mockedPluginContext);
+    Map<String, String> configMap = createSparkConfAndInitialize("src/test/resources/testConfigNegativeResourcePingInterval.json");
+    assertThat(sut.isError()).isTrue();
     assertThat(configMap).containsKeys("errorStatus");
     assertThat(configMap.get("errorStatus")).isEqualTo("true");
-    assertThat(sut.isError()).isTrue();
     verify(sut, times(0)).initListeners();
     try {
       sut.shutdown();
@@ -97,10 +163,7 @@ class WtaDriverPluginTest {
 
   @Test
   void wtaDriverPluginDoesNotInitializeWithMissingConfig() {
-    SparkConf conf = new SparkConf().setAppName("SystemTest").setMaster("local");
-    sc = SparkSession.builder().config(conf).getOrCreate().sparkContext();
-    assertThat(sut.isError()).isFalse();
-    Map<String, String> configMap = sut.init(sc, mockedPluginContext);
+    Map<String, String> configMap = createSparkConfWithNoConfig();
     assertThat(configMap).containsKeys("errorStatus");
     assertThat(configMap.get("errorStatus")).isEqualTo("true");
     assertThat(sut.isError()).isTrue();
@@ -114,8 +177,7 @@ class WtaDriverPluginTest {
 
   @Test
   void receiveAddsIntoMetricStreamCorrectly() {
-    createSparkConf("src/test/resources/config.json");
-    sut.init(sc, mockedPluginContext);
+    createSparkConfAndInitialize("src/test/resources/config.json");
     sut.receive(new ResourceCollectionDto(List.of(
         SparkBaseSupplierWrapperDto.builder().executorId("1").build(),
         SparkBaseSupplierWrapperDto.builder().executorId("2").build())));
