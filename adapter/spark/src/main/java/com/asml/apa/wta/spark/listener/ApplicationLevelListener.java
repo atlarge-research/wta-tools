@@ -97,13 +97,36 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
     final String[] authors = config.getAuthors();
     final String workloadDescription = config.getDescription();
 
+    setCounters(tasks, builder);
+    setMinMax(tasks, builder);
+    setMeanStdCov(tasks, builder);
+    setMedianAndQuartiles(tasks, builder);
+    processedObjects.add(builder.totalWorkflows(numWorkflows)
+        .totalTasks(totalTasks)
+        .domain(domain)
+        .dateStart(startDate)
+        .dateEnd(endDate)
+        .authors(authors)
+        .workloadDescription(workloadDescription)
+        .build());
+  }
+
+  /**
+   * This method sets all statistics about accumulators of the workload.
+   *
+   * @param tasks all tasks
+   * @param builder builder for workload
+   * @author Tianchen Qu
+   * @since 1.0.0
+   */
+  private void setCounters(List<Task> tasks, Workload.WorkloadBuilder builder) {
     final long numSites =
         tasks.stream().filter(task -> task.getSubmissionSite() != -1).count();
     final long numResources = tasks.stream()
         .map(Task::getResourceAmountRequested)
         .filter(task -> task >= 0.0)
         .reduce(Double::sum)
-        .orElseGet(() -> -1.0)
+        .orElse(-1.0)
         .longValue();
     final long numUsers =
         tasks.stream().filter(task -> task.getUserId() != -1).count();
@@ -115,9 +138,52 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
         .reduce(Double::sum)
         .orElse(-1.0);
 
+    builder.numSites(numSites)
+        .numResources(numResources)
+        .numUsers(numUsers)
+        .numGroups(numGroups)
+        .totalResourceSeconds(totalResourceSeconds);
+  }
+
+  /**
+   * This method sets all statistics about minimum value and maximum value.
+   *
+   * @param tasks all tasks
+   * @param builder builder for workload
+   * @author Tianchen Qu
+   * @since 1.0.0
+   */
+  private void setMinMax(List<Task> tasks, Workload.WorkloadBuilder builder) {
     min(tasks.stream().map(Task::getResourceAmountRequested), builder::minResourceTask);
+
     max(tasks.stream().map(Task::getResourceAmountRequested), builder::maxResourceTask);
 
+    min(tasks.stream().map(Task::getMemoryRequested), builder::minMemory);
+
+    max(tasks.stream().map(Task::getMemoryRequested), builder::maxMemory);
+
+    minLong(tasks.stream().map(Task::getNetworkIoTime), builder::minNetworkUsage);
+
+    maxLong(tasks.stream().map(Task::getNetworkIoTime), builder::maxNetworkUsage);
+
+    min(tasks.stream().map(Task::getDiskSpaceRequested), builder::minDiskSpaceUsage);
+
+    max(tasks.stream().map(Task::getDiskSpaceRequested), builder::maxDiskSpaceUsage);
+
+    min(tasks.stream().map(Task::getEnergyConsumption), builder::minEnergy);
+
+    max(tasks.stream().map(Task::getEnergyConsumption), builder::maxEnergy);
+  }
+
+  /**
+   * This method sets all statistics about mean, standard deviation and normalized standard deviation.
+   *
+   * @param tasks all tasks
+   * @param builder builder for workload
+   * @author Tianchen Qu
+   * @since 1.0.0
+   */
+  private void setMeanStdCov(List<Task> tasks, Workload.WorkloadBuilder builder) {
     final long resourceTaskSize = validSize(tasks.stream().map(Task::getResourceAmountRequested));
 
     final double meanResourceTask =
@@ -129,11 +195,6 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
         resourceTaskSize,
         builder::stdResourceTask,
         builder::covResourceTask);
-
-    min(tasks.stream().map(Task::getMemoryRequested), builder::minMemory);
-
-    max(tasks.stream().map(Task::getMemoryRequested), builder::maxMemory);
-
     long memorySize = validSize(tasks.stream().map(Task::getMemoryRequested));
 
     final double meanMemory = mean(tasks.stream().map(Task::getMemoryRequested), memorySize, builder::meanMemory);
@@ -144,11 +205,16 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
         memorySize,
         builder::stdMemory,
         builder::covMemory);
+    final long diskSpaceSize = validSize(tasks.stream().map(Task::getDiskSpaceRequested));
+    final double meanDiskSpaceUsage =
+        mean(tasks.stream().map(Task::getDiskSpaceRequested), diskSpaceSize, builder::meanDiskSpaceUsage);
 
-    minLong(tasks.stream().map(Task::getNetworkIoTime), builder::minNetworkUsage);
-
-    maxLong(tasks.stream().map(Task::getNetworkIoTime), builder::maxNetworkUsage);
-
+    stdAndCov(
+        tasks.stream().map(Task::getDiskSpaceRequested).filter(diskSpace -> diskSpace >= 0.0),
+        meanDiskSpaceUsage,
+        diskSpaceSize,
+        builder::stdDiskSpaceUsage,
+        builder::covDiskSpaceUsage);
     final long networkUsageSize =
         validSize(tasks.stream().mapToDouble(Task::getNetworkIoTime).boxed());
     final double meanNetworkUsage = mean(
@@ -165,24 +231,6 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
         networkUsageSize,
         builder::stdNetworkUsage,
         builder::covNetworkUsage);
-
-    min(tasks.stream().map(Task::getDiskSpaceRequested), builder::minDiskSpaceUsage);
-
-    max(tasks.stream().map(Task::getDiskSpaceRequested), builder::maxDiskSpaceUsage);
-
-    final long diskSpaceSize = validSize(tasks.stream().map(Task::getDiskSpaceRequested));
-    final double meanDiskSpaceUsage =
-        mean(tasks.stream().map(Task::getDiskSpaceRequested), diskSpaceSize, builder::meanDiskSpaceUsage);
-
-    stdAndCov(
-        tasks.stream().map(Task::getDiskSpaceRequested).filter(diskSpace -> diskSpace >= 0.0),
-        meanDiskSpaceUsage,
-        diskSpaceSize,
-        builder::stdDiskSpaceUsage,
-        builder::covDiskSpaceUsage);
-
-    min(tasks.stream().map(Task::getEnergyConsumption), builder::minEnergy);
-    max(tasks.stream().map(Task::getEnergyConsumption), builder::maxEnergy);
     final long energySize = validSize(tasks.stream().map(Task::getEnergyConsumption));
     final double meanEnergy = mean(tasks.stream().map(Task::getEnergyConsumption), energySize, builder::meanEnergy);
 
@@ -192,24 +240,16 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
         energySize,
         builder::stdEnergy,
         builder::covEnergy);
-
-    setMedianAndQuartiles(tasks, builder);
-
-    processedObjects.add(builder.totalWorkflows(numWorkflows)
-        .totalTasks(totalTasks)
-        .domain(domain)
-        .dateStart(startDate)
-        .dateEnd(endDate)
-        .authors(authors)
-        .workloadDescription(workloadDescription)
-        .numSites(numSites)
-        .numResources(numResources)
-        .numUsers(numUsers)
-        .numGroups(numGroups)
-        .totalResourceSeconds(totalResourceSeconds)
-        .build());
   }
 
+  /**
+   * This method sets all statistics about median and Quartiles.
+   *
+   * @param tasks all tasks
+   * @param builder builder for workload
+   * @author Tianchen Qu
+   * @since 1.0.0
+   */
   private void setMedianAndQuartiles(List<Task> tasks, Workload.WorkloadBuilder builder) {
     medianAndQuartiles(
         tasks.stream()
