@@ -83,6 +83,7 @@ For the most part, since we are pre-release this will serve no real purpose, oth
 - Fixed iostat partition bug and added support for comma decimal separator [@lyadalachanchu](https://gitlab.ewi.tudelft.nl/lyadalachanchu)
 - Fixed the bug that caused the plugin to crash if given invalid configs [@pcho](https://gitlab.ewi.tudelft.nl/pcho)
 - Fixed the Maven configuration by binding failsafe to the integration-test goals [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
+- Delete the serialized files left behind by unconsumed streams on application end [@lyadalachanchu](https://gitlab.ewi.tudelft.nl/lyadalachanchu)
 
 ### Deprecated
 
