@@ -25,17 +25,27 @@ public class OutputFileFactory {
   public OutputFile create(String path) {
     ServiceLoader<OutputFile> serviceLoader = ServiceLoader.load(OutputFile.class);
 
+    log.trace("Started loading the OutputFile implementation from the classpath.");
+
     for (OutputFile implementation : serviceLoader) {
       try {
         if (!implementation.acceptsLocation(path)) {
+          log.trace(
+              "Implementation {} cannot handle the specified path {}.", implementation.getClass(), path);
           continue;
         }
         implementation.setPath(path);
+        log.info("Loaded implementation {} for the specified output path {}.", implementation.getClass(), path);
         return implementation;
       } catch (IOException e) {
-        log.error("Could not set OutputFile field for implementation {} and path {}.", implementation, path);
+        log.error(
+            "Could not set OutputFile field for implementation {} and path {}.",
+            implementation.getClass(),
+            path);
       }
     }
+
+    log.info("Could not find a custom OutputFile implementation in the classpath, defaulting to DiskOutputFile.");
 
     return new DiskOutputFile(Path.of(path));
   }

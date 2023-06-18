@@ -19,7 +19,7 @@ import org.apache.hadoop.fs.Path;
 @AllArgsConstructor
 public class HadoopOutputFile implements OutputFile {
 
-  private Path file;
+  private Path outputFile;
   private final Configuration conf;
   private FileSystem fs;
 
@@ -42,9 +42,9 @@ public class HadoopOutputFile implements OutputFile {
    * @since 1.0.0
    */
   public HadoopOutputFile(String path) throws IOException {
-    file = new Path(path);
+    outputFile = new Path(path);
     conf = new Configuration();
-    fs = file.getFileSystem(conf);
+    fs = outputFile.getFileSystem(conf);
   }
 
   /**
@@ -56,8 +56,8 @@ public class HadoopOutputFile implements OutputFile {
    * @since 1.0.0
    */
   public void setPath(String path) throws IOException {
-    file = new Path(path);
-    fs = file.getFileSystem(conf);
+    outputFile = new Path(path);
+    fs = outputFile.getFileSystem(conf);
   }
 
   /**
@@ -65,6 +65,8 @@ public class HadoopOutputFile implements OutputFile {
    *
    * @param path a {@link String} representation of the location to point to
    * @return a {@code boolean} indicating whether the implementation can handle the given location
+   * @author Atour Mousavi Gourabi
+   * @since 1.0.0
    */
   @Override
   public boolean acceptsLocation(String path) {
@@ -81,7 +83,7 @@ public class HadoopOutputFile implements OutputFile {
    */
   @Override
   public OutputFile resolve(String path) {
-    return new HadoopOutputFile(new Path(file, path), conf, fs);
+    return new HadoopOutputFile(new Path(outputFile, path), conf, fs);
   }
 
   /**
@@ -94,7 +96,7 @@ public class HadoopOutputFile implements OutputFile {
    */
   @Override
   public BufferedOutputStream open() throws IOException {
-    return new BufferedOutputStream(fs.create(file));
+    return new BufferedOutputStream(fs.create(outputFile));
   }
 
   /**
@@ -107,8 +109,8 @@ public class HadoopOutputFile implements OutputFile {
    */
   @Override
   public void clearDirectory() throws IOException {
-    fs.delete(file, true);
-    fs.mkdirs(file);
+    fs.delete(outputFile, true);
+    fs.mkdirs(outputFile);
   }
 
   /**
@@ -120,7 +122,7 @@ public class HadoopOutputFile implements OutputFile {
    */
   @Override
   public org.apache.parquet.io.OutputFile wrap() throws IOException {
-    return org.apache.parquet.hadoop.util.HadoopOutputFile.fromPath(file, conf);
+    return org.apache.parquet.hadoop.util.HadoopOutputFile.fromPath(outputFile, conf);
   }
 
   /**
@@ -132,6 +134,6 @@ public class HadoopOutputFile implements OutputFile {
    */
   @Override
   public String toString() {
-    return file.toString();
+    return outputFile.toString();
   }
 }
