@@ -34,8 +34,6 @@ public class JobLevelListener extends AbstractListener<Workflow> {
 
   private final Map<Long, Integer> criticalPathTasks = new ConcurrentHashMap<>();
 
-  private List<Long> stageIds = new ArrayList<>();
-
   /**
    * Constructor for the job-level listener.
    *
@@ -84,9 +82,6 @@ public class JobLevelListener extends AbstractListener<Workflow> {
   public void onJobStart(SparkListenerJobStart jobStart) {
     jobSubmitTimes.put((long) jobStart.jobId() + 1, jobStart.time());
     criticalPathTasks.put(jobStart.jobId() + 1L, jobStart.stageIds().length());
-    stageIds = JavaConverters.seqAsJavaList(jobStart.stageIds()).stream()
-        .map(obj -> ((Long) obj) + 1)
-        .collect(Collectors.toList());
   }
 
   /**
@@ -100,13 +95,13 @@ public class JobLevelListener extends AbstractListener<Workflow> {
   @Override
   public void onJobEnd(SparkListenerJobEnd jobEnd) {
     final long jobId = jobEnd.jobId() + 1;
-    final long tsSubmit = jobSubmitTimes.remove(jobId);
+    final long tsSubmit = jobSubmitTimes.get(jobId);
     final Task[] tasks = wtaTaskListener
         .getWithCondition(task -> task.getWorkflowId() == jobId)
         .toArray(Task[]::new);
     final int taskCount = tasks.length;
     final long criticalPathLength = -1L;
-    final int criticalPathTaskCount = criticalPathTasks.remove(jobId);
+    final int criticalPathTaskCount = criticalPathTasks.get(jobId);
     final int maxNumberOfConcurrentTasks = -1;
     final String nfrs = "";
 
@@ -142,6 +137,38 @@ public class JobLevelListener extends AbstractListener<Workflow> {
             .totalDiskSpaceUsage(totalDiskSpaceUsage)
             .totalEnergyConsumption(totalEnergyConsumption)
             .build());
+    cleanUpContainers(jobEnd);
+  }
+
+  /**
+   * To prevent memory overload, clean up the containers in all listeners after a Spark job finishes.
+   * Spark jobs are designed to be independent and run in parallel, thus the clean-up of containers
+   * after a job finishes should not affect other jobs.
+   * <p>
+   * This is also necessary as some stages are created at job start but never submitted. For ConcurrentHashMap,
+   * remove() is thread-safe when removing based on key. For removing based on value, most thread-safe and is to
+   * use entrySet() in combination with removeIf().
+   * @author Pil Kyu Cho
+   * @since 1.0.0
+   */
+  private void cleanUpContainers(SparkListenerJobEnd jobEnd) {
+    long jobId = jobEnd.jobId() + 1;
+    jobSubmitTimes.remove(jobId);
+    criticalPathTasks.remove(jobId);
+
+    Stream<Long> stageIds = stageLevelListener.getStageToJob().entrySet().stream().filter(e -> e.getValue().equals(jobId)).map(Map.Entry::getKey);
+    stageIds.forEach(stageId -> {
+      stageLevelListener.getStageToJob().remove(stageId);
+      stageLevelListener.getStageToParents().remove(stageId);
+//      stageLevelListener.getParentStageToChildrenStages().remove(stageId);
+//      stageLevelListener.getStageToResource().remove(stageId);
+//      if (!config.isStageLevel()) {
+//        // additional clean up for task-level plugin
+//        TaskLevelListener taskLevelListener = (TaskLevelListener) wtaTaskListener;
+//        taskLevelListener.getStageToTasks().remove(stageId);
+//        taskLevelListener.getTaskToStage().entrySet().removeIf(entry -> entry.getValue().equals(stageId));
+//      }
+    });
   }
 
   /**

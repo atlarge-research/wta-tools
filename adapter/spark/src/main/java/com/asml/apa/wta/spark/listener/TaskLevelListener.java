@@ -133,13 +133,13 @@ public class TaskLevelListener extends TaskStageBaseListener {
         .energyConsumption(energyConsumption)
         .resourceUsed(resourceUsed)
         .build();
-
-    fillInParentChildMaps(taskId, stageId, task);
     this.getProcessedObjects().add(task);
+    fillInParentChildMaps(taskId, stageId, task);
   }
 
   /**
-   * Sets the parent, child and resource fields for Spark Tasks.
+   * Sets the parent, child and resource fields for Spark Tasks. This method is called at the end of
+   * the application.
    *
    * @param stageLevelListener  stage level listener to get resource bindings
    * @author Tianchen Qu
@@ -149,12 +149,12 @@ public class TaskLevelListener extends TaskStageBaseListener {
   public void setTasks(StageLevelListener stageLevelListener) {
     final List<Task> tasks = this.getProcessedObjects();
     for (Task task : tasks) {
-      // set parent field
+      // set parent field: all Tasks in taskLevelListener.getProcessedObjects() are guaranteed to be in taskToStage
       final long stageId = this.getTaskToStage().get(task.getId());
       final Long[] parentStages = stageLevelListener.getStageToParents().get(stageId);
       if (parentStages != null) {
         final Long[] parents = Arrays.stream(parentStages)
-            .flatMap(x -> Arrays.stream(this.getStageToTasks().getOrDefault(x, new ArrayList<>()).stream()
+            .flatMap(parentStageId -> Arrays.stream(this.getStageToTasks().getOrDefault(parentStageId, new ArrayList<>()).stream()
                 .map(Task::getId)
                 .toArray(Long[]::new)))
             .toArray(Long[]::new);

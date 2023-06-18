@@ -44,17 +44,4 @@ public abstract class TaskStageBaseListener extends AbstractListener<Task> {
     long jobId = jobStart.jobId() + 1;
     jobStart.stageInfos().foreach(stageInfo -> stageToJob.put((long) stageInfo.stageId() + 1, jobId));
   }
-
-  /**
-   * Stage to Job mapping needs to be removed in onJobEnd callback as some stages are created at job start but never
-   * submitted. For ConcurrentHashMap, most thread-safe and performance-optimized way to remove entries based
-   * on values is using entrySet() in combination with removeIf().
-   * @author Pil Kyu Cho
-   * @since 1.0.0
-   */
-  @Override
-  public void onJobEnd(SparkListenerJobEnd jobEnd) {
-    long jobId = jobEnd.jobId() + 1;
-    stageToJob.entrySet().removeIf(entry -> entry.getValue().equals(jobId));
-  }
 }
