@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.asml.apa.wta.core.model.Task;
 import com.asml.apa.wta.core.model.Workload;
 import java.util.Properties;
 import org.apache.spark.executor.ExecutorMetrics;
@@ -151,35 +150,35 @@ class ApplicationLevelListenerTest extends BaseLevelListenerTest {
     assertThat(workload.getTotalResourceSeconds()).isEqualTo(-1);
   }
 
-//  @Test
-//  void zeroMeanTest() {
-//    ListBuffer<StageInfo> stageBuffer = new ListBuffer<>();
-//    stageBuffer.$plus$eq(testStageInfo2);
-//    SparkListenerJobStart jobStart = new SparkListenerJobStart(1, 2L, stageBuffer.toList(), new Properties());
-//    fakeTaskListener.onJobStart(jobStart);
-//    fakeStageListener.onJobStart(jobStart);
-//    fakeTaskListener.onTaskEnd(taskEndEvent4);
-//    fakeStageListener.onStageCompleted(stageCompleted2);
-//    fakeApplicationListener.onApplicationEnd(applicationEndObj);
-//    Workload workload = fakeApplicationListener.getProcessedObjects().get(0);
-//    assertThat(fakeApplicationListener.getProcessedObjects().size()).isEqualTo(1);
-//    assertThat(workload.getFirstQuartileResourceTask()).isEqualTo(20);
-//    assertThat(workload.getMaxResourceTask()).isEqualTo(20);
-//    assertThat(workload.getCovResourceTask()).isEqualTo(0);
-//    assertThat(workload.getCovDiskSpaceUsage()).isEqualTo(-1);
-//    assertThat(workload.getFirstQuartileDiskSpaceUsage()).isEqualTo(0);
-//    assertThat(workload.getMinDiskSpaceUsage()).isEqualTo(0);
-//    assertThat(workload.getStdMemory()).isEqualTo(-1);
-//    assertThat(workload.getMedianMemory()).isEqualTo(-1);
-//    assertThat(workload.getMinMemory()).isEqualTo(-1);
-//    assertThat(workload.getTotalTasks()).isEqualTo(0);
-//    assertThat(workload.getMeanEnergy()).isEqualTo(-1.0);
-//    assertThat(workload.getMeanMemory()).isEqualTo(-1.0);
-//    assertThat(workload.getMeanResourceTask()).isEqualTo(20);
-//    assertThat(workload.getMeanNetworkUsage()).isEqualTo(-1);
-//    assertThat(workload.getMeanDiskSpaceUsage()).isEqualTo(0);
-//    assertThat(workload.getTotalResourceSeconds()).isEqualTo(-1);
-//  }
+  //  @Test
+  //  void zeroMeanTest() {
+  //    ListBuffer<StageInfo> stageBuffer = new ListBuffer<>();
+  //    stageBuffer.$plus$eq(testStageInfo2);
+  //    SparkListenerJobStart jobStart = new SparkListenerJobStart(1, 2L, stageBuffer.toList(), new Properties());
+  //    fakeTaskListener.onJobStart(jobStart);
+  //    fakeStageListener.onJobStart(jobStart);
+  //    fakeTaskListener.onTaskEnd(taskEndEvent4);
+  //    fakeStageListener.onStageCompleted(stageCompleted2);
+  //    fakeApplicationListener.onApplicationEnd(applicationEndObj);
+  //    Workload workload = fakeApplicationListener.getProcessedObjects().get(0);
+  //    assertThat(fakeApplicationListener.getProcessedObjects().size()).isEqualTo(1);
+  //    assertThat(workload.getFirstQuartileResourceTask()).isEqualTo(20);
+  //    assertThat(workload.getMaxResourceTask()).isEqualTo(20);
+  //    assertThat(workload.getCovResourceTask()).isEqualTo(0);
+  //    assertThat(workload.getCovDiskSpaceUsage()).isEqualTo(-1);
+  //    assertThat(workload.getFirstQuartileDiskSpaceUsage()).isEqualTo(0);
+  //    assertThat(workload.getMinDiskSpaceUsage()).isEqualTo(0);
+  //    assertThat(workload.getStdMemory()).isEqualTo(-1);
+  //    assertThat(workload.getMedianMemory()).isEqualTo(-1);
+  //    assertThat(workload.getMinMemory()).isEqualTo(-1);
+  //    assertThat(workload.getTotalTasks()).isEqualTo(0);
+  //    assertThat(workload.getMeanEnergy()).isEqualTo(-1.0);
+  //    assertThat(workload.getMeanMemory()).isEqualTo(-1.0);
+  //    assertThat(workload.getMeanResourceTask()).isEqualTo(20);
+  //    assertThat(workload.getMeanNetworkUsage()).isEqualTo(-1);
+  //    assertThat(workload.getMeanDiskSpaceUsage()).isEqualTo(0);
+  //    assertThat(workload.getTotalResourceSeconds()).isEqualTo(-1);
+  //  }
 
   @Test
   void stageWithoutTaskTest() {
@@ -242,56 +241,56 @@ class ApplicationLevelListenerTest extends BaseLevelListenerTest {
     assertThat(workload.getTotalResourceSeconds()).isEqualTo(-1);
   }
 
-//  @Test
-//  void parentChildrenAggregationTest() {
-//    ListBuffer<StageInfo> stageBuffer = new ListBuffer<>();
-//    stageBuffer.$plus$eq(testStageInfo1);
-//    stageBuffer.$plus$eq(testStageInfo2);
-//    SparkListenerJobStart jobStart = new SparkListenerJobStart(0, 2L, stageBuffer.toList(), new Properties());
-//    fakeTaskListener.onJobStart(jobStart);
-//    fakeStageListener.onJobStart(jobStart);
-//    fakeTaskListener.onTaskEnd(taskEndEvent1);
-//    fakeTaskListener.onTaskEnd(taskEndEvent2);
-//    fakeStageListener.onStageCompleted(stageCompleted1);
-//    fakeTaskListener.onTaskEnd(taskEndEvent3);
-//    fakeTaskListener.onTaskEnd(taskEndEvent4);
-//    fakeStageListener.onStageCompleted(stageCompleted2);
-//    fakeApplicationListener.onApplicationEnd(applicationEndObj);
-//    Task task = fakeTaskListener.getProcessedObjects().get(0);
-//    assertThat(task.getParents().length).isEqualTo(0);
-//    assertThat(task.getChildren().length).isEqualTo(2);
-//    assertThat(task.getChildren()).contains(3L, 4L);
-//    task = fakeTaskListener.getProcessedObjects().get(1);
-//    assertThat(task.getParents().length).isEqualTo(0);
-//    assertThat(task.getChildren().length).isEqualTo(2);
-//    assertThat(task.getChildren()).contains(3L, 4L);
-//    task = fakeTaskListener.getProcessedObjects().get(2);
-//    assertThat(task.getParents().length).isEqualTo(2);
-//    assertThat(task.getParents()).contains(1L, 2L);
-//    assertThat(task.getChildren().length).isEqualTo(0);
-//    task = fakeTaskListener.getProcessedObjects().get(3);
-//    assertThat(task.getParents().length).isEqualTo(2);
-//    assertThat(task.getParents()).contains(1L, 2L);
-//    assertThat(task.getChildren().length).isEqualTo(0);
-//    Workload workload = fakeApplicationListener.getProcessedObjects().get(0);
-//    assertThat(fakeApplicationListener.getProcessedObjects().size()).isEqualTo(1);
-//    assertThat(workload.getFirstQuartileResourceTask()).isEqualTo(20);
-//    assertThat(workload.getMaxResourceTask()).isEqualTo(20);
-//    assertThat(workload.getCovResourceTask()).isEqualTo(0);
-//    assertThat(workload.getCovDiskSpaceUsage()).isEqualTo(0.7071067811865474);
-//    assertThat(workload.getFirstQuartileDiskSpaceUsage()).isEqualTo(0);
-//    assertThat(workload.getMinDiskSpaceUsage()).isEqualTo(0);
-//    assertThat(workload.getStdMemory()).isEqualTo(-1);
-//    assertThat(workload.getMedianMemory()).isEqualTo(-1);
-//    assertThat(workload.getMinMemory()).isEqualTo(-1);
-//    assertThat(workload.getTotalTasks()).isEqualTo(0);
-//    assertThat(workload.getMeanEnergy()).isEqualTo(-1.0);
-//    assertThat(workload.getMeanMemory()).isEqualTo(-1.0);
-//    assertThat(workload.getMeanResourceTask()).isEqualTo(20);
-//    assertThat(workload.getMeanNetworkUsage()).isEqualTo(-1.0);
-//    assertThat(workload.getMeanDiskSpaceUsage()).isEqualTo(133.33333333333334);
-//    assertThat(workload.getTotalResourceSeconds()).isEqualTo(4000);
-//  }
+  //  @Test
+  //  void parentChildrenAggregationTest() {
+  //    ListBuffer<StageInfo> stageBuffer = new ListBuffer<>();
+  //    stageBuffer.$plus$eq(testStageInfo1);
+  //    stageBuffer.$plus$eq(testStageInfo2);
+  //    SparkListenerJobStart jobStart = new SparkListenerJobStart(0, 2L, stageBuffer.toList(), new Properties());
+  //    fakeTaskListener.onJobStart(jobStart);
+  //    fakeStageListener.onJobStart(jobStart);
+  //    fakeTaskListener.onTaskEnd(taskEndEvent1);
+  //    fakeTaskListener.onTaskEnd(taskEndEvent2);
+  //    fakeStageListener.onStageCompleted(stageCompleted1);
+  //    fakeTaskListener.onTaskEnd(taskEndEvent3);
+  //    fakeTaskListener.onTaskEnd(taskEndEvent4);
+  //    fakeStageListener.onStageCompleted(stageCompleted2);
+  //    fakeApplicationListener.onApplicationEnd(applicationEndObj);
+  //    Task task = fakeTaskListener.getProcessedObjects().get(0);
+  //    assertThat(task.getParents().length).isEqualTo(0);
+  //    assertThat(task.getChildren().length).isEqualTo(2);
+  //    assertThat(task.getChildren()).contains(3L, 4L);
+  //    task = fakeTaskListener.getProcessedObjects().get(1);
+  //    assertThat(task.getParents().length).isEqualTo(0);
+  //    assertThat(task.getChildren().length).isEqualTo(2);
+  //    assertThat(task.getChildren()).contains(3L, 4L);
+  //    task = fakeTaskListener.getProcessedObjects().get(2);
+  //    assertThat(task.getParents().length).isEqualTo(2);
+  //    assertThat(task.getParents()).contains(1L, 2L);
+  //    assertThat(task.getChildren().length).isEqualTo(0);
+  //    task = fakeTaskListener.getProcessedObjects().get(3);
+  //    assertThat(task.getParents().length).isEqualTo(2);
+  //    assertThat(task.getParents()).contains(1L, 2L);
+  //    assertThat(task.getChildren().length).isEqualTo(0);
+  //    Workload workload = fakeApplicationListener.getProcessedObjects().get(0);
+  //    assertThat(fakeApplicationListener.getProcessedObjects().size()).isEqualTo(1);
+  //    assertThat(workload.getFirstQuartileResourceTask()).isEqualTo(20);
+  //    assertThat(workload.getMaxResourceTask()).isEqualTo(20);
+  //    assertThat(workload.getCovResourceTask()).isEqualTo(0);
+  //    assertThat(workload.getCovDiskSpaceUsage()).isEqualTo(0.7071067811865474);
+  //    assertThat(workload.getFirstQuartileDiskSpaceUsage()).isEqualTo(0);
+  //    assertThat(workload.getMinDiskSpaceUsage()).isEqualTo(0);
+  //    assertThat(workload.getStdMemory()).isEqualTo(-1);
+  //    assertThat(workload.getMedianMemory()).isEqualTo(-1);
+  //    assertThat(workload.getMinMemory()).isEqualTo(-1);
+  //    assertThat(workload.getTotalTasks()).isEqualTo(0);
+  //    assertThat(workload.getMeanEnergy()).isEqualTo(-1.0);
+  //    assertThat(workload.getMeanMemory()).isEqualTo(-1.0);
+  //    assertThat(workload.getMeanResourceTask()).isEqualTo(20);
+  //    assertThat(workload.getMeanNetworkUsage()).isEqualTo(-1.0);
+  //    assertThat(workload.getMeanDiskSpaceUsage()).isEqualTo(133.33333333333334);
+  //    assertThat(workload.getTotalResourceSeconds()).isEqualTo(4000);
+  //  }
 
   @Test
   void parentChildrenAggregationAltTest() {
