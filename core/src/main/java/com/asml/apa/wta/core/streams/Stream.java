@@ -18,7 +18,10 @@ import java.util.NoSuchElementException;
 import java.util.Queue;
 import java.util.UUID;
 import java.util.function.BiFunction;
+import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.IntFunction;
+import java.util.function.Predicate;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -318,7 +321,7 @@ public class Stream<V extends Serializable> {
    * @author Atour Mousavi Gourabi
    * @since 1.0.0
    */
-  public synchronized Stream<V> filter(@NonNull Function<V, Boolean> predicate) {
+  public synchronized Stream<V> filter(@NonNull Predicate<V> predicate) {
     StreamNode<V> next = head;
     Stream<V> ret = new Stream<>();
     while (next != null) {
@@ -326,7 +329,7 @@ public class Stream<V extends Serializable> {
         head = next;
         deserializeInternals(diskLocations.poll());
       }
-      if (predicate.apply(next.getContent())) {
+      if (predicate.test(next.getContent())) {
         ret.addToStream(next.getContent());
       }
       next = next.getNext();
@@ -366,18 +369,59 @@ public class Stream<V extends Serializable> {
   }
 
   /**
-   * Converts the stream to a list, and consumes the stream.
+   * Converts the {@link Stream} to a {@link List}, and consumes the {@link Stream}.
    *
-   * @return A list with the stream elements
+   * @return a {@link List} with the {@link Stream}s elements
+   * @author Atour Mousavi Gourabi
    * @author Henry Page
    * @since 1.0.0
    */
   public synchronized List<V> toList() {
+    StreamNode<V> next = head;
     List<V> ret = new ArrayList<>();
-    while (!isEmpty()) {
-      ret.add(head());
+    while (next != null) {
+      if (next == deserializationStart && !diskLocations.isEmpty()) {
+        head = next;
+        deserializeInternals(diskLocations.poll());
+      }
+      ret.add(next.getContent());
+      next = next.getNext();
     }
+    head = null;
+    tail = null;
     return ret;
+  }
+
+  /**
+   * Performs the action for each element in the {@link Stream}. Consumes the {@link Stream}.
+   *
+   * @param action the action to perform for all elements of the {@link Stream}
+   * @author Atour Mousavi Gourabi
+   * @since 1.0.0
+   */
+  public synchronized void forEach(Consumer<? super V> action) {
+    StreamNode<V> next = head;
+    while (next != null) {
+      if (next == deserializationStart && !diskLocations.isEmpty()) {
+        head = next;
+        deserializeInternals(diskLocations.poll());
+      }
+      action.accept(next.getContent());
+      next = next.getNext();
+    }
+    head = null;
+    tail = null;
+  }
+
+  /**
+   * Converts the {@link Stream} to an array, and consumes the {@link Stream}.
+   *
+   * @return an array with the {@link Stream}s elements
+   * @author Atour Mousavi Gourabi
+   * @since 1.0.0
+   */
+  public synchronized V[] toArray(IntFunction<V[]> generator) {
+    return toList().toArray(generator);
   }
 
   /**
