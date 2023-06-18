@@ -139,6 +139,7 @@ public class Stream<V extends Serializable> {
    * @since 1.0.0
    */
   private synchronized void serializeInternals() {
+    log.trace("Serializing stream {}.", id);
     StreamNode<V> current;
     if (head == deserializationEnd) {
       current = head.getNext();
@@ -174,6 +175,7 @@ public class Stream<V extends Serializable> {
    * @since 1.0.0
    */
   private synchronized int deserializeInternals(@NonNull String filePath) {
+    log.trace("Deserializing stream internals from {}.", filePath);
     int amountOfNodes;
     try (ObjectInputStream objectInputStream = new ObjectInputStream(new FileInputStream(filePath))) {
       List<StreamNode<V>> nodes = (ArrayList<StreamNode<V>>) objectInputStream.readObject();
@@ -208,6 +210,7 @@ public class Stream<V extends Serializable> {
    * @since 1.0.0
    */
   public boolean isEmpty() {
+    log.trace("Checking whether stream {} is empty.", id);
     return head == null;
   }
 
@@ -222,6 +225,7 @@ public class Stream<V extends Serializable> {
    * @since 1.0.0
    */
   public synchronized V head() {
+    log.trace("Head of stream {} was requested.", id);
     if (head == null) {
       log.error("`Stream#head()` was called on an empty stream.");
       throw new NoSuchElementException();
@@ -251,6 +255,7 @@ public class Stream<V extends Serializable> {
    * @since 1.0.0
    */
   public synchronized V peek() {
+    log.trace("Peeked at head of stream {}", this.id);
     if (head == null) {
       log.error("`Stream#peek()` was called on an empty stream.");
       throw new NoSuchElementException();
@@ -266,6 +271,7 @@ public class Stream<V extends Serializable> {
    * @since 1.0.0
    */
   public synchronized void addToStream(V content) {
+    log.trace("Added content to stream {}", this.id);
     if (head == null) {
       head = new StreamNode<>(content);
       tail = head;
@@ -297,6 +303,7 @@ public class Stream<V extends Serializable> {
    * @since 1.0.0
    */
   public synchronized <R extends Serializable> Stream<R> map(@NonNull Function<V, R> op) {
+    log.trace("Consuming and applying map on stream {}", this.id);
     StreamNode<V> next = head;
     Stream<R> ret = new Stream<>();
     while (next != null) {
@@ -324,6 +331,7 @@ public class Stream<V extends Serializable> {
    * @since 1.0.0
    */
   public synchronized Stream<V> filter(@NonNull Function<V, Boolean> predicate) {
+    log.trace("Consuming and applying filter on stream {}", this.id);
     StreamNode<V> next = head;
     Stream<V> ret = new Stream<>();
     while (next != null) {
@@ -355,6 +363,7 @@ public class Stream<V extends Serializable> {
    * @since 1.0.0
    */
   public synchronized <R> R foldLeft(R init, @NonNull BiFunction<R, V, R> op) {
+    log.trace("Consuming and applying left fold on stream {}", this.id);
     R acc = init;
     StreamNode<V> next = head;
     while (next != null) {
@@ -378,6 +387,7 @@ public class Stream<V extends Serializable> {
    * @since 1.0.0
    */
   public synchronized List<V> toList() {
+    log.trace("Consuming stream {} to list", this.id);
     List<V> ret = new ArrayList<>();
     while (!isEmpty()) {
       ret.add(head());

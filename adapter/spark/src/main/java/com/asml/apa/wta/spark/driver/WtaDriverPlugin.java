@@ -62,6 +62,7 @@ public class WtaDriverPlugin implements DriverPlugin {
    */
   @Override
   public Map<String, String> init(SparkContext sparkCtx, PluginContext pluginCtx) {
+    log.info("Initialising WTA driver plugin.");
     Map<String, String> executorVars = new HashMap<>();
     try {
       RuntimeConfig runtimeConfig = RuntimeConfig.readConfig();
@@ -91,6 +92,7 @@ public class WtaDriverPlugin implements DriverPlugin {
    */
   @Override
   public Object receive(Object message) {
+    log.trace("The driver received a message from an executor.");
     if (message instanceof ResourceCollectionDto) {
       ((ResourceCollectionDto) message)
           .getResourceCollection()
@@ -120,6 +122,7 @@ public class WtaDriverPlugin implements DriverPlugin {
     } catch (Exception e) {
       log.error("A {} error occurred while generating files: {}", e.getClass(), e.getMessage());
     }
+    log.info("WTA driver plugin shutting down.");
   }
 
   /**
@@ -129,6 +132,7 @@ public class WtaDriverPlugin implements DriverPlugin {
    * @since 1.0.0
    */
   private void endApplicationAndWrite() {
+    log.debug("Attempting to write data to file.");
     removeListeners();
     List<Task> tasks = sparkDataSource.getRuntimeConfig().isStageLevel()
         ? sparkDataSource.getStageLevelListener().getProcessedObjects()
@@ -153,6 +157,7 @@ public class WtaDriverPlugin implements DriverPlugin {
     wtaWriter.write(workload);
 
     Stream.deleteAllSerializedFiles();
+    log.debug("Successfully wrote data to file.");
   }
 
   /**
@@ -162,6 +167,7 @@ public class WtaDriverPlugin implements DriverPlugin {
    * @since 1.0.0
    */
   public void initListeners() {
+    log.trace("Initializing listeners.");
     if (!sparkDataSource.getRuntimeConfig().isStageLevel()) {
       this.sparkDataSource.registerTaskListener();
     }
@@ -177,6 +183,7 @@ public class WtaDriverPlugin implements DriverPlugin {
    * @since 1.0.0
    */
   public void removeListeners() {
+    log.trace("Removing listeners.");
     sparkDataSource.removeTaskListener();
     sparkDataSource.removeStageListener();
     sparkDataSource.removeJobListener();

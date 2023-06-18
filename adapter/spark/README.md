@@ -2,7 +2,7 @@
 
 ## Overview
 
-![img.png](architecture.png)
+![architecture.png](architecture.png)
 
 The Spark Adapter is responsible for parsing Spark execution information into WTA objects.
 The diagram above illustrates the workflow of the adapter.
@@ -14,6 +14,21 @@ The diagram above illustrates the workflow of the adapter.
 - **Label 3:** At each stage, the task scheduler gets sets of tasks from the DAG and the task scheduler
   sends the tasks to each executor.
 - **Label 4:** Once the job has ended, all objects will be serialised into parquet format.
+
+By leveraging the architecture discussed above, the transmission of data across various stages within the plugin can be discussed in further detail.
+The SparkListenerInterface is used to gather Task and Job level data, while additional resource utilization metrics are acquired at the executor level.
+These metrics are then transmitted periodically to the driver using the Spark Plugin API.
+
+
+![dataflow.png](dataflow_diagram.png)
+
+To address the limitation of excessive memory consumption, it is impractical to store all this information solely in the driver's memory.
+As a solution, serialization and deserialization techniques are applied.
+The rate of serialization is configurable by the user.
+Upon completion of the application, all of the data is ultimately outputted to Parquet format.
+
+
+
 
 ## Installation and Usage
 1.  Clone the repository
