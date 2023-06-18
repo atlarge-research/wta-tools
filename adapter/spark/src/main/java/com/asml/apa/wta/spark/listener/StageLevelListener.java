@@ -30,6 +30,8 @@ public class StageLevelListener extends TaskStageBaseListener {
 
   private final Map<Integer, Integer> stageToResource = new ConcurrentHashMap<>();
 
+  private final Map<Long, List<Long>> jobToStages = new ConcurrentHashMap<>();
+
   public StageLevelListener(SparkContext sparkContext, RuntimeConfig config) {
     super(sparkContext, config);
   }
@@ -85,12 +87,9 @@ public class StageLevelListener extends TaskStageBaseListener {
      *  For SQL jobs, this only tracks all unsafe operators and ExternalSort
      */
     final double memoryRequested = -1.0;
-    long[] parents;
-    if (config.isStageLevel()) {
-      parents =
-          Arrays.stream(parentIds).mapToLong(parentId -> parentId + 1).toArray();
-    } else {
-      parents = new long[0];
+    long[] parents =
+        Arrays.stream(parentIds).mapToLong(parentId -> parentId + 1).toArray();
+    if (!config.isStageLevel()) {
       stageToParents.put(stageId, parentIds);
     }
     final long[] children = new long[0];

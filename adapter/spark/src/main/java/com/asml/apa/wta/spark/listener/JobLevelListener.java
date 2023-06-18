@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedDeque;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.Getter;
@@ -34,9 +35,7 @@ public class JobLevelListener extends AbstractListener<Workflow> {
 
   private final Map<Integer, Long> jobSubmitTimes = new ConcurrentHashMap<>();
 
-  private final Map<Integer, Integer> criticalPathTasks = new ConcurrentHashMap<>();
-
-  private List<Integer> jobStages;
+  private final Map<Long, List<Long>> jobToStages = new ConcurrentHashMap<>();
 
   /**
    * Constructor for the job-level listener.
@@ -84,10 +83,11 @@ public class JobLevelListener extends AbstractListener<Workflow> {
   @Override
   public void onJobStart(SparkListenerJobStart jobStart) {
     jobSubmitTimes.put(jobStart.jobId() + 1, jobStart.time());
-    criticalPathTasks.put(jobStart.jobId() + 1, jobStart.stageIds().length());
-    jobStages = JavaConverters.seqAsJavaList(jobStart.stageIds()).stream()
-        .map(stageId -> (int) stageId)
-        .collect(Collectors.toList());
+    jobToStages.put(
+        (long) jobStart.jobId(),
+        JavaConverters.seqAsJavaList(jobStart.stageInfos()).stream()
+            .map(stageInfo -> (long) stageInfo.stageId())
+            .collect(Collectors.toList()));
   }
 
   /**
@@ -108,7 +108,7 @@ public class JobLevelListener extends AbstractListener<Workflow> {
     final String scheduler = sparkContext.getConf().get("spark.scheduler.mode", "FIFO");
     final Domain domain = config.getDomain();
     final String appName = sparkContext.appName();
-    final int criticalPathTaskCount = criticalPathTasks.remove(jobId);
+
     final double totalResources = -1.0;
     final double totalMemoryUsage =
         calculatePositiveDoubleSum(Arrays.stream(tasks).map(Task::getMemoryRequested));
@@ -118,32 +118,10 @@ public class JobLevelListener extends AbstractListener<Workflow> {
         calculatePositiveDoubleSum(Arrays.stream(tasks).map(Task::getDiskSpaceRequested));
     final double totalEnergyConsumption =
         calculatePositiveDoubleSum(Arrays.stream(tasks).map(Task::getEnergyConsumption));
-    final long jobRunTime = jobEnd.time() - jobSubmitTimes.get(jobId);
-    final long driverTime = jobRunTime
-        - stageLevelListener.getProcessedObjects().stream()
-            .filter(stage -> jobStages.contains(Math.toIntExact(stage.getId())))
-            .map(Task::getRuntime)
-            .reduce(Long::sum)
-            .orElse(0L);
-    long criticalPathLength = -1L;
-    if (!config.isStageLevel()) {
-      TaskLevelListener listener = (TaskLevelListener) taskListener;
-      final Map<Integer, List<Task>> stageToTasks = listener.getStageToTasks();
-      List<Long> stageMaximumTaskTime = new ArrayList<>();
-      for (Object id : jobStages) {
-        List<Task> stageTasks = stageToTasks.get((Integer) id);
-        if (stageTasks != null) {
-          stageMaximumTaskTime.add(stageTasks.stream()
-              .map(Task::getRuntime)
-              .reduce(Long::max)
-              .orElse(0L));
-        } else {
-          stageMaximumTaskTime.add(0L);
-        }
-      }
-      criticalPathLength =
-          driverTime + stageMaximumTaskTime.stream().reduce(Long::sum).orElse(0L);
-    }
+    // Critical Path
+    final int criticalPathTaskCount = -1;
+    final long criticalPathLength = jobEnd.time() - jobSubmitTimes.get(jobId);
+
     // unknown
 
     final int maxNumberOfConcurrentTasks = -1;
@@ -212,7 +190,37 @@ public class JobLevelListener extends AbstractListener<Workflow> {
           .filter(resourceAmount -> resourceAmount >= 0.0)
           .reduce(Double::sum)
           .orElse(-1.0));
+
+      if (!config.isStageLevel()) {
+        List<Task> jobStages = stageLevelListener.getProcessedObjects().stream()
+            .filter(stage -> jobToStages.get(workflow.getId() - 1).contains(stage.getId()))
+            .collect(Collectors.toList());
+        final List<Task> criticalPath = solveCriticalPath(jobStages);
+        workflow.setCriticalPathTaskCount(criticalPath.size());
+        final long driverTime = workflow.getCriticalPathLength()
+            - criticalPath.stream()
+                .map(Task::getRuntime)
+                .reduce(Long::sum)
+                .orElse(0L);
+        TaskLevelListener listener = (TaskLevelListener) taskListener;
+        final Map<Integer, List<Task>> stageToTasks = listener.getStageToTasks();
+        workflow.setCriticalPathLength(driverTime
+            + criticalPath.stream()
+                .map(stage -> stageToTasks.getOrDefault((int) stage.getId(), new ArrayList<>()).stream()
+                    .map(Task::getRuntime)
+                    .reduce(Long::max)
+                    .orElse(0L))
+                .reduce(Long::sum)
+                .orElse(-1L));
+      } else {
+        workflow.setCriticalPathLength(-1L);
+      }
     }
+  }
+
+  public List<Task> solveCriticalPath(List<Task> stages) {
+    DAG dag = new DAG(stages);
+    return dag.longestPath();
   }
 
   class Node {
@@ -234,8 +242,6 @@ public class JobLevelListener extends AbstractListener<Workflow> {
 
   class DAG {
 
-    int nodeSize;
-
     Map<Long, Node> nodes;
 
     Map<Long, Map<Long, Long>> adjMap;
@@ -244,67 +250,83 @@ public class JobLevelListener extends AbstractListener<Workflow> {
 
     Deque<Long> stack;
 
-    public DAG() {
-      nodeSize = 0;
+    List<Task> stages;
+
+    public DAG(List<Task> stages) {
       nodes = new ConcurrentHashMap<>();
       adjMap = new ConcurrentHashMap<>();
       stack = new ConcurrentLinkedDeque<>();
       adjMapReversed = new ConcurrentHashMap<>();
+      this.stages = stages;
+
+      addNode(0L);
+      for (Task stage : stages) {
+        addNode(stage);
+      }
+      addNode(1L);
     }
 
     public void addNode(Task stage) {
-      nodeSize++;
       Node node = new Node(stage);
-      nodes.put(stage.getId(), node);
-      adjMap.put(stage.getId(), new ConcurrentHashMap<>());
-      adjMapReversed.put(stage.getId(), new ConcurrentHashMap<>());
+      nodes.put(stage.getId() + 2, node);
+
+      /*
       TaskLevelListener listener = (TaskLevelListener) taskListener;
       long runtime = 0L;
-      List<Task> tasks = listener.getStageToTasks().get(stage.getId());
+      List<Task> tasks = listener.getStageToTasks().get((int)stage.getId());
       if (tasks != null) {
-        runtime = tasks.stream().map(Task::getRuntime).reduce(Long::max).orElse(0L);
+      runtime = tasks.stream().map(Task::getRuntime).reduce(Long::max).orElse(0L);
       }
-      if (stage.getParents() != null && stage.getParents().length > 0) {
+       */
+      long runtime = stage.getRuntime();
+      if (stage.getParents().length > 0
+          && stages.stream()
+              .map(Task::getId)
+              .collect(Collectors.toList())
+              .contains(stage.getParents()[0] - 1)) {
         for (long id : stage.getParents()) {
-          addEdge(id, stage.getId(), runtime);
+          addEdge(id + 1, stage.getId() + 2, runtime);
         }
       } else {
-        addEdge(0, stage.getId(), runtime);
+        addEdge(0, stage.getId() + 2, runtime);
       }
     }
 
     public void addNode(Long id) {
-      nodeSize++;
       Node node = new Node(id);
       nodes.put(id, node);
-      adjMap.put(id, new ConcurrentHashMap<>());
-      adjMapReversed.put(id, new ConcurrentHashMap<>());
       // if the node is the ending node
       if (id == 1) {
         setFinalEdges();
+        adjMap.put(1L, new ConcurrentHashMap<>());
       } else if (id == 0) { // if the node is the starting node
         node.dist = 0;
+        adjMapReversed.put(0L, new ConcurrentHashMap<>());
       }
     }
 
     private void addEdge(long v, long u, long weight) {
+      if (adjMap.get(v) == null) {
+        adjMap.put(v, new ConcurrentHashMap<>());
+      }
+      if (adjMapReversed.get(u) == null) {
+        adjMapReversed.put(u, new ConcurrentHashMap<>());
+      }
       adjMap.get(v).put(u, weight);
       adjMapReversed.get(u).put(v, weight);
     }
 
     private void setFinalEdges() {
-      adjMap.forEach((node, adjNodes) -> {
-        if (adjNodes.size() == 0) {
+      for (Long node : nodes.keySet()) {
+        if (adjMap.get(node) == null && node != 1) {
           addEdge(node, 1, 0);
         }
-      });
+      }
     }
 
     private void topologicalSort() {
       Map<Long, Boolean> visited = new ConcurrentHashMap<>();
-      for (Long node : nodes.keySet()) {
-        topoUtil(visited, node);
-      }
+      topoUtil(visited, 0L);
     }
 
     private void topoUtil(Map<Long, Boolean> visited, Long node) {
@@ -317,7 +339,7 @@ public class JobLevelListener extends AbstractListener<Workflow> {
       stack.push(node);
     }
 
-    public long longestPath() {
+    public List<Task> longestPath() {
       topologicalSort();
       while (!stack.isEmpty()) {
         Node node = nodes.get(stack.pop());
@@ -328,8 +350,29 @@ public class JobLevelListener extends AbstractListener<Workflow> {
           }
         }
       }
+      return backTracing();
+    }
 
-      return nodes.get(1).dist;
+    private List<Task> backTracing() {
+      long pointer = 1L;
+      List<Long> criticalPath = new ArrayList<>();
+      while (pointer != 0) {
+        criticalPath.add(pointer);
+        AtomicLong nextPointer = new AtomicLong();
+        long edgeWeight = -1;
+        adjMapReversed.get(pointer).forEach((adjNode, weight) -> {
+          if (weight > edgeWeight) {
+            nextPointer.set(adjNode);
+          }
+        });
+        pointer = nextPointer.get();
+      }
+      List<Long> finalCriticalPath =
+          criticalPath.stream().map(x -> x - 2).filter(x -> x >= 0).collect(Collectors.toList());
+      ;
+      return stages.stream()
+          .filter(x -> finalCriticalPath.contains(x.getId()))
+          .collect(Collectors.toList());
     }
   }
 }
