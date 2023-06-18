@@ -11,5 +11,6 @@
       <item name="README" href="README.html" />
     </menu>
     <menu ref="reports" />
+    <menu ref="modules" />
   </body>
 </project>
