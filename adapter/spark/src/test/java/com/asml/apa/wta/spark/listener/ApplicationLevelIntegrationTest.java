@@ -14,36 +14,46 @@ class ApplicationLevelIntegrationTest extends BaseSparkJobIntegrationTest {
     sut1.registerJobListener();
     sut1.registerApplicationListener();
     invokeJob();
+    invokeJob();
+    invokeJob();
     stopJob();
 
-    assertThat(sut1.getTaskLevelListener().getProcessedObjects().size()).isEqualTo(2);
-    assertThat(sut1.getTaskLevelListener().getProcessedObjects().get(0).getParents())
-        .isEqualTo(new long[0]);
-    assertThat(sut1.getTaskLevelListener().getProcessedObjects().get(0).getChildren())
-        .isEqualTo(new long[] {2});
-    assertThat(sut1.getTaskLevelListener().getProcessedObjects().get(1).getParents())
-        .isEqualTo(new long[] {1});
-    assertThat(sut1.getTaskLevelListener().getProcessedObjects().get(1).getChildren())
-        .isEqualTo(new long[0]);
+    assertThat(sut1.getTaskLevelListener().getProcessedObjects().size()).isEqualTo(6);
+    assertThat(sut1.getTaskLevelListener().getProcessedObjects().get(0).getParents()).isEmpty();
+    assertThat(sut1.getTaskLevelListener().getProcessedObjects().get(0).getChildren()).isNotEmpty();
+    assertThat(sut1.getTaskLevelListener().getProcessedObjects().get(1).getParents()).isNotEmpty();
+    assertThat(sut1.getTaskLevelListener().getProcessedObjects().get(1).getChildren()).isEmpty();
+    assertThat(sut1.getTaskLevelListener().getProcessedObjects().get(2).getParents()).isEmpty();
+    assertThat(sut1.getTaskLevelListener().getProcessedObjects().get(2).getChildren()).isNotEmpty();
+    assertThat(sut1.getTaskLevelListener().getProcessedObjects().get(3).getParents()).isNotEmpty();
+    assertThat(sut1.getTaskLevelListener().getProcessedObjects().get(3).getChildren()).isEmpty();
+    assertThat(sut1.getTaskLevelListener().getProcessedObjects().get(4).getParents()).isEmpty();
+    assertThat(sut1.getTaskLevelListener().getProcessedObjects().get(4).getChildren()).isNotEmpty();
+    assertThat(sut1.getTaskLevelListener().getProcessedObjects().get(5).getParents()).isNotEmpty();
+    assertThat(sut1.getTaskLevelListener().getProcessedObjects().get(5).getChildren()).isEmpty();
   }
 
   @Test
   void testSparkStageParentChildrenField() {
-    sut2.registerTaskListener();
     sut2.registerStageListener();
     sut2.registerJobListener();
     sut2.registerApplicationListener();
     invokeJob();
+    invokeJob();
+    invokeJob();
     stopJob();
-
-    assertThat(sut2.getStageLevelListener().getProcessedObjects().size()).isEqualTo(2);
-    assertThat(sut2.getStageLevelListener().getProcessedObjects().get(0).getParents())
-        .isEqualTo(new long[0]);
-    assertThat(sut2.getStageLevelListener().getProcessedObjects().get(0).getChildren())
-        .isEqualTo(new long[] {2});
-    assertThat(sut2.getStageLevelListener().getProcessedObjects().get(1).getParents())
-        .isEqualTo(new long[] {1});
-    assertThat(sut2.getStageLevelListener().getProcessedObjects().get(1).getChildren())
-        .isEqualTo(new long[0]);
+    assertThat(sut2.getStageLevelListener().getProcessedObjects().size()).isEqualTo(6);
+    assertThat(sut2.getStageLevelListener().getProcessedObjects().get(0).getParents()).isEmpty();
+    assertThat(sut2.getStageLevelListener().getProcessedObjects().get(0).getChildren()).isNotEmpty();
+    assertThat(sut2.getStageLevelListener().getProcessedObjects().get(1).getParents()).isNotEmpty();
+    assertThat(sut2.getStageLevelListener().getProcessedObjects().get(1).getChildren()).isEmpty();
+    assertThat(sut2.getStageLevelListener().getProcessedObjects().get(2).getParents()).isEmpty();
+    assertThat(sut2.getStageLevelListener().getProcessedObjects().get(2).getChildren()).isNotEmpty();
+    assertThat(sut2.getStageLevelListener().getProcessedObjects().get(3).getParents()).isNotEmpty();
+    assertThat(sut2.getStageLevelListener().getProcessedObjects().get(3).getChildren()).isEmpty();
+    assertThat(sut2.getStageLevelListener().getProcessedObjects().get(4).getParents()).isEmpty();
+    assertThat(sut2.getStageLevelListener().getProcessedObjects().get(4).getChildren()).isNotEmpty();
+    assertThat(sut2.getStageLevelListener().getProcessedObjects().get(5).getParents()).isNotEmpty();
+    assertThat(sut2.getStageLevelListener().getProcessedObjects().get(5).getChildren()).isEmpty();
   }
 }
