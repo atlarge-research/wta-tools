@@ -2,8 +2,8 @@ package com.asml.apa.wta.spark.driver;
 
 import com.asml.apa.wta.core.WtaWriter;
 import com.asml.apa.wta.core.config.RuntimeConfig;
+import com.asml.apa.wta.core.io.DiskOutputFile;
 import com.asml.apa.wta.core.io.OutputFile;
-import com.asml.apa.wta.core.io.OutputFileFactory;
 import com.asml.apa.wta.core.model.Resource;
 import com.asml.apa.wta.core.model.ResourceState;
 import com.asml.apa.wta.core.model.Task;
@@ -14,6 +14,7 @@ import com.asml.apa.wta.spark.datasource.SparkDataSource;
 import com.asml.apa.wta.spark.dto.ResourceAndStateWrapper;
 import com.asml.apa.wta.spark.dto.ResourceCollectionDto;
 import com.asml.apa.wta.spark.streams.MetricStreamingEngine;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -64,10 +65,12 @@ public class WtaDriverPlugin implements DriverPlugin {
   public Map<String, String> init(SparkContext sparkCtx, PluginContext pluginCtx) {
     Map<String, String> executorVars = new HashMap<>();
     try {
-      RuntimeConfig runtimeConfig = RuntimeConfig.readConfig();
+      String configFile =
+          sparkCtx.conf().get("spark.driver.extraJavaOptions").split("-DconfigFile=")[1];
+      RuntimeConfig runtimeConfig = RuntimeConfig.readConfig(configFile);
       this.metricStreamingEngine = new MetricStreamingEngine();
       sparkDataSource = new SparkDataSource(sparkCtx, runtimeConfig);
-      outputFile = new OutputFileFactory().create(runtimeConfig.getOutputPath());
+      outputFile = new DiskOutputFile(Path.of(runtimeConfig.getOutputPath()));
       initListeners();
       executorVars.put("resourcePingInterval", String.valueOf(runtimeConfig.getResourcePingInterval()));
       executorVars.put(
@@ -177,7 +180,9 @@ public class WtaDriverPlugin implements DriverPlugin {
    * @since 1.0.0
    */
   public void removeListeners() {
-    sparkDataSource.removeTaskListener();
+    if (!sparkDataSource.getRuntimeConfig().isStageLevel()) {
+      sparkDataSource.removeTaskListener();
+    }
     sparkDataSource.removeStageListener();
     sparkDataSource.removeJobListener();
     sparkDataSource.removeApplicationListener();

@@ -57,6 +57,8 @@ For the most part, since we are pre-release this will serve no real purpose, oth
 - Enhanced documentation relating to Spark [@hpage](https://gitlab.ewi.tudelft.nl/hpage)
 - Added Spark aggregations [@tqu](https://gitlab.ewi.tudelft.nl/tqu)
 - Set up SPI for the connector output file implementations [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
+- Added parent-child functionality to Spark stage listeners as well [@pcho](https://gitlab.ewi.tudelft.nl/pcho)
+- Filter the ConcurrentHashMap containers and remove processed entries on job end [@pcho](https://gitlab.ewi.tudelft.nl/pcho)
 - Added coherent Maven lifecycle bindings [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 - Added Maven site generation [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 
@@ -79,6 +81,7 @@ For the most part, since we are pre-release this will serve no real purpose, oth
 - Added Dockerfiles for the user to deploy more easily for containerized environments [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 - Changed the pipeline to enforce code coverage [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 - Expanded the Parquet schema generator to privates and maps [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
+- Refactored the Spark listeners to improve readability and maintainability [@pcho](https://gitlab.ewi.tudelft.nl/pcho)
 
 ### Fixed
 - Fixed the slf4j logging module to allow use in testing and `adapter/spark` [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
@@ -91,6 +94,7 @@ For the most part, since we are pre-release this will serve no real purpose, oth
 - Fixed the Maven configuration by binding failsafe to the integration-test goals [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 - Delete the serialized files left behind by unconsumed streams on application end [@lyadalachanchu](https://gitlab.ewi.tudelft.nl/lyadalachanchu)
 - Fixed the shading to be more specific in the shaded locations to avoid dependency hell for users [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
+- Fixed the stage id bug in stage listener [@pcho](https://gitlab.ewi.tudelft.nl/pcho)
 
 ### Deprecated
 

@@ -33,14 +33,14 @@ class BaseLevelListenerTest {
 
   protected Map<String, TaskResourceRequest> mapResource2;
 
-  protected RuntimeConfig fakeConfig;
-
-  protected TaskLevelListener fakeTaskListener;
-  protected StageLevelListener fakeStageListener;
-  protected JobLevelListener fakeJobListener;
-  protected ApplicationLevelListener fakeApplicationListener;
+  protected RuntimeConfig fakeConfig1;
 
   protected RuntimeConfig fakeConfig2;
+
+  protected TaskLevelListener fakeTaskListener1;
+  protected StageLevelListener fakeStageListener1;
+  protected JobLevelListener fakeJobListener1;
+  protected ApplicationLevelListener fakeApplicationListener1;
 
   protected TaskLevelListener fakeTaskListener2;
   protected StageLevelListener fakeStageListener2;
@@ -78,32 +78,39 @@ class BaseLevelListenerTest {
     when(mockedResourceProfileManager2.resourceProfileFromId(100)).thenReturn(mockedResource2);
     when(mockedResource2.taskResources()).thenReturn(mapResource2);
 
-    // setup fake config
-    fakeConfig = RuntimeConfig.builder()
+    fakeConfig1 = RuntimeConfig.builder()
         .authors(new String[] {"Harry Potter"})
         .domain(Domain.SCIENTIFIC)
+        .isStageLevel(false)
         .description("Yer a wizard harry")
         .build();
-    fakeStageListener = new StageLevelListener(mockedSparkContext, fakeConfig);
+    fakeStageListener1 = new StageLevelListener(mockedSparkContext, fakeConfig1);
 
-    fakeTaskListener = new TaskLevelListener(mockedSparkContext, fakeConfig);
+    fakeTaskListener1 = new TaskLevelListener(mockedSparkContext, fakeConfig1);
 
-    fakeStageListener = new StageLevelListener(mockedSparkContext, fakeConfig);
+    fakeStageListener1 = new StageLevelListener(mockedSparkContext, fakeConfig1);
 
-    fakeJobListener = new JobLevelListener(mockedSparkContext, fakeConfig, fakeTaskListener, fakeStageListener);
+    fakeJobListener1 = new JobLevelListener(mockedSparkContext, fakeConfig1, fakeTaskListener1, fakeStageListener1);
 
-    fakeApplicationListener = new ApplicationLevelListener(
-        mockedSparkContext, fakeConfig, fakeJobListener, fakeTaskListener, fakeStageListener);
+    fakeApplicationListener1 = new ApplicationLevelListener(
+        mockedSparkContext, fakeConfig1, fakeTaskListener1, fakeStageListener1, fakeJobListener1);
 
-    fakeStageListener2 = new StageLevelListener(mockedSparkContext2, fakeConfig);
+    fakeConfig2 = RuntimeConfig.builder()
+        .authors(new String[] {"Harry Potter"})
+        .domain(Domain.SCIENTIFIC)
+        .isStageLevel(true)
+        .description("Yer a wizard harry")
+        .build();
+    fakeStageListener2 = new StageLevelListener(mockedSparkContext2, fakeConfig2);
 
-    fakeTaskListener2 = new TaskLevelListener(mockedSparkContext2, fakeConfig);
+    fakeTaskListener2 = new TaskLevelListener(mockedSparkContext2, fakeConfig2);
 
-    fakeStageListener2 = new StageLevelListener(mockedSparkContext2, fakeConfig);
+    fakeStageListener2 = new StageLevelListener(mockedSparkContext2, fakeConfig2);
 
-    fakeJobListener2 = new JobLevelListener(mockedSparkContext2, fakeConfig, fakeTaskListener2, fakeStageListener2);
+    fakeJobListener2 =
+        new JobLevelListener(mockedSparkContext2, fakeConfig2, fakeTaskListener2, fakeStageListener2);
 
     fakeApplicationListener2 = new ApplicationLevelListener(
-        mockedSparkContext2, fakeConfig, fakeJobListener2, fakeTaskListener2, fakeStageListener2);
+        mockedSparkContext2, fakeConfig2, fakeTaskListener2, fakeStageListener2, fakeJobListener2);
   }
 }
