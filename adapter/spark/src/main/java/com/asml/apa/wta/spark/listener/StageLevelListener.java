@@ -112,7 +112,7 @@ public class StageLevelListener extends TaskStageBaseListener {
 
     this.getProcessedObjects()
         .add(Task.builder()
-            .id(stageId)
+            .id(stageId + 1)
             .type(type)
             .submissionSite(submissionSite)
             .tsSubmit(submitTime)

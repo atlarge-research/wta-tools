@@ -9,6 +9,7 @@ import java.util.Arrays;
 import java.util.Deque;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.atomic.AtomicLong;
@@ -35,7 +36,7 @@ public class JobLevelListener extends AbstractListener<Workflow> {
 
   private final Map<Integer, Long> jobSubmitTimes = new ConcurrentHashMap<>();
 
-  private final Map<Long, List<Long>> jobToStages = new ConcurrentHashMap<>();
+  private final Map<Long, Map<Long, List<Long>>> jobToStages = new ConcurrentHashMap<>();
 
   /**
    * Constructor for the job-level listener.
@@ -83,11 +84,17 @@ public class JobLevelListener extends AbstractListener<Workflow> {
   @Override
   public void onJobStart(SparkListenerJobStart jobStart) {
     jobSubmitTimes.put(jobStart.jobId() + 1, jobStart.time());
-    jobToStages.put(
-        (long) jobStart.jobId(),
-        JavaConverters.seqAsJavaList(jobStart.stageInfos()).stream()
-            .map(stageInfo -> (long) stageInfo.stageId())
-            .collect(Collectors.toList()));
+    Map<Long, List<Long>> parents = new ConcurrentHashMap<>();
+    JavaConverters.seqAsJavaList(jobStart.stageInfos()).stream().forEach(stageInfo -> {
+      parents.put(
+          (long) stageInfo.stageId() + 1,
+          JavaConverters.seqAsJavaList(stageInfo.parentIds()).stream()
+              .mapToInt(x -> (int) x + 1)
+              .mapToLong(x -> (long) x)
+              .boxed()
+              .collect(Collectors.toList()));
+    });
+    jobToStages.put((long) jobStart.jobId() + 1, parents);
   }
 
   /**
@@ -192,9 +199,25 @@ public class JobLevelListener extends AbstractListener<Workflow> {
           .orElse(-1.0));
 
       if (!config.isStageLevel()) {
+        Set<Long> stageIds = jobToStages.get(workflow.getId()).keySet();
         List<Task> jobStages = stageLevelListener.getProcessedObjects().stream()
-            .filter(stage -> jobToStages.get(workflow.getId() - 1).contains(stage.getId()))
+            .filter(stage -> stageIds.contains(stage.getId()))
             .collect(Collectors.toList());
+        jobToStages.get(workflow.getId()).forEach((id, parents) -> {
+          if (!jobStages.stream()
+              .map(stage -> stage.getId())
+              .collect(Collectors.toList())
+              .contains(id)) {
+            jobStages.add(Task.builder()
+                .id(id)
+                .type("cached stage")
+                .parents(parents.stream()
+                    .mapToLong(parentId -> parentId)
+                    .toArray())
+                .build());
+          }
+        });
+
         final List<Task> criticalPath = solveCriticalPath(jobStages);
         workflow.setCriticalPathTaskCount(criticalPath.size());
         final long driverTime = workflow.getCriticalPathLength()
@@ -220,7 +243,9 @@ public class JobLevelListener extends AbstractListener<Workflow> {
 
   public List<Task> solveCriticalPath(List<Task> stages) {
     DAG dag = new DAG(stages);
-    return dag.longestPath();
+    return dag.longestPath().stream()
+        .filter(stage -> !stage.getType().equals("cached stage"))
+        .collect(Collectors.toList());
   }
 
   class Node {
@@ -230,7 +255,7 @@ public class JobLevelListener extends AbstractListener<Workflow> {
     long dist;
 
     public Node(Task stage) {
-      id = stage.getId() + 2;
+      id = stage.getId() + 1;
       dist = Integer.MIN_VALUE;
     }
 
@@ -268,27 +293,21 @@ public class JobLevelListener extends AbstractListener<Workflow> {
 
     public void addNode(Task stage) {
       Node node = new Node(stage);
-      nodes.put(stage.getId() + 2, node);
-
+      nodes.put(stage.getId() + 1, node);
 
       TaskLevelListener listener = (TaskLevelListener) taskListener;
       long runtime = 0L;
-      List<Task> tasks = listener.getStageToTasks().get((int)stage.getId());
+      List<Task> tasks = listener.getStageToTasks().get((int) stage.getId() - 1);
       if (tasks != null) {
-      runtime = tasks.stream().map(Task::getRuntime).reduce(Long::max).orElse(0L);
+        runtime = tasks.stream().map(Task::getRuntime).reduce(Long::max).orElse(0L);
       }
 
-      //long runtime = stage.getRuntime();
-      if (stage.getParents().length > 0
-          && stages.stream()
-              .map(Task::getId)
-              .collect(Collectors.toList())
-              .contains(stage.getParents()[0] - 1)) {
+      if (stage.getParents().length > 0) {
         for (long id : stage.getParents()) {
-          addEdge(id + 1, stage.getId() + 2, runtime);
+          addEdge(id + 1, stage.getId() + 1, runtime);
         }
       } else {
-        addEdge(0, stage.getId() + 2, runtime);
+        addEdge(0, stage.getId() + 1, runtime);
       }
     }
 
@@ -368,7 +387,7 @@ public class JobLevelListener extends AbstractListener<Workflow> {
         pointer = nextPointer.get();
       }
       List<Long> finalCriticalPath =
-          criticalPath.stream().map(x -> x - 2).filter(x -> x >= 0).collect(Collectors.toList());
+          criticalPath.stream().map(x -> x - 1).filter(x -> x >= 0).collect(Collectors.toList());
       ;
       return stages.stream()
           .filter(x -> finalCriticalPath.contains(x.getId()))
