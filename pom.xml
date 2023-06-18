@@ -27,12 +27,12 @@
 
     <maven.version>3.6.0</maven.version>
 
-    <assembly.plugin.version>3.6.0</assembly.plugin.version>
+    <assembly-plugin.version>3.6.0</assembly-plugin.version>
     <assertj.version>3.24.2</assertj.version>
     <awaitility.version>4.2.0</awaitility.version>
     <build-helper.version>3.4.0</build-helper.version>
     <checkstyle.version>3.3.0</checkstyle.version>
-    <compiler.plugin.version>3.11.0</compiler.plugin.version>
+    <compiler-plugin.version>3.11.0</compiler-plugin.version>
     <dependency-plugin.version>3.6.0</dependency-plugin.version>
     <enforcer.version>3.3.0</enforcer.version>
     <failsafe.version>3.1.2</failsafe.version>
@@ -42,14 +42,15 @@
     <junit.version>5.9.3</junit.version>
     <jxr.version>3.3.0</jxr.version>
     <lombok.version>1.18.28</lombok.version>
+    <lombok-plugin.version>1.18.20.0</lombok-plugin.version>
     <mockito.version>5.3.1</mockito.version>
     <parquet.version>1.12.2</parquet.version>
-    <pitest.junit.version>1.2.0</pitest.junit.version>
     <pitest.version>1.14.1</pitest.version>
+    <pitest-junit.version>1.2.0</pitest-junit.version>
     <pmd.version>3.20.0</pmd.version>
     <project-info-reports.version>3.4.5</project-info-reports.version>
     <rat.version>0.15</rat.version>
-    <shade.plugin.version>3.4.1</shade.plugin.version>
+    <shade-plugin.version>3.4.1</shade-plugin.version>
     <site-plugin.version>3.12.1</site-plugin.version>
     <slf4j2-mock.version>2.3.0</slf4j2-mock.version>
     <slf4j.version>2.0.7</slf4j.version>
@@ -146,6 +147,32 @@
 
   <build>
     <plugins>
+      <!-- https://mvnrepository.com/artifact/org.projectlombok/lombok-maven-plugin -->
+      <plugin>
+        <groupId>org.projectlombok</groupId>
+        <artifactId>lombok-maven-plugin</artifactId>
+        <version>${lombok-plugin.version}</version>
+        <dependencies>
+          <!-- https://mvnrepository.com/artifact/org.projectlombok/lombok -->
+          <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>${lombok.version}</version>
+          </dependency>
+        </dependencies>
+        <executions>
+          <execution>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>delombok</goal>
+            </goals>
+            <configuration>
+              <addOutputDirectory>false</addOutputDirectory>
+              <sourceDirectory>src/main/java</sourceDirectory>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
       <!-- https://mvnrepository.com/artifact/com.diffplug.spotless/spotless-maven-plugin -->
       <plugin>
         <groupId>com.diffplug.spotless</groupId>
@@ -168,6 +195,9 @@
             </format>
           </formats>
           <java>
+            <excludes>
+              <exclude>**/generated-sources/**/*.*</exclude>
+            </excludes>
             <toggleOffOn />
             <removeUnusedImports />
             <importOrder />
@@ -213,7 +243,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-assembly-plugin</artifactId>
-        <version>${assembly.plugin.version}</version>
+        <version>${assembly-plugin.version}</version>
       </plugin>
       <!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-checkstyle-plugin -->
       <plugin>
@@ -301,6 +331,9 @@
           <inputEncoding>utf-8</inputEncoding>
           <minimumTokens>100</minimumTokens>
           <targetDirectory>reports/pmd</targetDirectory>
+          <excludeRoots>
+            <excludeRoot>**/generated-sources/**/*.*</excludeRoot>
+          </excludeRoots>
         </configuration>
         <executions>
           <execution>
@@ -316,7 +349,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-shade-plugin</artifactId>
-        <version>${shade.plugin.version}</version>
+        <version>${shade-plugin.version}</version>
         <executions>
           <execution>
             <id>package-shade</id>
@@ -502,7 +535,7 @@
           <dependency>
             <groupId>org.pitest</groupId>
             <artifactId>pitest-junit5-plugin</artifactId>
-            <version>${pitest.junit.version}</version>
+            <version>${pitest-junit.version}</version>
           </dependency>
         </dependencies>
       </plugin>
@@ -553,6 +586,7 @@
           <configLocation>config/checkstyle.xml</configLocation>
           <suppressionsLocation>config/checkstyle-suppressions.xml</suppressionsLocation>
           <consoleOutput>false</consoleOutput>
+          <failsOnError>false</failsOnError>
           <outputFile>reports/checkstyle/violations.txt</outputFile>
           <outputFileFormat>plain</outputFileFormat>
         </configuration>
@@ -564,6 +598,8 @@
         <version>${javadoc-plugin.version}</version>
         <configuration>
           <show>private</show>
+          <doclint>none</doclint>
+          <sourcepath>target/generated-sources/delombok</sourcepath>
         </configuration>
       </plugin>
       <!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-jxr-plugin -->

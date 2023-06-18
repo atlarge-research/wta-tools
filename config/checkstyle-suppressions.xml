@@ -29,10 +29,6 @@
 
   <!-- custom checkstyle suppressions -->
 
-  <suppress files="Main.java" checks="HideUtilityClassConstructor" />
-  <suppress files="com/asml/apa/wta/spark/listener/AbstractListener.java" checks="VisibilityModifier" />
-  <suppress files="com/asml/apa/wta/spark/listener/TaskStageBaseListener.java" checks="VisibilityModifier" />
-
   <!-- suppress the LF newline rule to avoid trouble on Windows, Spotless still mandates a newline -->
   <suppress files=".*" checks="NewlineAtEndOfFile" />
 </suppressions>

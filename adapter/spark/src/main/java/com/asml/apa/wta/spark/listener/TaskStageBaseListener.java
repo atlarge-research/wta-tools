@@ -15,6 +15,7 @@ import org.apache.spark.scheduler.SparkListenerStageCompleted;
  * @author Lohithsai Yadala Chanchu
  * @since 1.0.0
  */
+@SuppressWarnings("VisibilityModifier")
 public abstract class TaskStageBaseListener extends AbstractListener<Task> {
 
   @Getter
