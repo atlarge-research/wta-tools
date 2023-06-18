@@ -154,32 +154,31 @@ public class TaskLevelListener extends TaskStageBaseListener {
       final Long[] parentStages = stageLevelListener.getStageToParents().get(stageId);
       if (parentStages != null) {
         final Long[] parents = Arrays.stream(parentStages)
-                .flatMap(x -> Arrays.stream(
-                        this.getStageToTasks().getOrDefault(x, new ArrayList<>()).stream()
-                                .map(Task::getId)
-                                .toArray(Long[]::new)))
-                .toArray(Long[]::new);
+            .flatMap(x -> Arrays.stream(this.getStageToTasks().getOrDefault(x, new ArrayList<>()).stream()
+                .map(Task::getId)
+                .toArray(Long[]::new)))
+            .toArray(Long[]::new);
         task.setParents(ArrayUtils.toPrimitive(parents));
       }
 
       // set children field
       List<Long> childrenStages =
-              stageLevelListener.getParentStageToChildrenStages().get(stageId);
+          stageLevelListener.getParentStageToChildrenStages().get(stageId);
       if (childrenStages != null) {
         List<Task> children = new ArrayList<>();
         childrenStages.forEach(
-                childrenStage -> children.addAll(this.getStageToTasks().get(childrenStage)));
+            childrenStage -> children.addAll(this.getStageToTasks().get(childrenStage)));
         Long[] temp = children.stream().map(Task::getId).toArray(Long[]::new);
         task.setChildren(ArrayUtils.toPrimitive(temp));
       }
 
       // set resource related fields
       final int resourceProfileId =
-              stageLevelListener.getStageToResource().getOrDefault(stageId, -1);
+          stageLevelListener.getStageToResource().getOrDefault(stageId, -1);
       final ResourceProfile resourceProfile =
-              sparkContext.resourceProfileManager().resourceProfileFromId(resourceProfileId);
+          sparkContext.resourceProfileManager().resourceProfileFromId(resourceProfileId);
       final List<TaskResourceRequest> resources = JavaConverters.seqAsJavaList(
-              resourceProfile.taskResources().values().toList());
+          resourceProfile.taskResources().values().toList());
       if (resources.size() > 0) {
         task.setResourceType(resources.get(0).resourceName());
         task.setResourceAmountRequested(resources.get(0).amount());

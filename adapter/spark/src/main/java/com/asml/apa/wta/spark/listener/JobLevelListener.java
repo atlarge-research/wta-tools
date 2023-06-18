@@ -67,8 +67,7 @@ public class JobLevelListener extends AbstractListener<Workflow> {
    * @author Tianchen Qu
    * @since 1.0.0
    */
-  public JobLevelListener(SparkContext sparkContext, RuntimeConfig config,
-                          StageLevelListener stageLevelListener) {
+  public JobLevelListener(SparkContext sparkContext, RuntimeConfig config, StageLevelListener stageLevelListener) {
     super(sparkContext, config);
     this.wtaTaskListener = stageLevelListener;
     this.stageLevelListener = stageLevelListener;
@@ -106,7 +105,8 @@ public class JobLevelListener extends AbstractListener<Workflow> {
         .getWithCondition(task -> task.getWorkflowId() == jobId)
         .toArray(Task[]::new);
     final int taskCount = tasks.length;
-    long criticalPathLength = -1L;
+    final long criticalPathLength = -1L;
+    final int criticalPathTaskCount = criticalPathTasks.remove(jobId);
     final int maxNumberOfConcurrentTasks = -1;
     final String nfrs = "";
 
@@ -115,10 +115,10 @@ public class JobLevelListener extends AbstractListener<Workflow> {
     final Domain domain = config.getDomain();
     final String appName = sparkContext.appName();
     final String applicationField = "ETL";
-    final int criticalPathTaskCount = criticalPathTasks.remove(jobId);
     final double totalResources = -1.0;
     final double totalMemoryUsage = computeSum(Arrays.stream(tasks).map(Task::getMemoryRequested));
-    final long totalNetworkUsage = (long) computeSum(Arrays.stream(tasks).map(task -> (double) task.getNetworkIoTime()));
+    final long totalNetworkUsage =
+        (long) computeSum(Arrays.stream(tasks).map(task -> (double) task.getNetworkIoTime()));
     final double totalDiskSpaceUsage = computeSum(Arrays.stream(tasks).map(Task::getDiskSpaceRequested));
     final double totalEnergyConsumption = computeSum(Arrays.stream(tasks).map(Task::getEnergyConsumption));
 
@@ -167,9 +167,9 @@ public class JobLevelListener extends AbstractListener<Workflow> {
   public void setWorkflows() {
     final List<Workflow> workflows = this.getProcessedObjects();
     workflows.forEach(workflow -> workflow.setTotalResources(Arrays.stream(workflow.getTasks())
-            .map(Task::getResourceAmountRequested)
-            .filter(resourceAmount -> resourceAmount >= 0.0)
-            .reduce(Double::sum)
-            .orElse(-1.0)));
+        .map(Task::getResourceAmountRequested)
+        .filter(resourceAmount -> resourceAmount >= 0.0)
+        .reduce(Double::sum)
+        .orElse(-1.0)));
   }
 }
