@@ -421,7 +421,7 @@ public class JobLevelListener extends AbstractListener<Workflow> {
     }
 
     /**
-     * This is the recursive utility method for topological sorting
+     * This is the recursive utility method for topological sorting.
      *
      * @param visited a map of all visited nodes
      * @param node the current node
