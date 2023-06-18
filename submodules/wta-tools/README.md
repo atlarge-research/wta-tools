@@ -41,7 +41,7 @@ git clone https://github.com/atlarge-research/wta-tools
 ### Create virtual environment and install dependencies
 The script makes use of third-party libraries, thus a virtual environment is needed. To create a virtual environment, run the following command:
 
-```bash
+```shell
 cd wta-tools
 python3 -m venv <name_of_your_virtual_env>
 ```
@@ -49,12 +49,12 @@ python3 -m venv <name_of_your_virtual_env>
 Then activate the virtual environment.
 
 For Linux systems:
-```bash
+```shell
 source venv/bin/activate
 ```
 
 For Windows system:
-```bash
+```shell
 source venv/Scripts/activate
 ```
 
@@ -69,14 +69,14 @@ toposort==1.10
 
 Verify that you are inside the virtual environment and install the dependencies:
 
-```bash
+```shell
 pip3 install -r requirements.txt
 ```
 
 ### Run the script
 Once all the dependencies are installed, you can run the script with the following command:
 
-```bash
+```shell
 cd wta-tools
 python parse_scripts/validate_parquet_files.py <dir_name>
 ```

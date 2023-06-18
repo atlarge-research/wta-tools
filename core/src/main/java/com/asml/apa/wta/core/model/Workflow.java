@@ -14,44 +14,43 @@ import org.apache.avro.generic.GenericRecord;
  */
 @Data
 @Builder
-@SuppressWarnings("VisibilityModifier")
 public class Workflow implements BaseTraceObject {
 
   private static final long serialVersionUID = 9065743819019553490L;
 
-  public final long id;
+  private final long id;
 
-  public final long tsSubmit;
+  private final long tsSubmit;
 
-  public final Task[] tasks;
+  private final Task[] tasks;
 
-  public final int taskCount;
+  private final int taskCount;
 
-  public final long criticalPathLength;
+  private final long criticalPathLength;
 
-  public final int criticalPathTaskCount;
+  private final int criticalPathTaskCount;
 
-  public final int maxConcurrentTasks;
+  private final int maxConcurrentTasks;
 
-  public final String nfrs;
+  private final String nfrs;
 
-  public final String scheduler;
+  private final String scheduler;
 
-  public final Domain domain;
+  private final Domain domain;
 
-  public final String applicationName;
+  private final String applicationName;
 
-  public final String applicationField;
+  private final String applicationField;
 
-  public double totalResources;
+  private double totalResources;
 
-  public final double totalMemoryUsage;
+  private final double totalMemoryUsage;
 
-  public final long totalNetworkUsage;
+  private final long totalNetworkUsage;
 
-  public final double totalDiskSpaceUsage;
+  private final double totalDiskSpaceUsage;
 
-  public final double totalEnergyConsumption;
+  private final double totalEnergyConsumption;
 
   /**
    * Converts the POJO object into record object, enabling it to be written by Avro.

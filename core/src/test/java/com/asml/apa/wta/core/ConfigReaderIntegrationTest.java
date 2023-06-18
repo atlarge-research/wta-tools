@@ -38,8 +38,8 @@ class ConfigReaderIntegrationTest {
     assertThat(cr.getAuthors()).isEqualTo(new String[] {"Test Name"});
     assertThat(cr.getDomain()).isEqualTo(Domain.ENGINEERING);
     assertThat(cr.getDescription()).isEqualTo("");
-    assertThat(cr.getResourcePingInterval()).isEqualTo(1000);
-    assertThat(cr.getExecutorSynchronizationInterval()).isEqualTo(2000);
+    assertThat(cr.getResourcePingInterval()).isEqualTo(500);
+    assertThat(cr.getExecutorSynchronizationInterval()).isEqualTo(-1);
     assertThat(cr.isStageLevel()).isEqualTo(true);
     assertThat(cr.getOutputPath()).isEqualTo("/home/user/WTA");
   }

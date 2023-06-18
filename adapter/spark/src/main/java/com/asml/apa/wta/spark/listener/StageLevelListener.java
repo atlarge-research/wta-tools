@@ -10,6 +10,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import lombok.Getter;
 import org.apache.spark.SparkContext;
 import org.apache.spark.executor.TaskMetrics;
+import org.apache.spark.scheduler.SparkListenerApplicationEnd;
 import org.apache.spark.scheduler.SparkListenerStageCompleted;
 import org.apache.spark.scheduler.StageInfo;
 import scala.collection.JavaConverters;
@@ -80,15 +81,20 @@ public class StageLevelListener extends TaskStageBaseListener {
   /**
    * This method is called every time a stage is completed. Stage-level metrics are collected, aggregated,
    * and added here.
+   * <p>
    * Note: peakExecutionMemory is the peak memory used by internal data structures created during
    * shuffles, aggregations and joins. The value of this accumulator should be approximately the sum of
    * the peak sizes across all such data structures created in this task. It is thus only an upper
    * bound of the actual peak memory for the task. For SQL jobs, this only tracks all unsafe operators
    * and ExternalSort
+   * <p>
+   * Alternative:
+   * final double memoryRequested = curTaskMetrics.peakExecutionMemory();
    *
    * @param stageCompleted   SparkListenerStageCompleted The object corresponding to information on stage completion
    * @author Tianchen Qu
    * @author Lohithsai Yadala Chanchu
+   * @author Pil Kyu Cho
    * @since 1.0.0
    */
   @Override
@@ -148,5 +154,21 @@ public class StageLevelListener extends TaskStageBaseListener {
         .build();
     fillInParentChildMaps(stageId, task, curStageInfo);
     this.getProcessedObjects().add(task);
+  }
+
+  /**
+   * Sets up the stage children, and it shall be called on application end in
+   * {@link ApplicationLevelListener#onApplicationEnd(SparkListenerApplicationEnd)}.
+   *
+   * @author Tianchen Qu
+   * @author Pil Kyu Cho
+   * @since 1.0.0
+   */
+  public void setStages() {
+    final List<Task> stages = this.getProcessedObjects();
+    stages.forEach(stage -> stage.setChildren(
+            this.getParentStageToChildrenStages().getOrDefault(stage.getId(), new ArrayList<>()).stream()
+                    .mapToLong(Long::longValue)
+                    .toArray()));
   }
 }

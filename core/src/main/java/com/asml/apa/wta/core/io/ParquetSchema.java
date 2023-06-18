@@ -2,6 +2,9 @@ package com.asml.apa.wta.core.io;
 
 import com.asml.apa.wta.core.model.BaseTraceObject;
 import com.asml.apa.wta.core.model.enums.Domain;
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.VarHandle;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
@@ -52,15 +55,19 @@ public class ParquetSchema {
     try {
       for (Field field : fields) {
         boolean sparseField = false;
+        MethodHandles.Lookup lookup = MethodHandles.privateLookupIn(clazz, MethodHandles.lookup());
+        MethodHandle handle = lookup.unreflectGetter(field);
         for (T o : objects) {
-          if (!Modifier.isPublic(field.getModifiers()) || field.get(o) == null) {
+          if (Modifier.isStatic(field.getModifiers()) || handle.invoke(o) == null) {
             sparseField = true;
             break;
           }
         }
         if (!sparseField) {
-          Class<?> fieldType = field.getType();
-          String fieldName = field.getName()
+          VarHandle typeInfoHandle = lookup.unreflectVarHandle(field);
+          Class<?> fieldType = typeInfoHandle.varType();
+          String fieldName = lookup.revealDirect(handle)
+              .getName()
               .replaceAll(followedByCapitalized, replacement)
               .replaceAll(followedByDigit, replacement)
               .toLowerCase();
@@ -82,15 +89,23 @@ public class ParquetSchema {
                 .items()
                 .longType()
                 .noDefault();
+          } else if (Map.class.isAssignableFrom(fieldType)) {
+            schemaBuilder = schemaBuilder
+                .name(fieldName)
+                .type()
+                .map()
+                .values()
+                .stringType()
+                .noDefault();
           } else {
             log.error("Could not create a valid encoding for {}.", fieldType);
             throw new IllegalAccessException(fieldType.toString());
           }
-          fieldsToSchema.put(field.getName(), fieldName);
+          fieldsToSchema.put(lookup.revealDirect(handle).getName(), fieldName);
         }
       }
       avroSchema = schemaBuilder.endRecord();
-    } catch (IllegalAccessException e) {
+    } catch (Throwable e) {
       log.error("Could not create a valid schema for {} in {}.", e.getMessage(), clazz);
       throw new RuntimeException("Could not create a valid schema for " + clazz, e);
     }
@@ -111,8 +126,12 @@ public class ParquetSchema {
     GenericData.Record record = new GenericData.Record(avroSchema);
     try {
       for (Field field : fields) {
-        if (Modifier.isPublic(field.getModifiers()) && fieldsToSchema.containsKey(field.getName())) {
-          Object object = field.get(pojo);
+        MethodHandles.Lookup lookup = MethodHandles.privateLookupIn(clazz, MethodHandles.lookup());
+        MethodHandle handle = lookup.unreflectGetter(field);
+        if (!Modifier.isStatic(field.getModifiers())
+            && fieldsToSchema.containsKey(
+                lookup.revealDirect(handle).getName())) {
+          Object object = handle.invoke(pojo);
           if (object instanceof BaseTraceObject[]) {
             object = Arrays.stream((BaseTraceObject[]) object)
                 .map(BaseTraceObject::getId)
@@ -134,17 +153,20 @@ public class ParquetSchema {
                 break;
               default:
                 object = "";
-                log.error("Failed to properly serialise {} for value {}.", field.getName(), domain);
+                log.error(
+                    "Failed to properly serialise {} for value {}.",
+                    lookup.revealDirect(handle).getName(),
+                    domain);
                 break;
             }
           } else if (object instanceof BaseTraceObject) {
             BaseTraceObject traceObject = (BaseTraceObject) object;
             object = traceObject.getId();
           }
-          record.put(fieldsToSchema.get(field.getName()), object);
+          record.put(fieldsToSchema.get(lookup.revealDirect(handle).getName()), object);
         }
       }
-    } catch (IllegalAccessException e) {
+    } catch (Throwable e) {
       log.error("Could not convert to Avro record {}.", e.getMessage());
     }
     log.debug("Converted record {}.", record);

@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import lombok.Getter;
 import org.apache.spark.SparkContext;
 import org.apache.spark.scheduler.SparkListenerJobEnd;
@@ -31,9 +32,7 @@ public class JobLevelListener extends AbstractListener<Workflow> {
 
   private final Map<Long, Long> jobSubmitTimes = new ConcurrentHashMap<>();
 
-  private int criticalPathTaskCount = -1;
-
-  private long jobStartTime = -1L;
+  private final Map<Long, Integer> criticalPathTasks = new ConcurrentHashMap<>();
 
   private List<Long> stageIds = new ArrayList<>();
 
@@ -59,36 +58,20 @@ public class JobLevelListener extends AbstractListener<Workflow> {
   }
 
   /**
-   * Computes the critical path length.
-   * @return    Critical path length
+   * Constructor for the job-level listener.
+   * This constructor is for stage-level plugin.
+   *
+   * @param sparkContext       The current spark context
+   * @param config             Additional config specified by the user for the plugin
+   * @param stageLevelListener The stage-level listener
    * @author Tianchen Qu
-   * @author Pil Kyu Cho
    * @since 1.0.0
    */
-  private long computeCriticalPathLength() {
-    final long jobRunTime = System.currentTimeMillis() - jobStartTime;
-    final long driverTime = jobRunTime
-        - stageLevelListener.getProcessedObjects().stream()
-            .filter(wtaTask -> stageIds.contains(wtaTask.getId()))
-            .map(Task::getRuntime)
-            .reduce(Long::sum)
-            .orElse(0L);
-
-    long criticalPathLength = -1L;
-    if (!config.isStageLevel()) {
-      TaskLevelListener taskLevelListener = (TaskLevelListener) wtaTaskListener;
-      final Map<Long, List<Task>> stageToTasks = taskLevelListener.getStageToTasks();
-      List<Long> stageMaximumTaskTime = new ArrayList<>();
-      stageIds.stream()
-          .filter(stageToTasks::containsKey)
-          .forEach(stageId -> stageMaximumTaskTime.add(stageToTasks.get(stageId).stream()
-              .map(Task::getRuntime)
-              .max(Long::compareTo)
-              .orElse(0L)));
-      criticalPathLength =
-          driverTime + stageMaximumTaskTime.stream().reduce(Long::sum).orElse(0L);
-    }
-    return criticalPathLength;
+  public JobLevelListener(SparkContext sparkContext, RuntimeConfig config,
+                          StageLevelListener stageLevelListener) {
+    super(sparkContext, config);
+    this.wtaTaskListener = stageLevelListener;
+    this.stageLevelListener = stageLevelListener;
   }
 
   /**
@@ -101,11 +84,10 @@ public class JobLevelListener extends AbstractListener<Workflow> {
   @Override
   public void onJobStart(SparkListenerJobStart jobStart) {
     jobSubmitTimes.put((long) jobStart.jobId() + 1, jobStart.time());
-    jobStartTime = System.currentTimeMillis();
+    criticalPathTasks.put(jobStart.jobId() + 1L, jobStart.stageIds().length());
     stageIds = JavaConverters.seqAsJavaList(jobStart.stageIds()).stream()
         .map(obj -> ((Long) obj) + 1)
         .collect(Collectors.toList());
-    criticalPathTaskCount = jobStart.stageIds().length();
   }
 
   /**
@@ -124,37 +106,21 @@ public class JobLevelListener extends AbstractListener<Workflow> {
         .getWithCondition(task -> task.getWorkflowId() == jobId)
         .toArray(Task[]::new);
     final int taskCount = tasks.length;
-
-    long criticalPathLength = computeCriticalPathLength();
-
+    long criticalPathLength = -1L;
     final int maxNumberOfConcurrentTasks = -1;
     final String nfrs = "";
+
     // we can also get the mode from the config, if that's what the user wants?
     final String scheduler = sparkContext.getConf().get("spark.scheduler.mode", "FIFO");
     final Domain domain = config.getDomain();
     final String appName = sparkContext.appName();
     final String applicationField = "ETL";
+    final int criticalPathTaskCount = criticalPathTasks.remove(jobId);
     final double totalResources = -1.0;
-    final double totalMemoryUsage = Arrays.stream(tasks)
-        .map(Task::getMemoryRequested)
-        .filter(x -> x >= 0.0)
-        .reduce(Double::sum)
-        .orElseGet(() -> -1.0);
-    final long totalNetworkUsage = Arrays.stream(tasks)
-        .map(Task::getNetworkIoTime)
-        .filter(x -> x >= 0)
-        .reduce(Long::sum)
-        .orElse(-1L);
-    final double totalDiskSpaceUsage = Arrays.stream(tasks)
-        .map(Task::getDiskSpaceRequested)
-        .filter(x -> x >= 0.0)
-        .reduce(Double::sum)
-        .orElseGet(() -> -1.0);
-    final double totalEnergyConsumption = Arrays.stream(tasks)
-        .map(Task::getEnergyConsumption)
-        .filter(x -> x >= 0.0)
-        .reduce(Double::sum)
-        .orElse(-1.0);
+    final double totalMemoryUsage = computeSum(Arrays.stream(tasks).map(Task::getMemoryRequested));
+    final long totalNetworkUsage = (long) computeSum(Arrays.stream(tasks).map(task -> (double) task.getNetworkIoTime()));
+    final double totalDiskSpaceUsage = computeSum(Arrays.stream(tasks).map(Task::getDiskSpaceRequested));
+    final double totalEnergyConsumption = computeSum(Arrays.stream(tasks).map(Task::getEnergyConsumption));
 
     this.getProcessedObjects()
         .add(Workflow.builder()
@@ -176,5 +142,34 @@ public class JobLevelListener extends AbstractListener<Workflow> {
             .totalDiskSpaceUsage(totalDiskSpaceUsage)
             .totalEnergyConsumption(totalEnergyConsumption)
             .build());
+  }
+
+  /**
+   * Summation for Double stream for positive terms.
+   *
+   * @param data              stream of data
+   * @return                  summation of positive values from data
+   * @author Tianchen Qu
+   * @author Pil Kyu Cho
+   * @since 1.0.0
+   */
+  private double computeSum(Stream<Double> data) {
+    return data.filter(task -> task >= 0.0).reduce(Double::sum).orElse(-1.0);
+  }
+
+  /**
+   * This is a method called on application end. it sets up the resources used in the spark workflow.
+   *
+   * @author Tianchen Qu
+   * @author Pil Kyu Cho
+   * @since 1.0.0
+   */
+  public void setWorkflows() {
+    final List<Workflow> workflows = this.getProcessedObjects();
+    workflows.forEach(workflow -> workflow.setTotalResources(Arrays.stream(workflow.getTasks())
+            .map(Task::getResourceAmountRequested)
+            .filter(resourceAmount -> resourceAmount >= 0.0)
+            .reduce(Double::sum)
+            .orElse(-1.0)));
   }
 }

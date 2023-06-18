@@ -4,21 +4,18 @@ import com.asml.apa.wta.core.config.RuntimeConfig;
 import com.asml.apa.wta.core.model.Task;
 import com.asml.apa.wta.core.model.Workflow;
 import com.asml.apa.wta.core.model.Workload;
+import com.asml.apa.wta.core.model.Workload.WorkloadBuilder;
 import com.asml.apa.wta.core.model.enums.Domain;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.spark.SparkContext;
-import org.apache.spark.resource.ResourceProfile;
-import org.apache.spark.resource.TaskResourceRequest;
 import org.apache.spark.scheduler.SparkListenerApplicationEnd;
 import org.apache.spark.scheduler.SparkListenerApplicationStart;
-import scala.collection.JavaConverters;
 
 /**
  * This class is an application-level listener for the Spark data source.
@@ -65,76 +62,163 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
   }
 
   /**
-   * Sets the parent, child and resource fields for Spark Tasks.
-   * @param wtaTaskListener   WTA Task object listener
-   * @param stageListener     Stagelistener
-   * @author Pil Kyu Cho
+   * Constructor for the application-level listener at stage level.
+   *
+   * @param sparkContext The current spark context
+   * @param config Additional config specified by the user for the plugin
+   * @param stageLevelListener The stage-level listener to be used by this listener
+   * @param jobLevelListener The job-level listener to be used by this listener
+   * @author Tianchen Qu
    * @since 1.0.0
    */
-  @SuppressWarnings("HiddenField")
-  private void setTaskFields(TaskStageBaseListener wtaTaskListener, StageLevelListener stageListener) {
-    TaskLevelListener taskLevelListener = (TaskLevelListener) wtaTaskListener;
-    final List<Task> tasks = taskLevelListener.getProcessedObjects();
-    for (Task task : tasks) {
-      // set parent field
-      final long stageId = taskLevelListener.getTaskToStage().get(task.getId());
-      final Long[] parentStages = stageListener.getStageToParents().get(stageId);
-      if (parentStages != null) {
-        final Long[] parents = Arrays.stream(parentStages)
-            .flatMap(x -> Arrays.stream(
-                taskLevelListener.getStageToTasks().getOrDefault(x, new ArrayList<>()).stream()
-                    .map(Task::getId)
-                    .toArray(Long[]::new)))
-            .toArray(Long[]::new);
-        task.setParents(ArrayUtils.toPrimitive(parents));
-      }
+  public ApplicationLevelListener(
+          SparkContext sparkContext,
+          RuntimeConfig config,
+          StageLevelListener stageLevelListener,
+          JobLevelListener jobLevelListener) {
+    super(sparkContext, config);
+    this.wtaTaskListener = stageLevelListener;
+    this.stageLevelListener = stageLevelListener;
+    this.jobLevelListener = jobLevelListener;
+  }
 
-      // set children field
-      List<Long> childrenStages =
-          stageLevelListener.getParentStageToChildrenStages().get(stageId);
-      if (childrenStages != null) {
-        List<Task> children = new ArrayList<>();
-        childrenStages.forEach(
-            x -> children.addAll(taskLevelListener.getStageToTasks().get(x)));
-        Long[] temp = children.stream().map(Task::getId).toArray(Long[]::new);
-        task.setChildren(ArrayUtils.toPrimitive(temp));
-      }
+  private void setGeneralFields(long dateEnd, WorkloadBuilder builder) {
+    final Domain domain = config.getDomain();
+    final long dateStart = sparkContext.startTime();
+    final String[] authors = config.getAuthors();
+    final String workloadDescription = config.getDescription();
+    builder.authors(authors)
+            .workloadDescription(workloadDescription)
+            .domain(domain)
+            .dateStart(dateStart)
+            .dateEnd(dateEnd);
+  }
 
-      // set resource related fields
-      final int resourceProfileId =
-          stageLevelListener.getStageToResource().getOrDefault(stageId, -1);
-      final ResourceProfile resourceProfile =
-          sparkContext.resourceProfileManager().resourceProfileFromId(resourceProfileId);
-      final List<TaskResourceRequest> resources = JavaConverters.seqAsJavaList(
-          resourceProfile.taskResources().values().toList());
-      if (resources.size() > 0) {
-        task.setResourceType(resources.get(0).resourceName());
-        task.setResourceAmountRequested(resources.get(0).amount());
-      }
+  private void setCountFields(List<Task> tasks, WorkloadBuilder builder) {
+    final Workflow[] workflows = jobLevelListener.getProcessedObjects().toArray(new Workflow[0]);
+    final int totalWorkflows = workflows.length;
+    final int totalTasks =
+            Arrays.stream(workflows).mapToInt(Workflow::getTaskCount).sum();
+    final long numSites =
+            tasks.stream().filter(task -> task.getSubmissionSite() != -1).count();
+    final long numResources = tasks.stream()
+            .map(Task::getResourceAmountRequested)
+            .filter(task -> task >= 0.0)
+            .reduce(Double::sum)
+            .orElse(-1.0)
+            .longValue();
+    final long numUsers =
+            tasks.stream().filter(task -> task.getUserId() != -1).count();
+    final long numGroups =
+            tasks.stream().filter(task -> task.getGroupId() != -1).count();
+    final double totalResourceSeconds = tasks.stream()
+            .filter(task -> task.getRuntime() >= 0 && task.getResourceAmountRequested() >= 0.0)
+            .map(task -> task.getResourceAmountRequested() * task.getRuntime())
+            .reduce(Double::sum)
+            .orElse(-1.0);
+    builder.totalWorkflows(totalWorkflows)
+            .totalTasks(totalTasks)
+            .numSites(numSites)
+            .numResources(numResources)
+            .numUsers(numUsers)
+            .numGroups(numGroups)
+            .totalResourceSeconds(totalResourceSeconds);
+  }
+
+  private enum ResourceType {
+    RESOURCE(),
+    MEMORY(),
+    DISK(),
+    NETWORK(),
+    ENERGY();
+
+    ResourceType() {
     }
   }
 
-  /**
-   * Sets the children fields for Spark Stages. Parent fields are already filled in from StageLevelListener.
-   * @param stageListener     Stagelistener
-   * @author Pil Kyu Cho
-   * @since 1.0.0
-   */
-  private void setStageFields(StageLevelListener stageListener) {
-    final List<Task> stages = stageListener.getProcessedObjects();
-    stages.forEach(stage -> stage.setChildren(
-        stageListener.getParentStageToChildrenStages().getOrDefault(stage.getId(), new ArrayList<>()).stream()
-            .mapToLong(Long::longValue)
-            .toArray()));
-  }
+  private void setResourceFields(
+        List<Task> tasks,
+        Function<Task, Double> function,
+        ResourceType resourceType,
+        WorkloadBuilder builder) {
+    List<Double> positiveList = tasks.stream()
+            .map(function)
+            .filter(x -> x >= 0.0)
+            .collect(Collectors.toList());
+    final double meanField =
+            computeMean(tasks.stream().map(function), positiveList.size());
+    final double stdField = computeStd(
+            tasks.stream().map(function).filter(x -> x >= 0.0),
+            meanField,
+            positiveList.size());
 
-  private void setWorkflowFields(JobLevelListener jobListener) {
-    final List<Workflow> workflows = jobListener.getProcessedObjects();
-    workflows.forEach(workflow -> workflow.setTotalResources(Arrays.stream(workflow.getTasks())
-        .map(Task::getResourceAmountRequested)
-        .filter(x -> x >= 0.0)
-        .reduce(Double::sum)
-        .orElse(-1.0)));
+    switch (resourceType) {
+      case RESOURCE:
+        builder.minResourceTask(computeMin(tasks.stream().map(function)))
+                .maxResourceTask(computeMax(tasks.stream().map(function)))
+                .meanResourceTask(meanField)
+                .stdResourceTask(stdField)
+                .covResourceTask(computeCov(meanField, stdField))
+                .medianResourceTask(positiveList.isEmpty() ? -1.0 : computeMedian(positiveList))
+                .firstQuartileResourceTask(
+                        positiveList.isEmpty() ? -1.0 : computeFirstQuantile(positiveList))
+                .thirdQuartileResourceTask(
+                        positiveList.isEmpty() ? -1.0 : computeThirdQuantile(positiveList));
+        break;
+      case MEMORY:
+        builder.minMemory(computeMin(tasks.stream().map(function)))
+                .maxMemory(computeMax(tasks.stream().map(function)))
+                .meanMemory(meanField)
+                .stdMemory(stdField)
+                .covMemory(computeCov(meanField, stdField))
+                .medianMemory(positiveList.isEmpty() ? -1.0 : computeMedian(positiveList))
+                .firstQuartileMemory(
+                        positiveList.isEmpty() ? -1.0 : computeFirstQuantile(positiveList))
+                .thirdQuartileMemory(
+                        positiveList.isEmpty() ? -1.0 : computeThirdQuantile(positiveList));
+        break;
+      case NETWORK:
+        builder.minNetworkUsage((long) computeMin(tasks.stream().map(function)))
+              .maxNetworkUsage((long) computeMax(tasks.stream().map(function)))
+              .meanNetworkUsage(meanField)
+              .stdNetworkUsage(stdField)
+              .covNetworkUsage(computeCov(meanField, stdField))
+              .medianNetworkUsage(
+                      positiveList.isEmpty() ? -1L : (long) computeMedian(positiveList))
+              .firstQuartileNetworkUsage(
+                      positiveList.isEmpty()
+                              ? -1L
+                              : (long) computeFirstQuantile(positiveList))
+              .thirdQuartileNetworkUsage(
+                      positiveList.isEmpty()
+                              ? -1L
+                              : (long) computeThirdQuantile(positiveList));
+        break;
+      case DISK:
+        builder.minDiskSpaceUsage(computeMin(tasks.stream().map(function)))
+              .maxDiskSpaceUsage(computeMax(tasks.stream().map(function)))
+              .meanDiskSpaceUsage(meanField)
+              .stdDiskSpaceUsage(stdField)
+              .covDiskSpaceUsage(computeCov(meanField, stdField))
+              .medianDiskSpaceUsage(
+                      positiveList.isEmpty() ? -1.0 : computeMedian(positiveList))
+              .firstQuartileDiskSpaceUsage(
+                      positiveList.isEmpty() ? -1.0 : computeFirstQuantile(positiveList))
+              .thirdQuartileDiskSpaceUsage(
+                      positiveList.isEmpty() ? -1.0 : computeThirdQuantile(positiveList));
+        break;
+      case ENERGY:
+        builder.minEnergy(computeMin(tasks.stream().map(function)))
+              .maxEnergy(computeMax(tasks.stream().map(function)))
+              .meanEnergy(meanField)
+              .stdEnergy(stdField)
+              .covEnergy(computeCov(meanField, stdField))
+              .medianEnergy(positiveList.isEmpty() ? -1.0 : computeMedian(positiveList))
+              .firstQuartileEnergy(
+                      positiveList.isEmpty() ? -1.0 : computeFirstQuantile(positiveList))
+              .thirdQuartileEnergy(
+                      positiveList.isEmpty() ? -1.0 : computeThirdQuantile(positiveList));
+    }
   }
 
   /**
@@ -155,180 +239,25 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
     }
 
     if (config.isStageLevel()) {
-      setStageFields(stageLevelListener);
+      stageLevelListener.setStages();
     } else {
-      setTaskFields(wtaTaskListener, stageLevelListener);
+      TaskLevelListener taskLevelListener = (TaskLevelListener) wtaTaskListener;
+      taskLevelListener.setTasks(stageLevelListener);
     }
-    setWorkflowFields(jobLevelListener);
+    jobLevelListener.setWorkflows();
 
-    final Workflow[] workflows = jobLevelListener.getProcessedObjects().toArray(new Workflow[0]);
-    final int numWorkflows = workflows.length;
-    final int totalTasks =
-        Arrays.stream(workflows).mapToInt(Workflow::getTaskCount).sum();
-    final Domain domain = config.getDomain();
-    final long startDate = sparkContext.startTime();
-    final long endDate = applicationEnd.time();
-    final String[] authors = config.getAuthors();
-    final String workloadDescription = config.getDescription();
+    WorkloadBuilder workloadBuilder = Workload.builder();
     final List<Task> tasks = wtaTaskListener.getProcessedObjects();
-    final long numSites =
-        tasks.stream().filter(x -> x.getSubmissionSite() != -1).count();
-    final long numResources = tasks.stream()
-        .map(Task::getResourceAmountRequested)
-        .filter(x -> x >= 0.0)
-        .reduce(Double::sum)
-        .orElseGet(() -> -1.0)
-        .longValue();
-    final long numUsers = tasks.stream().filter(x -> x.getUserId() != -1).count();
-    final long numGroups = tasks.stream().filter(x -> x.getGroupId() != -1).count();
-    final double totalResourceSeconds = tasks.stream()
-        .filter(task -> task.getRuntime() >= 0 && task.getResourceAmountRequested() >= 0.0)
-        .map(task -> task.getResourceAmountRequested() * task.getRuntime())
-        .reduce(Double::sum)
-        .orElse(-1.0);
+    Function<Task, Long> networkFunction = Task::getNetworkIoTime;
 
-    // resource
-    List<Double> positiveResourceList = tasks.stream()
-        .map(Task::getResourceAmountRequested)
-        .filter(x -> x >= 0.0)
-        .collect(Collectors.toList());
-    final double meanResourceTask =
-        computeMean(tasks.stream().map(Task::getResourceAmountRequested), positiveResourceList.size());
-    final double stdResourceTask = computeStd(
-        tasks.stream().map(Task::getResourceAmountRequested).filter(x -> x >= 0.0),
-        meanResourceTask,
-        positiveResourceList.size());
-
-    // memory
-    List<Double> positiveMemoryList = tasks.stream()
-        .map(Task::getMemoryRequested)
-        .filter(x -> x >= 0.0)
-        .collect(Collectors.toList());
-    final double meanMemory = computeMean(tasks.stream().map(Task::getMemoryRequested), positiveMemoryList.size());
-    final double stdMemory = computeStd(
-        tasks.stream().map(Task::getMemoryRequested).filter(x -> x >= 0.0),
-        meanMemory,
-        positiveMemoryList.size());
-
-    // network io
-    List<Double> positiveNetworkIoList = tasks.stream()
-        .map(task -> (double) task.getNetworkIoTime())
-        .filter(x -> x >= 0.0)
-        .collect(Collectors.toList());
-    final double meanNetworkIo =
-        computeMean(tasks.stream().map(task -> (double) task.getNetworkIoTime()), positiveNetworkIoList.size());
-    final double stdNetworkIo = computeStd(
-        tasks.stream().map(task -> (double) task.getNetworkIoTime()).filter(x -> x >= 0.0),
-        meanNetworkIo,
-        positiveNetworkIoList.size());
-
-    // disk space
-    List<Double> positiveDiskSpaceList = tasks.stream()
-        .map(Task::getDiskSpaceRequested)
-        .filter(x -> x >= 0.0)
-        .collect(Collectors.toList());
-    final double meanDiskSpace =
-        computeMean(tasks.stream().map(Task::getDiskSpaceRequested), positiveDiskSpaceList.size());
-    final double stdDiskSpace = computeStd(
-        tasks.stream().map(Task::getDiskSpaceRequested).filter(x -> x >= 0.0),
-        meanDiskSpace,
-        positiveDiskSpaceList.size());
-
-    // energy
-    List<Double> positiveEnergyList = tasks.stream()
-        .map(Task::getEnergyConsumption)
-        .filter(x -> x >= 0.0)
-        .collect(Collectors.toList());
-    final double meanEnergy =
-        computeMean(tasks.stream().map(Task::getEnergyConsumption), positiveEnergyList.size());
-    final double stdEnergy = computeStd(
-        tasks.stream().map(Task::getEnergyConsumption).filter(x -> x >= 0.0),
-        meanEnergy,
-        positiveEnergyList.size());
-
-    this.getProcessedObjects()
-        .add(Workload.builder()
-            .totalWorkflows(numWorkflows)
-            .totalTasks(totalTasks)
-            .domain(domain)
-            .dateStart(startDate)
-            .dateEnd(endDate)
-            .numSites(numSites)
-            .numResources(numResources)
-            .numUsers(numUsers)
-            .numGroups(numGroups)
-            .totalResourceSeconds(totalResourceSeconds)
-            .authors(authors)
-            .workloadDescription(workloadDescription)
-
-            // resources
-            .minResourceTask(computeMin(tasks.stream().map(Task::getResourceAmountRequested)))
-            .maxResourceTask(computeMax(tasks.stream().map(Task::getResourceAmountRequested)))
-            .meanResourceTask(meanResourceTask)
-            .stdResourceTask(stdResourceTask)
-            .covResourceTask(computeCov(meanResourceTask, stdResourceTask))
-            .medianResourceTask(positiveResourceList.isEmpty() ? -1.0 : computeMedian(positiveResourceList))
-            .firstQuartileResourceTask(
-                positiveResourceList.isEmpty() ? -1.0 : computeFirstQuantile(positiveResourceList))
-            .thirdQuartileResourceTask(
-                positiveResourceList.isEmpty() ? -1.0 : computeThirdQuantile(positiveResourceList))
-
-            // memory
-            .minMemory(computeMin(tasks.stream().map(Task::getMemoryRequested)))
-            .maxMemory(computeMax(tasks.stream().map(Task::getMemoryRequested)))
-            .meanMemory(meanMemory)
-            .stdMemory(stdMemory)
-            .covMemory(computeCov(meanMemory, stdMemory))
-            .medianMemory(positiveMemoryList.isEmpty() ? -1.0 : computeMedian(positiveMemoryList))
-            .firstQuartileMemory(
-                positiveMemoryList.isEmpty() ? -1.0 : computeFirstQuantile(positiveMemoryList))
-            .thirdQuartileMemory(
-                positiveMemoryList.isEmpty() ? -1.0 : computeThirdQuantile(positiveMemoryList))
-
-            // network io
-            .minNetworkUsage(
-                (long) computeMin(tasks.stream().map(task -> (double) task.getNetworkIoTime())))
-            .maxNetworkUsage(
-                (long) computeMax(tasks.stream().map(task -> (double) task.getNetworkIoTime())))
-            .meanNetworkUsage(meanNetworkIo)
-            .stdNetworkUsage(stdNetworkIo)
-            .covNetworkUsage(computeCov(meanMemory, stdMemory))
-            .medianNetworkUsage(
-                positiveNetworkIoList.isEmpty() ? -1L : (long) computeMedian(positiveNetworkIoList))
-            .firstQuartileNetworkUsage(
-                positiveNetworkIoList.isEmpty()
-                    ? -1L
-                    : (long) computeFirstQuantile(positiveNetworkIoList))
-            .thirdQuartileNetworkUsage(
-                positiveNetworkIoList.isEmpty()
-                    ? -1L
-                    : (long) computeThirdQuantile(positiveNetworkIoList))
-
-            // disk space
-            .minDiskSpaceUsage(computeMin(tasks.stream().map(Task::getDiskSpaceRequested)))
-            .maxDiskSpaceUsage(computeMax(tasks.stream().map(Task::getDiskSpaceRequested)))
-            .meanDiskSpaceUsage(meanDiskSpace)
-            .stdDiskSpaceUsage(stdDiskSpace)
-            .covDiskSpaceUsage(computeCov(meanDiskSpace, stdDiskSpace))
-            .medianDiskSpaceUsage(
-                positiveDiskSpaceList.isEmpty() ? -1.0 : computeMedian(positiveDiskSpaceList))
-            .firstQuartileDiskSpaceUsage(
-                positiveDiskSpaceList.isEmpty() ? -1.0 : computeFirstQuantile(positiveDiskSpaceList))
-            .thirdQuartileDiskSpaceUsage(
-                positiveDiskSpaceList.isEmpty() ? -1.0 : computeThirdQuantile(positiveDiskSpaceList))
-
-            // energy
-            .minEnergy(computeMin(tasks.stream().map(Task::getEnergyConsumption)))
-            .maxEnergy(computeMax(tasks.stream().map(Task::getEnergyConsumption)))
-            .meanEnergy(meanEnergy)
-            .stdEnergy(stdEnergy)
-            .covEnergy(computeCov(meanEnergy, stdEnergy))
-            .medianEnergy(positiveEnergyList.isEmpty() ? -1.0 : computeMedian(positiveEnergyList))
-            .firstQuartileEnergy(
-                positiveEnergyList.isEmpty() ? -1.0 : computeFirstQuantile(positiveEnergyList))
-            .thirdQuartileEnergy(
-                positiveEnergyList.isEmpty() ? -1.0 : computeThirdQuantile(positiveEnergyList))
-            .build());
+    setGeneralFields(applicationEnd.time(), workloadBuilder);
+    setCountFields(tasks, workloadBuilder);
+    setResourceFields(tasks, Task::getResourceAmountRequested, ResourceType.RESOURCE, workloadBuilder);
+    setResourceFields(tasks, Task::getMemoryRequested, ResourceType.MEMORY, workloadBuilder);
+    setResourceFields(tasks, networkFunction.andThen(Long::doubleValue), ResourceType.NETWORK, workloadBuilder);
+    setResourceFields(tasks, Task::getDiskSpaceRequested, ResourceType.DISK, workloadBuilder);
+    setResourceFields(tasks, Task::getEnergyConsumption, ResourceType.ENERGY, workloadBuilder);
+    this.getProcessedObjects().add(workloadBuilder.build());
   }
 
   /**

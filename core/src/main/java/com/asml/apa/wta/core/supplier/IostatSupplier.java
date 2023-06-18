@@ -58,7 +58,7 @@ public class IostatSupplier implements InformationSupplier<IostatDto> {
       log.error("Something went wrong while receiving the iostat shell command outputs.");
       return false;
     }
-    log.info("System does not have the necessary dependencies (sysstat) to run iostat.");
+    log.info("System does not have the necessary dependencies to run iostat.");
     return false;
   }
 

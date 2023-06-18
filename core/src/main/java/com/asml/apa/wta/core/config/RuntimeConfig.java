@@ -41,10 +41,10 @@ public class RuntimeConfig {
   private boolean isStageLevel = false;
 
   @Builder.Default
-  private int resourcePingInterval = 1000;
+  private int resourcePingInterval = 500;
 
   @Builder.Default
-  private int executorSynchronizationInterval = 2000;
+  private int executorSynchronizationInterval = -1;
 
   private String outputPath;
 
