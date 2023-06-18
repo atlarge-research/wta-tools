@@ -84,24 +84,24 @@ class TaskLevelListenerTest extends BaseLevelListenerTest {
     ListBuffer<StageInfo> stageBuffer = new ListBuffer<>();
     stageBuffer.$plus$eq(testStageInfo);
 
-    fakeTaskListener.onJobStart(new SparkListenerJobStart(0, 2L, stageBuffer.toList(), new Properties()));
-    fakeTaskListener.onTaskEnd(taskEndEvent);
-    assertThat(fakeTaskListener.getStageToTasks().size()).isEqualTo(1);
+    fakeTaskListener1.onJobStart(new SparkListenerJobStart(0, 2L, stageBuffer.toList(), new Properties()));
+    fakeTaskListener1.onTaskEnd(taskEndEvent);
+    assertThat(fakeTaskListener1.getStageToTasks().size()).isEqualTo(1);
     List<Task> list = new ArrayList<>();
     list.add(Task.builder().id(1L).build());
-    assertThat(fakeTaskListener.getStageToTasks().get(3L).size()).isEqualTo(1);
-    assertThat(fakeTaskListener.getStageToTasks().get(3L).get(0).getId()).isEqualTo(1);
-    assertThat(fakeTaskListener.getTaskToStage().size()).isEqualTo(1);
-    assertThat(fakeTaskListener.getTaskToStage()).containsEntry(1L, 3L);
-    fakeTaskListener.onTaskEnd(taskEndEvent2);
-    assertThat(fakeTaskListener.getStageToTasks().size()).isEqualTo(1);
+    assertThat(fakeTaskListener1.getStageToTasks().get(3L).size()).isEqualTo(1);
+    assertThat(fakeTaskListener1.getStageToTasks().get(3L).get(0).getId()).isEqualTo(1);
+    assertThat(fakeTaskListener1.getTaskToStage().size()).isEqualTo(1);
+    assertThat(fakeTaskListener1.getTaskToStage()).containsEntry(1L, 3L);
+    fakeTaskListener1.onTaskEnd(taskEndEvent2);
+    assertThat(fakeTaskListener1.getStageToTasks().size()).isEqualTo(1);
     list.add(Task.builder().id(2L).build());
-    assertThat(fakeTaskListener.getStageToTasks().get(3L).size()).isEqualTo(2);
-    assertThat(fakeTaskListener.getStageToTasks().get(3L).get(0).getId()).isEqualTo(1);
-    assertThat(fakeTaskListener.getStageToTasks().get(3L).get(1).getId()).isEqualTo(2);
-    assertThat(fakeTaskListener.getTaskToStage().size()).isEqualTo(2);
-    assertThat(fakeTaskListener.getTaskToStage()).containsEntry(1L, 3L);
-    assertThat(fakeTaskListener.getTaskToStage()).containsEntry(2L, 3L);
+    assertThat(fakeTaskListener1.getStageToTasks().get(3L).size()).isEqualTo(2);
+    assertThat(fakeTaskListener1.getStageToTasks().get(3L).get(0).getId()).isEqualTo(1);
+    assertThat(fakeTaskListener1.getStageToTasks().get(3L).get(1).getId()).isEqualTo(2);
+    assertThat(fakeTaskListener1.getTaskToStage().size()).isEqualTo(2);
+    assertThat(fakeTaskListener1.getTaskToStage()).containsEntry(1L, 3L);
+    assertThat(fakeTaskListener1.getTaskToStage()).containsEntry(2L, 3L);
   }
 
   @Test
@@ -109,10 +109,10 @@ class TaskLevelListenerTest extends BaseLevelListenerTest {
     ListBuffer<StageInfo> stageBuffer = new ListBuffer<>();
     stageBuffer.$plus$eq(testStageInfo);
 
-    fakeTaskListener.onJobStart(new SparkListenerJobStart(0, 2L, stageBuffer.toList(), new Properties()));
-    fakeTaskListener.onTaskEnd(taskEndEvent);
-    assertEquals(1, fakeTaskListener.getProcessedObjects().size());
-    Task curTask = fakeTaskListener.getProcessedObjects().get(0);
+    fakeTaskListener1.onJobStart(new SparkListenerJobStart(0, 2L, stageBuffer.toList(), new Properties()));
+    fakeTaskListener1.onTaskEnd(taskEndEvent);
+    assertEquals(1, fakeTaskListener1.getProcessedObjects().size());
+    Task curTask = fakeTaskListener1.getProcessedObjects().get(0);
     assertEquals(1, curTask.getId());
     assertEquals("testTaskType", curTask.getType());
     assertEquals(50L, curTask.getTsSubmit());

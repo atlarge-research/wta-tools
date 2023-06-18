@@ -71,10 +71,10 @@ class StageLevelListenerTest extends BaseLevelListenerTest {
     ListBuffer<StageInfo> stageBuffer = new ListBuffer<>();
     stageBuffer.$plus$eq(spyStageInfo);
 
-    fakeStageListener.onJobStart(new SparkListenerJobStart(0, 2L, stageBuffer.toList(), new Properties()));
-    fakeStageListener.onStageCompleted(stageEndEvent);
-    assertEquals(1, fakeStageListener.getProcessedObjects().size());
-    Task curStage = fakeStageListener.getProcessedObjects().get(0);
+    fakeStageListener1.onJobStart(new SparkListenerJobStart(0, 2L, stageBuffer.toList(), new Properties()));
+    fakeStageListener1.onStageCompleted(stageEndEvent);
+    assertEquals(1, fakeStageListener1.getProcessedObjects().size());
+    Task curStage = fakeStageListener1.getProcessedObjects().get(0);
     assertEquals(1, curStage.getId());
     assertEquals("", curStage.getType());
     assertEquals(10L, curStage.getTsSubmit());
@@ -101,14 +101,14 @@ class StageLevelListenerTest extends BaseLevelListenerTest {
     ListBuffer<StageInfo> stageBuffer = new ListBuffer<>();
     stageBuffer.$plus$eq(spyStageInfo);
 
-    fakeStageListener.onJobStart(new SparkListenerJobStart(0, 2L, stageBuffer.toList(), new Properties()));
-    fakeStageListener.onStageCompleted(stageEndEvent);
-    assertThat(fakeStageListener.getStageToParents()).containsEntry(1L, new Long[] {2L, 3L});
-    assertThat(fakeStageListener.getStageToParents().size()).isEqualTo(1);
+    fakeStageListener1.onJobStart(new SparkListenerJobStart(0, 2L, stageBuffer.toList(), new Properties()));
+    fakeStageListener1.onStageCompleted(stageEndEvent);
+    assertThat(fakeStageListener1.getStageToParents()).containsEntry(1L, new Long[] {2L, 3L});
+    assertThat(fakeStageListener1.getStageToParents().size()).isEqualTo(1);
     List<Long> childrenStages = new ArrayList<>();
     childrenStages.add(1L);
-    assertThat(fakeStageListener.getParentStageToChildrenStages()).containsEntry(2L, childrenStages);
-    assertThat(fakeStageListener.getParentStageToChildrenStages()).containsEntry(3L, childrenStages);
-    assertThat(fakeStageListener.getParentStageToChildrenStages().size()).isEqualTo(2);
+    assertThat(fakeStageListener1.getParentStageToChildrenStages()).containsEntry(2L, childrenStages);
+    assertThat(fakeStageListener1.getParentStageToChildrenStages()).containsEntry(3L, childrenStages);
+    assertThat(fakeStageListener1.getParentStageToChildrenStages().size()).isEqualTo(2);
   }
 }

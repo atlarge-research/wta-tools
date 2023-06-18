@@ -15,20 +15,21 @@ class JobLevelListenerTest extends BaseLevelListenerTest {
 
   @Test
   void recordsTheTimeWhenJobIsSubmittedInMap() {
-    fakeJobListener.onJobStart(
+    fakeJobListener1.onJobStart(
         new SparkListenerJobStart(559, 40L, new ListBuffer<StageInfo>().toList(), new Properties()));
-    assertThat(fakeJobListener.getJobSubmitTimes()).containsEntry(560L, 40L);
+    assertThat(fakeJobListener1.getJobSubmitTimes()).containsEntry(560L, 40L);
   }
 
   @Test
   void jobStartAndEndStateIsCorrect() {
-    fakeJobListener.onJobStart(
+    fakeJobListener1.onJobStart(
         new SparkListenerJobStart(559, 40L, new ListBuffer<StageInfo>().toList(), new Properties()));
-    fakeJobListener.onJobEnd(new SparkListenerJobEnd(559, 60L, new JobFailed(new RuntimeException("test"))));
-    assertThat(fakeJobListener.getJobSubmitTimes()).isEmpty();
-    assertThat(fakeJobListener.getProcessedObjects()).hasSize(1);
+    fakeJobListener1.onJobEnd(new SparkListenerJobEnd(559, 60L, new JobFailed(new RuntimeException("test"))));
+    assertThat(fakeJobListener1.getJobSubmitTimes()).isEmpty();
+    assertThat(fakeJobListener1.getProcessedObjects()).hasSize(1);
 
-    Workflow fakeJobListenerWorkflow = fakeJobListener.getProcessedObjects().get(0);
+    Workflow fakeJobListenerWorkflow =
+        fakeJobListener1.getProcessedObjects().get(0);
     assertThat(fakeJobListenerWorkflow.getId()).isEqualTo(560);
     assertThat(fakeJobListenerWorkflow.getTsSubmit()).isEqualTo(40L);
     assertThat(fakeJobListenerWorkflow.getScheduler()).isEqualTo("FIFO");
