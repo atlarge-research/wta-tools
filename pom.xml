@@ -344,6 +344,9 @@
               <goal>integration-test</goal>
               <goal>verify</goal>
             </goals>
+            <configuration>
+              <argLine>${failsafeArgLine}</argLine>
+            </configuration>
           </execution>
         </executions>
       </plugin>
@@ -507,6 +510,9 @@
             <goals>
               <goal>prepare-agent-integration</goal>
             </goals>
+            <configuration>
+              <propertyName>failsafeArgLine</propertyName>
+            </configuration>
           </execution>
           <execution>
             <id>jacoco-merge</id>
