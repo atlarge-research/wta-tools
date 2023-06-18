@@ -334,6 +334,9 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
     }
     double numerator =
         data.map(x -> Math.pow(x - mean, 2)).reduce(Double::sum).orElse(-1.0);
+    if (numerator == -1.0) {
+      return -1.0;
+    }
     return Math.pow(numerator / size, 0.5);
   }
 
