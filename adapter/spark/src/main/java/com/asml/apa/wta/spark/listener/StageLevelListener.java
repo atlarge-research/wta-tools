@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
-
 import lombok.Getter;
 import org.apache.spark.SparkContext;
 import org.apache.spark.executor.TaskMetrics;
@@ -169,7 +168,8 @@ public class StageLevelListener extends TaskStageBaseListener {
    * @since 1.0.0
    */
   public void setStages(long jobId) {
-    final List<Task> filteredStages = this.getProcessedObjects().stream().filter(task -> task.getWorkflowId() == jobId)
+    final List<Task> filteredStages = this.getProcessedObjects().stream()
+        .filter(task -> task.getWorkflowId() == jobId)
         .collect(Collectors.toList());
     filteredStages.forEach(stage -> stage.setChildren(
         this.getParentStageToChildrenStages().getOrDefault(stage.getId(), new ArrayList<>()).stream()
