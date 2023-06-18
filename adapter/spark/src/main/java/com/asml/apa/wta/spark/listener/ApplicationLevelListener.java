@@ -318,7 +318,7 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
 
   /**
    * Standard deviation value for data stream with invalid stream handling. Assumes the data has
-   * positive elemetns only.
+   * positive elements only.
    *
    * @param data              stream of data
    * @param mean              mean value from {@link #computeMean(Stream, long)}
@@ -332,12 +332,11 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
     if (size == 0 || mean == -1.0) {
       return -1.0;
     }
-    double numerator =
-        data.map(x -> Math.pow(x - mean, 2)).reduce(Double::sum).orElse(-1.0);
+    double numerator = data.map(x -> x * x).reduce(Double::sum).orElse(-1.0);
     if (numerator == -1.0) {
       return -1.0;
     }
-    return Math.pow(numerator / size, 0.5);
+    return Math.pow(numerator / size - mean * mean, 0.5);
   }
 
   /**
