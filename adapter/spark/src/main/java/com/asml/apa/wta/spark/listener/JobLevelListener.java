@@ -6,9 +6,11 @@ import com.asml.apa.wta.core.model.Workflow;
 import com.asml.apa.wta.core.model.enums.Domain;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Deque;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.Getter;
@@ -210,6 +212,124 @@ public class JobLevelListener extends AbstractListener<Workflow> {
           .filter(resourceAmount -> resourceAmount >= 0.0)
           .reduce(Double::sum)
           .orElse(-1.0));
+    }
+  }
+
+  class Node {
+
+    long id;
+
+    long dist;
+
+    public Node(Task stage) {
+      id = stage.getId() + 2;
+      dist = Integer.MIN_VALUE;
+    }
+
+    public Node(long id) {
+      this.id = id;
+      dist = Integer.MIN_VALUE;
+    }
+  }
+
+  class DAG {
+
+    int nodeSize;
+
+    Map<Long, Node> nodes;
+
+    Map<Long, Map<Long, Long>> adjMap;
+
+    Map<Long, Map<Long, Long>> adjMapReversed;
+
+    Deque<Long> stack;
+
+    public DAG() {
+      nodeSize = 0;
+      nodes = new ConcurrentHashMap<>();
+      adjMap = new ConcurrentHashMap<>();
+      stack = new ConcurrentLinkedDeque<>();
+      adjMapReversed = new ConcurrentHashMap<>();
+    }
+
+    public void addNode(Task stage) {
+      nodeSize++;
+      Node node = new Node(stage);
+      nodes.put(stage.getId(), node);
+      adjMap.put(stage.getId(), new ConcurrentHashMap<>());
+      adjMapReversed.put(stage.getId(), new ConcurrentHashMap<>());
+      TaskLevelListener listener = (TaskLevelListener) taskListener;
+      long runtime = 0L;
+      List<Task> tasks = listener.getStageToTasks().get(stage.getId());
+      if (tasks != null) {
+        runtime = tasks.stream().map(Task::getRuntime).reduce(Long::max).orElse(0L);
+      }
+      if (stage.getParents() != null && stage.getParents().length > 0) {
+        for (long id : stage.getParents()) {
+          addEdge(id, stage.getId(), runtime);
+        }
+      } else {
+        addEdge(0, stage.getId(), runtime);
+      }
+    }
+
+    public void addNode(Long id) {
+      nodeSize++;
+      Node node = new Node(id);
+      nodes.put(id, node);
+      adjMap.put(id, new ConcurrentHashMap<>());
+      adjMapReversed.put(id, new ConcurrentHashMap<>());
+      // if the node is the ending node
+      if (id == 1) {
+        setFinalEdges();
+      } else if (id == 0) { // if the node is the starting node
+        node.dist = 0;
+      }
+    }
+
+    private void addEdge(long v, long u, long weight) {
+      adjMap.get(v).put(u, weight);
+      adjMapReversed.get(u).put(v, weight);
+    }
+
+    private void setFinalEdges() {
+      adjMap.forEach((node, adjNodes) -> {
+        if (adjNodes.size() == 0) {
+          addEdge(node, 1, 0);
+        }
+      });
+    }
+
+    private void topologicalSort() {
+      Map<Long, Boolean> visited = new ConcurrentHashMap<>();
+      for (Long node : nodes.keySet()) {
+        topoUtil(visited, node);
+      }
+    }
+
+    private void topoUtil(Map<Long, Boolean> visited, Long node) {
+      visited.put(node, true);
+      for (Long children : adjMap.get(node).keySet()) {
+        if (visited.get(children) == null) {
+          topoUtil(visited, children);
+        }
+      }
+      stack.push(node);
+    }
+
+    public long longestPath() {
+      topologicalSort();
+      while (!stack.isEmpty()) {
+        Node node = nodes.get(stack.pop());
+        for (Long childId : adjMap.get(node.id).keySet()) {
+          Node child = nodes.get(childId);
+          if (child.dist < node.dist + adjMap.get(node.id).get(childId)) {
+            child.dist = node.dist + adjMap.get(node.id).get(childId);
+          }
+        }
+      }
+
+      return nodes.get(1).dist;
     }
   }
 }
