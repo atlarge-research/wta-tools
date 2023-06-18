@@ -7,10 +7,12 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
+
 import lombok.Getter;
 import org.apache.spark.SparkContext;
 import org.apache.spark.executor.TaskMetrics;
-import org.apache.spark.scheduler.SparkListenerApplicationEnd;
+import org.apache.spark.scheduler.SparkListenerJobEnd;
 import org.apache.spark.scheduler.SparkListenerStageCompleted;
 import org.apache.spark.scheduler.StageInfo;
 import scala.collection.JavaConverters;
@@ -157,16 +159,19 @@ public class StageLevelListener extends TaskStageBaseListener {
   }
 
   /**
-   * Sets up the stage children, and it shall be called on application end in
-   * {@link ApplicationLevelListener#onApplicationEnd(SparkListenerApplicationEnd)}.
+   * Sets up the stage children, and it shall be called on job end in
+   * {@link JobLevelListener#onJobEnd(SparkListenerJobEnd)}. It only sets the Stages which are
+   * affiliated to the passed jobId.
    *
+   * @param jobId            Spark Job id to filter Stages by
    * @author Tianchen Qu
    * @author Pil Kyu Cho
    * @since 1.0.0
    */
-  public void setStages() {
-    final List<Task> stages = this.getProcessedObjects();
-    stages.forEach(stage -> stage.setChildren(
+  public void setStages(long jobId) {
+    final List<Task> filteredStages = this.getProcessedObjects().stream().filter(task -> task.getWorkflowId() == jobId)
+        .collect(Collectors.toList());
+    filteredStages.forEach(stage -> stage.setChildren(
         this.getParentStageToChildrenStages().getOrDefault(stage.getId(), new ArrayList<>()).stream()
             .mapToLong(Long::longValue)
             .toArray()));

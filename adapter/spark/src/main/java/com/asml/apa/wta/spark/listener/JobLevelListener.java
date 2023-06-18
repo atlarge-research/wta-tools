@@ -4,18 +4,15 @@ import com.asml.apa.wta.core.config.RuntimeConfig;
 import com.asml.apa.wta.core.model.Task;
 import com.asml.apa.wta.core.model.Workflow;
 import com.asml.apa.wta.core.model.enums.Domain;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.Getter;
 import org.apache.spark.SparkContext;
 import org.apache.spark.scheduler.SparkListenerJobEnd;
 import org.apache.spark.scheduler.SparkListenerJobStart;
-import scala.collection.JavaConverters;
 
 /**
  * This class is a job-level listener for the Spark data source.
@@ -85,11 +82,15 @@ public class JobLevelListener extends AbstractListener<Workflow> {
   }
 
   /**
-   * Processes the workflow and puts it into an object.
+   * When a job is finished, processes the workflow and puts it into an object. In addition, it sets the
+   * parent, child, and resource information for the affiliated Spark tasks or Spark stages to this job,
+   * depending on the config setting of isStageLevel. This needs to happen here as the clean-up of
+   * ConcurrentHashMap containers must also happen at the very end when a job finishes.
    *
    * @param jobEnd The job end event object containing information upon job end
    * @author Henry Page
    * @author Tianchen Qu
+   * @author Pil Kyu Cho
    * @since 1.0.0
    */
   @Override
@@ -137,17 +138,24 @@ public class JobLevelListener extends AbstractListener<Workflow> {
             .totalDiskSpaceUsage(totalDiskSpaceUsage)
             .totalEnergyConsumption(totalEnergyConsumption)
             .build());
+
+    if (config.isStageLevel()) {
+      stageLevelListener.setStages(jobId);
+    } else {
+      TaskLevelListener taskLevelListener = (TaskLevelListener) wtaTaskListener;
+      taskLevelListener.setTasks(stageLevelListener, jobId);
+    }
     cleanUpContainers(jobEnd);
   }
 
   /**
    * To prevent memory overload, clean up the containers in all listeners after a Spark job finishes.
    * Spark jobs are designed to be independent and run in parallel, thus the clean-up of containers
-   * after a job finishes should not affect other jobs.
+   * after a job finishes should not affect other jobs. This is also necessary as some stages are created at
+   * job start but never submitted.
    * <p>
-   * This is also necessary as some stages are created at job start but never submitted. For ConcurrentHashMap,
-   * remove() is thread-safe when removing based on key. For removing based on value, most thread-safe and is to
-   * use entrySet() in combination with removeIf().
+   * For ConcurrentHashMap, remove() is thread-safe when removing based on key. For removing based on value,
+   * most thread-safe and is to use entrySet() in combination with removeIf().
    * @author Pil Kyu Cho
    * @since 1.0.0
    */
@@ -156,18 +164,21 @@ public class JobLevelListener extends AbstractListener<Workflow> {
     jobSubmitTimes.remove(jobId);
     criticalPathTasks.remove(jobId);
 
-    Stream<Long> stageIds = stageLevelListener.getStageToJob().entrySet().stream().filter(e -> e.getValue().equals(jobId)).map(Map.Entry::getKey);
+    Stream<Long> stageIds = stageLevelListener.getStageToJob().entrySet().stream()
+        .filter(e -> e.getValue().equals(jobId))
+        .map(Map.Entry::getKey);
     stageIds.forEach(stageId -> {
       stageLevelListener.getStageToJob().remove(stageId);
       stageLevelListener.getStageToParents().remove(stageId);
-//      stageLevelListener.getParentStageToChildrenStages().remove(stageId);
-//      stageLevelListener.getStageToResource().remove(stageId);
-//      if (!config.isStageLevel()) {
-//        // additional clean up for task-level plugin
-//        TaskLevelListener taskLevelListener = (TaskLevelListener) wtaTaskListener;
-//        taskLevelListener.getStageToTasks().remove(stageId);
-//        taskLevelListener.getTaskToStage().entrySet().removeIf(entry -> entry.getValue().equals(stageId));
-//      }
+      stageLevelListener.getParentStageToChildrenStages().remove(stageId);
+      stageLevelListener.getStageToResource().remove(stageId);
+      if (!config.isStageLevel()) {
+        // additional clean up for task-level plugin
+        TaskLevelListener taskLevelListener = (TaskLevelListener) wtaTaskListener;
+        taskLevelListener.getStageToTasks().remove(stageId);
+        taskLevelListener.getTaskToStage().entrySet().removeIf(entry -> entry.getValue()
+            .equals(stageId));
+      }
     });
   }
 

@@ -7,12 +7,14 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
+
 import lombok.Getter;
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.spark.SparkContext;
 import org.apache.spark.executor.TaskMetrics;
 import org.apache.spark.resource.ResourceProfile;
 import org.apache.spark.resource.TaskResourceRequest;
+import org.apache.spark.scheduler.SparkListenerJobEnd;
 import org.apache.spark.scheduler.SparkListenerTaskEnd;
 import org.apache.spark.scheduler.TaskInfo;
 import scala.collection.JavaConverters;
@@ -138,27 +140,32 @@ public class TaskLevelListener extends TaskStageBaseListener {
   }
 
   /**
-   * Sets the parent, child and resource fields for Spark Tasks. This method is called at the end of
-   * the application.
+   * Sets the parent, child and resource fields for Spark Tasks. This method is called on job end in
+   * {@link JobLevelListener#onJobEnd(SparkListenerJobEnd)} and only sets the Tasks which are
+   * affiliated to the passed jobId.
    *
-   * @param stageLevelListener  stage level listener to get resource bindings
+   * @param stageLevelListener    stage level listener to get ConcurrentHashMap containers
+   * @param jobId                 Spark Job id to filter Tasks by
    * @author Tianchen Qu
    * @author Pil Kyu Cho
    * @since 1.0.0
    */
-  public void setTasks(StageLevelListener stageLevelListener) {
-    final List<Task> tasks = this.getProcessedObjects();
-    for (Task task : tasks) {
-      // set parent field: all Tasks in taskLevelListener.getProcessedObjects() are guaranteed to be in taskToStage
+  public void setTasks(StageLevelListener stageLevelListener, long jobId) {
+    final List<Task> filteredTasks = this.getProcessedObjects().stream()
+            .filter(t -> t.getWorkflowId() == jobId).collect(Collectors.toList());
+    for (Task task : filteredTasks) {
+      // set parent field: all Tasks in are guaranteed to be in taskToStage
       final long stageId = this.getTaskToStage().get(task.getId());
       final Long[] parentStages = stageLevelListener.getStageToParents().get(stageId);
       if (parentStages != null) {
-        final Long[] parents = Arrays.stream(parentStages)
-            .flatMap(parentStageId -> Arrays.stream(this.getStageToTasks().getOrDefault(parentStageId, new ArrayList<>()).stream()
-                .map(Task::getId)
-                .toArray(Long[]::new)))
-            .toArray(Long[]::new);
-        task.setParents(ArrayUtils.toPrimitive(parents));
+        final long[] parents = Arrays.stream(parentStages)
+            .flatMap(parentStageId -> Arrays.stream(
+                this.getStageToTasks().getOrDefault(parentStageId, new ArrayList<>()).stream()
+                    .map(Task::getId)
+                    .toArray(Long[]::new)))
+            .mapToLong(Long::longValue)
+            .toArray();
+        task.setParents(parents);
       }
 
       // set children field
@@ -168,8 +175,11 @@ public class TaskLevelListener extends TaskStageBaseListener {
         List<Task> children = new ArrayList<>();
         childrenStages.forEach(
             childrenStage -> children.addAll(this.getStageToTasks().get(childrenStage)));
-        Long[] temp = children.stream().map(Task::getId).toArray(Long[]::new);
-        task.setChildren(ArrayUtils.toPrimitive(temp));
+        long[] childrenTaskIds = children.stream()
+            .map(Task::getId)
+            .mapToLong(Long::longValue)
+            .toArray();
+        task.setChildren(childrenTaskIds);
       }
 
       // set resource related fields

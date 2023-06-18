@@ -248,13 +248,6 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
       log.debug("Application end called twice, this should never happen");
       return;
     }
-
-    if (config.isStageLevel()) {
-      stageLevelListener.setStages();
-    } else {
-      TaskLevelListener taskLevelListener = (TaskLevelListener) wtaTaskListener;
-      taskLevelListener.setTasks(stageLevelListener);
-    }
     jobLevelListener.setWorkflows();
 
     WorkloadBuilder workloadBuilder = Workload.builder();
