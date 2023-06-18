@@ -45,38 +45,12 @@
   <profiles>
     <profile>
       <id>end-to-end</id>
-      <activation>
-        <property>
-          <name>e2e</name>
-          <value>true</value>
-        </property>
-      </activation>
       <build>
         <plugins>
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-surefire-plugin</artifactId>
-            <version>${surefire.version}</version>
-            <configuration>
-              <excludes>
-                <exclude>**/*Test.java</exclude>
-              </excludes>
-            </configuration>
-          </plugin>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-compiler-plugin</artifactId>
-            <version>${maven.compiler.plugin.version}</version>
-            <configuration>
-              <testExcludes>
-                <exclude>**/*Test.java</exclude>
-              </testExcludes>
-            </configuration>
-          </plugin>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-assembly-plugin</artifactId>
-            <version>${maven.assembly.plugin.version}</version>
+            <version>${assembly.plugin.version}</version>
             <configuration>
               <descriptors>
                 <descriptor>config/assembly-e2e.xml</descriptor>

@@ -24,13 +24,15 @@
     <maven.compiler.target>11</maven.compiler.target>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-    <maven.shade.plugin.version>3.4.1</maven.shade.plugin.version>
-    <maven.assembly.plugin.version>3.6.0</maven.assembly.plugin.version>
-    <maven.compiler.plugin.version>3.11.0</maven.compiler.plugin.version>
+
+    <maven.version>3.6.3</maven.version>
+
+    <shade.plugin.version>3.4.1</shade.plugin.version>
+    <assembly.plugin.version>3.6.0</assembly.plugin.version>
+    <compiler.plugin.version>3.11.0</compiler.plugin.version>
     <spotless.version>2.37.0</spotless.version>
     <junit.version>5.9.3</junit.version>
     <surefire.version>3.1.2</surefire.version>
-    <error-prone.version>2.18.0</error-prone.version>
     <gemnasium.version>0.5.1</gemnasium.version>
     <pmd.version>3.20.0</pmd.version>
     <jacoco.version>0.8.10</jacoco.version>
@@ -403,12 +405,21 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-assembly-plugin</artifactId>
-        <version>${maven.assembly.plugin.version}</version>
+        <version>${assembly.plugin.version}</version>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-shade-plugin</artifactId>
-        <version>${maven.shade.plugin.version}</version>
+        <version>${shade.plugin.version}</version>
+        <executions>
+          <execution>
+            <id>package-shade</id>
+            <phase>package</phase>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+          </execution>
+        </executions>
         <configuration>
           <minimizeJar>true</minimizeJar>
           <transformers>
@@ -466,10 +477,10 @@
         <configuration>
           <rules>
             <requireMavenVersion>
-              <version>3.0.0</version>
+              <version>${maven.version}</version>
             </requireMavenVersion>
             <requireJavaVersion>
-              <version>11</version>
+              <version>${maven.compiler.target}</version>
             </requireJavaVersion>
           </rules>
         </configuration>
@@ -580,27 +591,96 @@
 
   <profiles>
     <profile>
-      <id>default</id>
-      <activation>
-        <activeByDefault>true</activeByDefault>
-        <property>
-          <name>e2e</name>
-          <value>false</value>
-        </property>
-      </activation>
+      <id>no-checks</id>
+      <properties>
+        <skipTests>true</skipTests>
+      </properties>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>com.diffplug.spotless</groupId>
+            <artifactId>spotless-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>spotless-check</id>
+                <phase>none</phase>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-pmd-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>pmd-check</id>
+                <phase>none</phase>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.jacoco</groupId>
+            <artifactId>jacoco-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>prepare-jacoco-test</id>
+                <phase>none</phase>
+              </execution>
+              <execution>
+                <id>prepare-jacoco-integration-test</id>
+                <phase>none</phase>
+              </execution>
+              <execution>
+                <id>merge-jacoco</id>
+                <phase>none</phase>
+              </execution>
+              <execution>
+                <id>check-jacoco</id>
+                <phase>none</phase>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-checkstyle-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>checkstyle-verify</id>
+                <phase>none</phase>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>end-to-end</id>
       <build>
         <plugins>
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <excludes>
+                <exclude>**/*Test.java</exclude>
+              </excludes>
+            </configuration>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-compiler-plugin</artifactId>
+            <configuration>
+              <testExcludes>
+                <exclude>**/*Test.java</exclude>
+              </testExcludes>
+            </configuration>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-shade-plugin</artifactId>
-            <version>${maven.shade.plugin.version}</version>
             <executions>
               <execution>
                 <id>package-shade</id>
-                <phase>package</phase>
-                <goals>
-                  <goal>shade</goal>
-                </goals>
+                <phase>none</phase>
               </execution>
             </executions>
           </plugin>
