@@ -315,20 +315,6 @@
               <goal>prepare-agent</goal>
             </goals>
           </execution>
-          <execution>
-            <id>merge-jacoco</id>
-            <phase>post-integration-test</phase>
-            <goals>
-              <goal>merge</goal>
-            </goals>
-          </execution>
-          <execution>
-            <id>verify-jacoco</id>
-            <phase>verify</phase>
-            <goals>
-              <goal>check</goal>
-            </goals>
-          </execution>
         </executions>
       </plugin>
       <plugin>

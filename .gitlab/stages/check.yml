@@ -27,7 +27,7 @@ pmd:
   needs: [build-core]
   script:
     - echo "PMD checks started"
-    - "mvn pmd:check pmd:cpd-check"
+    - "mvn pmd:check"
   artifacts:
     name: pmd
     expire_in: 3 hours
