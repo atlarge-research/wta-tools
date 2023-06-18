@@ -162,12 +162,15 @@
         </dependencies>
         <executions>
           <execution>
-            <phase>generate-sources</phase>
+            <id>delombok-sources</id>
+            <phase>none</phase>
             <goals>
               <goal>delombok</goal>
             </goals>
             <configuration>
               <addOutputDirectory>false</addOutputDirectory>
+              <encoding>UTF-8</encoding>
+              <outputDirectory>${project.build.directory}/delombok</outputDirectory>
               <sourceDirectory>src/main/java</sourceDirectory>
             </configuration>
           </execution>
@@ -297,6 +300,21 @@
               <goal>enforce</goal>
             </goals>
           </execution>
+          <execution>
+            <id>enforcer-site</id>
+            <phase>pre-site</phase>
+            <goals>
+              <goal>enforce</goal>
+            </goals>
+            <configuration>
+              <rules>
+                <requireActiveProfile>
+                  <profiles>site</profiles>
+                </requireActiveProfile>
+              </rules>
+              <fail>true</fail>
+            </configuration>
+          </execution>
         </executions>
       </plugin>
       <!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-failsafe-plugin -->
@@ -413,7 +431,7 @@
             <goals>
               <goal>timestamp-property</goal>
             </goals>
-            <phase>validate</phase>
+            <phase>none</phase>
             <configuration>
               <timeZone>UTC</timeZone>
               <name>currentYear</name>
@@ -461,21 +479,21 @@
         </configuration>
         <executions>
           <execution>
-            <id>prepare-jacoco-test</id>
+            <id>jacoco-prepare-test</id>
             <phase>initialize</phase>
             <goals>
               <goal>prepare-agent</goal>
             </goals>
           </execution>
           <execution>
-            <id>prepare-jacoco-integration-test</id>
+            <id>jacoco-prepare-integration-test</id>
             <phase>pre-integration-test</phase>
             <goals>
               <goal>prepare-agent-integration</goal>
             </goals>
           </execution>
           <execution>
-            <id>merge-jacoco</id>
+            <id>jacoco-merge</id>
             <phase>post-integration-test</phase>
             <goals>
               <goal>merge</goal>
@@ -485,7 +503,7 @@
             </configuration>
           </execution>
           <execution>
-            <id>check-jacoco</id>
+            <id>jacoco-check</id>
             <phase>verify</phase>
             <goals>
               <goal>check</goal>
@@ -599,7 +617,7 @@
         <configuration>
           <show>private</show>
           <doclint>none</doclint>
-          <sourcepath>target/generated-sources/delombok</sourcepath>
+          <sourcepath>${project.build.directory}/delombok</sourcepath>
         </configuration>
       </plugin>
       <!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-jxr-plugin -->
@@ -613,6 +631,9 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-pmd-plugin</artifactId>
         <version>${pmd.version}</version>
+        <configuration>
+          <failOnViolation>false</failOnViolation>
+        </configuration>
       </plugin>
       <!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-project-info-reports-plugin -->
       <plugin>
@@ -670,6 +691,9 @@
         <groupId>org.jacoco</groupId>
         <artifactId>jacoco-maven-plugin</artifactId>
         <version>${jacoco.version}</version>
+        <configuration>
+          <includeCurrentProject>true</includeCurrentProject>
+        </configuration>
       </plugin>
     </plugins>
   </reporting>
@@ -718,19 +742,19 @@
             <artifactId>jacoco-maven-plugin</artifactId>
             <executions>
               <execution>
-                <id>prepare-jacoco-test</id>
+                <id>jacoco-prepare-test</id>
                 <phase>none</phase>
               </execution>
               <execution>
-                <id>prepare-jacoco-integration-test</id>
+                <id>jacoco-prepare-integration-test</id>
                 <phase>none</phase>
               </execution>
               <execution>
-                <id>merge-jacoco</id>
+                <id>jacoco-merge</id>
                 <phase>none</phase>
               </execution>
               <execution>
-                <id>check-jacoco</id>
+                <id>jacoco-check</id>
                 <phase>none</phase>
               </execution>
             </executions>
@@ -781,7 +805,7 @@
             <artifactId>jacoco-maven-plugin</artifactId>
             <executions>
               <execution>
-                <id>check-jacoco</id>
+                <id>jacoco-check</id>
                 <phase>none</phase>
               </execution>
             </executions>
@@ -823,6 +847,84 @@
                 <exclude>**/*Test.java</exclude>
               </excludes>
             </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>site</id>
+      <build>
+        <plugins>
+          <!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-enforcer-plugin -->
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-enforcer-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>enforce-site-plus-no-checks</id>
+                <phase>pre-site</phase>
+                <goals>
+                  <goal>enforce</goal>
+                </goals>
+                <configuration>
+                  <rules>
+                    <requireActiveProfile>
+                      <profiles>no-checks</profiles>
+                    </requireActiveProfile>
+                  </rules>
+                  <fail>true</fail>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+          <!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-failsafe-plugin -->
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-failsafe-plugin</artifactId>
+            <configuration>
+              <testFailureIgnore>true</testFailureIgnore>
+            </configuration>
+          </plugin>
+          <!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-surefire-plugin -->
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <testFailureIgnore>true</testFailureIgnore>
+            </configuration>
+          </plugin>
+          <!-- https://mvnrepository.com/artifact/org.codehaus.mojo/build-helper-maven-plugin -->
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>build-helper-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>current-year</id>
+                <phase>validate</phase>
+              </execution>
+            </executions>
+          </plugin>
+          <!-- https://mvnrepository.com/artifact/org.pitest/pitest-maven -->
+          <plugin>
+            <groupId>org.pitest</groupId>
+            <artifactId>pitest-maven</artifactId>
+            <executions>
+              <execution>
+                <id>pitest-mutation-coverage</id>
+                <phase>none</phase>
+              </execution>
+            </executions>
+          </plugin>
+          <!-- https://mvnrepository.com/artifact/org.projectlombok/lombok-maven-plugin -->
+          <plugin>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>delombok-sources</id>
+                <phase>generate-sources</phase>
+              </execution>
+            </executions>
           </plugin>
         </plugins>
       </build>

@@ -107,12 +107,19 @@ Additional modules can be found in the submodules directory. Currently, they inc
 To run the linters and other verification goals on the code, you need to run `mvn clean verify`.
 In order to generate the site, you need to run `mvn site`. If you want the site to contain information
 on testing, such as code coverage, you need to have JaCoCo reports present on your machine. A simple way
-to ensure that this works is by running `mvn clean verify site`. The site will be located in the `target/site`
-directory in every module by default.
+to ensure that this works is by running `mvn clean verify site -Psite,no-checks`. The site will be located
+in the `target/site` directory in every module by default.
 
-By default, the `mvn site` phase will generate separate sites for all the modules. To compile all the sites,
-you need to run `mvn site:stage` after running the site phase. This will compile all the sites in the
-`target/staging` directory in the top level project.
+It is also possible to run `mvn site -Psite,no-checks` without running the `mvn verify` phase. This will, however,
+make the site less informative as there would be no information on tests run or code coverage from these tests.
+It is also important to note that the activation of the `site` and `no-checks` profiles is enforced when running the
+`mvn site` goal.
+
+By default, the `mvn site` phase will generate separate sites for all the modules. To compile all the sites
+into one, you need to run `mvn site:stage` after running the site phase. This will compile all the sites in the
+`target/staging` directory in the top level project. You can put this all together into one big command, to generate
+the final site. This final site can be generated in one go by running the
+`mvn clean verify site site:stage -Psite,no-checks` command.
 
 
 ## Authors and Acknowledgement

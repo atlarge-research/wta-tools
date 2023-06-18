@@ -14,6 +14,8 @@
   <artifactId>hdfs-connector</artifactId>
   <packaging>jar</packaging>
 
+  <description>HDFS connector for WTA generators to output files directly to HDFS.</description>
+
   <properties>
     <hadoop.version>3.3.5</hadoop.version>
   </properties>
