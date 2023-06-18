@@ -283,7 +283,7 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
    * @since 1.0.0
    */
   private double computeMax(Stream<Double> data) {
-    return data.filter(x -> x >= 0.0).reduce(Double::max).orElse(-1.0);
+    return data.reduce(Double::max).orElse(-1.0);
   }
 
   /**
