@@ -270,15 +270,15 @@ public class JobLevelListener extends AbstractListener<Workflow> {
       Node node = new Node(stage);
       nodes.put(stage.getId() + 2, node);
 
-      /*
+
       TaskLevelListener listener = (TaskLevelListener) taskListener;
       long runtime = 0L;
       List<Task> tasks = listener.getStageToTasks().get((int)stage.getId());
       if (tasks != null) {
       runtime = tasks.stream().map(Task::getRuntime).reduce(Long::max).orElse(0L);
       }
-       */
-      long runtime = stage.getRuntime();
+
+      //long runtime = stage.getRuntime();
       if (stage.getParents().length > 0
           && stages.stream()
               .map(Task::getId)
