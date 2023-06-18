@@ -38,7 +38,8 @@ class JobLevelListenerIntegrationTest extends BaseSparkJobIntegrationTest {
     sut1.registerJobListener();
     invokeJob();
     invokeJob();
-    assertThat(sut1.getJobLevelListener().getProcessedObjects()).hasSizeGreaterThan(0)
+    assertThat(sut1.getJobLevelListener().getProcessedObjects())
+        .hasSizeGreaterThan(0)
         .allMatch(wf -> wf.getTasks().length == 0);
   }
 
@@ -72,16 +73,19 @@ class JobLevelListenerIntegrationTest extends BaseSparkJobIntegrationTest {
     sut1.registerJobListener();
     invokeJob();
     invokeJob();
-    assertThat(((TaskLevelListener)sut1.getJobLevelListener().getWtaTaskListener()).getStageToTasks()).isEmpty();
-    assertThat(((TaskLevelListener)sut1.getJobLevelListener().getWtaTaskListener()).getTaskToStage()).isEmpty();
+    assertThat(((TaskLevelListener) sut1.getJobLevelListener().getWtaTaskListener()).getStageToTasks())
+        .isEmpty();
+    assertThat(((TaskLevelListener) sut1.getJobLevelListener().getWtaTaskListener()).getTaskToStage())
+        .isEmpty();
     assertThat(sut1.getStageLevelListener().getStageToJob()).isEmpty();
     assertThat(sut1.getStageLevelListener().getStageToParents()).isEmpty();
-    assertThat(sut1.getStageLevelListener().getParentStageToChildrenStages()).isEmpty();
+    assertThat(sut1.getStageLevelListener().getParentStageToChildrenStages())
+        .isEmpty();
     assertThat(sut1.getStageLevelListener().getStageToResource()).isEmpty();
     assertThat(sut1.getTaskLevelListener().getProcessedObjects()).hasSizeGreaterThanOrEqualTo(1);
     assertThat(sut1.getTaskLevelListener().getProcessedObjects().get(0).getWorkflowId())
-            .isInstanceOf(Long.class)
-            .isNotNull();
+        .isInstanceOf(Long.class)
+        .isNotNull();
   }
 
   @Test
@@ -92,11 +96,12 @@ class JobLevelListenerIntegrationTest extends BaseSparkJobIntegrationTest {
     invokeJob();
     assertThat(sut2.getStageLevelListener().getStageToJob()).isEmpty();
     assertThat(sut2.getStageLevelListener().getStageToParents()).isEmpty();
-    assertThat(sut2.getStageLevelListener().getParentStageToChildrenStages()).isEmpty();
+    assertThat(sut2.getStageLevelListener().getParentStageToChildrenStages())
+        .isEmpty();
     assertThat(sut2.getStageLevelListener().getStageToResource()).isEmpty();
     assertThat(sut2.getStageLevelListener().getProcessedObjects()).hasSizeGreaterThanOrEqualTo(1);
     assertThat(sut2.getStageLevelListener().getProcessedObjects().get(0).getWorkflowId())
-            .isInstanceOf(Long.class)
-            .isNotNull();
+        .isInstanceOf(Long.class)
+        .isNotNull();
   }
 }
