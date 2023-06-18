@@ -17,6 +17,7 @@ class JobLevelListenerIntegrationTest extends BaseSparkJobIntegrationTest {
     sut1.registerJobListener();
     invokeJob();
     invokeJob();
+    stopJob();
     assertThat(sut1.getJobLevelListener().getJobSubmitTimes()).isEmpty();
     assertThat(sut1.getJobLevelListener().getCriticalPathTasks()).isEmpty();
 
@@ -38,6 +39,7 @@ class JobLevelListenerIntegrationTest extends BaseSparkJobIntegrationTest {
     sut1.registerJobListener();
     invokeJob();
     invokeJob();
+    stopJob();
     assertThat(sut1.getJobLevelListener().getProcessedObjects())
         .hasSizeGreaterThan(0)
         .allMatch(wf -> wf.getTasks().length == 0);
@@ -50,6 +52,7 @@ class JobLevelListenerIntegrationTest extends BaseSparkJobIntegrationTest {
     sut1.registerJobListener();
     invokeJob();
     invokeJob();
+    stopJob();
     assertThat(sut1.getTaskLevelListener().getProcessedObjects()).hasSizeGreaterThan(0);
     assertThat(sut1.getStageLevelListener().getProcessedObjects()).hasSizeGreaterThan(0);
     assertThat(sut1.getJobLevelListener().getProcessedObjects()).hasSizeGreaterThan(0);
@@ -61,6 +64,7 @@ class JobLevelListenerIntegrationTest extends BaseSparkJobIntegrationTest {
     sut2.registerJobListener();
     invokeJob();
     invokeJob();
+    stopJob();
     assertThat(sut2.getTaskLevelListener().getProcessedObjects()).hasSize(0);
     assertThat(sut2.getStageLevelListener().getProcessedObjects()).hasSizeGreaterThan(0);
     assertThat(sut2.getJobLevelListener().getProcessedObjects()).hasSizeGreaterThan(0);
@@ -73,6 +77,7 @@ class JobLevelListenerIntegrationTest extends BaseSparkJobIntegrationTest {
     sut1.registerJobListener();
     invokeJob();
     invokeJob();
+    stopJob();
     assertThat(((TaskLevelListener) sut1.getJobLevelListener().getWtaTaskListener()).getStageToTasks())
         .isEmpty();
     assertThat(((TaskLevelListener) sut1.getJobLevelListener().getWtaTaskListener()).getTaskToStage())
@@ -94,6 +99,7 @@ class JobLevelListenerIntegrationTest extends BaseSparkJobIntegrationTest {
     sut2.registerJobListener();
     invokeJob();
     invokeJob();
+    stopJob();
     assertThat(sut2.getStageLevelListener().getStageToJob()).isEmpty();
     assertThat(sut2.getStageLevelListener().getStageToParents()).isEmpty();
     assertThat(sut2.getStageLevelListener().getParentStageToChildrenStages())
