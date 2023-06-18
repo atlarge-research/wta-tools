@@ -170,11 +170,11 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
   @SuppressWarnings("CyclomaticComplexity")
   private void setResourceStatisticsFields(
       List<Task> tasks, Function<Task, Double> function, ResourceType resourceType, WorkloadBuilder builder) {
-    List<Double> positiveList =
-        tasks.stream().map(function).filter(x -> x >= 0.0).collect(Collectors.toList());
-    final double meanField = computeMean(tasks.stream().map(function), positiveList.size());
+    List<Double> sortedPositiveList =
+        tasks.stream().map(function).filter(x -> x >= 0.0).sorted().collect(Collectors.toList());
+    final double meanField = computeMean(tasks.stream().map(function), sortedPositiveList.size());
     final double stdField =
-        computeStd(tasks.stream().map(function).filter(x -> x >= 0.0), meanField, positiveList.size());
+        computeStd(tasks.stream().map(function).filter(x -> x >= 0.0), meanField, sortedPositiveList.size());
 
     switch (resourceType) {
       case RESOURCE:
@@ -183,9 +183,11 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
             .meanResourceTask(meanField)
             .stdResourceTask(stdField)
             .covResourceTask(computeCov(meanField, stdField))
-            .medianResourceTask(positiveList.isEmpty() ? -1.0 : computeMedian(positiveList))
-            .firstQuartileResourceTask(positiveList.isEmpty() ? -1.0 : computeFirstQuantile(positiveList))
-            .thirdQuartileResourceTask(positiveList.isEmpty() ? -1.0 : computeThirdQuantile(positiveList));
+            .medianResourceTask(sortedPositiveList.isEmpty() ? -1.0 : computeMedian(sortedPositiveList))
+            .firstQuartileResourceTask(
+                sortedPositiveList.isEmpty() ? -1.0 : computeFirstQuantile(sortedPositiveList))
+            .thirdQuartileResourceTask(
+                sortedPositiveList.isEmpty() ? -1.0 : computeThirdQuantile(sortedPositiveList));
         break;
       case MEMORY:
         builder.minMemory(computeMin(tasks.stream().map(function)))
@@ -193,9 +195,11 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
             .meanMemory(meanField)
             .stdMemory(stdField)
             .covMemory(computeCov(meanField, stdField))
-            .medianMemory(positiveList.isEmpty() ? -1.0 : computeMedian(positiveList))
-            .firstQuartileMemory(positiveList.isEmpty() ? -1.0 : computeFirstQuantile(positiveList))
-            .thirdQuartileMemory(positiveList.isEmpty() ? -1.0 : computeThirdQuantile(positiveList));
+            .medianMemory(sortedPositiveList.isEmpty() ? -1.0 : computeMedian(sortedPositiveList))
+            .firstQuartileMemory(
+                sortedPositiveList.isEmpty() ? -1.0 : computeFirstQuantile(sortedPositiveList))
+            .thirdQuartileMemory(
+                sortedPositiveList.isEmpty() ? -1.0 : computeThirdQuantile(sortedPositiveList));
         break;
       case NETWORK:
         builder.minNetworkUsage((long) computeMin(tasks.stream().map(function)))
@@ -203,11 +207,12 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
             .meanNetworkUsage(meanField)
             .stdNetworkUsage(stdField)
             .covNetworkUsage(computeCov(meanField, stdField))
-            .medianNetworkUsage(positiveList.isEmpty() ? -1L : (long) computeMedian(positiveList))
+            .medianNetworkUsage(
+                sortedPositiveList.isEmpty() ? -1L : (long) computeMedian(sortedPositiveList))
             .firstQuartileNetworkUsage(
-                positiveList.isEmpty() ? -1L : (long) computeFirstQuantile(positiveList))
+                sortedPositiveList.isEmpty() ? -1L : (long) computeFirstQuantile(sortedPositiveList))
             .thirdQuartileNetworkUsage(
-                positiveList.isEmpty() ? -1L : (long) computeThirdQuantile(positiveList));
+                sortedPositiveList.isEmpty() ? -1L : (long) computeThirdQuantile(sortedPositiveList));
         break;
       case DISK:
         builder.minDiskSpaceUsage(computeMin(tasks.stream().map(function)))
@@ -215,10 +220,11 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
             .meanDiskSpaceUsage(meanField)
             .stdDiskSpaceUsage(stdField)
             .covDiskSpaceUsage(computeCov(meanField, stdField))
-            .medianDiskSpaceUsage(positiveList.isEmpty() ? -1.0 : computeMedian(positiveList))
-            .firstQuartileDiskSpaceUsage(positiveList.isEmpty() ? -1.0 : computeFirstQuantile(positiveList))
+            .medianDiskSpaceUsage(sortedPositiveList.isEmpty() ? -1.0 : computeMedian(sortedPositiveList))
+            .firstQuartileDiskSpaceUsage(
+                sortedPositiveList.isEmpty() ? -1.0 : computeFirstQuantile(sortedPositiveList))
             .thirdQuartileDiskSpaceUsage(
-                positiveList.isEmpty() ? -1.0 : computeThirdQuantile(positiveList));
+                sortedPositiveList.isEmpty() ? -1.0 : computeThirdQuantile(sortedPositiveList));
         break;
       case ENERGY:
         builder.minEnergy(computeMin(tasks.stream().map(function)))
@@ -226,9 +232,11 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
             .meanEnergy(meanField)
             .stdEnergy(stdField)
             .covEnergy(computeCov(meanField, stdField))
-            .medianEnergy(positiveList.isEmpty() ? -1.0 : computeMedian(positiveList))
-            .firstQuartileEnergy(positiveList.isEmpty() ? -1.0 : computeFirstQuantile(positiveList))
-            .thirdQuartileEnergy(positiveList.isEmpty() ? -1.0 : computeThirdQuantile(positiveList));
+            .medianEnergy(sortedPositiveList.isEmpty() ? -1.0 : computeMedian(sortedPositiveList))
+            .firstQuartileEnergy(
+                sortedPositiveList.isEmpty() ? -1.0 : computeFirstQuantile(sortedPositiveList))
+            .thirdQuartileEnergy(
+                sortedPositiveList.isEmpty() ? -1.0 : computeThirdQuantile(sortedPositiveList));
     }
   }
 
@@ -346,7 +354,7 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
   }
 
   /**
-   * Median value for data stream. Assumes that data is not empty.
+   * Median value for data stream. Assumes that data is not empty, sorted, and positive elements only.
    *
    * @param data            stream of data
    * return                 median value of the data
@@ -359,7 +367,7 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
   }
 
   /**
-   * First quantile value for data stream. Assumes that data is not empty.
+   * First quantile value for data stream. Assumes that data is not empty, sorted, and positive elements only.
    *
    * @param data            stream of data
    * return                 first quantile value of the data
@@ -372,7 +380,7 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
   }
 
   /**
-   * Third quantile value for data stream. Assumes that data is not empty.
+   * Third quantile value for data stream. Assumes that data is not empty, sorted, and positive elements only.
    *
    * @param data            stream of data
    * return                 third quantile value of the data
