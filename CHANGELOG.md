@@ -57,6 +57,8 @@ For the most part, since we are pre-release this will serve no real purpose, oth
 - Enhanced documentation relating to Spark [@hpage](https://gitlab.ewi.tudelft.nl/hpage)
 - Added Spark aggregations [@tqu](https://gitlab.ewi.tudelft.nl/tqu)
 - Set up SPI for the connector output file implementations [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
+- Added coherent Maven lifecycle bindings [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
+- Added Maven site generation [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 
 ### Changed
 - Refactored listeners into a generic interface to reduce code duplication and increase cc [@hpage](https://gitlab.ewi.tudelft.nl/hpage)

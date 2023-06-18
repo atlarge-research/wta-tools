@@ -116,7 +116,7 @@ mutation-tests-core:
     - build-core
   script:
     - echo "Core mutation tests core started"
-    - "mvn -pl core $PITEST_OPTS pitest:mutationCoverage"
+    - "mvn -pl core pitest:mutationCoverage"
     - "cat core/reports/pitest/index.html | awk -F '</?td>' 'FNR == 25 { print $2 }' || echo '0%'"
   coverage: /([0-9]{1,3})%/
   artifacts:

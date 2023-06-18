@@ -485,14 +485,12 @@
             <param>com.asml.apa.wta.spark.MultithreadTest</param>
           </excludedTestClasses>
           <mutationThreshold>60</mutationThreshold>
+          <withHistory>true</withHistory>
         </configuration>
         <executions>
           <execution>
             <id>pitest-mutation-coverage</id>
             <phase>integration-test</phase>
-            <configuration>
-              <withHistory>true</withHistory>
-            </configuration>
             <goals>
               <goal>mutationCoverage</goal>
             </goals>
@@ -616,6 +614,17 @@
       <id>no-tests</id>
       <build>
         <plugins>
+          <!-- https://mvnrepository.com/artifact/org.pitest/pitest-maven -->
+          <plugin>
+            <groupId>org.pitest</groupId>
+            <artifactId>pitest-maven</artifactId>
+            <executions>
+              <execution>
+                <id>pitest-mutation-coverage</id>
+                <phase>none</phase>
+              </execution>
+            </executions>
+          </plugin>
           <!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-surefire-plugin -->
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
@@ -634,6 +643,29 @@
             <executions>
               <execution>
                 <id>integration-test</id>
+                <phase>none</phase>
+              </execution>
+            </executions>
+          </plugin>
+          <!-- https://mvnrepository.com/artifact/org.jacoco/jacoco-maven-plugin -->
+          <plugin>
+            <groupId>org.jacoco</groupId>
+            <artifactId>jacoco-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>prepare-jacoco-test</id>
+                <phase>none</phase>
+              </execution>
+              <execution>
+                <id>prepare-jacoco-integration-test</id>
+                <phase>none</phase>
+              </execution>
+              <execution>
+                <id>merge-jacoco</id>
+                <phase>none</phase>
+              </execution>
+              <execution>
+                <id>check-jacoco</id>
                 <phase>none</phase>
               </execution>
             </executions>
@@ -683,18 +715,6 @@
             <groupId>org.jacoco</groupId>
             <artifactId>jacoco-maven-plugin</artifactId>
             <executions>
-              <execution>
-                <id>prepare-jacoco-test</id>
-                <phase>none</phase>
-              </execution>
-              <execution>
-                <id>prepare-jacoco-integration-test</id>
-                <phase>none</phase>
-              </execution>
-              <execution>
-                <id>merge-jacoco</id>
-                <phase>none</phase>
-              </execution>
               <execution>
                 <id>check-jacoco</id>
                 <phase>none</phase>
