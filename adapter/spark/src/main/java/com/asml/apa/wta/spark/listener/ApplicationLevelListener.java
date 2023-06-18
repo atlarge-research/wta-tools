@@ -82,6 +82,14 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
     this.jobLevelListener = jobLevelListener;
   }
 
+  /**
+   * Setters for the general fields of the Workload.
+   *
+   * @param dateEnd     End date of the application
+   * @param builder     WorkloadBuilder to be used to build the Workload
+   * @author Pil Kyu Cho
+   * @since 1.0.0
+   */
   private void setGeneralFields(long dateEnd, WorkloadBuilder builder) {
     final Domain domain = config.getDomain();
     final long dateStart = sparkContext.startTime();
@@ -94,6 +102,14 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
             .dateEnd(dateEnd);
   }
 
+  /**
+   * Setters for the count fields of the Workload.
+   *
+   * @param tasks       List of WTA Task objects
+   * @param builder     WorkloadBuilder to be used to build the Workload
+   * @author Pil Kyu Cho
+   * @since 1.0.0
+   */
   private void setCountFields(List<Task> tasks, WorkloadBuilder builder) {
     final Workflow[] workflows = jobLevelListener.getProcessedObjects().toArray(new Workflow[0]);
     final int totalWorkflows = workflows.length;
@@ -125,6 +141,12 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
             .totalResourceSeconds(totalResourceSeconds);
   }
 
+  /**
+   * Private enum to represent the different types of resources for resource fields.
+   *
+   * @author Pil Kyu Cho
+   * @since 1.0.0
+   */
   private enum ResourceType {
     RESOURCE(),
     MEMORY(),
@@ -136,7 +158,17 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
     }
   }
 
-  private void setResourceFields(
+  /**
+   * Setters for the statistical resource fields of the Workload.
+   *
+   * @param tasks           List of WTA Task objects
+   * @param function        Function to be applied to the tasks to get the resource field
+   * @param resourceType    Type of resource to be set
+   * @param builder         WorkloadBuilder to be used to build the Workload
+   * @author Pil Kyu Cho
+   * @since 1.0.0
+   */
+  private void setResourceStatisticsFields(
         List<Task> tasks,
         Function<Task, Double> function,
         ResourceType resourceType,
@@ -225,12 +257,12 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
    * Callback function that is called right at the end of the application. Further experimentation
    * is needed to determine if applicationEnd is called first or shutdown.
    *
-   * @param applicationEnd The event corresponding to the end of the application
+   * @param applicationEnd    The event corresponding to the end of the application
    * @author Henry Page
    * @author Tianchen Qu
+   * @author Pil Kyu Cho
    * @since 1.0.0
    */
-  @SuppressWarnings({"MethodLength", "CyclomaticComplexity"})
   public void onApplicationEnd(SparkListenerApplicationEnd applicationEnd) {
     // we should never enter this branch, this is a guard since an application only terminates once.
     if (!this.getProcessedObjects().isEmpty()) {
@@ -252,11 +284,11 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
 
     setGeneralFields(applicationEnd.time(), workloadBuilder);
     setCountFields(tasks, workloadBuilder);
-    setResourceFields(tasks, Task::getResourceAmountRequested, ResourceType.RESOURCE, workloadBuilder);
-    setResourceFields(tasks, Task::getMemoryRequested, ResourceType.MEMORY, workloadBuilder);
-    setResourceFields(tasks, networkFunction.andThen(Long::doubleValue), ResourceType.NETWORK, workloadBuilder);
-    setResourceFields(tasks, Task::getDiskSpaceRequested, ResourceType.DISK, workloadBuilder);
-    setResourceFields(tasks, Task::getEnergyConsumption, ResourceType.ENERGY, workloadBuilder);
+    setResourceStatisticsFields(tasks, Task::getResourceAmountRequested, ResourceType.RESOURCE, workloadBuilder);
+    setResourceStatisticsFields(tasks, Task::getMemoryRequested, ResourceType.MEMORY, workloadBuilder);
+    setResourceStatisticsFields(tasks, networkFunction.andThen(Long::doubleValue), ResourceType.NETWORK, workloadBuilder);
+    setResourceStatisticsFields(tasks, Task::getDiskSpaceRequested, ResourceType.DISK, workloadBuilder);
+    setResourceStatisticsFields(tasks, Task::getEnergyConsumption, ResourceType.ENERGY, workloadBuilder);
     this.getProcessedObjects().add(workloadBuilder.build());
   }
 
