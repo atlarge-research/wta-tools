@@ -221,7 +221,8 @@
         <artifactId>maven-checkstyle-plugin</artifactId>
         <version>${checkstyle.version}</version>
         <configuration>
-          <configLocation>/config/checkstyle.xml</configLocation>
+          <configLocation>config/checkstyle.xml</configLocation>
+          <suppressionsLocation>config/checkstyle-suppressions.xml</suppressionsLocation>
           <consoleOutput>false</consoleOutput>
           <failsOnError>true</failsOnError>
           <outputFile>reports/checkstyle/violations.txt</outputFile>
@@ -506,6 +507,33 @@
         </dependencies>
       </plugin>
     </plugins>
+    <pluginManagement>
+      <plugins>
+        <!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-checkstyle-plugin -->
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-checkstyle-plugin</artifactId>
+          <version>${checkstyle.version}</version>
+          <configuration>
+            <configLocation>${project.parent.basedir}/config/checkstyle.xml</configLocation>
+            <suppressionsLocation>${project.parent.basedir}/config/checkstyle-suppressions.xml</suppressionsLocation>
+            <consoleOutput>false</consoleOutput>
+            <failsOnError>true</failsOnError>
+            <outputFile>reports/checkstyle/violations.txt</outputFile>
+            <outputFileFormat>plain</outputFileFormat>
+          </configuration>
+          <executions>
+            <execution>
+              <id>checkstyle-verify</id>
+              <phase>verify</phase>
+              <goals>
+                <goal>check</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+      </plugins>
+    </pluginManagement>
   </build>
 
   <reporting>
@@ -522,7 +550,8 @@
         <artifactId>maven-checkstyle-plugin</artifactId>
         <version>${checkstyle.version}</version>
         <configuration>
-          <configLocation>/config/checkstyle.xml</configLocation>
+          <configLocation>config/checkstyle.xml</configLocation>
+          <suppressionsLocation>config/checkstyle-suppressions.xml</suppressionsLocation>
           <consoleOutput>false</consoleOutput>
           <outputFile>reports/checkstyle/violations.txt</outputFile>
           <outputFileFormat>plain</outputFileFormat>

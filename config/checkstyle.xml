@@ -29,14 +29,14 @@
     <property name="format" value="^\n\n$"/>
     <property name="message" value="Two consecutive blank lines are not permitted."/>
   </module>
-  <module name="SuppressionFilter"> <!-- baseline-gradle: README.md -->
-    <property name="file" value="config/checkstyle-suppressions.xml"/>
-  </module>
-  <module name="SuppressionFilter"> <!-- baseline-gradle: README.md -->
-    <!-- custom-suppressions.xml allows users to specify suppresions that will not be overriden by baselineUpdateConfig -->
-    <property name="file" value="config/custom-suppressions.xml"/>
-    <property name="optional" value="true"/>
-  </module>
+<!--  <module name="SuppressionFilter"> &lt;!&ndash; baseline-gradle: README.md &ndash;&gt;-->
+<!--    <property name="file" value="config/checkstyle-suppressions.xml"/>-->
+<!--  </module>-->
+<!--  <module name="SuppressionFilter"> &lt;!&ndash; baseline-gradle: README.md &ndash;&gt;-->
+<!--    &lt;!&ndash; custom-suppressions.xml allows users to specify suppresions that will not be overriden by baselineUpdateConfig &ndash;&gt;-->
+<!--    <property name="file" value="config/custom-suppressions.xml"/>-->
+<!--    <property name="optional" value="true"/>-->
+<!--  </module>-->
   <module name="SuppressWarningsFilter"/> <!-- baseline-gradle: README.md -->
   <module name="BeforeExecutionExclusionFileFilter">
     <property name="fileNamePattern" value="module\-info\.java$"/>
