@@ -50,7 +50,7 @@ build-hadoop-connector:
     - build-core
   script:
     - echo "Build Hadoop connector started"
-    - "mvn -pl connector/hadoop process-test-classes"
+    - "mvn -pl connector/hdfs process-test-classes"
   artifacts:
     name: build-hadoop-connector
     expire_in: 20 minutes
@@ -65,6 +65,7 @@ build-hadoop-connector:
           - core/pom.xml
       paths:
         - .m2/repository
+
 
 package-spark-adapter-e2e_2.12:
   stage: build

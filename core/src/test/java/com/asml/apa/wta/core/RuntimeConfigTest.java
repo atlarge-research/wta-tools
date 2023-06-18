@@ -14,7 +14,6 @@ class RuntimeConfigTest {
     assertThat(cr.getDomain()).isNull();
     assertThat(cr.isStageLevel()).isFalse();
     assertThat(cr.getDescription()).isEqualTo("");
-    assertThat(cr.getLogLevel()).isEqualTo("ERROR");
     assertThat(cr.getResourcePingInterval()).isEqualTo(500);
     assertThat(cr.getExecutorSynchronizationInterval()).isEqualTo(-1);
     assertThat(cr.getOutputPath()).isNull();

@@ -43,6 +43,7 @@
     <jxr.version>3.3.0</jxr.version>
     <lombok.version>1.18.28</lombok.version>
     <mockito.version>5.3.1</mockito.version>
+    <parquet.version>1.12.2</parquet.version>
     <pitest.junit.version>1.2.0</pitest.junit.version>
     <pitest.version>1.14.1</pitest.version>
     <pmd.version>3.20.0</pmd.version>
@@ -66,7 +67,7 @@
   <modules>
     <module>core</module>
     <module>adapter/spark</module>
-    <module>connector/hadoop</module>
+    <module>connector/hdfs</module>
   </modules>
 
   <distributionManagement>

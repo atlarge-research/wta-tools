@@ -18,9 +18,13 @@ public class BaseSparkJobIntegrationTest {
 
   protected SparkDataSource sut;
 
-  protected JavaRDD<String> textFile;
+  protected SparkDataSource sut2;
+
+  protected JavaRDD<String> testFile;
 
   RuntimeConfig fakeConfig;
+
+  RuntimeConfig fakeConfig2;
 
   MetricStreamingEngine fakeMetricStreamingEngine;
 
@@ -28,15 +32,22 @@ public class BaseSparkJobIntegrationTest {
   void setupBaseIntegrationTest() {
     fakeConfig = RuntimeConfig.builder()
         .authors(new String[] {"Harry Potter"})
+        .isStageLevel(false)
         .domain(Domain.SCIENTIFIC)
         .description("Yer a wizard harry")
-        .logLevel("INFO")
         .isStageLevel(false)
         .resourcePingInterval(500)
         .executorSynchronizationInterval(-100)
         .outputPath("src/test/resources/wta-output")
         .build();
 
+    fakeConfig2 = RuntimeConfig.builder()
+        .authors(new String[] {"Harry Potter"})
+        .isStageLevel(true)
+        .domain(Domain.SCIENTIFIC)
+        .description("Yer a wizard harry")
+        .outputPath("src/test/resources/WTA")
+        .build();
     SparkConf conf = new SparkConf()
         .setAppName("SparkTestRunner")
         .setMaster("local")
@@ -48,8 +59,9 @@ public class BaseSparkJobIntegrationTest {
     fakeMetricStreamingEngine = new MetricStreamingEngine();
 
     sut = new SparkDataSource(spark.sparkContext(), fakeConfig);
+    sut2 = new SparkDataSource(spark.sparkContext(), fakeConfig2);
     String resourcePath = "src/test/resources/wordcount.txt";
-    textFile = JavaSparkContext.fromSparkContext(spark.sparkContext()).textFile(resourcePath);
+    testFile = JavaSparkContext.fromSparkContext(spark.sparkContext()).textFile(resourcePath);
   }
 
   /**
@@ -63,7 +75,7 @@ public class BaseSparkJobIntegrationTest {
    * Method to invoke the Spark operation. Important to invoke collect() to store the metrics.
    */
   protected void invokeJob() {
-    textFile.flatMap(s -> Arrays.asList(s.split(" ")).iterator())
+    testFile.flatMap(s -> Arrays.asList(s.split(" ")).iterator())
         .mapToPair(word -> new Tuple2<>(word, 1))
         .reduceByKey(Integer::sum)
         .collect();

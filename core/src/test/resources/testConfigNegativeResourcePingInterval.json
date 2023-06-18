@@ -2,7 +2,6 @@
   "authors": ["Test Name"],
   "domain": "Scientific",
   "description": "Test Description",
-  "logLevel": "INFO",
   "outputPath": "/home/user/WTA",
   "isStageLevel": "true",
   "resourcePingInterval": 0,

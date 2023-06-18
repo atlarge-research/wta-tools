@@ -11,12 +11,11 @@
     <relativePath>../../pom.xml</relativePath>
   </parent>
 
-  <artifactId>hadoop-connector</artifactId>
+  <artifactId>hdfs-connector</artifactId>
   <packaging>jar</packaging>
 
   <properties>
     <hadoop.version>3.3.5</hadoop.version>
-    <parquet.version>1.12.2</parquet.version>
   </properties>
 
   <dependencies>
@@ -25,12 +24,14 @@
       <groupId>org.apache.hadoop</groupId>
       <artifactId>hadoop-client-api</artifactId>
       <version>${hadoop.version}</version>
+      <scope>provided</scope>
     </dependency>
     <!-- https://mvnrepository.com/artifact/org.apache.hadoop/hadoop-client-runtime -->
     <dependency>
       <groupId>org.apache.hadoop</groupId>
       <artifactId>hadoop-client-runtime</artifactId>
       <version>${hadoop.version}</version>
+      <scope>provided</scope>
     </dependency>
     <!-- https://mvnrepository.com/artifact/org.apache.parquet/parquet-hadoop -->
     <dependency>
@@ -44,11 +45,19 @@
       <artifactId>parquet-common</artifactId>
       <version>${parquet.version}</version>
     </dependency>
+    <!--  https://mvnrepository.com/artifact/org.apache.hadoop/hadoop-minicluster  -->
+    <dependency>
+      <groupId>org.apache.hadoop</groupId>
+      <artifactId>hadoop-minicluster</artifactId>
+      <version>${hadoop.version}</version>
+      <scope>test</scope>
+    </dependency>
     <!-- internal dependency -->
     <dependency>
       <groupId>com.asml.apa.wta</groupId>
       <artifactId>core</artifactId>
       <version>${project.version}</version>
+      <scope>provided</scope>
     </dependency>
   </dependencies>
 </project>

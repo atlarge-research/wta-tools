@@ -29,7 +29,6 @@ class ConfigReaderIntegrationTest {
     assertThat(cr.getResourcePingInterval()).isEqualTo(2000);
     assertThat(cr.getExecutorSynchronizationInterval()).isEqualTo(4000);
     assertThat(cr.isStageLevel()).isEqualTo(true);
-    assertThat(cr.getLogLevel()).isEqualTo("INFO");
     assertThat(cr.getOutputPath()).isEqualTo("/home/user/WTA");
   }
 
@@ -42,7 +41,6 @@ class ConfigReaderIntegrationTest {
     assertThat(cr.getResourcePingInterval()).isEqualTo(500);
     assertThat(cr.getExecutorSynchronizationInterval()).isEqualTo(-1);
     assertThat(cr.isStageLevel()).isEqualTo(true);
-    assertThat(cr.getLogLevel()).isEqualTo("INFO");
     assertThat(cr.getOutputPath()).isEqualTo("/home/user/WTA");
   }
 
@@ -75,7 +73,6 @@ class ConfigReaderIntegrationTest {
     assertThat(cr.getDomain()).isEqualTo(Domain.INDUSTRIAL);
     assertThat(cr.getDescription()).isEqualTo("Test Description");
     assertThat(cr.isStageLevel()).isEqualTo(true);
-    assertThat(cr.getLogLevel()).isEqualTo("ERROR");
     assertThat(cr.getOutputPath()).isEqualTo("/home/user/WTA");
   }
 
@@ -98,6 +95,5 @@ class ConfigReaderIntegrationTest {
     assertThat(cr.getDomain()).isEqualTo(Domain.SCIENTIFIC);
     assertThat(cr.getDescription()).isEqualTo("Test Description");
     assertThat(cr.isStageLevel()).isEqualTo(false);
-    assertThat(cr.getLogLevel()).isEqualTo("INFO");
   }
 }
