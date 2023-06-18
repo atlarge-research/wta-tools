@@ -336,7 +336,7 @@ public class JobLevelListener extends AbstractListener<Workflow> {
      * @author Tianchen Qu
      * @since 1.0.0
      */
-    void addNode(Task stage) {
+    private void addNode(Task stage) {
       Node node = new Node(stage);
       nodes.put(stage.getId() + 1, node);
 
@@ -363,7 +363,7 @@ public class JobLevelListener extends AbstractListener<Workflow> {
      * @author Tianchen Qu
      * @since 1.0.0
      */
-    void addNode(Long id) {
+    private void addNode(Long id) {
       Node node = new Node(id);
       nodes.put(id, node);
       // if the node is the ending node
@@ -445,7 +445,7 @@ public class JobLevelListener extends AbstractListener<Workflow> {
      * @author Tianchen Qu
      * @since 1.0.0
      */
-    List<Task> longestPath() {
+    public List<Task> longestPath() {
       topologicalSort();
       while (!stack.isEmpty()) {
         Node node = nodes.get(stack.pop());
