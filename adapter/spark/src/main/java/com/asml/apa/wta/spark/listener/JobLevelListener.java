@@ -439,8 +439,8 @@ public class JobLevelListener extends AbstractListener<Workflow> {
     }
 
     /**
-     * This method returns the longest path on the DAG.
-     * 
+     * This method returns the longest path on the DAG graph.
+     *
      * @return longest path
      * @author Tianchen Qu
      * @since 1.0.0
