@@ -5,7 +5,7 @@ unit-tests-core:
     - build-core
   script:
     - echo "Core unit tests started"
-    - "mvn -pl core jacoco:prepare-agent surefire:test jacoco:report"
+    - "mvn -pl core jacoco:prepare-agent surefire:test"
     - "[ -f core/target/jacoco.exec ] && mv -f core/target/jacoco.exec core/target/jacoco-unit-tests.exec || echo '0' >/dev/null"
   artifacts:
     name: unit-tests-core
@@ -32,7 +32,7 @@ integration-tests-core:
     - echo "Core integration tests started"
     - apt-get install -y linux-tools-`uname -r`
     - sysctl -w kernel.perf_event_paranoid=0
-    - "mvn -pl core jacoco:prepare-agent-integration failsafe:integration-test failsafe:verify jacoco:report-integration"
+    - "mvn -pl core jacoco:prepare-agent-integration failsafe:integration-test failsafe:verify"
     - "[ -f core/target/jacoco-it.exec ] && mv -f core/target/jacoco-it.exec core/target/jacoco-integration-tests.exec || echo '0' >/dev/null"
   artifacts:
     name: integration-tests-core

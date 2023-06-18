@@ -278,7 +278,7 @@
           <includes>
             <include>**/*IntegrationTest.java</include>
           </includes>
-          <argLine>${failsafeArgLine}</argLine>
+          <argLine>${argLine}</argLine>
         </configuration>
         <executions>
           <execution>
@@ -439,9 +439,6 @@
             <goals>
               <goal>prepare-agent-integration</goal>
             </goals>
-            <configuration>
-              <propertyName>failsafeArgLine</propertyName>
-            </configuration>
           </execution>
           <execution>
             <id>merge-jacoco</id>
