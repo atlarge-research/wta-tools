@@ -18,6 +18,7 @@ build-base-image:
     - docker build -t $BASE_IMAGE .gitlab/dockerfiles/base
     - docker push $BASE_IMAGE
 
+
 build-linux-tooling-image:
   stage: images
   image: docker:20.10.16
@@ -29,6 +30,7 @@ build-linux-tooling-image:
     - if docker manifest inspect $LINUX_TOOLING_IMAGE >/dev/null ; then exit 0 ; fi
     - docker build --build-arg base_image=$BASE_IMAGE -t $LINUX_TOOLING_IMAGE .gitlab/dockerfiles/linux-tooling
     - docker push $LINUX_TOOLING_IMAGE
+
 
 build-barebones-spark-adapter-image_2_12:
   stage: images
@@ -53,6 +55,7 @@ build-spark-adapter-image_2_12:
     - if docker manifest inspect $SPARK_IMAGE_2_12 > /dev/null ; then exit 0 ; fi
     - docker build --build-arg base_image=$SPARK_BAREBONES_IMAGE_2_12 -t $SPARK_IMAGE_2_12 .gitlab/dockerfiles/linux-tooling
     - docker push $SPARK_IMAGE_2_12
+
 
 build-barebones-spark-adapter-image_2_13:
   stage: images

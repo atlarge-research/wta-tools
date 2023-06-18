@@ -35,7 +35,6 @@ public class BaseSparkJobIntegrationTest {
         .isStageLevel(false)
         .domain(Domain.SCIENTIFIC)
         .description("Yer a wizard harry")
-        .logLevel("INFO")
         .isStageLevel(false)
         .resourcePingInterval(500)
         .executorSynchronizationInterval(-100)

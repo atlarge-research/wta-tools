@@ -6,7 +6,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Comparator;
 import java.util.stream.Stream;
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -16,10 +16,10 @@ import lombok.extern.slf4j.Slf4j;
  * @since 1.0.0
  */
 @Slf4j
-@RequiredArgsConstructor
+@AllArgsConstructor
 public class DiskOutputFile implements OutputFile {
 
-  private final Path file;
+  private Path outputFile;
 
   /**
    * Resolves a path in the current location.
@@ -31,9 +31,32 @@ public class DiskOutputFile implements OutputFile {
    */
   @Override
   public OutputFile resolve(String path) {
-    Path resolved = file.resolve(path);
+    Path resolved = outputFile.resolve(path);
     log.debug("Resolves {} and {} to {}.", this, path, resolved);
-    return new DiskOutputFile(file.resolve(path));
+    return new DiskOutputFile(outputFile.resolve(path));
+  }
+
+  /**
+   * Signals whether this implementation can output to the specified location.
+   *
+   * @param path a {@link String} representation of the location to point to
+   * @return a {@code boolean} indicating whether the implementation can handle the given location
+   */
+  @Override
+  public boolean acceptsLocation(String path) {
+    return true;
+  }
+
+  /**
+   * Sets the path of the disk output file.
+   *
+   * @param path a {@link String} representation of the {@link Path} to point to
+   * @throws IOException when something goes wrong during I/O
+   * @author Atour Mousavi Gourabi
+   * @since 1.0.0
+   */
+  public void setPath(String path) {
+    outputFile = Path.of(path);
   }
 
   /**
@@ -46,8 +69,8 @@ public class DiskOutputFile implements OutputFile {
    */
   @Override
   public BufferedOutputStream open() throws IOException {
-    log.debug("Open stream at {}.", file);
-    return new BufferedOutputStream(Files.newOutputStream(file));
+    log.debug("Open stream at {}.", outputFile);
+    return new BufferedOutputStream(Files.newOutputStream(outputFile));
   }
 
   /**
@@ -76,11 +99,11 @@ public class DiskOutputFile implements OutputFile {
    */
   @Override
   public void clearDirectory() throws IOException {
-    Files.createDirectories(file);
-    try (Stream<Path> paths = Files.walk(file)) {
+    Files.createDirectories(outputFile);
+    try (Stream<Path> paths = Files.walk(outputFile)) {
       paths.sorted(Comparator.reverseOrder()).forEach(this::deleteFile);
     }
-    log.debug("Cleared the directory at {}.", file);
+    log.debug("Cleared the directory at {}.", outputFile);
   }
 
   /**
@@ -93,7 +116,7 @@ public class DiskOutputFile implements OutputFile {
   @Override
   public org.apache.parquet.io.OutputFile wrap() {
     log.debug("Wrapping {} with org.apache.parquet.io.OutputFile.", this);
-    return new DiskParquetOutputFile(file);
+    return new DiskParquetOutputFile(outputFile);
   }
 
   /**
@@ -105,6 +128,6 @@ public class DiskOutputFile implements OutputFile {
    */
   @Override
   public String toString() {
-    return file.toString();
+    return outputFile.toString();
   }
 }
