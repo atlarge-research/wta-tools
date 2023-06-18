@@ -34,6 +34,7 @@
     <checkstyle.version>3.3.0</checkstyle.version>
     <compiler-plugin.version>3.11.0</compiler-plugin.version>
     <dependency-plugin.version>3.6.0</dependency-plugin.version>
+    <doxia-markdown.version>2.0.0-M6</doxia-markdown.version>
     <enforcer.version>3.3.0</enforcer.version>
     <failsafe.version>3.1.2</failsafe.version>
     <gemnasium.version>0.5.1</gemnasium.version>
@@ -51,12 +52,13 @@
     <project-info-reports.version>3.4.5</project-info-reports.version>
     <rat.version>0.15</rat.version>
     <shade-plugin.version>3.4.1</shade-plugin.version>
-    <site-plugin.version>3.12.1</site-plugin.version>
+    <site-plugin.version>4.0.0-M8</site-plugin.version>
     <slf4j2-mock.version>2.3.0</slf4j2-mock.version>
     <slf4j.version>2.0.7</slf4j.version>
     <spotless.version>2.37.0</spotless.version>
     <surefire.version>3.1.2</surefire.version>
     <taglist.version>3.0.0</taglist.version>
+    <versions-plugin.version>2.16.0</versions-plugin.version>
   </properties>
 
   <inceptionYear>2023</inceptionYear>
@@ -136,7 +138,7 @@
       <version>${mockito.version}</version>
       <scope>test</scope>
     </dependency>
-    <!-- https://mvnrepository.com/artifact/org.simplify4u/slf4j2-mock/2.3.0 -->
+    <!-- https://mvnrepository.com/artifact/org.simplify4u/slf4j2-mock -->
     <dependency>
       <groupId>org.simplify4u</groupId>
       <artifactId>slf4j2-mock</artifactId>
@@ -277,6 +279,12 @@
         <artifactId>maven-dependency-plugin</artifactId>
         <version>${dependency-plugin.version}</version>
       </plugin>
+      <!-- https://mvnrepository.com/artifact/org.codehaus.mojo/versions-maven-plugin -->
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>versions-maven-plugin</artifactId>
+        <version>${versions-plugin.version}</version>
+      </plugin>
       <!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-enforcer-plugin -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -403,6 +411,14 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-site-plugin</artifactId>
         <version>${site-plugin.version}</version>
+        <dependencies>
+          <!-- https://mvnrepository.com/artifact/org.apache.maven.doxia/doxia-module-markdown -->
+          <dependency>
+            <groupId>org.apache.maven.doxia</groupId>
+            <artifactId>doxia-module-markdown</artifactId>
+            <version>${doxia-markdown.version}</version>
+          </dependency>
+        </dependencies>
       </plugin>
       <!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-surefire-plugin -->
       <plugin>
@@ -608,6 +624,27 @@
           <outputFile>reports/checkstyle/violations.txt</outputFile>
           <outputFileFormat>plain</outputFileFormat>
         </configuration>
+        <reportSets>
+          <reportSet>
+            <inherited>false</inherited>
+            <reports>
+              <report>checkstyle-aggregate</report>
+            </reports>
+          </reportSet>
+        </reportSets>
+      </plugin>
+      <!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-dependency-plugin -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <version>${dependency-plugin.version}</version>
+        <reportSets>
+          <reportSet>
+            <reports>
+              <report>analyze-report</report>
+            </reports>
+          </reportSet>
+        </reportSets>
       </plugin>
       <!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-javadoc-plugin -->
       <plugin>
@@ -619,12 +656,28 @@
           <doclint>none</doclint>
           <sourcepath>${project.build.directory}/delombok</sourcepath>
         </configuration>
+        <reportSets>
+          <reportSet>
+            <inherited>false</inherited>
+            <reports>
+              <report>aggregate</report>
+            </reports>
+          </reportSet>
+        </reportSets>
       </plugin>
       <!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-jxr-plugin -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jxr-plugin</artifactId>
         <version>${jxr.version}</version>
+        <reportSets>
+          <reportSet>
+            <inherited>false</inherited>
+            <reports>
+              <report>aggregate</report>
+            </reports>
+          </reportSet>
+        </reportSets>
       </plugin>
       <!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-pmd-plugin -->
       <plugin>
@@ -648,14 +701,8 @@
         <version>${surefire.version}</version>
         <reportSets>
           <reportSet>
-            <id>integration-tests</id>
             <reports>
               <report>failsafe-report-only</report>
-            </reports>
-          </reportSet>
-          <reportSet>
-            <id>unit-tests</id>
-            <reports>
               <report>report-only</report>
             </reports>
           </reportSet>
@@ -686,6 +733,21 @@
           </tagListOptions>
         </configuration>
       </plugin>
+      <!-- https://mvnrepository.com/artifact/org.codehaus.mojo/build-helper-maven-plugin -->
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>versions-maven-plugin</artifactId>
+        <version>${versions-plugin.version}</version>
+        <reportSets>
+          <reportSet>
+            <reports>
+              <report>dependency-updates-report</report>
+              <report>plugin-updates-report</report>
+              <report>property-updates-report</report>
+            </reports>
+          </reportSet>
+        </reportSets>
+      </plugin>
       <!-- https://mvnrepository.com/artifact/org.jacoco/jacoco-maven-plugin -->
       <plugin>
         <groupId>org.jacoco</groupId>
@@ -694,6 +756,14 @@
         <configuration>
           <includeCurrentProject>true</includeCurrentProject>
         </configuration>
+        <reportSets>
+          <reportSet>
+            <reports>
+              <report>report</report>
+              <report>report-integration</report>
+            </reports>
+          </reportSet>
+        </reportSets>
       </plugin>
     </plugins>
   </reporting>
@@ -901,6 +971,17 @@
               <execution>
                 <id>current-year</id>
                 <phase>validate</phase>
+              </execution>
+            </executions>
+          </plugin>
+          <!-- https://mvnrepository.com/artifact/org.jacoco/jacoco-maven-plugin -->
+          <plugin>
+            <groupId>org.jacoco</groupId>
+            <artifactId>jacoco-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>jacoco-merge</id>
+                <phase>none</phase>
               </execution>
             </executions>
           </plugin>
