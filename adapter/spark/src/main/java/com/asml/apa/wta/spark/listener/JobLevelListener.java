@@ -77,9 +77,12 @@ public class JobLevelListener extends AbstractListener<Workflow> {
 
   /**
    * Callback for job start event, tracks the submit time of the job.
+   * Also tracks the stages and their parents in the job.
    *
    * @param jobStart The jobstart event object containing information upon job start.
    * @author Henry Page
+   * @author Tianchen Qu
+   * @since 1.0.0
    */
   @Override
   public void onJobStart(SparkListenerJobStart jobStart) {
@@ -102,6 +105,8 @@ public class JobLevelListener extends AbstractListener<Workflow> {
    *
    * @param jobEnd The job end event object containing information upon job end
    * @author Henry Page
+   * @author Tianchen Qu
+   * @since 1.0.0
    */
   @Override
   public void onJobEnd(SparkListenerJobEnd jobEnd) {
@@ -185,6 +190,7 @@ public class JobLevelListener extends AbstractListener<Workflow> {
 
   /**
    * This is a method called on application end. it sets up the resources used in the spark workflow.
+   * It also calculated the critical path for the job.
    *
    * @author Tianchen Qu
    * @since 1.0.0
@@ -241,43 +247,74 @@ public class JobLevelListener extends AbstractListener<Workflow> {
     }
   }
 
-  public List<Task> solveCriticalPath(List<Task> stages) {
-    DAG dag = new DAG(stages);
+  /**
+   * This method takes the stages inside this job and return the critical path.
+   * it will filter out all dummy caches nodes.
+   *
+   * @param stages all stages in the job(including the cached ones)
+   * @return critical path
+   * @author Tianchen Qu
+   * @since 1.0.0
+   */
+  List<Task> solveCriticalPath(List<Task> stages) {
+    DagSolver dag = new DagSolver(stages);
     return dag.longestPath().stream()
         .filter(stage -> !stage.getType().equals("cached stage"))
         .collect(Collectors.toList());
   }
 
+  /**
+   * This is the utility class for all the nodes inside the DAG graph for stages.
+   *
+   * @author Tianchen Qu
+   * @since 1.0.0
+   */
   class Node {
 
-    long id;
+    private long id;
 
-    long dist;
+    private long dist;
 
-    public Node(Task stage) {
+    /**
+     * The id get added one as we need to leave node 0,1 as the extra origin/ending node.
+     *
+     * @param stage stage
+     * @author Tianchen Qu
+     * @since 1.0.0
+     */
+    Node(Task stage) {
       id = stage.getId() + 1;
       dist = Integer.MIN_VALUE;
     }
 
-    public Node(long id) {
+    Node(long id) {
       this.id = id;
       dist = Integer.MIN_VALUE;
     }
   }
 
-  class DAG {
+  /**
+   * This class will take in all stages within the job, generate the dependency DAG
+   * and find the longest path(critical path). It will add two additional node to the dependency graph
+   * one as the origin connecting all stages that don't have parents, the other as the sink connecting all stages
+   * without a children. The critical path shall be the longest path from the origin to the sink.
+   *
+   * @author Tianchen Qu
+   * @since 1.0.0
+   */
+  class DagSolver {
 
-    Map<Long, Node> nodes;
+    private Map<Long, Node> nodes;
 
-    Map<Long, Map<Long, Long>> adjMap;
+    private Map<Long, Map<Long, Long>> adjMap;
 
-    Map<Long, Map<Long, Long>> adjMapReversed;
+    private Map<Long, Map<Long, Long>> adjMapReversed;
 
-    Deque<Long> stack;
+    private Deque<Long> stack;
 
-    List<Task> stages;
+    private List<Task> stages;
 
-    public DAG(List<Task> stages) {
+    DagSolver(List<Task> stages) {
       nodes = new ConcurrentHashMap<>();
       adjMap = new ConcurrentHashMap<>();
       stack = new ConcurrentLinkedDeque<>();
@@ -291,7 +328,15 @@ public class JobLevelListener extends AbstractListener<Workflow> {
       addNode(1L);
     }
 
-    public void addNode(Task stage) {
+    /**
+     * This will add the node and the adjacent edges of the node.
+     * If there is no parents, it will be linked to the origin node.
+     *
+     * @param stage stage
+     * @author Tianchen Qu
+     * @since 1.0.0
+     */
+    void addNode(Task stage) {
       Node node = new Node(stage);
       nodes.put(stage.getId() + 1, node);
 
@@ -311,7 +356,14 @@ public class JobLevelListener extends AbstractListener<Workflow> {
       }
     }
 
-    public void addNode(Long id) {
+    /**
+     * This method is used to create the origin and sink node.
+     *
+     * @param id id of the origin(id = 0) and sink(id = 1) node
+     * @author Tianchen Qu
+     * @since 1.0.0
+     */
+    void addNode(Long id) {
       Node node = new Node(id);
       nodes.put(id, node);
       // if the node is the ending node
@@ -324,17 +376,31 @@ public class JobLevelListener extends AbstractListener<Workflow> {
       }
     }
 
-    private void addEdge(long v, long u, long weight) {
-      if (adjMap.get(v) == null) {
-        adjMap.put(v, new ConcurrentHashMap<>());
+    /**
+     * This method add a directed edge from vertex1 to vertex2 with the specified weight.
+     *
+     * @param vertex1 vertex1
+     * @param vertex2 vertex2
+     * @param weight weight
+     * @author Tianchen Qu
+     * @since 1.0.0
+     */
+    private void addEdge(long vertex1, long vertex2, long weight) {
+      if (adjMap.get(vertex1) == null) {
+        adjMap.put(vertex1, new ConcurrentHashMap<>());
       }
-      if (adjMapReversed.get(u) == null) {
-        adjMapReversed.put(u, new ConcurrentHashMap<>());
+      if (adjMapReversed.get(vertex2) == null) {
+        adjMapReversed.put(vertex2, new ConcurrentHashMap<>());
       }
-      adjMap.get(v).put(u, weight);
-      adjMapReversed.get(u).put(v, weight);
+      adjMap.get(vertex1).put(vertex2, weight);
+      adjMapReversed.get(vertex2).put(vertex1, weight);
     }
 
+    /**
+     * This method links all nodes without a children to the sink node.
+     * @author Tianchen Qu
+     * @since 1.0.0
+     */
     private void setFinalEdges() {
       for (Long node : nodes.keySet()) {
         if (adjMap.get(node) == null && node != 1) {
@@ -343,11 +409,25 @@ public class JobLevelListener extends AbstractListener<Workflow> {
       }
     }
 
+    /**
+     * This method does topological sorting on the dag using a deque.
+     *
+     * @author Tianchen Qu
+     * @since 1.0.0
+     */
     private void topologicalSort() {
       Map<Long, Boolean> visited = new ConcurrentHashMap<>();
       topoUtil(visited, 0L);
     }
 
+    /**
+     * This is the recursive utility method for topological sorting
+     *
+     * @param visited a map of all visited nodes
+     * @param node the current node
+     * @author Tianchen Qu
+     * @since 1.0.0
+     */
     private void topoUtil(Map<Long, Boolean> visited, Long node) {
       visited.put(node, true);
       for (Long children : adjMap.get(node).keySet()) {
@@ -358,7 +438,14 @@ public class JobLevelListener extends AbstractListener<Workflow> {
       stack.push(node);
     }
 
-    public List<Task> longestPath() {
+    /**
+     * This method returns the longest path on the DAG.
+     *
+     * @return longest path
+     * @author Tianchen Qu
+     * @since 1.0.0
+     */
+    List<Task> longestPath() {
       topologicalSort();
       while (!stack.isEmpty()) {
         Node node = nodes.get(stack.pop());
@@ -372,6 +459,13 @@ public class JobLevelListener extends AbstractListener<Workflow> {
       return backTracing();
     }
 
+    /**
+     * This method backtraces the longest path on the DAG based on each node's maximum value.
+     *
+     * @return the longest path
+     * @author Tianchen Qu
+     * @since 1.0.0
+     */
     private List<Task> backTracing() {
       long pointer = 1L;
       List<Long> criticalPath = new ArrayList<>();
@@ -388,7 +482,6 @@ public class JobLevelListener extends AbstractListener<Workflow> {
       }
       List<Long> finalCriticalPath =
           criticalPath.stream().map(x -> x - 1).filter(x -> x >= 0).collect(Collectors.toList());
-      ;
       return stages.stream()
           .filter(x -> finalCriticalPath.contains(x.getId()))
           .collect(Collectors.toList());
