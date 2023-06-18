@@ -7,9 +7,11 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 import lombok.Getter;
 import org.apache.spark.SparkContext;
 import org.apache.spark.executor.TaskMetrics;
+import org.apache.spark.scheduler.SparkListenerJobEnd;
 import org.apache.spark.scheduler.SparkListenerStageCompleted;
 import org.apache.spark.scheduler.StageInfo;
 import scala.collection.JavaConverters;
@@ -24,132 +26,154 @@ import scala.collection.JavaConverters;
 @Getter
 public class StageLevelListener extends TaskStageBaseListener {
 
-  private final Map<Integer, Integer[]> stageToParents = new ConcurrentHashMap<>();
+  private final Map<Long, Long[]> stageToParents = new ConcurrentHashMap<>();
 
-  private final Map<Integer, List<Integer>> parentToChildren = new ConcurrentHashMap<>();
+  private final Map<Long, List<Long>> parentStageToChildrenStages = new ConcurrentHashMap<>();
 
-  private final Map<Integer, Integer> stageToResource = new ConcurrentHashMap<>();
+  private final Map<Long, Integer> stageToResource = new ConcurrentHashMap<>();
 
+  /**
+   * Constructor for the stage-level listener from Spark datasource class.
+   *
+   * @param sparkContext       The current spark context
+   * @param config             Additional config specified by the user for the plugin
+   * @author Pil Kyu Cho
+   * @since 1.0.0
+   */
   public StageLevelListener(SparkContext sparkContext, RuntimeConfig config) {
     super(sparkContext, config);
   }
 
   /**
-   * This method will store the stage hierarchy information from the callback.
-   * This class is a stage-level listener for the Spark data source.
+   * This method will store the stage hierarchy information from the callback, depending on the isStageLevel config.
+   * Only the parents of the current stage is determined here. The children are determined on application end in
+   * ApplicationLevelListener.
+   * @param stageId           Current stage id
+   * @param task              Task object of current stage metrics
+   * @param curStageInfo      Current stage info
+   * @author Pil Kyu Cho
+   * @since 1.0.0
+   */
+  public void fillInParentChildMaps(long stageId, Task task, StageInfo curStageInfo) {
+    final long[] parentStageIds = JavaConverters.seqAsJavaList(
+            curStageInfo.parentIds().toList())
+        .stream()
+        .mapToLong(parentId -> (Integer) parentId + 1)
+        .toArray();
+    if (config.isStageLevel()) {
+      task.setParents(parentStageIds);
+    } else {
+      stageToParents.put(stageId, Arrays.stream(parentStageIds).boxed().toArray(Long[]::new));
+    }
+
+    // Add current task as child to its parent stages
+    for (Long parentStageId : parentStageIds) {
+      List<Long> childrenStages = parentStageToChildrenStages.get(parentStageId);
+      if (childrenStages == null) {
+        childrenStages = new ArrayList<>();
+        childrenStages.add(stageId);
+        parentStageToChildrenStages.put(parentStageId, childrenStages);
+      } else {
+        childrenStages.add(stageId);
+      }
+    }
+  }
+
+  /**
+   * This method is called every time a stage is completed. Stage-level metrics are collected, aggregated,
+   * and added here.
+   * <p>
+   * Note: peakExecutionMemory is the peak memory used by internal data structures created during
+   * shuffles, aggregations and joins. The value of this accumulator should be approximately the sum of
+   * the peak sizes across all such data structures created in this task. It is thus only an upper
+   * bound of the actual peak memory for the task. For SQL jobs, this only tracks all unsafe operators
+   * and ExternalSort
+   * <p>
+   * Alternative:
+   * final double memoryRequested = curTaskMetrics.peakExecutionMemory();
    *
    * @param stageCompleted   SparkListenerStageCompleted The object corresponding to information on stage completion
    * @author Tianchen Qu
    * @author Lohithsai Yadala Chanchu
+   * @author Pil Kyu Cho
    * @since 1.0.0
    */
   @Override
   public void onStageCompleted(SparkListenerStageCompleted stageCompleted) {
     final StageInfo curStageInfo = stageCompleted.stageInfo();
     final TaskMetrics curStageMetrics = curStageInfo.taskMetrics();
-
-    final int stageId = curStageInfo.stageId();
+    final long stageId = curStageInfo.stageId() + 1;
     stageToResource.put(stageId, curStageInfo.resourceProfileId());
-    final Long submitTime = curStageInfo.submissionTime().getOrElse(() -> -1L);
-    final long runTime = curStageMetrics.executorRunTime();
-    final int userId = Math.abs(sparkContext.sparkUser().hashCode());
-    final long workflowId = stageIdsToJobs.get(stageId + 1);
 
-    final Integer[] parentIds = JavaConverters.seqAsJavaList(
-            curStageInfo.parentIds().toList())
-        .stream()
-        .map(parentId -> (Integer) parentId)
-        .toArray(Integer[]::new);
-    for (Integer id : parentIds) {
-      List<Integer> children = parentToChildren.get(id);
-      if (children == null) {
-        children = new ArrayList<>();
-        children.add(stageId);
-        parentToChildren.put(id, children);
-      } else {
-        children.add(stageId);
-      }
-    }
+    final Long tsSubmit = curStageInfo.submissionTime().getOrElse(() -> -1L);
+    final long runtime = curStageInfo.taskMetrics().executorRunTime();
+    final long[] parents = new long[0];
+    final long[] children = new long[0];
+    final int userId = Math.abs(sparkContext.sparkUser().hashCode());
+    final long workflowId = stageToJob.get(stageId);
     final double diskSpaceRequested = (double) curStageMetrics.diskBytesSpilled()
         + curStageMetrics.shuffleWriteMetrics().bytesWritten();
-    /**
-     * alternative:
-     *
-     * final double memoryRequested = curTaskMetrics.peakExecutionMemory();
-     *
-     *  peakExecutionMemory is the peak memory used by internal data structures created during shuffles,
-     *  aggregations and joins.
-     *  The value of this accumulator should be approximately the sum of the peak sizes across all such data structures
-     *  created in this task.
-     *  It is thus only an upper bound of the actual peak memory for the task.
-     *  For SQL jobs, this only tracks all unsafe operators and ExternalSort
-     */
-    final double memoryRequested = -1.0;
-    long[] parents;
-    if (config.isStageLevel()) {
-      parents =
-          Arrays.stream(parentIds).mapToLong(parentId -> parentId + 1).toArray();
-    } else {
-      parents = new long[0];
-      stageToParents.put(stageId, parentIds);
-    }
-    final long[] children = new long[0];
+    // final double memoryRequested = curTaskMetrics.peakExecutionMemory();
+
     // dummy values
     final String type = "";
     final int submissionSite = -1;
     final String resourceType = "N/A";
     final double resourceAmountRequested = -1.0;
-
     final int groupId = -1;
     final String nfrs = "";
+    final long waitTime = -1L;
     final String params = "";
-
+    final double memoryRequested = -1.0;
     final long networkIoTime = -1L;
     final long diskIoTime = -1L;
-
     final double energyConsumption = -1L;
-    final long waitTime = -1L;
     final long resourceUsed = -1L;
 
-    this.getProcessedObjects()
-        .add(Task.builder()
-            .id(stageId)
-            .type(type)
-            .submissionSite(submissionSite)
-            .tsSubmit(submitTime)
-            .runtime(runTime)
-            .resourceType(resourceType)
-            .resourceAmountRequested(resourceAmountRequested)
-            .parents(parents)
-            .children(children)
-            .userId(userId)
-            .groupId(groupId)
-            .nfrs(nfrs)
-            .workflowId(workflowId)
-            .waitTime(waitTime)
-            .params(params)
-            .memoryRequested(memoryRequested)
-            .networkIoTime(networkIoTime)
-            .diskIoTime(diskIoTime)
-            .diskSpaceRequested(diskSpaceRequested)
-            .energyConsumption(energyConsumption)
-            .resourceUsed(resourceUsed)
-            .build());
-    stageIdsToJobs.remove(stageCompleted.stageInfo().stageId() + 1);
+    Task task = Task.builder()
+        .id(stageId)
+        .type(type)
+        .submissionSite(submissionSite)
+        .tsSubmit(tsSubmit)
+        .runtime(runtime)
+        .resourceType(resourceType)
+        .resourceAmountRequested(resourceAmountRequested)
+        .parents(parents)
+        .children(children)
+        .userId(userId)
+        .groupId(groupId)
+        .nfrs(nfrs)
+        .workflowId(workflowId)
+        .waitTime(waitTime)
+        .params(params)
+        .memoryRequested(memoryRequested)
+        .networkIoTime(networkIoTime)
+        .diskIoTime(diskIoTime)
+        .diskSpaceRequested(diskSpaceRequested)
+        .energyConsumption(energyConsumption)
+        .resourceUsed(resourceUsed)
+        .build();
+    fillInParentChildMaps(stageId, task, curStageInfo);
+    this.getProcessedObjects().add(task);
   }
 
   /**
-   * This method sets up the stage children, and it shall be called on application end.
+   * Sets up the stage children, and it shall be called on job end in
+   * {@link JobLevelListener#onJobEnd(SparkListenerJobEnd)}. It only sets the Stages which are
+   * affiliated to the passed jobId.
    *
+   * @param jobId            Spark Job id to filter Stages by
    * @author Tianchen Qu
+   * @author Pil Kyu Cho
    * @since 1.0.0
    */
-  public void setStages() {
-    final List<Task> stages = this.getProcessedObjects();
-    for (Task stage : stages) {
-      stage.setChildren(parentToChildren.getOrDefault(Math.toIntExact(stage.getId()), new ArrayList<>()).stream()
-          .mapToLong(childrenId -> childrenId + 1)
-          .toArray());
-    }
+  public void setStages(long jobId) {
+    final List<Task> filteredStages = this.getProcessedObjects().stream()
+        .filter(task -> task.getWorkflowId() == jobId)
+        .collect(Collectors.toList());
+    filteredStages.forEach(stage -> stage.setChildren(
+        this.getParentStageToChildrenStages().getOrDefault(stage.getId(), new ArrayList<>()).stream()
+            .mapToLong(Long::longValue)
+            .toArray()));
   }
 }
