@@ -2,7 +2,7 @@
 
 ## Overview
 
-![img.png](architecture.png)
+![img.png](../resources/images/architecture.png)
 
 The Spark Adapter is responsible for parsing Spark execution information into WTA objects.
 The diagram above illustrates the workflow of the adapter.
@@ -95,7 +95,7 @@ you will need to set the `spark.scala.version` flag to 2.13, such as in
 `mvn -pl adapter/spark -Dspark.scala.version=2.13 clean package`.
 
 ## Configuration
-General configuration instructions are located [here](/../../README.md#configuration). See above for [instructions](#installation-and-usage) on how to provide the configuration to the plugin.
+General configuration instructions are located [here](/README.md#configuration). See above for [instructions](#installation-and-usage) on how to provide the configuration to the plugin.
 
 
 ## Description
@@ -112,7 +112,7 @@ This module listens to events from the Spark job that is being carrying out. It 
 
 The SparkListenerInterface listens to the Spark events and collects the metrics. As part of the
 standard instrumentation of Spark, metrics are transmitted from the executor to the driver as part of a heartbeat. The listener interface
-intercepts these events. Examples of how we use it, and what metrics we collect for the different WTA objects can be seen [here](/src/main/java/com/asml/apa/wta/spark/listener).
+intercepts these events. Examples of how we use it, and what metrics we collect for the different WTA objects can be seen [here](/com/asml/apa/wta/spark/listener).
 The heartbeat interval can be modified by modifying `spark.executor.heartbeatInterval`
 > ExecutorMetrics are updated as part of heartbeat processes scheduled for the executors and for the driver at regular intervals: spark.executor.heartbeatInterval (default value is 10 seconds)
 
@@ -186,7 +186,7 @@ if (ping.getIostatDto().isPresent()) {
         + iostatDto.getKiloByteWrtnPerSec() / kBpsToGbpsDenom;
 }
 ```
-This snippet can be found [here](src/main/java/com/asml/apa/wta/spark/streams/MetricStreamingEngine.java)
+This snippet can be found [here](../../main/java/com/asml/apa/wta/spark/streams/MetricStreamingEngine.java)
 
 #### averageUtilizationXMinute
 - By using the information provided by `cat /proc/loadavg`, we can obtain the average utilization of the CPU over the last X minutes, as mentioned [here](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/4/html/reference_guide/s2-proc-loadavg).
@@ -198,9 +198,9 @@ final double averageUtilization1Minute = ping.getProcDto()
         .orElse(-1.0);
 ```
 
-This snippet can be found [here](src/main/java/com/asml/apa/wta/spark/streams/MetricStreamingEngine.java)
+This snippet can be found [here](../../main/java/com/asml/apa/wta/spark/streams/MetricStreamingEngine.java)
 
 ## Benchmarking
-[The benchmarking module](../../submodules/benchmarking/README.md) is used to benchmark the performance of the plugin. Any changes to the plugin should be benchmarked to ensure no significant performance degradation.
+[The benchmarking module](../../../../../submodules/benchmarking/README.md) is used to benchmark the performance of the plugin. Any changes to the plugin should be benchmarked to ensure no significant performance degradation.
 
 It is important to note that the benchmarking module is not part of the plugin itself but a separate tool.

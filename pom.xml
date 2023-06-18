@@ -11,6 +11,24 @@
 
   <description>Extensible Java project to facilitate the generation of WTA traces for big data frameworks.</description>
 
+  <developers>
+    <developer>
+      <name>Atour Mousavi Gourabi</name>
+    </developer>
+    <developer>
+      <name>Lohithsai Yadala Chanchu</name>
+    </developer>
+    <developer>
+      <name>Henry Page</name>
+    </developer>
+    <developer>
+      <name>Pil Kyu Cho</name>
+    </developer>
+    <developer>
+      <name>Tianchen Qu</name>
+    </developer>
+  </developers>
+
   <licenses>
     <license>
       <name>Apache-2.0</name>

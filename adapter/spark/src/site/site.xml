@@ -6,6 +6,10 @@
     <version>2.0.0-M6</version>
   </skin>
   <body>
-    <menu ref="reports"/>
+    <menu ref="parent" />
+    <menu name="Documentation">
+      <item name="README" href="README.html" />
+    </menu>
+    <menu ref="reports" />
   </body>
 </project>
