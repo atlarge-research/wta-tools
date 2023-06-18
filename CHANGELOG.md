@@ -56,6 +56,7 @@ For the most part, since we are pre-release this will serve no real purpose, oth
 - Brought mutation testing coverage up to 80% and add mutation testing coverage to pipeline [@lyadalachanchu](https://gitlab.ewi.tudelft.nl/lyadalachanchu)
 - Enhanced documentation relating to Spark [@hpage](https://gitlab.ewi.tudelft.nl/hpage)
 - Added Spark aggregations [@tqu](https://gitlab.ewi.tudelft.nl/tqu)
+- Implemented critical path fields [@tqu](https://gitlab.ewi.tudelft.nl/tqu)
 
 ### Changed
 - Refactored listeners into a generic interface to reduce code duplication and increase cc [@hpage](https://gitlab.ewi.tudelft.nl/hpage)
