@@ -13,11 +13,14 @@ import java.nio.file.Path;
 import java.time.Instant;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.Queue;
 import java.util.UUID;
 import java.util.function.BiFunction;
+import java.util.function.BinaryOperator;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.IntFunction;
@@ -128,6 +131,20 @@ public class Stream<V extends Serializable> {
     id = UUID.randomUUID();
     additionsSinceLastWriteToDisk = 0;
     serializationTrigger = 1800;
+  }
+
+  /**
+   * Constructs a {@link Stream} out of a {@link Collection}.
+   *
+   * @param content the {@link Collection} to construct the {@link Stream} from
+   * @author Atour Mousavi Gourabi
+   * @since 1.0.0
+   */
+  public Stream(@NonNull Collection<V> content) {
+    this();
+    for (V elem : content) {
+      addToStream(elem);
+    }
   }
 
   /**
@@ -369,6 +386,21 @@ public class Stream<V extends Serializable> {
   }
 
   /**
+   * Reduces the {@link Stream} with the given accumulator. Consumes the stream.
+   *
+   * @param accumulator the {@link BinaryOperator} to reduce the stream over
+   * @return the result of the reduction, an empty {@link Optional} if the {@link Stream} was empty
+   * @author Atour Mousavi Gourabi
+   */
+  public synchronized Optional<V> reduce(@NonNull BinaryOperator<V> accumulator) {
+    V acc = head();
+    if (acc == null) {
+      return Optional.empty();
+    }
+    return Optional.of(foldLeft(acc, accumulator));
+  }
+
+  /**
    * Converts the {@link Stream} to a {@link List}, and consumes the {@link Stream}.
    *
    * @return a {@link List} with the {@link Stream}s elements
@@ -411,6 +443,28 @@ public class Stream<V extends Serializable> {
     }
     head = null;
     tail = null;
+  }
+
+  /**
+   * Counts the number of elements in the {@link Stream}. Consumes the {@link Stream}.
+   *
+   * @author Atour Mousavi Gourabi
+   * @since 1.0.0
+   */
+  public synchronized long count() {
+    StreamNode<V> next = head;
+    long count = 0;
+    while (next != null) {
+      if (next == deserializationStart && !diskLocations.isEmpty()) {
+        head = next;
+        deserializeInternals(diskLocations.poll());
+      }
+      ++count;
+      next = next.getNext();
+    }
+    head = null;
+    tail = null;
+    return count;
   }
 
   /**
