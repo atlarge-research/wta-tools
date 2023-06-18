@@ -317,7 +317,8 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
   }
 
   /**
-   * Standard deviation value for data stream with invalid stream handling.
+   * Standard deviation value for data stream with invalid stream handling. Assumes the data has
+   * positive elemetns only.
    *
    * @param data              stream of data
    * @param mean              mean value from {@link #computeMean(Stream, long)}
@@ -347,7 +348,7 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
    * @since 1.0.0
    */
   private double computeCov(double mean, double std) {
-    if (mean == 0.0 || mean == -1.0) {
+    if (mean == 0.0 || mean == -1.0 || std == -1.0) {
       return -1.0;
     }
     return std / mean;
