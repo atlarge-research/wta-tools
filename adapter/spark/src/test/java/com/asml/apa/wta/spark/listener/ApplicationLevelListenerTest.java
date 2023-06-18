@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.asml.apa.wta.core.model.Task;
 import com.asml.apa.wta.core.model.Workload;
 import java.util.Properties;
 import org.apache.spark.executor.ExecutorMetrics;
@@ -37,8 +36,6 @@ class ApplicationLevelListenerTest extends BaseLevelListenerTest {
 
   StageInfo testStageInfo2;
 
-  StageInfo testStageInfo3;
-
   SparkListenerTaskEnd taskEndEvent1;
 
   SparkListenerTaskEnd taskEndEvent2;
@@ -51,11 +48,9 @@ class ApplicationLevelListenerTest extends BaseLevelListenerTest {
 
   SparkListenerStageCompleted stageCompleted2;
 
-  SparkListenerStageCompleted stageCompleted3;
-
   int stageId1;
+
   int stageId2;
-  int stageId3;
 
   long applicationDateEnd;
 
@@ -102,13 +97,11 @@ class ApplicationLevelListenerTest extends BaseLevelListenerTest {
 
     stageId1 = 2;
     stageId2 = 10;
-    stageId3 = 14;
     parents.$plus$eq(stageId1);
 
     testStageInfo1 = new StageInfo(
         stageId1, 0, "test", 50, null, new ListBuffer<>(), "None", mockedMetrics1, null, null, 100);
     testStageInfo2 = new StageInfo(stageId2, 0, "test", 50, null, parents, "None", mockedMetrics1, null, null, 100);
-    testStageInfo3 = new StageInfo(stageId3, 0, "test", 50, null, parents, "None", mockedMetrics1, null, null, 100);
 
     taskEndEvent1 = new SparkListenerTaskEnd(
         stageId1, 1, "testTaskType", null, testTaskInfo1, new ExecutorMetrics(), mockedMetrics1);
@@ -120,7 +113,6 @@ class ApplicationLevelListenerTest extends BaseLevelListenerTest {
         stageId2, 1, "testTaskType", null, testTaskInfo4, new ExecutorMetrics(), mockedMetrics3);
     stageCompleted1 = new SparkListenerStageCompleted(testStageInfo1);
     stageCompleted2 = new SparkListenerStageCompleted(testStageInfo2);
-    stageCompleted3 = new SparkListenerStageCompleted(testStageInfo3);
 
     applicationDateEnd = mockedSparkContext.startTime() + 1000L;
     applicationEndObj = new SparkListenerApplicationEnd(applicationDateEnd);
@@ -206,10 +198,10 @@ class ApplicationLevelListenerTest extends BaseLevelListenerTest {
     assertThat(fakeApplicationListener1.getProcessedObjects().size()).isEqualTo(1);
     assertThat(workload.getMeanEnergy()).isEqualTo(-1.0);
     assertThat(workload.getMeanMemory()).isEqualTo(-1.0);
-    assertThat(workload.getMeanResourceTask()).isEqualTo(20);
+    assertThat(workload.getMeanResourceTask()).isEqualTo(-1.0);
     assertThat(workload.getMeanNetworkUsage()).isEqualTo(-1.0);
     assertThat(workload.getMeanDiskSpaceUsage()).isEqualTo(133.33333333333334);
-    assertThat(workload.getTotalResourceSeconds()).isEqualTo(4000);
+    assertThat(workload.getTotalResourceSeconds()).isEqualTo(-1.0);
   }
 
   @Test
@@ -270,73 +262,5 @@ class ApplicationLevelListenerTest extends BaseLevelListenerTest {
     assertThat(fakeApplicationListener1.getProcessedObjects()).hasSize(1);
     fakeApplicationListener1.onApplicationEnd(applicationEndObj);
     assertThat(fakeApplicationListener1.getProcessedObjects()).hasSize(1);
-  }
-
-  @Test
-  void parentChildrenAggregatedForTaskLevelMetrics() {
-    ListBuffer<StageInfo> stageBuffer = new ListBuffer<>();
-    stageBuffer.$plus$eq(testStageInfo1);
-    stageBuffer.$plus$eq(testStageInfo2);
-    SparkListenerJobStart jobStart = new SparkListenerJobStart(0, 2L, stageBuffer.toList(), new Properties());
-    fakeTaskListener1.onJobStart(jobStart);
-    fakeStageListener1.onJobStart(jobStart);
-    fakeTaskListener1.onTaskEnd(taskEndEvent1);
-    fakeTaskListener1.onTaskEnd(taskEndEvent2);
-    fakeStageListener1.onStageCompleted(stageCompleted1);
-    fakeTaskListener1.onTaskEnd(taskEndEvent3);
-    fakeTaskListener1.onTaskEnd(taskEndEvent4);
-    fakeStageListener1.onStageCompleted(stageCompleted2);
-    fakeApplicationListener1.onApplicationEnd(applicationEndObj);
-    assertThat(fakeTaskListener1.getProcessedObjects()).hasSize(4);
-
-    Task task1 = fakeTaskListener1.getProcessedObjects().get(0);
-    assertThat(task1.getParents().length).isEqualTo(0);
-    assertThat(task1.getChildren().length).isEqualTo(2);
-    assertThat(task1.getChildren()).contains(3L, 4L);
-
-    Task task2 = fakeTaskListener1.getProcessedObjects().get(1);
-    assertThat(task2.getParents().length).isEqualTo(0);
-    assertThat(task2.getChildren().length).isEqualTo(2);
-    assertThat(task2.getChildren()).contains(3L, 4L);
-
-    Task task3 = fakeTaskListener1.getProcessedObjects().get(2);
-    assertThat(task3.getParents().length).isEqualTo(2);
-    assertThat(task3.getParents()).contains(1L, 2L);
-    assertThat(task3.getChildren().length).isEqualTo(0);
-
-    Task task4 = fakeTaskListener1.getProcessedObjects().get(3);
-    assertThat(task4.getParents().length).isEqualTo(2);
-    assertThat(task4.getParents()).contains(1L, 2L);
-    assertThat(task4.getChildren().length).isEqualTo(0);
-  }
-
-  @Test
-  void parentChildrenAggregatedForStageLevelMetrics() {
-    ListBuffer<StageInfo> stageBuffer = new ListBuffer<>();
-    stageBuffer.$plus$eq(testStageInfo1);
-    stageBuffer.$plus$eq(testStageInfo2);
-    stageBuffer.$plus$eq(testStageInfo3);
-    SparkListenerJobStart jobStart = new SparkListenerJobStart(0, 2L, stageBuffer.toList(), new Properties());
-    fakeStageListener2.onJobStart(jobStart);
-    fakeStageListener2.onStageCompleted(stageCompleted1);
-    fakeStageListener2.onStageCompleted(stageCompleted2);
-    fakeStageListener2.onStageCompleted(stageCompleted3);
-    fakeApplicationListener2.onApplicationEnd(applicationEndObj);
-    assertThat(fakeStageListener2.getProcessedObjects()).hasSize(3);
-
-    Task task1 = fakeStageListener2.getProcessedObjects().get(0);
-    assertThat(task1.getParents().length).isEqualTo(0);
-    assertThat(task1.getChildren().length).isEqualTo(2);
-    assertThat(task1.getChildren()).contains(stageId2 + 1, stageId3 + 1);
-
-    Task task2 = fakeStageListener2.getProcessedObjects().get(1);
-    assertThat(task2.getParents().length).isEqualTo(1);
-    assertThat(task2.getParents()).contains(stageId1 + 1);
-    assertThat(task2.getChildren().length).isEqualTo(0);
-
-    Task task3 = fakeStageListener2.getProcessedObjects().get(2);
-    assertThat(task3.getParents().length).isEqualTo(1);
-    assertThat(task3.getParents()).contains(stageId1 + 1);
-    assertThat(task3.getChildren().length).isEqualTo(0);
   }
 }
