@@ -76,6 +76,7 @@ Below is an explanation of each field and their expected types. The default valu
 ### General Architecture (TL;DR)
 
 The structure of this framework is split into two modules. Namely, `core` and `adapter`.
+
 #### Core
 The `core` module contains logic and information which is agnostic to the application that is being traced. This includes, but is not limited to:
 - DTOs (Data Transfer Object) which are used to represent the events and resources that are captured.
@@ -96,13 +97,22 @@ The `adapter` module contains logic and information which is specific to the app
 
 More information can be found in the [adapter](./adapter/README.md) module.
 
-Additional modules can be found in the submodules directory. Currently they include the following things
+Additional modules can be found in the submodules directory. Currently, they include the following things
 - Benchmarking
-  - Contains scripts to benchmark the performance of the framework against The Distributed ASCI Supercomputer 5 (DAS-5). More information can be found in the [here](./submodules/benchmarking/README.md).
+  - Contains scripts to benchmark the performance of the framework against the Distributed ASCI Supercomputer 5 (DAS-5). More information can be found in the [here](./submodules/benchmarking/README.md).
 - wta-tools
   - Instructions to use validation scripts. More information can be found in [here](./submodules/wta-tools/README.md).
 
+#### Maven Verification and Deployment
+To run the linters and other verification goals on the code, you need to run `mvn clean verify`.
+In order to generate the site, you need to run `mvn site`. If you want the site to contain information
+on testing, such as code coverage, you need to have JaCoCo reports present on your machine. A simple way
+to ensure that this works is by running `mvn clean verify site`. The site will be located in the `target/site`
+directory in every module by default.
 
+By default, the `mvn site` phase will generate separate sites for all the modules. To compile all the sites,
+you need to run `mvn site:stage` after running the site phase. This will compile all the sites in the
+`target/staging` directory in the top level project.
 
 
 ## Authors and Acknowledgement

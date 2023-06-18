@@ -24,6 +24,9 @@
   <suppress files="\.(bdr|eot|gif|gzip|jar|json|otf|png|svg|ttf|woff|zip)$" checks="FileTabCharacter" />
   <suppress files="\.(bdr|eot|gif|gzip|jar|json|otf|png|svg|ttf|woff|zip)$" checks="NewlineAtEndOfFile" />
 
+  <!-- suppress the LF newline rule to avoid trouble on Windows, Spotless still mandates a newline -->
+  <suppress files=".*" checks="NewlineAtEndOfFile" />
+
   <!-- Generated code should not be subjected to checkstyle. -->
   <suppress files="[/\\].*[/\\]generated.*[/\\]" checks="." />
 </suppressions>
