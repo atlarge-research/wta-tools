@@ -22,6 +22,24 @@ public interface OutputFile {
   OutputFile resolve(String path);
 
   /**
+   * Sets the path of the output file.
+   *
+   * @param path a {@link String} representation of the location to point to
+   * @throws IOException when something goes wrong during I/O
+   * @author Atour Mousavi Gourabi
+   * @since 1.0.0
+   */
+  void setPath(String path) throws IOException;
+
+  /**
+   * Signals whether this implementation can output to the specified location.
+   *
+   * @param path a {@link String} representation of the location to point to
+   * @return a {@code boolean} indicating whether the implementation can handle the given location
+   */
+  boolean acceptsLocation(String path);
+
+  /**
    * Open a writer resource for the {@link OutputFile}.
    *
    * @return an opened {@link OutputFile} writer

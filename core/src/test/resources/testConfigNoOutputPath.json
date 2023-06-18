@@ -1,6 +1,5 @@
 {
   "authors": ["Test Name"],
   "domain": "Scientific",
-  "description": "Test Description",
-  "logLevel": "INFO"
+  "description": "Test Description"
 }

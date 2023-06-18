@@ -2,6 +2,7 @@ package com.asml.apa.wta.spark.listener;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.asml.apa.wta.core.model.Workload;
 import com.asml.apa.wta.spark.BaseSparkJobIntegrationTest;
 import org.junit.jupiter.api.Test;
 
@@ -17,6 +18,21 @@ class ApplicationLevelIntegrationTest extends BaseSparkJobIntegrationTest {
     invokeJob();
     invokeJob();
     stopJob();
+
+    Workload workload =
+        sut.getApplicationLevelListener().getProcessedObjects().get(0);
+    assertThat(workload.getMeanResourceTask()).isEqualTo(1.0);
+    assertThat(workload.getFirstQuartileResourceTask()).isEqualTo(1.0);
+    assertThat(workload.getMaxResourceTask()).isEqualTo(1.0);
+    assertThat(workload.getCovResourceTask()).isEqualTo(0.0);
+    assertThat(workload.getMeanDiskSpaceUsage()).isEqualTo(1874);
+    assertThat(workload.getCovDiskSpaceUsage()).isEqualTo(1);
+    assertThat(workload.getFirstQuartileDiskSpaceUsage()).isEqualTo(0);
+    assertThat(workload.getMinDiskSpaceUsage()).isEqualTo(0);
+    assertThat(workload.getMeanMemory()).isEqualTo(-1);
+    assertThat(workload.getStdMemory()).isEqualTo(-1);
+    assertThat(workload.getMedianMemory()).isEqualTo(-1);
+    assertThat(workload.getMinMemory()).isEqualTo(-1);
 
     assertThat(sut.getTaskLevelListener().getProcessedObjects().size()).isEqualTo(6);
     assertThat(sut.getTaskLevelListener().getProcessedObjects().get(0).getParents())
@@ -42,6 +58,59 @@ class ApplicationLevelIntegrationTest extends BaseSparkJobIntegrationTest {
     assertThat(sut.getTaskLevelListener().getProcessedObjects().get(5).getParents())
         .isEqualTo(new long[] {5});
     assertThat(sut.getTaskLevelListener().getProcessedObjects().get(5).getChildren())
+        .isEqualTo(new long[0]);
+  }
+
+  @Test
+  void testParentChildrenFieldAlt() {
+    sut2.registerTaskListener();
+    sut2.registerStageListener();
+    sut2.registerJobListener();
+    sut2.registerApplicationListener();
+    invokeJob();
+    invokeJob();
+    invokeJob();
+    stopJob();
+
+    Workload workload =
+        sut2.getApplicationLevelListener().getProcessedObjects().get(0);
+    assertThat(workload.getMeanResourceTask()).isEqualTo(-1.0);
+    assertThat(workload.getFirstQuartileResourceTask()).isEqualTo(-1.0);
+    assertThat(workload.getMaxResourceTask()).isEqualTo(-1.0);
+    assertThat(workload.getCovResourceTask()).isEqualTo(-1.0);
+    assertThat(workload.getMeanDiskSpaceUsage()).isEqualTo(1874);
+    assertThat(workload.getCovDiskSpaceUsage()).isEqualTo(1);
+    assertThat(workload.getFirstQuartileDiskSpaceUsage()).isEqualTo(0);
+    assertThat(workload.getMinDiskSpaceUsage()).isEqualTo(0);
+    assertThat(workload.getMeanMemory()).isEqualTo(-1);
+    assertThat(workload.getStdMemory()).isEqualTo(-1);
+    assertThat(workload.getMedianMemory()).isEqualTo(-1);
+    assertThat(workload.getMinMemory()).isEqualTo(-1);
+
+    assertThat(sut2.getTaskLevelListener().getProcessedObjects().size()).isEqualTo(6);
+    assertThat(sut2.getStageLevelListener().getProcessedObjects().get(0).getParents())
+        .isEqualTo(new long[0]);
+    assertThat(sut2.getStageLevelListener().getProcessedObjects().get(0).getChildren())
+        .isEqualTo(new long[] {2});
+    assertThat(sut2.getStageLevelListener().getProcessedObjects().get(1).getParents())
+        .isEqualTo(new long[] {1});
+    assertThat(sut2.getStageLevelListener().getProcessedObjects().get(1).getChildren())
+        .isEqualTo(new long[0]);
+    assertThat(sut2.getStageLevelListener().getProcessedObjects().get(2).getParents())
+        .isEqualTo(new long[0]);
+    assertThat(sut2.getStageLevelListener().getProcessedObjects().get(2).getChildren())
+        .isEqualTo(new long[] {4});
+    assertThat(sut2.getStageLevelListener().getProcessedObjects().get(3).getParents())
+        .isEqualTo(new long[] {3});
+    assertThat(sut2.getStageLevelListener().getProcessedObjects().get(3).getChildren())
+        .isEqualTo(new long[0]);
+    assertThat(sut2.getStageLevelListener().getProcessedObjects().get(4).getParents())
+        .isEqualTo(new long[0]);
+    assertThat(sut2.getStageLevelListener().getProcessedObjects().get(4).getChildren())
+        .isEqualTo(new long[] {6});
+    assertThat(sut2.getStageLevelListener().getProcessedObjects().get(5).getParents())
+        .isEqualTo(new long[] {5});
+    assertThat(sut2.getStageLevelListener().getProcessedObjects().get(5).getChildren())
         .isEqualTo(new long[0]);
   }
 }

@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.stream.Collectors;
 import org.apache.spark.executor.ExecutorMetrics;
+import org.apache.spark.executor.ShuffleWriteMetrics;
 import org.apache.spark.executor.TaskMetrics;
 import org.apache.spark.scheduler.SparkListenerJobStart;
 import org.apache.spark.scheduler.SparkListenerStageCompleted;
@@ -47,7 +48,14 @@ class TaskLevelListenerTest extends BaseLevelListenerTest {
     parents.$plus$eq(0);
     parents.$plus$eq(1);
     TaskMetrics mockedMetrics = mock(TaskMetrics.class);
+    ShuffleWriteMetrics mockedShuffleMetrics = mock(ShuffleWriteMetrics.class);
+    when(mockedMetrics.shuffleWriteMetrics()).thenReturn(mockedShuffleMetrics);
+    when(mockedShuffleMetrics.bytesWritten()).thenReturn(100L);
     when(mockedMetrics.executorRunTime()).thenReturn(100L);
+    when(mockedMetrics.peakExecutionMemory()).thenReturn(-1L);
+    when(mockedMetrics.diskBytesSpilled()).thenReturn(-1L);
+    when(mockedMetrics.resultSerializationTime()).thenReturn(-1L);
+    when(mockedMetrics.executorDeserializeTime()).thenReturn(0L);
 
     testStageInfo = new StageInfo(
         3,
@@ -81,15 +89,18 @@ class TaskLevelListenerTest extends BaseLevelListenerTest {
     fakeTaskListener.onJobStart(new SparkListenerJobStart(1, 2L, stageBuffer.toList(), new Properties()));
     fakeTaskListener.onTaskEnd(taskEndEvent);
     assertThat(fakeTaskListener.getStageToTasks().size()).isEqualTo(1);
-    List<Long> list = new ArrayList<>();
-    list.add(1L);
-    assertThat(fakeTaskListener.getStageToTasks()).containsEntry(3, list);
+    List<Task> list = new ArrayList<>();
+    list.add(Task.builder().id(1L).build());
+    assertThat(fakeTaskListener.getStageToTasks().get(3).size()).isEqualTo(1);
+    assertThat(fakeTaskListener.getStageToTasks().get(3).get(0).getId()).isEqualTo(1);
     assertThat(fakeTaskListener.getTaskToStage().size()).isEqualTo(1);
     assertThat(fakeTaskListener.getTaskToStage()).containsEntry(1L, 3);
     fakeTaskListener.onTaskEnd(taskEndEvent2);
     assertThat(fakeTaskListener.getStageToTasks().size()).isEqualTo(1);
-    list.add(2L);
-    assertThat(fakeTaskListener.getStageToTasks()).containsEntry(3, list);
+    list.add(Task.builder().id(2L).build());
+    assertThat(fakeTaskListener.getStageToTasks().get(3).size()).isEqualTo(2);
+    assertThat(fakeTaskListener.getStageToTasks().get(3).get(0).getId()).isEqualTo(1);
+    assertThat(fakeTaskListener.getStageToTasks().get(3).get(1).getId()).isEqualTo(2);
     assertThat(fakeTaskListener.getTaskToStage().size()).isEqualTo(2);
     assertThat(fakeTaskListener.getTaskToStage()).containsEntry(1L, 3);
     assertThat(fakeTaskListener.getTaskToStage()).containsEntry(2L, 3);
@@ -114,7 +125,7 @@ class TaskLevelListenerTest extends BaseLevelListenerTest {
     assertEquals("N/A", curTask.getResourceType());
     assertEquals(-1.0, curTask.getResourceAmountRequested());
     assertEquals(-1.0, curTask.getMemoryRequested());
-    assertEquals(-1.0, curTask.getDiskSpaceRequested());
+    assertEquals(99.0, curTask.getDiskSpaceRequested());
     assertEquals(-1L, curTask.getEnergyConsumption());
     assertEquals(-1L, curTask.getNetworkIoTime());
     assertEquals(-1L, curTask.getDiskIoTime());

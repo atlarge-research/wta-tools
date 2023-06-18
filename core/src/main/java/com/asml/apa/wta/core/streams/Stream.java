@@ -8,6 +8,8 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.Instant;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -66,6 +68,8 @@ public class Stream<V extends Serializable> {
   private final Queue<String> diskLocations;
   private int additionsSinceLastWriteToDisk;
   private final int serializationTrigger;
+
+  private static final String TEMP_SERIALIZATION_DIRECTORY = "tmp/wta/streams/serialization/";
 
   private StreamNode<V> deserializationStart;
   private StreamNode<V> deserializationEnd;
@@ -141,7 +145,7 @@ public class Stream<V extends Serializable> {
     } else {
       current = deserializationEnd;
     }
-    String filePath = "tmp\\" + id + "-" + System.currentTimeMillis() + "-"
+    String filePath = Stream.TEMP_SERIALIZATION_DIRECTORY + id + "-" + System.currentTimeMillis() + "-"
         + Instant.now().getNano() + ".ser";
     List<StreamNode<V>> toSerialize = new ArrayList<>();
     while (current != tail && current != null) {
@@ -379,5 +383,22 @@ public class Stream<V extends Serializable> {
       ret.add(head());
     }
     return ret;
+  }
+
+  /**
+   * Deletes all the generated stream files.
+   *
+   * @author Lohithsai Yadala Chanchu
+   * @since 1.0.0
+   */
+  public static synchronized void deleteAllSerializedFiles() {
+    try {
+      Files.walk(Path.of(Stream.TEMP_SERIALIZATION_DIRECTORY))
+          .sorted(java.util.Comparator.reverseOrder())
+          .map(Path::toFile)
+          .forEach(File::delete);
+    } catch (IOException e) {
+      log.error("Something went wrong while trying to delete the temporarily serialized files");
+    }
   }
 }

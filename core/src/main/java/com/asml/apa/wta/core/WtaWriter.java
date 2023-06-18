@@ -38,13 +38,14 @@ public class WtaWriter {
    *
    * @param path the output path to write to
    * @param version the version of files to write
+   * @param toolVersion the version of the tool that writes to file
    * @author Atour Mousavi Gourabi
    * @since 1.0.0
    */
-  public WtaWriter(@NonNull OutputFile path, String version) {
-    file = path;
+  public WtaWriter(@NonNull OutputFile path, String version, String toolVersion) {
+    file = path.resolve(toolVersion);
     schemaVersion = version;
-    setupDirectories(path, version);
+    setupDirectories(file, version);
   }
 
   /**
@@ -56,8 +57,7 @@ public class WtaWriter {
    */
   public void write(Workload workload) {
     log.debug("Writing workload to file.");
-    OutputFile path = file.resolve("workload").resolve(schemaVersion).resolve("generic_information.json");
-    try (JsonWriter<Workload> workloadWriter = new JsonWriter<>(path)) {
+    try (JsonWriter<Workload> workloadWriter = createWorkloadWriter()) {
       workloadWriter.write(workload);
     } catch (IOException e) {
       log.error("Could not write workload to file.");
@@ -94,7 +94,7 @@ public class WtaWriter {
    * @author Atour Mousavi Gourabi
    * @since 1.0.0
    */
-  private void setupDirectories(OutputFile path, String version) {
+  protected void setupDirectories(OutputFile path, String version) {
     log.debug("Setting up directory structure for the output.");
     try {
       path.resolve("workload").resolve(version).resolve(".temp").clearDirectory();
@@ -104,5 +104,17 @@ public class WtaWriter {
     } catch (IOException e) {
       log.error("Could not create directory structure for the output.");
     }
+  }
+
+  /**
+   * Creates a Workload json writer.
+   *
+   * @return JsonWriter a json writer that writes the workload json file
+   * @author Lohithsai Yadala Chanchu
+   * @since 1.0.0
+   */
+  protected JsonWriter<Workload> createWorkloadWriter() throws IOException {
+    OutputFile path = file.resolve("workload").resolve(schemaVersion).resolve("generic_information.json");
+    return new JsonWriter<>(path);
   }
 }
