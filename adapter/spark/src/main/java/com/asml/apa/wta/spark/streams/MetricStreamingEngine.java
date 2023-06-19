@@ -13,6 +13,7 @@ import com.asml.apa.wta.spark.dto.SparkBaseSupplierWrapperDto;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -115,8 +116,8 @@ public class MetricStreamingEngine {
     final String processorModel = pings.stream()
         .filter(ping -> ping.getProcDto().isPresent())
         .map(ping -> ping.getProcDto().get())
-        .filter(pcDto -> pcDto.getCpuModel().isPresent())
-        .map(pcDto -> pcDto.getCpuModel().get())
+        .map(ProcDto::getCpuModel)
+        .filter(Objects::nonNull)
         .findFirst()
         .orElse("unknown");
 
@@ -190,17 +191,17 @@ public class MetricStreamingEngine {
               .orElse(-1);
 
           final double averageUtilization1Minute = ping.getProcDto()
-              .flatMap(ProcDto::getLoadAvgOneMinute)
+              .map(ProcDto::getLoadAvgOneMinute)
               .map(loadAvg -> loadAvg / numCores)
               .orElse(-1.0);
 
           final double averageUtilization5Minute = ping.getProcDto()
-              .flatMap(ProcDto::getLoadAvgFiveMinutes)
+              .map(ProcDto::getLoadAvgFiveMinutes)
               .map(loadAvg -> loadAvg / numCores)
               .orElse(-1.0);
 
           final double averageUtilization15Minute = ping.getProcDto()
-              .flatMap(ProcDto::getLoadAvgFifteenMinutes)
+              .map(ProcDto::getLoadAvgFifteenMinutes)
               .map(loadAvg -> loadAvg / numCores)
               .orElse(-1.0);
 
