@@ -62,9 +62,8 @@ public class StageLevelListener extends TaskStageBaseListener {
         .stream()
         .mapToLong(parentId -> (Integer) parentId + 1)
         .toArray();
-    if (config.isStageLevel()) {
-      task.setParents(parentStageIds);
-    } else {
+    task.setParents(parentStageIds);
+    if (!config.isStageLevel()){
       stageToParents.put(stageId, Arrays.stream(parentStageIds).boxed().toArray(Long[]::new));
     }
 
@@ -107,7 +106,6 @@ public class StageLevelListener extends TaskStageBaseListener {
     final long stageId = curStageInfo.stageId() + 1;
     stageToResource.put(stageId, curStageInfo.resourceProfileId());
 
-    final int stageId = curStageInfo.stageId() + 1;
     final Long tsSubmit = curStageInfo.submissionTime().getOrElse(() -> -1L);
     final long runtime = curStageInfo.taskMetrics().executorRunTime();
     final long[] parents = new long[0];
@@ -116,28 +114,7 @@ public class StageLevelListener extends TaskStageBaseListener {
     final long workflowId = stageToJob.get(stageId);
     final double diskSpaceRequested = (double) curStageMetrics.diskBytesSpilled()
         + curStageMetrics.shuffleWriteMetrics().bytesWritten();
-    /**
-     * alternative:
-     *
-     * final double memoryRequested = curTaskMetrics.peakExecutionMemory();
-     *
-     *  peakExecutionMemory is the peak memory used by internal data structures created during shuffles,
-     *  aggregations and joins.
-     *  The value of this accumulator should be approximately the sum of the peak sizes across all such data structures
-     *  created in this task.
-     *  It is thus only an upper bound of the actual peak memory for the task.
-     *  For SQL jobs, this only tracks all unsafe operators and ExternalSort
-     */
     final double memoryRequested = -1.0;
-    long[] parents;
-    if (config.isStageLevel()) {
-      parents =
-          Arrays.stream(parentIds).mapToLong(parentId -> parentId + 1).toArray();
-    } else {
-      parents = new long[0];
-      stageToParents.put(stageId, parentIds);
-    }
-    final long[] children = new long[0];
     // dummy values
     final String type = "";
     final int submissionSite = -1;
@@ -147,7 +124,6 @@ public class StageLevelListener extends TaskStageBaseListener {
     final String nfrs = "";
     final long waitTime = -1L;
     final String params = "";
-    final double memoryRequested = -1.0;
     final long networkIoTime = -1L;
     final long diskIoTime = -1L;
     final double energyConsumption = -1L;

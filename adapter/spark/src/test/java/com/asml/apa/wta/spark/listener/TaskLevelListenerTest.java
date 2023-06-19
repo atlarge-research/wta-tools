@@ -89,19 +89,19 @@ class TaskLevelListenerTest extends BaseLevelListenerTest {
     assertThat(fakeTaskListener1.getStageToTasks().size()).isEqualTo(1);
     List<Task> list = new ArrayList<>();
     list.add(Task.builder().id(1L).build());
-    assertThat(fakeTaskListener.getStageToTasks().get(4).size()).isEqualTo(1);
-    assertThat(fakeTaskListener.getStageToTasks().get(4).get(0).getId()).isEqualTo(1);
-    assertThat(fakeTaskListener.getTaskToStage().size()).isEqualTo(1);
-    assertThat(fakeTaskListener.getTaskToStage()).containsEntry(1L, 4);
-    fakeTaskListener.onTaskEnd(taskEndEvent2);
-    assertThat(fakeTaskListener.getStageToTasks().size()).isEqualTo(1);
+    assertThat(fakeTaskListener1.getStageToTasks().get(3L).size()).isEqualTo(1);
+    assertThat(fakeTaskListener1.getStageToTasks().get(3L).get(0).getId()).isEqualTo(1);
+    assertThat(fakeTaskListener1.getTaskToStage().size()).isEqualTo(1);
+    assertThat(fakeTaskListener1.getTaskToStage()).containsEntry(1L, 3L);
+    fakeTaskListener1.onTaskEnd(taskEndEvent2);
+    assertThat(fakeTaskListener1.getStageToTasks().size()).isEqualTo(1);
     list.add(Task.builder().id(2L).build());
-    assertThat(fakeTaskListener.getStageToTasks().get(4).size()).isEqualTo(2);
-    assertThat(fakeTaskListener.getStageToTasks().get(4).get(0).getId()).isEqualTo(1);
-    assertThat(fakeTaskListener.getStageToTasks().get(4).get(1).getId()).isEqualTo(2);
-    assertThat(fakeTaskListener.getTaskToStage().size()).isEqualTo(2);
-    assertThat(fakeTaskListener.getTaskToStage()).containsEntry(1L, 4);
-    assertThat(fakeTaskListener.getTaskToStage()).containsEntry(2L, 4);
+    assertThat(fakeTaskListener1.getStageToTasks().get(3L).size()).isEqualTo(2);
+    assertThat(fakeTaskListener1.getStageToTasks().get(3L).get(0).getId()).isEqualTo(1);
+    assertThat(fakeTaskListener1.getStageToTasks().get(3L).get(1).getId()).isEqualTo(2);
+    assertThat(fakeTaskListener1.getTaskToStage().size()).isEqualTo(2);
+    assertThat(fakeTaskListener1.getTaskToStage()).containsEntry(1L, 3L);
+    assertThat(fakeTaskListener1.getTaskToStage()).containsEntry(2L, 3L);
   }
 
   @Test

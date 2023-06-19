@@ -32,22 +32,22 @@ class DAGsolverTest extends BaseLevelListenerTest {
     when(mockedTask2.getRuntime()).thenReturn(2L);
     Task mockedTask3 = mock(Task.class);
     when(mockedTask3.getRuntime()).thenReturn(4L);
-    Map<Integer, List<Task>> stt1 = new HashMap<>();
-    stt1.put(0, Arrays.asList(new Task[] {mockedTask1}));
-    stt1.put(1, Arrays.asList(new Task[] {mockedTask1}));
-    stt1.put(2, Arrays.asList(new Task[] {mockedTask2}));
-    stt1.put(3, Arrays.asList(new Task[] {mockedTask1}));
+    Map<Long, List<Task>> stt1 = new HashMap<>();
+    stt1.put(0L, List.of(mockedTask1));
+    stt1.put(1L, List.of(mockedTask1));
+    stt1.put(2L, List.of(mockedTask2));
+    stt1.put(3L, List.of(mockedTask1));
     mockedListener1 = mock(TaskLevelListener.class);
     when(mockedListener1.getStageToTasks()).thenReturn(stt1);
 
-    Map<Integer, List<Task>> stt2 = new HashMap<>();
-    stt2.put(0, Arrays.asList(new Task[] {mockedTask1}));
-    stt2.put(1, Arrays.asList(new Task[] {mockedTask2}));
-    stt2.put(2, Arrays.asList(new Task[] {mockedTask2}));
-    stt2.put(3, Arrays.asList(new Task[] {mockedTask1}));
-    stt2.put(4, Arrays.asList(new Task[] {mockedTask2}));
-    stt2.put(5, Arrays.asList(new Task[] {mockedTask1}));
-    stt2.put(6, Arrays.asList(new Task[] {mockedTask3}));
+    Map<Long, List<Task>> stt2 = new HashMap<>();
+    stt2.put(0L, List.of(mockedTask1));
+    stt2.put(1L, List.of(mockedTask2));
+    stt2.put(2L, List.of(mockedTask2));
+    stt2.put(3L, List.of(mockedTask1));
+    stt2.put(4L, List.of(mockedTask2));
+    stt2.put(5L, List.of(mockedTask1));
+    stt2.put(6L, List.of(mockedTask3));
     mockedListener2 = mock(TaskLevelListener.class);
     when(mockedListener2.getStageToTasks()).thenReturn(stt2);
 
@@ -96,7 +96,7 @@ class DAGsolverTest extends BaseLevelListenerTest {
 
   @Test
   void test() {
-    List<Long> cp = fakeJobListener.solveCriticalPath(stages1).stream()
+    List<Long> cp = fakeJobListener1.solveCriticalPath(stages1).stream()
         .map(Task::getId)
         .collect(Collectors.toList());
     assertThat(cp.size()).isEqualTo(3);
@@ -107,7 +107,7 @@ class DAGsolverTest extends BaseLevelListenerTest {
 
   @Test
   void augTest() {
-    List<Long> cp = fakeJobListener.solveCriticalPath(stages2).stream()
+    List<Long> cp = fakeJobListener1.solveCriticalPath(stages2).stream()
         .map(Task::getId)
         .collect(Collectors.toList());
     assertThat(cp.size()).isEqualTo(3);

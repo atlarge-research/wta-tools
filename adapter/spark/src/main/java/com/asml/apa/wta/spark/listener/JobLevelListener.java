@@ -10,11 +10,13 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.Getter;
 import org.apache.spark.SparkContext;
 import org.apache.spark.scheduler.SparkListenerJobEnd;
 import org.apache.spark.scheduler.SparkListenerJobStart;
+import scala.collection.JavaConverters;
 
 /**
  * This class is a job-level listener for the Spark data source.
@@ -81,9 +83,9 @@ public class JobLevelListener extends AbstractListener<Workflow> {
    */
   @Override
   public void onJobStart(SparkListenerJobStart jobStart) {
-    jobSubmitTimes.put(jobStart.jobId() + 1, jobStart.time());
+    jobSubmitTimes.put((long) jobStart.jobId() + 1, jobStart.time());
     List<Task> stages = new ArrayList<>();
-    JavaConverters.seqAsJavaList(jobStart.stageInfos()).stream().forEach(stageInfo -> {
+    JavaConverters.seqAsJavaList(jobStart.stageInfos()).forEach(stageInfo -> {
       stages.add(Task.builder()
           .id((long) stageInfo.stageId() + 1)
           .parents(JavaConverters.seqAsJavaList(stageInfo.parentIds()).stream()
@@ -116,7 +118,7 @@ public class JobLevelListener extends AbstractListener<Workflow> {
         .toArray(Task[]::new);
     final int taskCount = tasks.length;
     final long criticalPathLength = -1L;
-    final int criticalPathTaskCount = criticalPathTasks.get(jobId);
+    final int criticalPathTaskCount = -1;
     final int maxNumberOfConcurrentTasks = -1;
     final String nfrs = "";
 
@@ -131,8 +133,6 @@ public class JobLevelListener extends AbstractListener<Workflow> {
         (long) computeSum(Arrays.stream(tasks).map(task -> (double) task.getNetworkIoTime()));
     final double totalDiskSpaceUsage = computeSum(Arrays.stream(tasks).map(Task::getDiskSpaceRequested));
     final double totalEnergyConsumption = computeSum(Arrays.stream(tasks).map(Task::getEnergyConsumption));
-    final int criticalPathTaskCount = -1;
-    final long criticalPathLength = -1;
 
     this.getProcessedObjects()
         .add(Workflow.builder()
@@ -178,7 +178,6 @@ public class JobLevelListener extends AbstractListener<Workflow> {
   private void cleanUpContainers(SparkListenerJobEnd jobEnd) {
     long jobId = jobEnd.jobId() + 1;
     jobSubmitTimes.remove(jobId);
-    criticalPathTasks.remove(jobId);
 
     Stream<Long> stageIds = stageLevelListener.getStageToJob().entrySet().stream()
         .filter(e -> e.getValue().equals(jobId))
@@ -221,47 +220,41 @@ public class JobLevelListener extends AbstractListener<Workflow> {
    */
   public void setWorkflows() {
     final List<Workflow> workflows = this.getProcessedObjects();
-    workflows.forEach(workflow -> workflow.setTotalResources(Arrays.stream(workflow.getTasks())
-        .map(Task::getResourceAmountRequested)
-        .filter(resourceAmount -> resourceAmount >= 0.0)
-        .reduce(Double::sum)
-        .orElse(-1.0)));
-    final List<Workflow> workflows = getProcessedObjects();
-    for (Workflow workflow : workflows) {
-      workflow.setTotalResources(Arrays.stream(workflow.getTasks())
-          .map(Task::getResourceAmountRequested)
-          .filter(resourceAmount -> resourceAmount >= 0.0)
-          .reduce(Double::sum)
-          .orElse(-1.0));
-
+    workflows.forEach(workflow -> {
       if (!config.isStageLevel()) {
         List<Task> jobStages = stageLevelListener.getProcessedObjects().stream()
-            .filter(stage -> stage.getWorkflowId() == workflow.getId())
-            .collect(Collectors.toList());
+                .filter(stage -> stage.getWorkflowId() == workflow.getId())
+                .collect(Collectors.toList());
         jobStages.addAll(jobToStages.get(workflow.getId()).stream()
-            .filter(stage -> !jobStages.stream()
-                .map(Task::getId)
-                .collect(Collectors.toList())
-                .contains(stage.getId()))
-            .collect(Collectors.toList()));
+                .filter(stage -> !jobStages.stream()
+                        .map(Task::getId)
+                        .collect(Collectors.toList())
+                        .contains(stage.getId()))
+                .collect(Collectors.toList()));
 
         final List<Task> criticalPath = solveCriticalPath(jobStages);
-        TaskLevelListener listener = (TaskLevelListener) taskListener;
+        TaskLevelListener listener = (TaskLevelListener) wtaTaskListener;
 
-        final Map<Integer, List<Task>> stageToTasks = listener.getStageToTasks();
+        final Map<Long, List<Task>> stageToTasks = listener.getStageToTasks();
         workflow.setCriticalPathTaskCount(criticalPath.stream()
-            .map(stage -> stageToTasks.get((int) stage.getId()).size())
-            .reduce(Integer::sum)
-            .orElse(-1));
+                .map(stage -> stageToTasks.get(stage.getId()).size())
+                .reduce(Integer::sum)
+                .orElse(-1));
         workflow.setCriticalPathLength(criticalPath.stream()
-            .map(stage -> stageToTasks.getOrDefault((int) stage.getId(), new ArrayList<>()).stream()
-                .map(Task::getRuntime)
-                .reduce(Long::max)
-                .orElse(0L))
-            .reduce(Long::sum)
-            .orElse(-1L));
+                .map(stage -> stageToTasks.getOrDefault(stage.getId(), new ArrayList<>()).stream()
+                        .map(Task::getRuntime)
+                        .reduce(Long::max)
+                        .orElse(0L))
+                .reduce(Long::sum)
+                .orElse(-1L));
       }
-    }
+
+      workflow.setTotalResources(Arrays.stream(workflow.getTasks())
+              .map(Task::getResourceAmountRequested)
+              .filter(resourceAmount -> resourceAmount >= 0.0)
+              .reduce(Double::sum)
+              .orElse(-1.0));
+    });
   }
 
   /**
@@ -275,7 +268,7 @@ public class JobLevelListener extends AbstractListener<Workflow> {
    */
   List<Task> solveCriticalPath(List<Task> stages) {
     try {
-      DagSolver dag = new DagSolver(stages, (TaskLevelListener) taskListener);
+      DagSolver dag = new DagSolver(stages, (TaskLevelListener) wtaTaskListener);
       return dag.longestPath().stream()
           .filter(stage -> stage.getRuntime() != 0)
           .collect(Collectors.toList());
