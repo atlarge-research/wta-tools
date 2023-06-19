@@ -43,7 +43,7 @@ public class ProcSupplierTest {
         .memFree(1921196L)
         .memAvailable(5470300L)
         .buffers(239068L)
-        .cpuModel("Intel(R Core(TM) i7-10750H CPU @ 2.60GHz")
+        .cpuModel("Intel(R) Core(TM) i7-10750H CPU @ 2.60GHz")
         .loadAvgOneMinute(0.62)
         .loadAvgFiveMinutes(1.23)
         .loadAvgFifteenMinutes(1.02)
