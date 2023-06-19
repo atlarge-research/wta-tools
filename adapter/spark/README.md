@@ -81,10 +81,10 @@ For the second approach, create a JAR file of the plugin and run it alongside th
 - Execute the following command in the directory where the jar file is located:
 
 ```shell
-spark-submit --class <main class path to spark application> --master local
---conf spark.plugins=com.asml.apa.wta.spark.WtaPlugin
---conf "spark.driver.extraJavaOptions=-DconfigFile=<config.json_location>"
---jars <plugin_jar_location> <Spark_jar_location>
+spark-submit --class <main class path to spark application> --master local \
+--conf spark.plugins=com.asml.apa.wta.spark.WtaPlugin \
+--conf spark.driver.extraJavaOptions=-DconfigFile=<config.json_location> \
+--jars <plugin_jar_location> <Spark_jar_location> \
 <optional arguments for spark application>
 ```
 - The Parquet files should now be located in the `outputPath` as specified in the config file.
@@ -94,20 +94,37 @@ you will need to set the `spark.scala.version` flag to 2.13, such as in
 `mvn -pl adapter/spark -Dspark.scala.version=2.13 clean package`.
 
 ### Integration with Pyspark
-The plugin can also be used with Pyspark. To do this, you need to create a JAR file of the plugin and run it alongside the main Spark application using **spark-submit**.
+PySpark is the Python API for Apache Spark and the plugin can also be used with Python scripts that make use of Pyspark via `spark-submit`. Like the previous section, this can be done both by plugin integration and CLI execution.
 
-For Spark 3.2.4, Python 3.7 ~ 3.10 is required. In addition add the following to your environment variable in your .bashrc file.
+For Spark 3.2.4, Python 3.7 to Python 3.10 needs to be installed. In addition, add the following environment variables in your .bashrc file:
 
 ```
 export PYSPARK_PYTHON=/usr/bin/python3.10
 export PYSPARK_DRIVER_PYTHON=/usr/bin/python3.10
 ```
 
-You need the following tools installe:
+After specifying the above environment variables, submit a Python script that makes use of Pyspark along with the JAR file of the plugin to **spark-submit**:
+
+For example:
 
 ```
-Insta
+.set("spark.plugins", "com.asml.apa.wta.spark.WtaPlugin")
+.set("spark.driver.extraJavaOptions", "-DconfigFile=/home/philly/sp_resources/config.json" )
 ```
+
+```shell
+spark-submit --jars /home/philly/sp_resources/SparkPlugin.jar /home/philly/sp_resources/pyspark-test.py
+```
+
+or
+
+It is important to note that the plugin specification must come and then the mention the python script. 
+
+```shell
+spark-submit --conf spark.plugins=com.asml.apa.wta.spark.WtaPlugin --conf spark.driver.extraJavaOptions=-DconfigFile=/home/philly/sp_resources/config.json --jars /home/philly/sp_resources/SparkPlugin.jar /home/philly/sp_resources/pyspark-test.py
+```
+
+Note that in the Python script, `sc.stop()` must also be specified at the end of the application to invoke the application finished callback for the plugin.
 
 ## Configuration
 General configuration instructions are located [here](/../../README.md#configuration). See above for [instructions](#installation-and-usage) on how to provide the configuration to the plugin.
