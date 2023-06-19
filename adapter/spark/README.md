@@ -94,37 +94,41 @@ you will need to set the `spark.scala.version` flag to 2.13, such as in
 `mvn -pl adapter/spark -Dspark.scala.version=2.13 clean package`.
 
 ### Integration with Pyspark
-PySpark is the Python API for Apache Spark and the plugin can also be used with Python scripts that make use of Pyspark via `spark-submit`. Like the previous section, this can be done both by plugin integration and CLI execution.
+PySpark is the Python API for Apache Spark and the plugin can also be used with Python scripts that make use of Pyspark.
 
-For Spark 3.2.4, Python 3.7 to Python 3.10 needs to be installed. In addition, add the following environment variables in your .bashrc file:
+For Spark 3.2.4, Python 3.7 to Python 3.10 needs to be installed. In addition, add the following environment variables in your .bashrc file (assuming we are using Python 3.10):
 
 ```
 export PYSPARK_PYTHON=/usr/bin/python3.10
 export PYSPARK_DRIVER_PYTHON=/usr/bin/python3.10
 ```
 
-After specifying the above environment variables, submit a Python script that makes use of Pyspark along with the JAR file of the plugin to **spark-submit**:
+After specifying the above environment variables, create a Python script such as the following:
 
-For example:
+```Python
+from pyspark import SparkConf, SparkContext
 
+conf = SparkConf().setAppName("PythonScript").set("spark.plugins", "com.asml.apa.wta.spark.WtaPlugin").set("spark.driver.extraJavaOptions", "-DconfigFile=/home/philly/sp_resources/config.json")
+sc = SparkContext(conf=conf)
+
+...
+
+sc.stop()
 ```
-.set("spark.plugins", "com.asml.apa.wta.spark.WtaPlugin")
-.set("spark.driver.extraJavaOptions", "-DconfigFile=/home/philly/sp_resources/config.json" )
-```
+
+Note that in the Python script, `sc.stop()` must also be specified at the end to invoke the plugin's application finished callback.
+
+Now execute the following command and submit the Python script along with the JAR file of the plugin to **spark-submit**.
 
 ```shell
-spark-submit --jars /home/philly/sp_resources/SparkPlugin.jar /home/philly/sp_resources/pyspark-test.py
+spark-submit --jars <path-to-plugin-jar> <path-to-python-script>
 ```
 
-or
-
-It is important to note that the plugin specification must come and then the mention the python script. 
+Another way to specify the plugin config is to use the `--conf` flag in the command line directly:
 
 ```shell
-spark-submit --conf spark.plugins=com.asml.apa.wta.spark.WtaPlugin --conf spark.driver.extraJavaOptions=-DconfigFile=/home/philly/sp_resources/config.json --jars /home/philly/sp_resources/SparkPlugin.jar /home/philly/sp_resources/pyspark-test.py
+spark-submit --conf spark.plugins=com.asml.apa.wta.spark.WtaPlugin --conf spark.driver.extraJavaOptions=-DconfigFile=<path-to-config-file> --jars <path-to-plugin-jar> <path-to-python-script>
 ```
-
-Note that in the Python script, `sc.stop()` must also be specified at the end of the application to invoke the application finished callback for the plugin.
 
 ## Configuration
 General configuration instructions are located [here](/../../README.md#configuration). See above for [instructions](#installation-and-usage) on how to provide the configuration to the plugin.
