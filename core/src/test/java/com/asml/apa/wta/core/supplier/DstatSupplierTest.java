@@ -21,9 +21,9 @@ public class DstatSupplierTest {
     doReturn(CompletableFuture.completedFuture(
             "----total-usage---- -dsk/total- -net/total- ---paging-- ---system--\n"
                 + "usr sys idl wai stl| read  writ| recv  send|  in   out | int   csw\n"
-                + "  0   1  98k   0   0|   0     0 |   0     0 |   0     0 | 516  2116"))
+                + "  0   1  98k   0   0|   0     0 |   0     0 |   0B     0B | 516  2116"))
         .when(shellUtils)
-        .executeCommand("dstat -cdngy 1 -c 1");
+        .executeCommand("dstat -cdngy 1 1");
     DstatSupplier sut = spy(new DstatSupplier(shellUtils));
 
     Optional<DstatDto> actual = sut.getSnapshot().join();

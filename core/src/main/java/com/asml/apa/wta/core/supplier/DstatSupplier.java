@@ -40,7 +40,7 @@ public class DstatSupplier implements InformationSupplier<DstatDto> {
       return notAvailableResult();
     }
 
-    CompletableFuture<String> allMetrics = shellUtils.executeCommand("dstat -cdngy 1 -c 1");
+    CompletableFuture<String> allMetrics = shellUtils.executeCommand("dstat -cdngy 1 1");
 
     return allMetrics.thenApply(result -> {
       if (result != null) {
@@ -78,16 +78,20 @@ public class DstatSupplier implements InformationSupplier<DstatDto> {
    */
   private static List<Integer> extractNumbers(String input) {
     List<Integer> numbers = new ArrayList<>();
-    Pattern pattern = Pattern.compile("\\b(\\d+)(k)?\\b");
+    Pattern pattern = Pattern.compile("\\b(\\d+)(k|B)?\\b");
     Matcher matcher = pattern.matcher(input);
 
     while (matcher.find()) {
       String match = matcher.group(1);
-      boolean isKilo = matcher.group(2) != null;
+      String suffix = matcher.group(2);
 
       int number = Integer.parseInt(match);
-      if (isKilo) {
-        number *= 1000;
+      if (suffix != null) {
+        if (suffix.equals("k")) {
+          number *= 1000;
+        } else if (suffix.equals("B")) {
+          number *= 1;
+        }
       }
       numbers.add(number);
     }
@@ -105,7 +109,7 @@ public class DstatSupplier implements InformationSupplier<DstatDto> {
   @Override
   public boolean isAvailable() {
     try {
-      if (shellUtils.executeCommand("dstat -cdngy 1 -c 1").get() != null) {
+      if (shellUtils.executeCommand("dstat -cdngy 1 1").get() != null) {
         return true;
       }
     } catch (InterruptedException | ExecutionException e) {
