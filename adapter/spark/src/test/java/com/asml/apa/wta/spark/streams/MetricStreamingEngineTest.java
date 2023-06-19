@@ -63,10 +63,10 @@ class MetricStreamingEngineTest {
             .totalPhysicalMemorySize(120000000000L)
             .build()))
         .procDto(Optional.of(ProcDto.builder()
-            .cpuModel(Optional.of("Ryzen 7 Over 90000"))
-            .loadAvgOneMinute(Optional.of(1.36))
-            .loadAvgFiveMinutes(Optional.of(1.76))
-            .loadAvgFifteenMinutes(Optional.of(1.96))
+            .cpuModel("Ryzen 7 Over 90000")
+            .loadAvgOneMinute(1.36)
+            .loadAvgFiveMinutes(1.76)
+            .loadAvgFifteenMinutes(1.96)
             .build()))
         .build();
 
@@ -95,7 +95,7 @@ class MetricStreamingEngineTest {
             .totalPhysicalMemorySize(120000000000L)
             .build()))
         .procDto(Optional.of(ProcDto.builder()
-            .cpuModel(Optional.of("Ryzen 7 Over 90000"))
+            .cpuModel("Ryzen 7 Over 90000")
             .build()))
         .build();
   }
