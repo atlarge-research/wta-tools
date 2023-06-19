@@ -44,7 +44,7 @@ public class DstatSupplier implements InformationSupplier<DstatDto> {
 
     return allMetrics.thenApply(result -> {
       if (result != null) {
-        List<Integer> metrics = extractNumbers(result);
+        List<Long> metrics = extractNumbers(result);
         try {
           return Optional.of(DstatDto.builder()
               .totalUsageUsr(metrics.get(0))
@@ -76,21 +76,23 @@ public class DstatSupplier implements InformationSupplier<DstatDto> {
    * @author Lohithsai Yadala Chanchu
    * @since 1.0.0
    */
-  private static List<Integer> extractNumbers(String input) {
-    List<Integer> numbers = new ArrayList<>();
-    Pattern pattern = Pattern.compile("\\b(\\d+)(k|B)?\\b");
+  private static List<Long> extractNumbers(String input) {
+    List<Long> numbers = new ArrayList<>();
+    Pattern pattern = Pattern.compile("\\b(\\d+)(k|B|G|M)?\\b");
     Matcher matcher = pattern.matcher(input);
 
     while (matcher.find()) {
       String match = matcher.group(1);
       String suffix = matcher.group(2);
 
-      int number = Integer.parseInt(match);
+      long number = Integer.parseInt(match);
       if (suffix != null) {
         if (suffix.equals("k")) {
           number *= 1000;
-        } else if (suffix.equals("B")) {
-          number *= 1;
+        } else if (suffix.equals("M")) {
+          number *= 1000000;
+        } else if (suffix.equals("G")) {
+          number *= 1000000000;
         }
       }
       numbers.add(number);

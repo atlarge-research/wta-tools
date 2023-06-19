@@ -21,7 +21,7 @@ public class DstatSupplierTest {
     doReturn(CompletableFuture.completedFuture(
             "----total-usage---- -dsk/total- -net/total- ---paging-- ---system--\n"
                 + "usr sys idl wai stl| read  writ| recv  send|  in   out | int   csw\n"
-                + "  0   1  98k   0   0|   0     0 |   0     0 |   0B     0B | 516  2116"))
+                + "  0   1M  98k   0   0|   0     0 |   0     0 |   0B     0B | 516G  2116"))
         .when(shellUtils)
         .executeCommand("dstat -cdngy 1 1");
     DstatSupplier sut = spy(new DstatSupplier(shellUtils));
@@ -29,19 +29,19 @@ public class DstatSupplierTest {
     Optional<DstatDto> actual = sut.getSnapshot().join();
 
     DstatDto expected = DstatDto.builder()
-        .totalUsageUsr(0)
-        .totalUsageSys(1)
-        .totalUsageIdl(98000)
-        .totalUsageWai(0)
-        .totalUsageStl(0)
-        .dskRead(0)
-        .dskWrite(0)
-        .netRecv(0)
-        .netSend(0)
-        .pagingIn(0)
-        .pagingOut(0)
-        .systemInt(516)
-        .systemCsw(2116)
+        .totalUsageUsr(0L)
+        .totalUsageSys(1000000L)
+        .totalUsageIdl(98000L)
+        .totalUsageWai(0L)
+        .totalUsageStl(0L)
+        .dskRead(0L)
+        .dskWrite(0L)
+        .netRecv(0L)
+        .netSend(0L)
+        .pagingIn(0L)
+        .pagingOut(0L)
+        .systemInt(516000000000L)
+        .systemCsw(2116L)
         .build();
 
     assertEquals(expected, actual.get());
