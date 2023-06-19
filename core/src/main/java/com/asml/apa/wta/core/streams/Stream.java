@@ -87,6 +87,7 @@ public class Stream<V extends Serializable> {
    * @since 1.0.0
    */
   public Stream(V content, int serializationTrigger) {
+    new File(Stream.TEMP_SERIALIZATION_DIRECTORY).mkdirs();
     head = new StreamNode<>(content);
     tail = head;
     diskLocations = new ArrayDeque<>();
@@ -105,14 +106,7 @@ public class Stream<V extends Serializable> {
    * @since 1.0.0
    */
   public Stream(V content) {
-    head = new StreamNode<>(content);
-    tail = head;
-    diskLocations = new ArrayDeque<>();
-    deserializationStart = head;
-    deserializationEnd = head;
-    id = UUID.randomUUID();
-    additionsSinceLastWriteToDisk = 0;
-    serializationTrigger = 1800;
+    this(content, 1800);
   }
 
   /**
@@ -122,6 +116,7 @@ public class Stream<V extends Serializable> {
    * @since 1.0.0
    */
   public Stream() {
+    new File(Stream.TEMP_SERIALIZATION_DIRECTORY).mkdirs();
     deserializationStart = null;
     deserializationEnd = null;
     head = null;
