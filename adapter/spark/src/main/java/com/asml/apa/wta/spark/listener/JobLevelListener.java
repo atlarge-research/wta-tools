@@ -1,15 +1,14 @@
 package com.asml.apa.wta.spark.listener;
 
-import DagSolver.DagSolver;
 import com.asml.apa.wta.core.config.RuntimeConfig;
 import com.asml.apa.wta.core.model.Task;
 import com.asml.apa.wta.core.model.Workflow;
 import com.asml.apa.wta.core.model.enums.Domain;
+import dagsolver.DagSolver;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -34,7 +33,7 @@ public class JobLevelListener extends AbstractListener<Workflow> {
 
   private final Map<Integer, Long> jobSubmitTimes = new ConcurrentHashMap<>();
 
-  private final Map<Long, Map<Long, List<Long>>> jobToStages = new ConcurrentHashMap<>();
+  private final Map<Long, List<Task>> jobToStages = new ConcurrentHashMap<>();
 
   /**
    * Constructor for the job-level listener.
@@ -85,17 +84,17 @@ public class JobLevelListener extends AbstractListener<Workflow> {
   @Override
   public void onJobStart(SparkListenerJobStart jobStart) {
     jobSubmitTimes.put(jobStart.jobId() + 1, jobStart.time());
-    Map<Long, List<Long>> parents = new ConcurrentHashMap<>();
+    List<Task> stages = new ArrayList<>();
     JavaConverters.seqAsJavaList(jobStart.stageInfos()).stream().forEach(stageInfo -> {
-      parents.put(
-          (long) stageInfo.stageId() + 1,
-          JavaConverters.seqAsJavaList(stageInfo.parentIds()).stream()
+      stages.add(Task.builder()
+          .id((long) stageInfo.stageId() + 1)
+          .parents(JavaConverters.seqAsJavaList(stageInfo.parentIds()).stream()
               .mapToInt(x -> (int) x + 1)
               .mapToLong(x -> (long) x)
-              .boxed()
-              .collect(Collectors.toList()));
+              .toArray())
+          .build());
     });
-    jobToStages.put((long) jobStart.jobId() + 1, parents);
+    jobToStages.put((long) jobStart.jobId() + 1, stages);
   }
 
   /**
@@ -203,24 +202,15 @@ public class JobLevelListener extends AbstractListener<Workflow> {
           .orElse(-1.0));
 
       if (!config.isStageLevel()) {
-        Set<Long> stageIds = jobToStages.get(workflow.getId()).keySet();
         List<Task> jobStages = stageLevelListener.getProcessedObjects().stream()
-            .filter(stage -> stageIds.contains(stage.getId()))
+            .filter(stage -> stage.getWorkflowId() == workflow.getId())
             .collect(Collectors.toList());
-        jobToStages.get(workflow.getId()).forEach((id, parents) -> {
-          if (!jobStages.stream()
-              .map(stage -> stage.getId())
-              .collect(Collectors.toList())
-              .contains(id)) {
-            jobStages.add(Task.builder()
-                .id(id)
-                .type("cached stage")
-                .parents(parents.stream()
-                    .mapToLong(parentId -> parentId)
-                    .toArray())
-                .build());
-          }
-        });
+        jobStages.addAll(jobToStages.get(workflow.getId()).stream()
+            .filter(stage -> !jobStages.stream()
+                .map(Task::getId)
+                .collect(Collectors.toList())
+                .contains(stage.getId()))
+            .collect(Collectors.toList()));
 
         final List<Task> criticalPath = solveCriticalPath(jobStages);
         workflow.setCriticalPathTaskCount(criticalPath.size());
@@ -257,7 +247,7 @@ public class JobLevelListener extends AbstractListener<Workflow> {
   List<Task> solveCriticalPath(List<Task> stages) {
     DagSolver dag = new DagSolver(stages, (TaskLevelListener) taskListener);
     return dag.longestPath().stream()
-        .filter(stage -> !stage.getType().equals("cached stage"))
+        .filter(stage -> stage.getRuntime() != 0)
         .collect(Collectors.toList());
   }
 }
