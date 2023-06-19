@@ -46,8 +46,7 @@ class SparkSupplierExtractionEngineTest {
         Optional.of(DstatDto.builder().netSend(1).build());
     Optional<PerfDto> fakePerfDto =
         Optional.of(PerfDto.builder().watt(30.12).build());
-    Optional<ProcDto> fakeProcDto =
-        Optional.of(ProcDto.builder().active(1L).build());
+    Optional<ProcDto> fakeProcDto = Optional.of(ProcDto.builder().active(1L).build());
 
     Optional<JvmFileDto> fakeJvmFileDto =
         Optional.of(JvmFileDto.builder().freeSpace(11L).build());

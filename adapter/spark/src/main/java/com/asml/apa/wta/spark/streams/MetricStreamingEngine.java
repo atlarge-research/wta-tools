@@ -192,16 +192,19 @@ public class MetricStreamingEngine {
 
           final double averageUtilization1Minute = ping.getProcDto()
               .map(ProcDto::getLoadAvgOneMinute)
+              .filter(loadAvg -> loadAvg != -1)
               .map(loadAvg -> loadAvg / numCores)
               .orElse(-1.0);
 
           final double averageUtilization5Minute = ping.getProcDto()
               .map(ProcDto::getLoadAvgFiveMinutes)
+              .filter(loadAvg -> loadAvg != -1)
               .map(loadAvg -> loadAvg / numCores)
               .orElse(-1.0);
 
           final double averageUtilization15Minute = ping.getProcDto()
               .map(ProcDto::getLoadAvgFifteenMinutes)
+              .filter(loadAvg -> loadAvg != -1)
               .map(loadAvg -> loadAvg / numCores)
               .orElse(-1.0);
 
