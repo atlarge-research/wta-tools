@@ -13,9 +13,9 @@ import java.util.stream.Collectors;
 
 /**
  * This class will take in all stages within the job, generate the dependency DAG
- * and find the longest path(critical path). It will add two additional node to the dependency graph
- * one as the origin connecting all stages that don't have parents, the other as the sink connecting all stages
- * without a children. The critical path shall be the longest path from the origin to the sink.
+ * and find the longest path(critical path). It will add two additional nodes to the dependency graph
+ * one as the source connecting all stages that don't have parents, the other as the sink connecting all stages
+ * without a children. The critical path shall be the longest path from the source to the sink.
  *
  * @author Tianchen Qu
  * @since 1.0.0
@@ -34,18 +34,18 @@ public class DagSolver {
 
     private long dist;
 
-    /**
-     * The id get added one as we need to leave node 0,1 as the extra origin/ending node.
-     *
-     * @param stage stage
-     * @author Tianchen Qu
-     * @since 1.0.0
-     */
     Node(Task stage) {
       id = stage.getId();
       dist = Integer.MIN_VALUE;
     }
 
+    /**
+     * This is used for instanciating node 0,-1 as the extra source/sink node.
+     *
+     * @param id id(0/-1)
+     * @author Tianchen Qu
+     * @since 1.0.0
+     */
     Node(long id) {
       this.id = id;
       dist = Integer.MIN_VALUE;
@@ -75,7 +75,7 @@ public class DagSolver {
 
   /**
    * This will add the node and the adjacent edges of the node.
-   * If there is no parents, it will be linked to the origin node.
+   * If there is no parents, it will be linked to the source node.
    *
    * @param stage stage
    * @author Tianchen Qu
@@ -101,9 +101,9 @@ public class DagSolver {
   }
 
   /**
-   * This method is used to create the origin and sink node.
+   * This method is used to create the source and sink node.
    *
-   * @param id id of the origin(id = 0) and sink(id = 1) node
+   * @param id id of the source(id = 0) and sink(id = -1) node
    * @author Tianchen Qu
    * @since 1.0.0
    */

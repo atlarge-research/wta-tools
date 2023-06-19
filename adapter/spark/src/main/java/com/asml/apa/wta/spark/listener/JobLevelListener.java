@@ -241,9 +241,13 @@ public class JobLevelListener extends AbstractListener<Workflow> {
    * @since 1.0.0
    */
   List<Task> solveCriticalPath(List<Task> stages) {
-    DagSolver dag = new DagSolver(stages, (TaskLevelListener) taskListener);
-    return dag.longestPath().stream()
-        .filter(stage -> stage.getRuntime() != 0)
-        .collect(Collectors.toList());
+    try {
+      DagSolver dag = new DagSolver(stages, (TaskLevelListener) taskListener);
+      return dag.longestPath().stream()
+          .filter(stage -> stage.getRuntime() != 0)
+          .collect(Collectors.toList());
+    } catch (Exception e) {
+      return new ArrayList<>();
+    }
   }
 }
