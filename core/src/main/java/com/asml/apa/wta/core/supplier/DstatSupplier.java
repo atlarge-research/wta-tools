@@ -40,11 +40,11 @@ public class DstatSupplier implements InformationSupplier<DstatDto> {
       return notAvailableResult();
     }
 
-    CompletableFuture<String> allMetrics = shellUtils.executeCommand("dstat -cdngy 1 -c 1");
+    CompletableFuture<String> allMetrics = shellUtils.executeCommand("dstat -cdngy 1 1");
 
     return allMetrics.thenApply(result -> {
       if (result != null) {
-        List<Integer> metrics = extractNumbers(result);
+        List<Long> metrics = extractNumbers(result);
         try {
           return Optional.of(DstatDto.builder()
               .totalUsageUsr(metrics.get(0))
@@ -76,18 +76,24 @@ public class DstatSupplier implements InformationSupplier<DstatDto> {
    * @author Lohithsai Yadala Chanchu
    * @since 1.0.0
    */
-  private static List<Integer> extractNumbers(String input) {
-    List<Integer> numbers = new ArrayList<>();
-    Pattern pattern = Pattern.compile("\\b(\\d+)(k)?\\b");
+  private static List<Long> extractNumbers(String input) {
+    List<Long> numbers = new ArrayList<>();
+    Pattern pattern = Pattern.compile("\\b(\\d+)(k|B|G|M)?\\b");
     Matcher matcher = pattern.matcher(input);
 
     while (matcher.find()) {
       String match = matcher.group(1);
-      boolean isKilo = matcher.group(2) != null;
+      String suffix = matcher.group(2);
 
-      int number = Integer.parseInt(match);
-      if (isKilo) {
-        number *= 1000;
+      long number = Integer.parseInt(match);
+      if (suffix != null) {
+        if (suffix.equals("k")) {
+          number *= 1000;
+        } else if (suffix.equals("M")) {
+          number *= 1000000;
+        } else if (suffix.equals("G")) {
+          number *= 1000000000;
+        }
       }
       numbers.add(number);
     }
@@ -105,7 +111,7 @@ public class DstatSupplier implements InformationSupplier<DstatDto> {
   @Override
   public boolean isAvailable() {
     try {
-      if (shellUtils.executeCommand("dstat -cdngy 1 -c 1").get() != null) {
+      if (shellUtils.executeCommand("dstat -cdngy 1 1").get() != null) {
         return true;
       }
     } catch (InterruptedException | ExecutionException e) {
