@@ -93,6 +93,22 @@ Note: this way, the plugin will be compiled for Scala 2.12. If you want to compi
 you will need to set the `spark.scala.version` flag to 2.13, such as in
 `mvn -pl adapter/spark -Dspark.scala.version=2.13 clean package`.
 
+### Integration with Pyspark
+The plugin can also be used with Pyspark. To do this, you need to create a JAR file of the plugin and run it alongside the main Spark application using **spark-submit**.
+
+For Spark 3.2.4, Python 3.7 ~ 3.10 is required. In addition add the following to your environment variable in your .bashrc file.
+
+```
+export PYSPARK_PYTHON=/usr/bin/python3.10
+export PYSPARK_DRIVER_PYTHON=/usr/bin/python3.10
+```
+
+You need the following tools installe:
+
+```
+Insta
+```
+
 ## Configuration
 General configuration instructions are located [here](/../../README.md#configuration). See above for [instructions](#installation-and-usage) on how to provide the configuration to the plugin.
 
