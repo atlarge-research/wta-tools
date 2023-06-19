@@ -1,5 +1,6 @@
 package com.asml.apa.wta.core.supplier;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
@@ -21,7 +22,7 @@ public class DstatSupplierTest {
     doReturn(CompletableFuture.completedFuture(
             "----total-usage---- -dsk/total- -net/total- ---paging-- ---system--\n"
                 + "usr sys idl wai stl| read  writ| recv  send|  in   out | int   csw\n"
-                + "  0   1M  98k   0   0|   0     0 |   0     0 |   0B     0B | 516G  2116"))
+                + "  0   1M  98k   0   0|   0     0 |   10B     0 |   0B     0B | 516G  2116"))
         .when(shellUtils)
         .executeCommand("dstat -cdngy 1 1");
     DstatSupplier sut = spy(new DstatSupplier(shellUtils));
@@ -36,7 +37,7 @@ public class DstatSupplierTest {
         .totalUsageStl(0L)
         .dskRead(0L)
         .dskWrite(0L)
-        .netRecv(0L)
+        .netRecv(10L)
         .netSend(0L)
         .pagingIn(0L)
         .pagingOut(0L)
@@ -45,5 +46,16 @@ public class DstatSupplierTest {
         .build();
 
     assertEquals(expected, actual.get());
+  }
+
+  @Test
+  void dstatNotAvailable() {
+    ShellUtils shellUtils = mock(ShellUtils.class);
+    doReturn(CompletableFuture.completedFuture(null)).when(shellUtils).executeCommand("dstat -cdngy 1 1");
+    DstatSupplier sut = spy(new DstatSupplier(shellUtils));
+
+    Optional<DstatDto> actual = sut.getSnapshot().join();
+
+    assertThat(actual).isEmpty();
   }
 }
