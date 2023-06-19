@@ -26,7 +26,7 @@ import scala.collection.mutable.ListBuffer;
 
 class TaskLevelListenerTest extends BaseLevelListenerTest {
 
-  TaskInfo testTaskInfo;
+  TaskInfo testTaskInfo1;
 
   TaskInfo testTaskInfo2;
 
@@ -40,13 +40,12 @@ class TaskLevelListenerTest extends BaseLevelListenerTest {
 
   @BeforeEach
   void setup() {
-
-    testTaskInfo = new TaskInfo(0, 0, 1, 50L, "testExecutor", "local", TaskLocality.NODE_LOCAL(), false);
+    testTaskInfo1 = new TaskInfo(0, 0, 1, 50L, "testExecutor", "local", TaskLocality.NODE_LOCAL(), false);
     testTaskInfo2 = new TaskInfo(1, 0, 1, 50L, "testExecutor", "local", TaskLocality.NODE_LOCAL(), false);
 
     ListBuffer<Integer> parents = new ListBuffer<>();
-    parents.$plus$eq(0);
     parents.$plus$eq(1);
+    parents.$plus$eq(2);
     TaskMetrics mockedMetrics = mock(TaskMetrics.class);
     ShuffleWriteMetrics mockedShuffleMetrics = mock(ShuffleWriteMetrics.class);
     when(mockedMetrics.shuffleWriteMetrics()).thenReturn(mockedShuffleMetrics);
@@ -58,7 +57,7 @@ class TaskLevelListenerTest extends BaseLevelListenerTest {
     when(mockedMetrics.executorDeserializeTime()).thenReturn(0L);
 
     testStageInfo = new StageInfo(
-        3,
+        2,
         0,
         "test",
         50,
@@ -74,10 +73,9 @@ class TaskLevelListenerTest extends BaseLevelListenerTest {
         100);
     parents.$plus$eq(3);
     taskEndEvent = new SparkListenerTaskEnd(
-        3, 1, "testTaskType", null, testTaskInfo, new ExecutorMetrics(), mockedMetrics);
+        2, 1, "testTaskType", null, testTaskInfo1, new ExecutorMetrics(), mockedMetrics);
     taskEndEvent2 = new SparkListenerTaskEnd(
-        3, 1, "testTaskType", null, testTaskInfo2, new ExecutorMetrics(), mockedMetrics);
-
+        2, 1, "testTaskType", null, testTaskInfo2, new ExecutorMetrics(), mockedMetrics);
     stageCompleted = new SparkListenerStageCompleted(testStageInfo);
   }
 
@@ -86,9 +84,9 @@ class TaskLevelListenerTest extends BaseLevelListenerTest {
     ListBuffer<StageInfo> stageBuffer = new ListBuffer<>();
     stageBuffer.$plus$eq(testStageInfo);
 
-    fakeTaskListener.onJobStart(new SparkListenerJobStart(1, 2L, stageBuffer.toList(), new Properties()));
-    fakeTaskListener.onTaskEnd(taskEndEvent);
-    assertThat(fakeTaskListener.getStageToTasks().size()).isEqualTo(1);
+    fakeTaskListener1.onJobStart(new SparkListenerJobStart(0, 2L, stageBuffer.toList(), new Properties()));
+    fakeTaskListener1.onTaskEnd(taskEndEvent);
+    assertThat(fakeTaskListener1.getStageToTasks().size()).isEqualTo(1);
     List<Task> list = new ArrayList<>();
     list.add(Task.builder().id(1L).build());
     assertThat(fakeTaskListener.getStageToTasks().get(4).size()).isEqualTo(1);
@@ -111,15 +109,15 @@ class TaskLevelListenerTest extends BaseLevelListenerTest {
     ListBuffer<StageInfo> stageBuffer = new ListBuffer<>();
     stageBuffer.$plus$eq(testStageInfo);
 
-    fakeTaskListener.onJobStart(new SparkListenerJobStart(1, 2L, stageBuffer.toList(), new Properties()));
-    fakeTaskListener.onTaskEnd(taskEndEvent);
-    assertEquals(1, fakeTaskListener.getProcessedObjects().size());
-    Task curTask = fakeTaskListener.getProcessedObjects().get(0);
+    fakeTaskListener1.onJobStart(new SparkListenerJobStart(0, 2L, stageBuffer.toList(), new Properties()));
+    fakeTaskListener1.onTaskEnd(taskEndEvent);
+    assertEquals(1, fakeTaskListener1.getProcessedObjects().size());
+    Task curTask = fakeTaskListener1.getProcessedObjects().get(0);
     assertEquals(1, curTask.getId());
     assertEquals("testTaskType", curTask.getType());
     assertEquals(50L, curTask.getTsSubmit());
     assertEquals(100L, curTask.getRuntime());
-    assertEquals(2L, curTask.getWorkflowId());
+    assertEquals(1L, curTask.getWorkflowId());
     assertEquals("testUser".hashCode(), curTask.getUserId());
     assertEquals(-1, curTask.getSubmissionSite());
     assertEquals("N/A", curTask.getResourceType());

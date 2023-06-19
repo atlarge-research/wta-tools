@@ -16,11 +16,11 @@ public class BaseSparkJobIntegrationTest {
 
   protected SparkSession spark;
 
-  protected SparkDataSource sut;
+  protected SparkDataSource sut1;
 
   protected SparkDataSource sut2;
 
-  protected JavaRDD<String> testFile;
+  protected JavaRDD<String> textFile;
 
   RuntimeConfig fakeConfig;
 
@@ -32,10 +32,8 @@ public class BaseSparkJobIntegrationTest {
   void setupBaseIntegrationTest() {
     fakeConfig = RuntimeConfig.builder()
         .authors(new String[] {"Harry Potter"})
-        .isStageLevel(false)
         .domain(Domain.SCIENTIFIC)
         .description("Yer a wizard harry")
-        .logLevel("INFO")
         .isStageLevel(false)
         .resourcePingInterval(500)
         .executorSynchronizationInterval(-100)
@@ -46,23 +44,22 @@ public class BaseSparkJobIntegrationTest {
         .authors(new String[] {"Harry Potter"})
         .isStageLevel(true)
         .domain(Domain.SCIENTIFIC)
+        .resourcePingInterval(500)
+        .executorSynchronizationInterval(-100)
         .description("Yer a wizard harry")
-        .outputPath("src/test/resources/WTA")
+        .outputPath("src/test/resources/wta-output")
         .build();
-    SparkConf conf = new SparkConf()
-        .setAppName("SparkTestRunner")
-        .setMaster("local")
-        .set("spark.executor.instances", "1")
-        .set("spark.executor.cores", "2");
+
+    SparkConf conf = new SparkConf().setAppName("SparkTestRunner").setMaster("local");
     spark = SparkSession.builder().config(conf).getOrCreate();
     spark.sparkContext().setLogLevel("ERROR");
 
     fakeMetricStreamingEngine = new MetricStreamingEngine();
 
-    sut = new SparkDataSource(spark.sparkContext(), fakeConfig);
+    sut1 = new SparkDataSource(spark.sparkContext(), fakeConfig);
     sut2 = new SparkDataSource(spark.sparkContext(), fakeConfig2);
     String resourcePath = "src/test/resources/wordcount.txt";
-    testFile = JavaSparkContext.fromSparkContext(spark.sparkContext()).textFile(resourcePath);
+    textFile = JavaSparkContext.fromSparkContext(spark.sparkContext()).textFile(resourcePath);
   }
 
   /**
@@ -76,7 +73,7 @@ public class BaseSparkJobIntegrationTest {
    * Method to invoke the Spark operation. Important to invoke collect() to store the metrics.
    */
   protected void invokeJob() {
-    testFile.flatMap(s -> Arrays.asList(s.split(" ")).iterator())
+    textFile.flatMap(s -> Arrays.asList(s.split(" ")).iterator())
         .mapToPair(word -> new Tuple2<>(word, 1))
         .reduceByKey(Integer::sum)
         .collect();

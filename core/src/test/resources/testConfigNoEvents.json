@@ -2,7 +2,6 @@
   "authors": ["Test Name"],
   "domain": "Industrial",
   "description": "Test Description",
-  "logLevel": "INFO",
   "outputPath": "/home/user/WTA",
   "isStageLevel": "true"
 }

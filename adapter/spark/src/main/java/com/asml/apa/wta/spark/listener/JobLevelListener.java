@@ -10,13 +10,11 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.Getter;
 import org.apache.spark.SparkContext;
 import org.apache.spark.scheduler.SparkListenerJobEnd;
 import org.apache.spark.scheduler.SparkListenerJobStart;
-import scala.collection.JavaConverters;
 
 /**
  * This class is a job-level listener for the Spark data source.
@@ -27,11 +25,11 @@ import scala.collection.JavaConverters;
 @Getter
 public class JobLevelListener extends AbstractListener<Workflow> {
 
-  private final TaskStageBaseListener taskListener;
+  private final TaskStageBaseListener wtaTaskListener;
 
   private final StageLevelListener stageLevelListener;
 
-  private final Map<Integer, Long> jobSubmitTimes = new ConcurrentHashMap<>();
+  private final Map<Long, Long> jobSubmitTimes = new ConcurrentHashMap<>();
 
   private final Map<Long, List<Task>> jobToStages = new ConcurrentHashMap<>();
 
@@ -40,7 +38,7 @@ public class JobLevelListener extends AbstractListener<Workflow> {
    *
    * @param sparkContext       The current spark context
    * @param config             Additional config specified by the user for the plugin
-   * @param taskListener       The task-level listener to be used by this listener
+   * @param wtaTaskListener       The task-level listener to be used by this listener
    * @param stageLevelListener The stage-level listener
    * @author Henry Page
    * @author Tianchen Qu
@@ -49,10 +47,10 @@ public class JobLevelListener extends AbstractListener<Workflow> {
   public JobLevelListener(
       SparkContext sparkContext,
       RuntimeConfig config,
-      TaskStageBaseListener taskListener,
+      TaskStageBaseListener wtaTaskListener,
       StageLevelListener stageLevelListener) {
     super(sparkContext, config);
-    this.taskListener = taskListener;
+    this.wtaTaskListener = wtaTaskListener;
     this.stageLevelListener = stageLevelListener;
   }
 
@@ -68,7 +66,7 @@ public class JobLevelListener extends AbstractListener<Workflow> {
    */
   public JobLevelListener(SparkContext sparkContext, RuntimeConfig config, StageLevelListener stageLevelListener) {
     super(sparkContext, config);
-    this.taskListener = stageLevelListener;
+    this.wtaTaskListener = stageLevelListener;
     this.stageLevelListener = stageLevelListener;
   }
 
@@ -76,7 +74,7 @@ public class JobLevelListener extends AbstractListener<Workflow> {
    * Callback for job start event, tracks the submit time of the job.
    * Also tracks the stages and their parents in the job.
    *
-   * @param jobStart The jobstart event object containing information upon job start.
+   * @param jobStart The SparkListenerJobStart event object containing information upon job start.
    * @author Henry Page
    * @author Tianchen Qu
    * @since 1.0.0
@@ -98,51 +96,50 @@ public class JobLevelListener extends AbstractListener<Workflow> {
   }
 
   /**
-   * Processes the workflow and puts it into an object.
+   * When a job is finished, processes the workflow and puts it into an object. In addition, it sets the
+   * parent, child, and resource information for the affiliated Spark tasks or Spark stages to this job,
+   * depending on the config setting of isStageLevel. This needs to happen here as the clean-up of
+   * ConcurrentHashMap containers must also happen at the very end when a job finishes.
    *
    * @param jobEnd The job end event object containing information upon job end
    * @author Henry Page
    * @author Tianchen Qu
+   * @author Pil Kyu Cho
    * @since 1.0.0
    */
   @Override
   public void onJobEnd(SparkListenerJobEnd jobEnd) {
-    final int jobId = jobEnd.jobId() + 1;
-    final long submitTime = jobSubmitTimes.get(jobId);
-    final Task[] tasks = taskListener
+    final long jobId = jobEnd.jobId() + 1;
+    final long tsSubmit = jobSubmitTimes.get(jobId);
+    final Task[] tasks = wtaTaskListener
         .getWithCondition(task -> task.getWorkflowId() == jobId)
         .toArray(Task[]::new);
-    final int numTasks = tasks.length;
+    final int taskCount = tasks.length;
+    final long criticalPathLength = -1L;
+    final int criticalPathTaskCount = criticalPathTasks.get(jobId);
+    final int maxNumberOfConcurrentTasks = -1;
+    final String nfrs = "";
+
     // we can also get the mode from the config, if that's what the user wants?
     final String scheduler = sparkContext.getConf().get("spark.scheduler.mode", "FIFO");
     final Domain domain = config.getDomain();
     final String appName = sparkContext.appName();
-
+    final String applicationField = "ETL";
     final double totalResources = -1.0;
-    final double totalMemoryUsage =
-        calculatePositiveDoubleSum(Arrays.stream(tasks).map(Task::getMemoryRequested));
+    final double totalMemoryUsage = computeSum(Arrays.stream(tasks).map(Task::getMemoryRequested));
     final long totalNetworkUsage =
-        calculatePositiveLongSum(Arrays.stream(tasks).map(Task::getNetworkIoTime));
-    final double totalDiskSpaceUsage =
-        calculatePositiveDoubleSum(Arrays.stream(tasks).map(Task::getDiskSpaceRequested));
-    final double totalEnergyConsumption =
-        calculatePositiveDoubleSum(Arrays.stream(tasks).map(Task::getEnergyConsumption));
-    // Critical Path
+        (long) computeSum(Arrays.stream(tasks).map(task -> (double) task.getNetworkIoTime()));
+    final double totalDiskSpaceUsage = computeSum(Arrays.stream(tasks).map(Task::getDiskSpaceRequested));
+    final double totalEnergyConsumption = computeSum(Arrays.stream(tasks).map(Task::getEnergyConsumption));
     final int criticalPathTaskCount = -1;
     final long criticalPathLength = -1;
-
-    // unknown
-
-    final int maxNumberOfConcurrentTasks = -1;
-    final String nfrs = "";
-    final String applicationField = "ETL";
 
     this.getProcessedObjects()
         .add(Workflow.builder()
             .id(jobId)
-            .tsSubmit(submitTime)
+            .tsSubmit(tsSubmit)
             .tasks(tasks)
-            .taskCount(numTasks)
+            .taskCount(taskCount)
             .criticalPathLength(criticalPathLength)
             .criticalPathTaskCount(criticalPathTaskCount)
             .maxConcurrentTasks(maxNumberOfConcurrentTasks)
@@ -158,31 +155,60 @@ public class JobLevelListener extends AbstractListener<Workflow> {
             .totalEnergyConsumption(totalEnergyConsumption)
             .build());
 
+    if (config.isStageLevel()) {
+      stageLevelListener.setStages(jobId);
+    } else {
+      TaskLevelListener taskLevelListener = (TaskLevelListener) wtaTaskListener;
+      taskLevelListener.setTasks(stageLevelListener, jobId);
+    }
+    cleanUpContainers(jobEnd);
+  }
+
+  /**
+   * To prevent memory overload, clean up the containers in all listeners after a Spark job finishes.
+   * Spark jobs are designed to be independent and run in parallel, thus the clean-up of containers
+   * after a job finishes should not affect other jobs. This is also necessary as some stages are created at
+   * job start but never submitted.
+   * <p>
+   * For ConcurrentHashMap, remove() is thread-safe when removing based on key. For removing based on value,
+   * most thread-safe and is to use entrySet() in combination with removeIf().
+   * @author Pil Kyu Cho
+   * @since 1.0.0
+   */
+  private void cleanUpContainers(SparkListenerJobEnd jobEnd) {
+    long jobId = jobEnd.jobId() + 1;
     jobSubmitTimes.remove(jobId);
+    criticalPathTasks.remove(jobId);
+
+    Stream<Long> stageIds = stageLevelListener.getStageToJob().entrySet().stream()
+        .filter(e -> e.getValue().equals(jobId))
+        .map(Map.Entry::getKey);
+    stageIds.forEach(stageId -> {
+      stageLevelListener.getStageToJob().remove(stageId);
+      stageLevelListener.getStageToParents().remove(stageId);
+      stageLevelListener.getParentStageToChildrenStages().remove(stageId);
+      stageLevelListener.getStageToResource().remove(stageId);
+      if (!config.isStageLevel()) {
+        // additional clean up for task-level plugin
+        TaskLevelListener taskLevelListener = (TaskLevelListener) wtaTaskListener;
+        taskLevelListener.getStageToTasks().remove(stageId);
+        taskLevelListener.getTaskToStage().entrySet().removeIf(entry -> entry.getValue()
+            .equals(stageId));
+      }
+    });
   }
 
   /**
    * Summation for Double stream for positive terms.
    *
-   * @param data data stream
-   * @return summation
+   * @param data              stream of data
+   * @return                  summation of positive values from data
    * @author Tianchen Qu
+   * @author Pil Kyu Cho
    * @since 1.0.0
    */
-  private double calculatePositiveDoubleSum(Stream<Double> data) {
+  private double computeSum(Stream<Double> data) {
     return data.filter(task -> task >= 0.0).reduce(Double::sum).orElse(-1.0);
-  }
-
-  /**
-   * Summation for Long stream for positive terms.
-   *
-   * @param data data stream
-   * @return summation
-   * @author Tianchen Qu
-   * @since 1.0.0
-   */
-  private long calculatePositiveLongSum(Stream<Long> data) {
-    return data.filter(task -> task >= 0).reduce(Long::sum).orElse(-1L);
   }
 
   /**
@@ -190,9 +216,16 @@ public class JobLevelListener extends AbstractListener<Workflow> {
    * It also calculated the critical path for the job.
    *
    * @author Tianchen Qu
+   * @author Pil Kyu Cho
    * @since 1.0.0
    */
   public void setWorkflows() {
+    final List<Workflow> workflows = this.getProcessedObjects();
+    workflows.forEach(workflow -> workflow.setTotalResources(Arrays.stream(workflow.getTasks())
+        .map(Task::getResourceAmountRequested)
+        .filter(resourceAmount -> resourceAmount >= 0.0)
+        .reduce(Double::sum)
+        .orElse(-1.0)));
     final List<Workflow> workflows = getProcessedObjects();
     for (Workflow workflow : workflows) {
       workflow.setTotalResources(Arrays.stream(workflow.getTasks())

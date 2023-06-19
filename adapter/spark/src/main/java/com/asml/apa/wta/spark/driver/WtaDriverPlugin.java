@@ -65,7 +65,9 @@ public class WtaDriverPlugin implements DriverPlugin {
   public Map<String, String> init(SparkContext sparkCtx, PluginContext pluginCtx) {
     Map<String, String> executorVars = new HashMap<>();
     try {
-      RuntimeConfig runtimeConfig = RuntimeConfig.readConfig();
+      String configFile =
+          sparkCtx.conf().get("spark.driver.extraJavaOptions").split("-DconfigFile=")[1];
+      RuntimeConfig runtimeConfig = RuntimeConfig.readConfig(configFile);
       this.metricStreamingEngine = new MetricStreamingEngine();
       sparkDataSource = new SparkDataSource(sparkCtx, runtimeConfig);
       outputFile = new DiskOutputFile(Path.of(runtimeConfig.getOutputPath()));
@@ -178,7 +180,9 @@ public class WtaDriverPlugin implements DriverPlugin {
    * @since 1.0.0
    */
   public void removeListeners() {
-    sparkDataSource.removeTaskListener();
+    if (!sparkDataSource.getRuntimeConfig().isStageLevel()) {
+      sparkDataSource.removeTaskListener();
+    }
     sparkDataSource.removeStageListener();
     sparkDataSource.removeJobListener();
     sparkDataSource.removeApplicationListener();

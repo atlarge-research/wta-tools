@@ -1,9 +1,9 @@
-package com.asml.apa.wta.hadoop.io;
+package com.asml.apa.wta.hdfs.io;
 
 import com.asml.apa.wta.core.io.OutputFile;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
@@ -16,26 +16,61 @@ import org.apache.hadoop.fs.Path;
  * @since 1.0.0
  */
 @Slf4j
-@RequiredArgsConstructor
+@AllArgsConstructor
 public class HadoopOutputFile implements OutputFile {
 
-  private final Path file;
+  private Path outputFile;
   private final Configuration conf;
-  private final FileSystem fs;
+  private FileSystem fs;
+
+  /**
+   * Default constructor for Java SPI.
+   *
+   * @author Atour Mousavi Gourabi
+   * @since 1.0.0
+   */
+  public HadoopOutputFile() {
+    conf = new Configuration();
+  }
 
   /**
    * Constructs a HadoopOutputFile.
    *
-   * @param path the {@link Path} to construct a {@link HadoopOutputFile} for
-   * @param configuration the {@link Configuration} to use
+   * @param path a {@link String} representation of the {@link Path} to construct a {@link HadoopOutputFile} for
    * @throws IOException when something goes wrong during I/O
    * @author Atour Mousavi Gourabi
    * @since 1.0.0
    */
-  public HadoopOutputFile(Path path, Configuration configuration) throws IOException {
-    file = path;
-    conf = configuration;
-    fs = path.getFileSystem(new Configuration());
+  public HadoopOutputFile(String path) throws IOException {
+    outputFile = new Path(path);
+    conf = new Configuration();
+    fs = outputFile.getFileSystem(conf);
+  }
+
+  /**
+   * Sets the path of the HDFS output file.
+   *
+   * @param path a {@link String} representation of the {@link Path} to point to
+   * @throws IOException when something goes wrong during I/O
+   * @author Atour Mousavi Gourabi
+   * @since 1.0.0
+   */
+  public void setPath(String path) throws IOException {
+    outputFile = new Path(path);
+    fs = outputFile.getFileSystem(conf);
+  }
+
+  /**
+   * Signals whether this implementation can output to the specified location.
+   *
+   * @param path a {@link String} representation of the location to point to
+   * @return a {@code boolean} indicating whether the implementation can handle the given location
+   * @author Atour Mousavi Gourabi
+   * @since 1.0.0
+   */
+  @Override
+  public boolean acceptsLocation(String path) {
+    return true;
   }
 
   /**
@@ -48,7 +83,7 @@ public class HadoopOutputFile implements OutputFile {
    */
   @Override
   public OutputFile resolve(String path) {
-    return new HadoopOutputFile(new Path(file, path), conf, fs);
+    return new HadoopOutputFile(new Path(outputFile, path), conf, fs);
   }
 
   /**
@@ -61,7 +96,7 @@ public class HadoopOutputFile implements OutputFile {
    */
   @Override
   public BufferedOutputStream open() throws IOException {
-    return new BufferedOutputStream(fs.create(file));
+    return new BufferedOutputStream(fs.create(outputFile));
   }
 
   /**
@@ -74,8 +109,8 @@ public class HadoopOutputFile implements OutputFile {
    */
   @Override
   public void clearDirectory() throws IOException {
-    fs.delete(file, true);
-    fs.mkdirs(file);
+    fs.delete(outputFile, true);
+    fs.mkdirs(outputFile);
   }
 
   /**
@@ -87,7 +122,7 @@ public class HadoopOutputFile implements OutputFile {
    */
   @Override
   public org.apache.parquet.io.OutputFile wrap() throws IOException {
-    return org.apache.parquet.hadoop.util.HadoopOutputFile.fromPath(file, conf);
+    return org.apache.parquet.hadoop.util.HadoopOutputFile.fromPath(outputFile, conf);
   }
 
   /**
@@ -99,6 +134,6 @@ public class HadoopOutputFile implements OutputFile {
    */
   @Override
   public String toString() {
-    return file.toString();
+    return outputFile.toString();
   }
 }

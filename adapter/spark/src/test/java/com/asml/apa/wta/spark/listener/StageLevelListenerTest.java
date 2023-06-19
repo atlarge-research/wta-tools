@@ -45,7 +45,7 @@ class StageLevelListenerTest extends BaseLevelListenerTest {
     parents.$plus$eq(2);
 
     testStageInfo = new StageInfo(
-        3,
+        0,
         0,
         "test",
         50,
@@ -71,15 +71,15 @@ class StageLevelListenerTest extends BaseLevelListenerTest {
     ListBuffer<StageInfo> stageBuffer = new ListBuffer<>();
     stageBuffer.$plus$eq(spyStageInfo);
 
-    fakeStageListener.onJobStart(new SparkListenerJobStart(1, 2L, stageBuffer.toList(), new Properties()));
-    fakeStageListener.onStageCompleted(stageEndEvent);
-    assertEquals(1, fakeStageListener.getProcessedObjects().size());
-    Task curStage = fakeStageListener.getProcessedObjects().get(0);
-    assertEquals(4, curStage.getId());
+    fakeStageListener1.onJobStart(new SparkListenerJobStart(0, 2L, stageBuffer.toList(), new Properties()));
+    fakeStageListener1.onStageCompleted(stageEndEvent);
+    assertEquals(1, fakeStageListener1.getProcessedObjects().size());
+    Task curStage = fakeStageListener1.getProcessedObjects().get(0);
+    assertEquals(1, curStage.getId());
     assertEquals("", curStage.getType());
     assertEquals(10L, curStage.getTsSubmit());
     assertEquals(100L, curStage.getRuntime());
-    assertEquals(2L, curStage.getWorkflowId());
+    assertEquals(1L, curStage.getWorkflowId());
     assertEquals(Math.abs("testUser".hashCode()), curStage.getUserId());
     assertEquals(-1, curStage.getSubmissionSite());
     assertEquals("N/A", curStage.getResourceType());
@@ -101,14 +101,14 @@ class StageLevelListenerTest extends BaseLevelListenerTest {
     ListBuffer<StageInfo> stageBuffer = new ListBuffer<>();
     stageBuffer.$plus$eq(spyStageInfo);
 
-    fakeStageListener.onJobStart(new SparkListenerJobStart(1, 2L, stageBuffer.toList(), new Properties()));
-    fakeStageListener.onStageCompleted(stageEndEvent);
-    assertThat(fakeStageListener.getStageToParents()).containsEntry(4, new Integer[] {2, 3});
-    assertThat(fakeStageListener.getStageToParents().size()).isEqualTo(1);
-    List<Integer> temp = new ArrayList<>();
-    temp.add(4);
-    assertThat(fakeStageListener.getParentToChildren()).containsEntry(2, temp);
-    assertThat(fakeStageListener.getParentToChildren()).containsEntry(3, temp);
-    assertThat(fakeStageListener.getParentToChildren().size()).isEqualTo(2);
+    fakeStageListener1.onJobStart(new SparkListenerJobStart(0, 2L, stageBuffer.toList(), new Properties()));
+    fakeStageListener1.onStageCompleted(stageEndEvent);
+    assertThat(fakeStageListener1.getStageToParents()).containsEntry(1L, new Long[] {2L, 3L});
+    assertThat(fakeStageListener1.getStageToParents().size()).isEqualTo(1);
+    List<Long> childrenStages = new ArrayList<>();
+    childrenStages.add(1L);
+    assertThat(fakeStageListener1.getParentStageToChildrenStages()).containsEntry(2L, childrenStages);
+    assertThat(fakeStageListener1.getParentStageToChildrenStages()).containsEntry(3L, childrenStages);
+    assertThat(fakeStageListener1.getParentStageToChildrenStages().size()).isEqualTo(2);
   }
 }

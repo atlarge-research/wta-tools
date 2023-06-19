@@ -43,12 +43,13 @@
     <slf4j.version>2.0.7</slf4j.version>
     <dependency-plugin.version>3.6.0</dependency-plugin.version>
     <awaitility.version>4.2.0</awaitility.version>
+    <parquet.version>1.12.2</parquet.version>
   </properties>
 
   <modules>
     <module>core</module>
     <module>adapter/spark</module>
-    <module>connector/hadoop</module>
+    <module>connector/hdfs</module>
   </modules>
 
   <dependencies>
