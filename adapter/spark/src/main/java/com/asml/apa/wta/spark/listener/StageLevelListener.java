@@ -50,17 +50,17 @@ public class StageLevelListener extends TaskStageBaseListener {
     final StageInfo curStageInfo = stageCompleted.stageInfo();
     final TaskMetrics curStageMetrics = curStageInfo.taskMetrics();
 
-    final int stageId = curStageInfo.stageId();
+    final int stageId = curStageInfo.stageId() + 1;
     stageToResource.put(stageId, curStageInfo.resourceProfileId());
     final Long submitTime = curStageInfo.submissionTime().getOrElse(() -> -1L);
     final long runTime = curStageMetrics.executorRunTime();
     final int userId = Math.abs(sparkContext.sparkUser().hashCode());
-    final long workflowId = stageIdsToJobs.get(stageId + 1);
+    final long workflowId = stageIdsToJobs.get(stageId);
 
     final Integer[] parentIds = JavaConverters.seqAsJavaList(
             curStageInfo.parentIds().toList())
         .stream()
-        .map(parentId -> (Integer) parentId)
+        .map(parentId -> (Integer) parentId + 1)
         .toArray(Integer[]::new);
     for (Integer id : parentIds) {
       List<Integer> children = parentToChildren.get(id);
@@ -88,7 +88,7 @@ public class StageLevelListener extends TaskStageBaseListener {
      */
     final double memoryRequested = -1.0;
     long[] parents =
-        Arrays.stream(parentIds).mapToLong(parentId -> parentId + 1).toArray();
+        Arrays.stream(parentIds).mapToLong(parentId -> parentId).toArray();
     if (!config.isStageLevel()) {
       stageToParents.put(stageId, parentIds);
     }
@@ -112,7 +112,7 @@ public class StageLevelListener extends TaskStageBaseListener {
 
     this.getProcessedObjects()
         .add(Task.builder()
-            .id(stageId + 1)
+            .id(stageId)
             .type(type)
             .submissionSite(submissionSite)
             .tsSubmit(submitTime)
@@ -146,10 +146,9 @@ public class StageLevelListener extends TaskStageBaseListener {
   public void setStages() {
     final List<Task> stages = this.getProcessedObjects();
     for (Task stage : stages) {
-      stage.setChildren(
-          parentToChildren.getOrDefault(Math.toIntExact(stage.getId() - 1), new ArrayList<>()).stream()
-              .mapToLong(childrenId -> childrenId + 1)
-              .toArray());
+      stage.setChildren(parentToChildren.getOrDefault(Math.toIntExact(stage.getId()), new ArrayList<>()).stream()
+          .mapToLong(childrenId -> childrenId)
+          .toArray());
     }
   }
 }

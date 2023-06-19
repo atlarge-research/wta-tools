@@ -42,7 +42,7 @@ public class DagSolver {
      * @since 1.0.0
      */
     Node(Task stage) {
-      id = stage.getId() + 1;
+      id = stage.getId();
       dist = Integer.MIN_VALUE;
     }
 
@@ -58,14 +58,11 @@ public class DagSolver {
 
   private Map<Long, Map<Long, Long>> adjMapReversed;
 
-  private Deque<Long> stack;
-
   private List<Task> stages;
 
   public DagSolver(List<Task> stages, TaskLevelListener listener) {
     nodes = new ConcurrentHashMap<>();
     adjMap = new ConcurrentHashMap<>();
-    stack = new ConcurrentLinkedDeque<>();
     adjMapReversed = new ConcurrentHashMap<>();
     this.stages = stages;
 
@@ -73,7 +70,7 @@ public class DagSolver {
     for (Task stage : stages) {
       addNode(stage, listener);
     }
-    addNode(1L);
+    addNode(-1L);
   }
 
   /**
@@ -86,20 +83,20 @@ public class DagSolver {
    */
   private void addNode(Task stage, TaskLevelListener listener) {
     Node node = new Node(stage);
-    nodes.put(stage.getId() + 1, node);
+    nodes.put(stage.getId(), node);
 
     long runtime = 0L;
-    List<Task> tasks = listener.getStageToTasks().get((int) stage.getId() - 1);
+    List<Task> tasks = listener.getStageToTasks().get((int) stage.getId());
     if (tasks != null) {
       runtime = tasks.stream().map(Task::getRuntime).reduce(Long::max).orElse(0L);
     }
 
     if (stage.getParents().length > 0) {
       for (long id : stage.getParents()) {
-        addEdge(id + 1, stage.getId() + 1, runtime);
+        addEdge(id, stage.getId(), runtime);
       }
     } else {
-      addEdge(0, stage.getId() + 1, runtime);
+      addEdge(0, stage.getId(), runtime);
     }
   }
 
@@ -114,9 +111,9 @@ public class DagSolver {
     Node node = new Node(id);
     nodes.put(id, node);
     // if the node is the ending node
-    if (id == 1) {
+    if (id == -1L) {
       setFinalEdges();
-      adjMap.put(1L, new ConcurrentHashMap<>());
+      adjMap.put(-1L, new ConcurrentHashMap<>());
     } else if (id == 0) { // if the node is the starting node
       node.dist = 0;
       adjMapReversed.put(0L, new ConcurrentHashMap<>());
@@ -151,7 +148,7 @@ public class DagSolver {
   private void setFinalEdges() {
     for (Long node : nodes.keySet()) {
       if (adjMap.get(node) == null && node != 1) {
-        addEdge(node, 1, 0);
+        addEdge(node, -1L, 0);
       }
     }
   }
@@ -162,9 +159,11 @@ public class DagSolver {
    * @author Tianchen Qu
    * @since 1.0.0
    */
-  private void topologicalSort() {
+  private Deque<Long> topologicalSort() {
+    Deque<Long> stack = new ConcurrentLinkedDeque<>();
     Map<Long, Boolean> visited = new ConcurrentHashMap<>();
-    topoUtil(visited, 0L);
+    topoUtil(visited, 0L, stack);
+    return stack;
   }
 
   /**
@@ -175,11 +174,11 @@ public class DagSolver {
    * @author Tianchen Qu
    * @since 1.0.0
    */
-  private void topoUtil(Map<Long, Boolean> visited, Long node) {
+  private void topoUtil(Map<Long, Boolean> visited, Long node, Deque<Long> stack) {
     visited.put(node, true);
     for (Long children : adjMap.get(node).keySet()) {
       if (visited.get(children) == null) {
-        topoUtil(visited, children);
+        topoUtil(visited, children, stack);
       }
     }
     stack.push(node);
@@ -193,7 +192,7 @@ public class DagSolver {
    * @since 1.0.0
    */
   public List<Task> longestPath() {
-    topologicalSort();
+    Deque<Long> stack = topologicalSort();
     while (!stack.isEmpty()) {
       Node node = nodes.get(stack.pop());
       for (Long childId : adjMap.get(node.id).keySet()) {
@@ -214,7 +213,7 @@ public class DagSolver {
    * @since 1.0.0
    */
   private List<Task> backTracing() {
-    long pointer = 1L;
+    long pointer = -1L;
     List<Long> criticalPath = new ArrayList<>();
     while (pointer != 0) {
       criticalPath.add(pointer);
@@ -227,8 +226,7 @@ public class DagSolver {
       });
       pointer = nextPointer.get();
     }
-    List<Long> finalCriticalPath =
-        criticalPath.stream().map(x -> x - 1).filter(x -> x >= 0).collect(Collectors.toList());
+    List<Long> finalCriticalPath = criticalPath.stream().filter(x -> x >= 1).collect(Collectors.toList());
     return stages.stream()
         .filter(x -> finalCriticalPath.contains(x.getId()))
         .collect(Collectors.toList());

@@ -103,12 +103,12 @@ class StageLevelListenerTest extends BaseLevelListenerTest {
 
     fakeStageListener.onJobStart(new SparkListenerJobStart(1, 2L, stageBuffer.toList(), new Properties()));
     fakeStageListener.onStageCompleted(stageEndEvent);
-    assertThat(fakeStageListener.getStageToParents()).containsEntry(3, new Integer[] {1, 2});
+    assertThat(fakeStageListener.getStageToParents()).containsEntry(4, new Integer[] {2, 3});
     assertThat(fakeStageListener.getStageToParents().size()).isEqualTo(1);
     List<Integer> temp = new ArrayList<>();
-    temp.add(3);
-    assertThat(fakeStageListener.getParentToChildren()).containsEntry(1, temp);
+    temp.add(4);
     assertThat(fakeStageListener.getParentToChildren()).containsEntry(2, temp);
+    assertThat(fakeStageListener.getParentToChildren()).containsEntry(3, temp);
     assertThat(fakeStageListener.getParentToChildren().size()).isEqualTo(2);
   }
 }

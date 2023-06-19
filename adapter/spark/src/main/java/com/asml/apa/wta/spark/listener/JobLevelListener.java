@@ -129,7 +129,7 @@ public class JobLevelListener extends AbstractListener<Workflow> {
         calculatePositiveDoubleSum(Arrays.stream(tasks).map(Task::getEnergyConsumption));
     // Critical Path
     final int criticalPathTaskCount = -1;
-    final long criticalPathLength = jobEnd.time() - jobSubmitTimes.get(jobId);
+    final long criticalPathLength = -1;
 
     // unknown
 
@@ -213,24 +213,20 @@ public class JobLevelListener extends AbstractListener<Workflow> {
             .collect(Collectors.toList()));
 
         final List<Task> criticalPath = solveCriticalPath(jobStages);
-        workflow.setCriticalPathTaskCount(criticalPath.size());
-        final long driverTime = workflow.getCriticalPathLength()
-            - criticalPath.stream()
-                .map(Task::getRuntime)
-                .reduce(Long::sum)
-                .orElse(0L);
         TaskLevelListener listener = (TaskLevelListener) taskListener;
+
         final Map<Integer, List<Task>> stageToTasks = listener.getStageToTasks();
-        workflow.setCriticalPathLength(driverTime
-            + criticalPath.stream()
-                .map(stage -> stageToTasks.getOrDefault((int) stage.getId(), new ArrayList<>()).stream()
-                    .map(Task::getRuntime)
-                    .reduce(Long::max)
-                    .orElse(0L))
-                .reduce(Long::sum)
-                .orElse(-1L));
-      } else {
-        workflow.setCriticalPathLength(-1L);
+        workflow.setCriticalPathTaskCount(criticalPath.stream()
+            .map(stage -> stageToTasks.get((int) stage.getId()).size())
+            .reduce(Integer::sum)
+            .orElse(-1));
+        workflow.setCriticalPathLength(criticalPath.stream()
+            .map(stage -> stageToTasks.getOrDefault((int) stage.getId(), new ArrayList<>()).stream()
+                .map(Task::getRuntime)
+                .reduce(Long::max)
+                .orElse(0L))
+            .reduce(Long::sum)
+            .orElse(-1L));
       }
     }
   }

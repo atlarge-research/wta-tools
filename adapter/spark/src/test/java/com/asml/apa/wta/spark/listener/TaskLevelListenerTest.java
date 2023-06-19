@@ -91,19 +91,19 @@ class TaskLevelListenerTest extends BaseLevelListenerTest {
     assertThat(fakeTaskListener.getStageToTasks().size()).isEqualTo(1);
     List<Task> list = new ArrayList<>();
     list.add(Task.builder().id(1L).build());
-    assertThat(fakeTaskListener.getStageToTasks().get(3).size()).isEqualTo(1);
-    assertThat(fakeTaskListener.getStageToTasks().get(3).get(0).getId()).isEqualTo(1);
+    assertThat(fakeTaskListener.getStageToTasks().get(4).size()).isEqualTo(1);
+    assertThat(fakeTaskListener.getStageToTasks().get(4).get(0).getId()).isEqualTo(1);
     assertThat(fakeTaskListener.getTaskToStage().size()).isEqualTo(1);
-    assertThat(fakeTaskListener.getTaskToStage()).containsEntry(1L, 3);
+    assertThat(fakeTaskListener.getTaskToStage()).containsEntry(1L, 4);
     fakeTaskListener.onTaskEnd(taskEndEvent2);
     assertThat(fakeTaskListener.getStageToTasks().size()).isEqualTo(1);
     list.add(Task.builder().id(2L).build());
-    assertThat(fakeTaskListener.getStageToTasks().get(3).size()).isEqualTo(2);
-    assertThat(fakeTaskListener.getStageToTasks().get(3).get(0).getId()).isEqualTo(1);
-    assertThat(fakeTaskListener.getStageToTasks().get(3).get(1).getId()).isEqualTo(2);
+    assertThat(fakeTaskListener.getStageToTasks().get(4).size()).isEqualTo(2);
+    assertThat(fakeTaskListener.getStageToTasks().get(4).get(0).getId()).isEqualTo(1);
+    assertThat(fakeTaskListener.getStageToTasks().get(4).get(1).getId()).isEqualTo(2);
     assertThat(fakeTaskListener.getTaskToStage().size()).isEqualTo(2);
-    assertThat(fakeTaskListener.getTaskToStage()).containsEntry(1L, 3);
-    assertThat(fakeTaskListener.getTaskToStage()).containsEntry(2L, 3);
+    assertThat(fakeTaskListener.getTaskToStage()).containsEntry(1L, 4);
+    assertThat(fakeTaskListener.getTaskToStage()).containsEntry(2L, 4);
   }
 
   @Test
