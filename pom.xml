@@ -310,6 +310,7 @@
         <version>${enforcer.version}</version>
         <configuration>
           <rules>
+            <dependencyConvergence />
             <requireMavenVersion>
               <version>${maven.version}</version>
             </requireMavenVersion>
