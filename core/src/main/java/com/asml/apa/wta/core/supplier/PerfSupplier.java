@@ -43,10 +43,13 @@ public class PerfSupplier implements InformationSupplier<PerfDto> {
   @Override
   public boolean isAvailable() {
     try {
-      return shellUtils
+      if (shellUtils
           .executeCommand("perf list | grep -w 'power/energy-pkg/' | awk '{print $1}'", true)
           .get()
-          .equals("power/energy-pkg/");
+          .equals("power/energy-pkg/")) {
+        return true;
+      }
+      return false;
     } catch (Exception e) {
       log.error("Something went wrong while trying to execute the shell command.");
       return false;

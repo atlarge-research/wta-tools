@@ -54,12 +54,11 @@ public class IostatSupplier implements InformationSupplier<IostatDto> {
       if (shellUtils.executeCommand("iostat", true).get() != null) {
         return true;
       }
+      return false;
     } catch (InterruptedException | ExecutionException e) {
       log.error("Something went wrong while receiving the iostat shell command outputs.");
       return false;
     }
-    log.info("System does not have the necessary dependencies to run iostat.");
-    return false;
   }
 
   /**
@@ -79,23 +78,25 @@ public class IostatSupplier implements InformationSupplier<IostatDto> {
     CompletableFuture<String> allMetrics = shellUtils.executeCommand("iostat -d", false);
 
     return allMetrics.thenApply(result -> {
-      try {
-        List<OutputLine> rows = parseIostat(result);
-        double[] metrics = aggregateIostat(rows);
+      if (result != null) {
+        try {
+          List<OutputLine> rows = parseIostat(result);
+          double[] metrics = aggregateIostat(rows);
 
-        return Optional.of(IostatDto.builder()
-            .tps(metrics[0])
-            .kiloByteReadPerSec(metrics[1])
-            .kiloByteWrtnPerSec(metrics[2])
-            .kiloByteDscdPerSec(metrics[3])
-            .kiloByteRead(metrics[4])
-            .kiloByteWrtn(metrics[5])
-            .kiloByteDscd(metrics[6])
-            .build());
-      } catch (NullPointerException npe) {
-        log.error("Iostat returned a malformed output: {}", npe.toString());
-      } catch (Exception e) {
-        log.error("Something went wrong while receiving the iostat bash command outputs.");
+          return Optional.of(IostatDto.builder()
+              .tps(metrics[0])
+              .kiloByteReadPerSec(metrics[1])
+              .kiloByteWrtnPerSec(metrics[2])
+              .kiloByteDscdPerSec(metrics[3])
+              .kiloByteRead(metrics[4])
+              .kiloByteWrtn(metrics[5])
+              .kiloByteDscd(metrics[6])
+              .build());
+        } catch (NullPointerException npe) {
+          log.error("Iostat returned a malformed output: {}", npe.toString());
+        } catch (Exception e) {
+          log.error("Something went wrong while receiving the iostat bash command outputs.");
+        }
       }
       return Optional.empty();
     });

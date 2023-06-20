@@ -62,7 +62,7 @@ public class DstatSupplier implements InformationSupplier<DstatDto> {
               .systemCsw(metrics.get(12))
               .build());
         } catch (Exception e) {
-          log.error("Something went wrong while receiving the dstat bash command outputs.");
+          log.error("Something went wrong with dstat bash command outputs.");
         }
       }
       return Optional.empty();
@@ -114,11 +114,10 @@ public class DstatSupplier implements InformationSupplier<DstatDto> {
       if (shellUtils.executeCommand("dstat -cdngy 1 1", true).get() != null) {
         return true;
       }
+      return false;
     } catch (InterruptedException | ExecutionException e) {
       log.error("Something went wrong while receiving the dstat shell command outputs.");
       return false;
     }
-    log.info("System does not have the necessary dependencies to run dstat.");
-    return false;
   }
 }
