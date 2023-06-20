@@ -59,6 +59,8 @@ For the most part, since we are pre-release this will serve no real purpose, oth
 - Set up SPI for the connector output file implementations [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 - Added parent-child functionality to Spark stage listeners as well [@pcho](https://gitlab.ewi.tudelft.nl/pcho)
 - Filter the ConcurrentHashMap containers and remove processed entries on job end [@pcho](https://gitlab.ewi.tudelft.nl/pcho)
+- Added coherent Maven lifecycle bindings [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
+- Added Maven site generation [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 
 ### Changed
 - Refactored listeners into a generic interface to reduce code duplication and increase cc [@hpage](https://gitlab.ewi.tudelft.nl/hpage)
