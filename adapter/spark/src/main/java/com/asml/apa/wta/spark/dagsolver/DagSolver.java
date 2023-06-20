@@ -42,12 +42,12 @@ public class DagSolver {
     /**
      * This is used for instantiating node 0,-1 as the extra source/sink node.
      *
-     * @param id id(0/-1)
+     * @param nodeId id(0/-1)
      * @author Tianchen Qu
      * @since 1.0.0
      */
-    Node(long id) {
-      this.id = id;
+    Node(long nodeId) {
+      id = nodeId;
       distance = Integer.MIN_VALUE;
     }
   }
@@ -100,7 +100,7 @@ public class DagSolver {
   /**
    * This method is used to create the source and sink node.
    *
-   * @param id id of the source(id = 0) and sink(id = -1) node
+   * @param id id of the source (id = 0) and sink (id = -1) node
    * @author Tianchen Qu
    * @since 1.0.0
    */
@@ -151,7 +151,7 @@ public class DagSolver {
   }
 
   /**
-   * This method does topological sorting on the dag using a deque.
+   * This method does topological sorting on the DAG using a {@link Deque}.
    *
    * @author Tianchen Qu
    * @since 1.0.0
