@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 import lombok.NonNull;
 
@@ -34,6 +35,22 @@ public class KeyedStream<K, V extends Serializable> {
     } else {
       streams.put(key, new Stream<>(record));
     }
+  }
+
+  /**
+   * Performs the mapping operation over the {@link KeyedStream} per key.
+   * Consumes the {@link KeyedStream}.
+   *
+   * @param mapper the mapping function, takes in the key and value of the element to map
+   * @author Atour Mousavi Gourabi
+   * @since 1.0.0
+   */
+  public <R extends Serializable> Stream<R> mapKey(@NonNull BiFunction<K, Stream<V>, R> mapper) {
+    Stream<R> stream = new Stream<>();
+    for (K key : streams.keySet()) {
+      stream.addToStream(mapper.apply(key, streams.get(key)));
+    }
+    return stream;
   }
 
   /**

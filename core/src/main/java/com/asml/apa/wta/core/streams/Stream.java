@@ -40,7 +40,9 @@ import lombok.extern.slf4j.Slf4j;
  * @since 1.0.0
  */
 @Slf4j
-public class Stream<V extends Serializable> implements Cloneable {
+public class Stream<V extends Serializable> implements Cloneable, Serializable {
+
+  private static final long serialVersionUID = 7414918352615022254L;
 
   /**
    * Internal node of the {@link com.asml.apa.wta.core.streams.Stream}.
@@ -268,6 +270,21 @@ public class Stream<V extends Serializable> implements Cloneable {
    */
   public boolean isEmpty() {
     return head == null;
+  }
+
+  /**
+   * Gets an {@link Optional} containing the head of the {@link Stream} if present.
+   * If not, it returns an empty {@link Optional}. Consumes the element it returns.
+   *
+   * @return the head of the {@link Stream} wrapped in an {@link Optional} if present
+   * @author Atour Mousavi Gourabi
+   * @since 1.0.0
+   */
+  public synchronized Optional<V> findFirst() {
+    if (head == null) {
+      return Optional.empty();
+    }
+    return Optional.of(head());
   }
 
   /**
