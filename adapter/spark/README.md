@@ -105,7 +105,7 @@ export PYSPARK_PYTHON=/usr/bin/python3.10
 export PYSPARK_DRIVER_PYTHON=/usr/bin/python3.10
 ```
 
-After specifying the above environment variables, adjust your spark configuration as follows:
+After specifying the above environment variables, adjust your Spark configuration as follows:
 
 ```Python
 from pyspark import SparkConf, SparkContext
