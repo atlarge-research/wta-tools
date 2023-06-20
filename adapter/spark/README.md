@@ -98,7 +98,7 @@ you will need to set the `spark.scala.version` flag to 2.13, such as in
 ### Integration with Pyspark
 PySpark is the Python API for Apache Spark and the plugin can also be used with Python scripts that make use of Pyspark.
 
-For Spark 3.2.4, Python 3.7 to Python 3.10 needs to be installed. In addition, add the following environment variables in your .bashrc file (adjust the version accordingly):
+For Spark 3.2.4, a Python version between 3.7 to 3.10 needs to be installed. In addition, add the following environment variables in your .bashrc file (adjust the version accordingly):
 
 ```
 export PYSPARK_PYTHON=/usr/bin/python3.10
