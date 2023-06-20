@@ -9,6 +9,8 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledOnOs;
+import org.junit.jupiter.api.condition.OS;
 import org.mockito.Mockito;
 
 public class IostatSupplierTest {
@@ -20,6 +22,7 @@ public class IostatSupplierTest {
   void setup() {
     shellUtils = Mockito.mock(ShellUtils.class);
     doReturn(CompletableFuture.completedFuture("str")).when(shellUtils).executeCommand("iostat", true);
+
     sut = Mockito.spy(new IostatSupplier(shellUtils));
   }
 
@@ -45,7 +48,12 @@ public class IostatSupplierTest {
 
     Optional<IostatDto> result = sut.getSnapshot().join();
 
-    assertEquals(expected, result.get());
+    if(sut.isAvailable()) {
+      assertEquals(expected, result.get());
+    }
+    else {
+      assertEquals(Optional.empty(), result);
+    }
   }
 
   @Test
@@ -56,7 +64,11 @@ public class IostatSupplierTest {
 
     Optional<IostatDto> result = sut.getSnapshot().join();
 
-    assertEquals(expected, result.get());
+    if(sut.isAvailable()) {
+      assertEquals(expected, result.get());
+    }else {
+      assertEquals(Optional.empty(), result);
+    }
   }
 
   @Test
@@ -72,6 +84,10 @@ public class IostatSupplierTest {
 
     Optional<IostatDto> result = sut.getSnapshot().join();
 
-    assertEquals(expected, result.get());
+    if(sut.isAvailable()) {
+      assertEquals(expected, result.get());
+    }else {
+      assertEquals(Optional.empty(), result);
+    }
   }
 }

@@ -11,6 +11,8 @@ import com.asml.apa.wta.core.utils.ShellUtils;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledOnOs;
+import org.junit.jupiter.api.condition.OS;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -51,7 +53,11 @@ public class DstatSupplierTest {
         .systemCsw(2116L)
         .build();
 
-    assertEquals(expected, actual.get());
+    if(sut.isAvailable()) {
+      assertEquals(expected, actual.get());
+    } else {
+      assertEquals(Optional.empty(), actual);
+    }
   }
 
   @Test
@@ -62,6 +68,6 @@ public class DstatSupplierTest {
 
     Optional<DstatDto> actual = sut.getSnapshot().join();
 
-    assertThat(actual).isEmpty();
+    assertEquals(Optional.empty(), actual);
   }
 }

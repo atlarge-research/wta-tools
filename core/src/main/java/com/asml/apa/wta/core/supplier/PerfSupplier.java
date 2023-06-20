@@ -42,6 +42,9 @@ public class PerfSupplier implements InformationSupplier<PerfDto> {
    */
   @Override
   public boolean isAvailable() {
+    if (!System.getProperty("os.name").toLowerCase().contains("linux")) {
+      return false;
+    }
     try {
       if (shellUtils
           .executeCommand("perf list | grep -w 'power/energy-pkg/' | awk '{print $1}'", true)

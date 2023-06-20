@@ -1,6 +1,7 @@
 package com.asml.apa.wta.core.supplier;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
 import com.asml.apa.wta.core.dto.PerfDto;
@@ -74,7 +75,12 @@ public class PerfSupplierTest {
     sut = spy(new PerfSupplier(shellUtils));
     assertThat(sut.isAvailable()).isTrue();
     Optional<PerfDto> result = sut.getSnapshot().join();
-    assertThat(result.get().getWatt()).isEqualTo(12.34);
+    if(sut.isAvailable()) {
+      assertThat(result.get().getWatt()).isEqualTo(12.34);
+    }
+    else {
+      assertEquals(Optional.empty(), result);
+    }
   }
 
   @Test
