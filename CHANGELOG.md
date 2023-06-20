@@ -95,8 +95,9 @@ For the most part, since we are pre-release this will serve no real purpose, oth
 - Fixed the Maven configuration by binding failsafe to the integration-test goals [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 - Delete the serialized files left behind by unconsumed streams on application end [@lyadalachanchu](https://gitlab.ewi.tudelft.nl/lyadalachanchu)
 - Fixed the shading to be more specific in the shaded locations to avoid dependency hell for users [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
-- Fixed the stage id bug in stage listener [@pcho](https://gitlab.ewi.tudelft.nl/pcho
+- Fixed the stage id bug in stage listener [@pcho](https://gitlab.ewi.tudelft.nl/pcho)
 - Fixed dstat command bug [@lyadalachanchu](https://gitlab.ewi.tudelft.nl/lyadalachanchu)
+- Fixed serialization bug in the new supplier POJOs [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 
 ### Deprecated
 
