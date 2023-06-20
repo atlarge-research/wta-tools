@@ -66,7 +66,7 @@ public class ParquetSchema {
             }
           }
         }
-        if (!sparseField) {
+        if (!staticField && !sparseField) {
           VarHandle typeInfoHandle = lookup.unreflectVarHandle(field);
           Class<?> fieldType = typeInfoHandle.varType();
           String fieldName = lookup.revealDirect(handle)
