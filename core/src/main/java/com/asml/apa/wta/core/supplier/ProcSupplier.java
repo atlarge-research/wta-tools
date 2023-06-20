@@ -139,7 +139,7 @@ public class ProcSupplier implements InformationSupplier<ProcDto> {
               .directMap4k(memResult[47].orElse(-1L))
               .directMap2M(memResult[48].orElse(-1L))
               .directMap1G(memResult[49].orElse(-1L))
-              .cpuModel(cpuModel.orElse(null))
+              .cpuModel(cpuModel.orElse("unknown"))
               .loadAvgOneMinute(loadAvgResult[0].orElse(-1.0))
               .loadAvgFiveMinutes(loadAvgResult[1].orElse(-1.0))
               .loadAvgFifteenMinutes(loadAvgResult[2].orElse(-1.0))
