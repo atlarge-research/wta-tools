@@ -17,6 +17,7 @@ import java.util.stream.Collectors;
  * one as the source (node with id = 0) connecting all stages that do not have parents,
  * the other as the sink (node with id = -1) connecting all stages without children.
  * The critical path shall be the longest path from the source to the sink.
+ * The ids of the additional node(source and sink) are chosen such that there will be no collisions with the stage ids.
  *
  * @author Tianchen Qu
  * @since 1.0.0
@@ -42,6 +43,7 @@ public class DagSolver {
 
     /**
      * This is used for instantiating node 0,-1 as the extra source/sink node.
+     * The ids of the source and sink are chosen such that there will be no collisions with the stage ids.
      *
      * @param nodeId id(0/-1)
      * @author Tianchen Qu
@@ -100,6 +102,7 @@ public class DagSolver {
 
   /**
    * This method is used to create the additional source and sink node.
+   * The ids of the source and sink are chosen such that there will be no collisions with the stage ids.
    *
    * @param id id of the source (id = 0) and sink (id = -1) node
    * @author Tianchen Qu
