@@ -54,13 +54,16 @@ public class ParquetSchema {
         .fields();
     try {
       for (Field field : fields) {
+        boolean staticField = Modifier.isStatic(field.getModifiers());
         boolean sparseField = false;
         MethodHandles.Lookup lookup = MethodHandles.privateLookupIn(clazz, MethodHandles.lookup());
         MethodHandle handle = lookup.unreflectGetter(field);
-        for (T o : objects) {
-          if (Modifier.isStatic(field.getModifiers()) || handle.invoke(o) == null) {
-            sparseField = true;
-            break;
+        if (!staticField) {
+          for (T o : objects) {
+            if (handle.invoke(o) == null) {
+              sparseField = true;
+              break;
+            }
           }
         }
         if (!sparseField) {
