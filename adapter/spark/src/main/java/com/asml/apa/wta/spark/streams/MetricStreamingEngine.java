@@ -114,10 +114,11 @@ public class MetricStreamingEngine {
     StringBuilder processorInformation = new StringBuilder();
 
     final String processorModel = pings.stream()
-        .filter(ping -> ping.getProcDto().isPresent())
-        .map(ping -> ping.getProcDto().get())
+        .map(BaseSupplierDto::getProcDto)
+        .filter(Objects::nonNull)
         .map(ProcDto::getCpuModel)
         .filter(Objects::nonNull)
+        .filter(s -> !s.equals("unknown"))
         .findFirst()
         .orElse("unknown");
 
@@ -166,43 +167,43 @@ public class MetricStreamingEngine {
           final long timestamp = ping.getTimestamp();
           final String eventType = "resource active";
           final long platformId = -1L;
-          final double availableResources = ping.getOsInfoDto()
+          final double availableResources = Optional.ofNullable(ping.getOsInfoDto())
               .map(pg -> (double) pg.getAvailableProcessors())
               .orElse(-1.0);
-          final double availableMemory = ping.getOsInfoDto()
+          final double availableMemory = Optional.ofNullable(ping.getOsInfoDto())
               .map(pg -> (double) pg.getFreePhysicalMemorySize() / bytesToGbDenom)
               .orElse(-1.0);
-          final double availableDiskSpace = ping.getJvmFileDto()
+          final double availableDiskSpace = Optional.ofNullable(ping.getJvmFileDto())
               .map(pg -> (double) pg.getUsableSpace() / bytesToGbDenom)
               .orElse(-1.0);
 
           double availableDiskIoBandwith = -1.0;
 
-          if (ping.getIostatDto().isPresent()) {
-            final IostatDto iostatDto = ping.getIostatDto().get();
+          if (Objects.nonNull(ping.getIostatDto())) {
+            final IostatDto iostatDto = ping.getIostatDto();
             availableDiskIoBandwith = iostatDto.getKiloByteReadPerSec() / kBpsToGbpsDenom
                 + iostatDto.getKiloByteWrtnPerSec() / kBpsToGbpsDenom;
           }
 
           final double availableNetworkBandwidth = -1.0;
 
-          final double numCores = ping.getOsInfoDto()
+          final double numCores = Optional.ofNullable(ping.getOsInfoDto())
               .map(OsInfoDto::getAvailableProcessors)
               .orElse(-1);
 
-          final double averageUtilization1Minute = ping.getProcDto()
+          final double averageUtilization1Minute = Optional.ofNullable(ping.getProcDto())
               .map(ProcDto::getLoadAvgOneMinute)
               .filter(loadAvg -> loadAvg != -1)
               .map(loadAvg -> loadAvg / numCores)
               .orElse(-1.0);
 
-          final double averageUtilization5Minute = ping.getProcDto()
+          final double averageUtilization5Minute = Optional.ofNullable(ping.getProcDto())
               .map(ProcDto::getLoadAvgFiveMinutes)
               .filter(loadAvg -> loadAvg != -1)
               .map(loadAvg -> loadAvg / numCores)
               .orElse(-1.0);
 
-          final double averageUtilization15Minute = ping.getProcDto()
+          final double averageUtilization15Minute = Optional.ofNullable(ping.getProcDto())
               .map(ProcDto::getLoadAvgFifteenMinutes)
               .filter(loadAvg -> loadAvg != -1)
               .map(loadAvg -> loadAvg / numCores)
@@ -235,7 +236,7 @@ public class MetricStreamingEngine {
    * @return The constant information that is requested
    */
   private <R> Optional<R> getFirstAvailable(
-      List<SparkBaseSupplierWrapperDto> pings, Function<SparkBaseSupplierWrapperDto, Optional<R>> mapper) {
-    return pings.stream().map(mapper).flatMap(Optional::stream).findFirst();
+      List<SparkBaseSupplierWrapperDto> pings, Function<SparkBaseSupplierWrapperDto, R> mapper) {
+    return pings.stream().map(mapper).filter(Objects::nonNull).findFirst();
   }
 }

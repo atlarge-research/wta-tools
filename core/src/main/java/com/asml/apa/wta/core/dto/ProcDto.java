@@ -223,7 +223,7 @@ public class ProcDto implements SupplierDto {
   private long directMap1G = -1;
 
   @Builder.Default
-  private String cpuModel = "";
+  private String cpuModel = "unknown";
 
   @Builder.Default
   private double loadAvgOneMinute = -1.0;

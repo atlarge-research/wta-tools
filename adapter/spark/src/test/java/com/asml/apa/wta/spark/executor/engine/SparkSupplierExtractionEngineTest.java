@@ -12,7 +12,6 @@ import com.asml.apa.wta.core.dto.OsInfoDto;
 import com.asml.apa.wta.core.dto.PerfDto;
 import com.asml.apa.wta.core.dto.ProcDto;
 import com.asml.apa.wta.spark.dto.SparkBaseSupplierWrapperDto;
-import java.util.Optional;
 import org.apache.spark.api.plugin.PluginContext;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -38,18 +37,17 @@ class SparkSupplierExtractionEngineTest {
 
   @Test
   void correctDtoGetsReturnedWhenBaseInformationIsTransformed() {
-    Optional<OsInfoDto> fakeOsInfo =
-        Optional.of(OsInfoDto.builder().availableProcessors(1).build());
-    Optional<IostatDto> fakeIoStatDto =
-        Optional.of(IostatDto.builder().kiloByteRead(40).build());
-    Optional<DstatDto> fakeDstatDto =
-        Optional.of(DstatDto.builder().netSend(1).build());
-    Optional<PerfDto> fakePerfDto =
-        Optional.of(PerfDto.builder().watt(30.12).build());
-    Optional<ProcDto> fakeProcDto = Optional.of(ProcDto.builder().active(1L).build());
-
-    Optional<JvmFileDto> fakeJvmFileDto =
-        Optional.of(JvmFileDto.builder().freeSpace(11L).build());
+    OsInfoDto fakeOsInfo =
+        OsInfoDto.builder().availableProcessors(1).build();
+    IostatDto fakeIoStatDto =
+        IostatDto.builder().kiloByteRead(40).build();
+    DstatDto fakeDstatDto =
+        DstatDto.builder().netSend(1).build();
+    PerfDto fakePerfDto =
+        PerfDto.builder().watt(30.12).build();
+    ProcDto fakeProcDto = ProcDto.builder().active(1L).build();
+    JvmFileDto fakeJvmFileDto =
+        JvmFileDto.builder().freeSpace(11L).build();
 
     long fakeTime = System.currentTimeMillis();
 

@@ -11,7 +11,6 @@ import com.asml.apa.wta.core.model.ResourceState;
 import com.asml.apa.wta.spark.dto.ResourceAndStateWrapper;
 import com.asml.apa.wta.spark.dto.SparkBaseSupplierWrapperDto;
 import java.util.List;
-import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -30,30 +29,28 @@ class MetricStreamingEngineTest {
     s1 = SparkBaseSupplierWrapperDto.builder()
         .timestamp(234232L)
         .executorId("executor1")
-        .dstatDto(Optional.empty())
-        .iostatDto(Optional.of(IostatDto.builder()
+        .dstatDto(null)
+        .iostatDto(IostatDto.builder()
             .kiloByteWrtnPerSec(39321321321321L)
             .kiloByteReadPerSec(432423432432L)
-            .build()))
-        .jvmFileDto(Optional.of(JvmFileDto.builder()
+            .build())
+        .jvmFileDto(JvmFileDto.builder()
             .freeSpace(50000000000000L)
             .totalSpace(5000000000000342L)
             .totalSpace(56732423432423432L)
-            .build()))
-        .procDto(Optional.of(ProcDto.builder().build()))
+            .build())
+        .procDto(ProcDto.builder().build())
         .build();
 
     s2 = SparkBaseSupplierWrapperDto.builder()
         .timestamp(23423439L)
         .executorId("executor1")
-        .dstatDto(Optional.empty())
-        .iostatDto(Optional.empty())
-        .jvmFileDto(Optional.of(JvmFileDto.builder()
+        .jvmFileDto(JvmFileDto.builder()
             .freeSpace(50000000000000L)
             .totalSpace(5000000000000342L)
             .totalSpace(56732423432423432L)
-            .build()))
-        .osInfoDto(Optional.of(OsInfoDto.builder()
+            .build())
+        .osInfoDto(OsInfoDto.builder()
             .os("Mac OS X")
             .architecture("x64")
             .availableProcessors(8)
@@ -61,31 +58,30 @@ class MetricStreamingEngineTest {
             .freePhysicalMemorySize(12000000000L)
             .processCpuLoad(50L)
             .totalPhysicalMemorySize(120000000000L)
-            .build()))
-        .procDto(Optional.of(ProcDto.builder()
+            .build())
+        .procDto(ProcDto.builder()
             .cpuModel("Ryzen 7 Over 90000")
             .loadAvgOneMinute(1.36)
             .loadAvgFiveMinutes(1.76)
             .loadAvgFifteenMinutes(1.96)
-            .build()))
+            .build())
         .build();
 
     s3 = SparkBaseSupplierWrapperDto.builder()
         .timestamp(23423439L)
         .executorId("executor2")
-        .dstatDto(Optional.empty())
-        .iostatDto(Optional.of(IostatDto.builder()
+        .iostatDto(IostatDto.builder()
             .kiloByteDscd(26L)
             .kiloByteRead(36L)
             .kiloByteWrtnPerSec(3913213L)
             .kiloByteReadPerSec(932423432423L)
-            .build()))
-        .jvmFileDto(Optional.of(JvmFileDto.builder()
+            .build())
+        .jvmFileDto(JvmFileDto.builder()
             .freeSpace(50000000000000L)
             .totalSpace(5000000000000342L)
             .totalSpace(56732423432423432L)
-            .build()))
-        .osInfoDto(Optional.of(OsInfoDto.builder()
+            .build())
+        .osInfoDto(OsInfoDto.builder()
             .os("Mac OS X")
             .architecture("x64")
             .availableProcessors(8)
@@ -93,9 +89,9 @@ class MetricStreamingEngineTest {
             .freePhysicalMemorySize(12000000000L)
             .processCpuLoad(50L)
             .totalPhysicalMemorySize(120000000000L)
-            .build()))
-        .procDto(Optional.of(
-            ProcDto.builder().cpuModel("Ryzen 7 Over 90000").build()))
+            .build())
+        .procDto(
+            ProcDto.builder().cpuModel("Ryzen 7 Over 90000").build())
         .build();
   }
 
@@ -127,25 +123,22 @@ class MetricStreamingEngineTest {
     // size assertions
     assertThat(result).hasSize(2);
 
-    ResourceAndStateWrapper executor1 = result.stream()
+    ResourceAndStateWrapper executor2 = result.stream()
         .filter(r ->
-            r.getResource().getId() == Math.abs(s1.getExecutorId().hashCode()))
+            r.getResource().getId() == Math.abs(s2.getExecutorId().hashCode()))
         .findFirst()
         .get();
-    ResourceAndStateWrapper executor2 = result.stream()
+    ResourceAndStateWrapper executor3 = result.stream()
         .filter(r ->
             r.getResource().getId() == Math.abs(s3.getExecutorId().hashCode()))
         .findFirst()
         .get();
 
-    assertThat(executor1.getResource())
+    assertThat(executor2.getResource())
         .isEqualTo(Resource.builder()
-            .network(-1L)
-            .procModel("unknown")
             .id(Math.abs(s1.getExecutorId().hashCode()))
             .type("cluster node")
             .numResources(8.0)
-            .procModel("unknown / x64")
             .memory(111L)
             .diskSpace(52836186L)
             .network(-1L)
@@ -153,10 +146,10 @@ class MetricStreamingEngineTest {
             .os("Mac OS X")
             .build());
 
-    ResourceState state1 = executor1.getStates().get(0);
-    ResourceState state2 = executor1.getStates().get(1);
+    ResourceState state1 = executor2.getStates().get(0);
+    ResourceState state2 = executor2.getStates().get(1);
 
-    assertThat(executor1.getStates()).hasSize(2);
+    assertThat(executor2.getStates()).hasSize(2);
     assertThat(state1.getTimestamp()).isLessThan(state2.getTimestamp());
     assertThat(state1.getResourceId()).isEqualTo(state2.getResourceId());
     assertThat(state1.getAvailableDiskIoBandwidth()).isGreaterThan(0);
@@ -172,19 +165,19 @@ class MetricStreamingEngineTest {
     assertThat(state2.getAverageUtilization5Minute()).isGreaterThan(0.0);
     assertThat(state2.getAverageUtilization15Minute()).isGreaterThan(0.0);
 
-    assertThat(executor2.getResource()).isNotEqualTo(executor1.getResource());
+    assertThat(executor3.getResource()).isNotEqualTo(executor2.getResource());
 
-    assertThat(executor1.getStates()).hasSize(2);
-    assertThat(executor2.getStates()).hasSize(1);
+    assertThat(executor2.getStates()).hasSize(2);
+    assertThat(executor3.getStates()).hasSize(1);
     assertThat(sut.collectResourceInformation().get(0).getStates()).isEmpty();
     assertThat(sut.collectResourceInformation().get(0).getResource()).isNotNull();
   }
 
   @Test
   void filteringThroughAStreamReturnsTheFirstValueWhereTheOptionalIsPresent() {
-    OsInfoDto modifiedDto = s3.getOsInfoDto().get();
+    OsInfoDto modifiedDto = s3.getOsInfoDto();
     modifiedDto.setOs("asfasdfjasfsadfasfasdfsa");
-    s3.setOsInfoDto(Optional.of(modifiedDto));
+    s3.setOsInfoDto(modifiedDto);
     s3.setExecutorId(s1.getExecutorId());
 
     sut.addToResourceStream(s1.getExecutorId(), s1);
