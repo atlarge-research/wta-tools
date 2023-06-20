@@ -90,8 +90,7 @@ class MetricStreamingEngineTest {
             .processCpuLoad(50L)
             .totalPhysicalMemorySize(120000000000L)
             .build())
-        .procDto(
-            ProcDto.builder().cpuModel("Ryzen 7 Over 90000").build())
+        .procDto(ProcDto.builder().cpuModel("Ryzen 7 Over 90000").build())
         .build();
   }
 

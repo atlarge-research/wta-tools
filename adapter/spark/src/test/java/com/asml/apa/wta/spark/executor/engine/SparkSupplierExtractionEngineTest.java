@@ -37,17 +37,12 @@ class SparkSupplierExtractionEngineTest {
 
   @Test
   void correctDtoGetsReturnedWhenBaseInformationIsTransformed() {
-    OsInfoDto fakeOsInfo =
-        OsInfoDto.builder().availableProcessors(1).build();
-    IostatDto fakeIoStatDto =
-        IostatDto.builder().kiloByteRead(40).build();
-    DstatDto fakeDstatDto =
-        DstatDto.builder().netSend(1).build();
-    PerfDto fakePerfDto =
-        PerfDto.builder().watt(30.12).build();
+    OsInfoDto fakeOsInfo = OsInfoDto.builder().availableProcessors(1).build();
+    IostatDto fakeIoStatDto = IostatDto.builder().kiloByteRead(40).build();
+    DstatDto fakeDstatDto = DstatDto.builder().netSend(1).build();
+    PerfDto fakePerfDto = PerfDto.builder().watt(30.12).build();
     ProcDto fakeProcDto = ProcDto.builder().active(1L).build();
-    JvmFileDto fakeJvmFileDto =
-        JvmFileDto.builder().freeSpace(11L).build();
+    JvmFileDto fakeJvmFileDto = JvmFileDto.builder().freeSpace(11L).build();
 
     long fakeTime = System.currentTimeMillis();
 
