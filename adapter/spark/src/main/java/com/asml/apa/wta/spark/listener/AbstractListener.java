@@ -20,7 +20,7 @@ import org.apache.spark.scheduler.SparkListener;
  */
 @RequiredArgsConstructor
 @SuppressWarnings("VisibilityModifier")
-public class AbstractListener<T extends BaseTraceObject> extends SparkListener {
+public abstract class AbstractListener<T extends BaseTraceObject> extends SparkListener {
 
   /**
    * The current spark context.
