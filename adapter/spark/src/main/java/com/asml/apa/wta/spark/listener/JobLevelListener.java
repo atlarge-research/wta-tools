@@ -4,7 +4,7 @@ import com.asml.apa.wta.core.config.RuntimeConfig;
 import com.asml.apa.wta.core.model.Task;
 import com.asml.apa.wta.core.model.Workflow;
 import com.asml.apa.wta.core.model.enums.Domain;
-import dagsolver.DagSolver;
+import com.asml.apa.wta.spark.dagsolver.DagSolver;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;

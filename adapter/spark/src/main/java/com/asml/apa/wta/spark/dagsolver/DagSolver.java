@@ -1,4 +1,4 @@
-package dagsolver;
+package com.asml.apa.wta.spark.dagsolver;
 
 import com.asml.apa.wta.core.model.Task;
 import com.asml.apa.wta.spark.listener.TaskLevelListener;
@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 public class DagSolver {
 
   /**
-   * This is the utility class for all the nodes inside the DAG graph for stages.
+   * This is a class representing node inside the DAG graph.
    *
    * @author Tianchen Qu
    * @since 1.0.0
@@ -32,15 +32,15 @@ public class DagSolver {
 
     private long id;
 
-    private long dist;
+    private long distance;
 
     Node(Task stage) {
       id = stage.getId();
-      dist = Integer.MIN_VALUE;
+      distance = Integer.MIN_VALUE;
     }
 
     /**
-     * This is used for instanciating node 0,-1 as the extra source/sink node.
+     * This is used for instantiating node 0,-1 as the extra source/sink node.
      *
      * @param id id(0/-1)
      * @author Tianchen Qu
@@ -48,22 +48,19 @@ public class DagSolver {
      */
     Node(long id) {
       this.id = id;
-      dist = Integer.MIN_VALUE;
+      distance = Integer.MIN_VALUE;
     }
   }
 
-  private Map<Long, Node> nodes;
+  private Map<Long, Node> nodes= new ConcurrentHashMap<>();
 
-  private Map<Long, Map<Long, Long>> adjMap;
+  private Map<Long, Map<Long, Long>> adjMap = new ConcurrentHashMap<>();
 
-  private Map<Long, Map<Long, Long>> adjMapReversed;
+  private Map<Long, Map<Long, Long>> adjMapReversed = new ConcurrentHashMap<>();
 
   private List<Task> stages;
 
   public DagSolver(List<Task> stages, TaskLevelListener listener) {
-    nodes = new ConcurrentHashMap<>();
-    adjMap = new ConcurrentHashMap<>();
-    adjMapReversed = new ConcurrentHashMap<>();
     this.stages = stages;
 
     addNode(0L);
@@ -115,7 +112,7 @@ public class DagSolver {
       setFinalEdges();
       adjMap.put(-1L, new ConcurrentHashMap<>());
     } else if (id == 0) { // if the node is the starting node
-      node.dist = 0;
+      node.distance = 0;
       adjMapReversed.put(0L, new ConcurrentHashMap<>());
     }
   }
@@ -171,6 +168,7 @@ public class DagSolver {
    *
    * @param visited a map of all visited nodes
    * @param node the current node
+   * @param stack stack used for topological sorting
    * @author Tianchen Qu
    * @since 1.0.0
    */
@@ -197,8 +195,8 @@ public class DagSolver {
       Node node = nodes.get(stack.pop());
       for (Long childId : adjMap.get(node.id).keySet()) {
         Node child = nodes.get(childId);
-        if (child.dist < node.dist + adjMap.get(node.id).get(childId)) {
-          child.dist = node.dist + adjMap.get(node.id).get(childId);
+        if (child.distance < node.distance + adjMap.get(node.id).get(childId)) {
+          child.distance = node.distance + adjMap.get(node.id).get(childId);
         }
       }
     }
@@ -218,7 +216,7 @@ public class DagSolver {
     while (pointer.get() != 0) {
       criticalPath.add(pointer.get());
       adjMapReversed.get(pointer.get()).forEach((adjNode, weight) -> {
-        if (weight + nodes.get(adjNode).dist == nodes.get(pointer.get()).dist) {
+        if (weight + nodes.get(adjNode).distance == nodes.get(pointer.get()).distance) {
           pointer.set(adjNode);
         }
       });
