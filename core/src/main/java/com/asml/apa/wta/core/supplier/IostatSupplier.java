@@ -51,7 +51,7 @@ public class IostatSupplier implements InformationSupplier<IostatDto> {
   @Override
   public boolean isAvailable() {
     try {
-      if (shellUtils.executeCommand("iostat").get() != null) {
+      if (shellUtils.executeCommand("iostat", true).get() != null) {
         return true;
       }
     } catch (InterruptedException | ExecutionException e) {
@@ -76,7 +76,7 @@ public class IostatSupplier implements InformationSupplier<IostatDto> {
       return notAvailableResult();
     }
 
-    CompletableFuture<String> allMetrics = shellUtils.executeCommand("iostat -d");
+    CompletableFuture<String> allMetrics = shellUtils.executeCommand("iostat -d", false);
 
     return allMetrics.thenApply(result -> {
       try {

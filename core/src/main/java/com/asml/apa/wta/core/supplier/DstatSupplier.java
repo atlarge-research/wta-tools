@@ -40,7 +40,7 @@ public class DstatSupplier implements InformationSupplier<DstatDto> {
       return notAvailableResult();
     }
 
-    CompletableFuture<String> allMetrics = shellUtils.executeCommand("dstat -cdngy 1 1");
+    CompletableFuture<String> allMetrics = shellUtils.executeCommand("dstat -cdngy 1 1", false);
 
     return allMetrics.thenApply(result -> {
       if (result != null) {
@@ -111,7 +111,7 @@ public class DstatSupplier implements InformationSupplier<DstatDto> {
   @Override
   public boolean isAvailable() {
     try {
-      if (shellUtils.executeCommand("dstat -cdngy 1 1").get() != null) {
+      if (shellUtils.executeCommand("dstat -cdngy 1 1", true).get() != null) {
         return true;
       }
     } catch (InterruptedException | ExecutionException e) {

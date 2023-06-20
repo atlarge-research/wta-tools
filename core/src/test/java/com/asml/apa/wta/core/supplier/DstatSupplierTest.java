@@ -24,7 +24,13 @@ public class DstatSupplierTest {
                 + "usr sys idl wai stl| read  writ| recv  send|  in   out | int   csw\n"
                 + "  0   1M  98k   0   0|   0     0 |   10B     0 |   0B     0B | 516G  2116"))
         .when(shellUtils)
-        .executeCommand("dstat -cdngy 1 1");
+        .executeCommand("dstat -cdngy 1 1", false);
+    doReturn(CompletableFuture.completedFuture(
+            "----total-usage---- -dsk/total- -net/total- ---paging-- ---system--\n"
+                + "usr sys idl wai stl| read  writ| recv  send|  in   out | int   csw\n"
+                + "  0   1M  98k   0   0|   0     0 |   10B     0 |   0B     0B | 516G  2116"))
+        .when(shellUtils)
+        .executeCommand("dstat -cdngy 1 1", true);
     DstatSupplier sut = spy(new DstatSupplier(shellUtils));
 
     Optional<DstatDto> actual = sut.getSnapshot().join();
@@ -51,7 +57,7 @@ public class DstatSupplierTest {
   @Test
   void dstatNotAvailable() {
     ShellUtils shellUtils = mock(ShellUtils.class);
-    doReturn(CompletableFuture.completedFuture(null)).when(shellUtils).executeCommand("dstat -cdngy 1 1");
+    doReturn(CompletableFuture.completedFuture(null)).when(shellUtils).executeCommand("dstat -cdngy 1 1", true);
     DstatSupplier sut = spy(new DstatSupplier(shellUtils));
 
     Optional<DstatDto> actual = sut.getSnapshot().join();

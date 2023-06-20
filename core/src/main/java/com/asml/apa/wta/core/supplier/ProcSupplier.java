@@ -158,7 +158,7 @@ public class ProcSupplier implements InformationSupplier<ProcDto> {
    * @since 1.0.0
    */
   private CompletableFuture<Optional<Long>[]> getMemMetrics() {
-    CompletableFuture<String> memMetrics = shell.executeCommand("cat /proc/meminfo");
+    CompletableFuture<String> memMetrics = shell.executeCommand("cat /proc/meminfo", false);
 
     return memMetrics.thenApply(result -> {
       Optional<Long>[] agg = Stream.generate(Optional::empty).limit(60).toArray(Optional[]::new);
@@ -179,7 +179,7 @@ public class ProcSupplier implements InformationSupplier<ProcDto> {
    * @since 1.0.0
    */
   private CompletableFuture<Optional<Long>[]> getDiskMetrics() {
-    CompletableFuture<String> diskMetrics = shell.executeCommand("cat /proc/diskstats");
+    CompletableFuture<String> diskMetrics = shell.executeCommand("cat /proc/diskstats", false);
 
     return diskMetrics.thenApply(result -> {
       Optional<Long>[] agg = Stream.generate(Optional::empty).limit(17).toArray(Optional[]::new);
@@ -210,7 +210,7 @@ public class ProcSupplier implements InformationSupplier<ProcDto> {
    */
   private CompletableFuture<Optional<String>> getCpuModel() {
     CompletableFuture<String> cpuMetrics = shell.executeCommand(
-        "grep -m 1 \"model name\" /proc/cpuinfo | awk -F: '{print $2}' | sed 's/^[ \\t]*//'");
+        "grep -m 1 \"model name\" /proc/cpuinfo | awk -F: '{print $2}' | sed 's/^[ \\t]*//'", false);
     return cpuMetrics.thenApply(result -> {
       if (result != null && !result.isEmpty() && !fileNotFound(result)) {
         return Optional.of(result);
@@ -227,7 +227,7 @@ public class ProcSupplier implements InformationSupplier<ProcDto> {
    * @since 1.0.0
    */
   private CompletableFuture<Optional<Double>[]> getLoadAvgMetrics() {
-    CompletableFuture<String> loadAvgMetrics = shell.executeCommand("cat /proc/loadavg");
+    CompletableFuture<String> loadAvgMetrics = shell.executeCommand("cat /proc/loadavg", false);
 
     Pattern pattern = Pattern.compile("\\d+(?:[.,]\\d+)?");
 

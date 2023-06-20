@@ -44,7 +44,7 @@ public class PerfSupplier implements InformationSupplier<PerfDto> {
   public boolean isAvailable() {
     try {
       return shellUtils
-          .executeCommand("perf list | grep -w 'power/energy-pkg/' | awk '{print $1}'")
+          .executeCommand("perf list | grep -w 'power/energy-pkg/' | awk '{print $1}'", true)
           .get()
           .equals("power/energy-pkg/");
     } catch (Exception e) {
@@ -90,7 +90,9 @@ public class PerfSupplier implements InformationSupplier<PerfDto> {
    * @since 1.0.0
    */
   public CompletableFuture<String> gatherMetrics() {
-    return shellUtils.executeCommand("perf stat -e power/energy-pkg/ -a sleep 1 2>&1 | "
-        + "grep -oP '^\\s+\\K[0-9]+[,\\.][0-9]+(?=\\s+Joules)' | sed 's/,/./g'");
+    return shellUtils.executeCommand(
+        "perf stat -e power/energy-pkg/ -a sleep 1 2>&1 | "
+            + "grep -oP '^\\s+\\K[0-9]+[,\\.][0-9]+(?=\\s+Joules)' | sed 's/,/./g'",
+        false);
   }
 }

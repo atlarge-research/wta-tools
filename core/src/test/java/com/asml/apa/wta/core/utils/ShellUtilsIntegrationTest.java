@@ -13,7 +13,7 @@ public class ShellUtilsIntegrationTest {
   @EnabledOnOs(OS.LINUX)
   void runExecuteCommandSuccessfully() {
     ShellUtils shellUtils = new ShellUtils();
-    CompletableFuture<String> actual = shellUtils.executeCommand("echo hello");
+    CompletableFuture<String> actual = shellUtils.executeCommand("echo hello", false);
     assertEquals(actual.join(), "hello\n");
   }
 }

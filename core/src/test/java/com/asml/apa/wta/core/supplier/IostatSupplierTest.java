@@ -19,7 +19,7 @@ public class IostatSupplierTest {
   @BeforeEach
   void setup() {
     shellUtils = Mockito.mock(ShellUtils.class);
-    doReturn(CompletableFuture.completedFuture("str")).when(shellUtils).executeCommand("iostat");
+    doReturn(CompletableFuture.completedFuture("str")).when(shellUtils).executeCommand("iostat", true);
     sut = Mockito.spy(new IostatSupplier(shellUtils));
   }
 
@@ -31,7 +31,7 @@ public class IostatSupplierTest {
                     + "sda               0,01         0.54         0.00         0.00      70941          0          0\n"
                     + "str               1.0          2.0          3.0          4.0       5.0        6.0        7.0"))
         .when(shellUtils)
-        .executeCommand("iostat -d");
+        .executeCommand("iostat -d", false);
 
     IostatDto expected = IostatDto.builder()
         .tps(1.01)
@@ -50,7 +50,7 @@ public class IostatSupplierTest {
 
   @Test
   public void aggregateIostatWorksCorrectlyWithZeroRows() {
-    doReturn(CompletableFuture.completedFuture("")).when(shellUtils).executeCommand("iostat -d");
+    doReturn(CompletableFuture.completedFuture("")).when(shellUtils).executeCommand("iostat -d", false);
 
     IostatDto expected = IostatDto.builder().build();
 
@@ -66,7 +66,7 @@ public class IostatSupplierTest {
                 + "sda               0,01         0.54         0.00         0.00      70941          0\n"
                 + "str               1.0          2.0          3.0          4.0       5.0        6.0"))
         .when(shellUtils)
-        .executeCommand("iostat -d");
+        .executeCommand("iostat -d", false);
 
     IostatDto expected = IostatDto.builder().build();
 
