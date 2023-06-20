@@ -108,7 +108,7 @@ After specifying the above environment variables, create a Python script such as
 ```Python
 from pyspark import SparkConf, SparkContext
 
-conf = SparkConf().setAppName("PythonScript").set("spark.plugins", "com.asml.apa.wta.spark.WtaPlugin").set("spark.driver.extraJavaOptions", "-DconfigFile=/home/philly/sp_resources/config.json")
+conf = SparkConf().setAppName("MyApp").set("spark.plugins", "com.asml.apa.wta.spark.WtaPlugin").set("spark.driver.extraJavaOptions", "-DconfigFile=/home/user/sp_resources/config.json")
 sc = SparkContext(conf=conf)
 
 ...
