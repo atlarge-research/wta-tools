@@ -8,15 +8,13 @@ import com.asml.apa.wta.core.dto.ProcDto;
 import com.asml.apa.wta.core.model.Resource;
 import com.asml.apa.wta.core.model.ResourceState;
 import com.asml.apa.wta.core.streams.KeyedStream;
+import com.asml.apa.wta.core.streams.Stream;
 import com.asml.apa.wta.spark.dto.ResourceAndStateWrapper;
 import com.asml.apa.wta.spark.dto.SparkBaseSupplierWrapperDto;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.io.Serializable;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 import lombok.Getter;
 
 /**
@@ -79,18 +77,13 @@ public class MetricStreamingEngine {
    * @author Henry Page
    * @since 1.0.0
    */
-  public List<ResourceAndStateWrapper> collectResourceInformation() {
-    Map<String, List<SparkBaseSupplierWrapperDto>> allPings = executorResourceStream.collectAll();
-
-    return allPings.entrySet().stream()
-        .map(entry -> {
-          long transformedId = Math.abs(entry.getKey().hashCode());
-          Resource resource = produceResourceFromExecutorInfo(transformedId, entry.getValue());
-          List<ResourceState> states = produceResourceStatesFromExecutorInfo(resource, entry.getValue());
-          states.sort(Comparator.comparing(ResourceState::getTimestamp));
-          return new ResourceAndStateWrapper(resource, states);
-        })
-        .collect(Collectors.toList());
+  public Stream<ResourceAndStateWrapper> collectResourceInformation() {
+    return executorResourceStream.mapKey((key, value) -> {
+      long transformedId = Math.abs(key.hashCode());
+      Resource resource = produceResourceFromExecutorInfo(transformedId, value);
+      Stream<ResourceState> states = produceResourceStatesFromExecutorInfo(resource, value);
+      return new ResourceAndStateWrapper(resource, states);
+    });
   }
 
   /**
@@ -102,10 +95,10 @@ public class MetricStreamingEngine {
    * @author Henry Page
    * @since 1.0.0
    */
-  private Resource produceResourceFromExecutorInfo(long executorId, List<SparkBaseSupplierWrapperDto> pings) {
+  private Resource produceResourceFromExecutorInfo(long executorId, Stream<SparkBaseSupplierWrapperDto> pings) {
 
-    Optional<OsInfoDto> sampleOsInfo = getFirstAvailable(pings, BaseSupplierDto::getOsInfoDto);
-    Optional<JvmFileDto> sampleJvmInfo = getFirstAvailable(pings, BaseSupplierDto::getJvmFileDto);
+    Optional<OsInfoDto> sampleOsInfo = getFirstAvailable(pings.clone(), BaseSupplierDto::getOsInfoDto);
+    Optional<JvmFileDto> sampleJvmInfo = getFirstAvailable(pings.clone(), BaseSupplierDto::getJvmFileDto);
     // do not sample proc info, later pings might actually have useful information
 
     final String type = "cluster node";
@@ -113,7 +106,7 @@ public class MetricStreamingEngine {
 
     StringBuilder processorInformation = new StringBuilder();
 
-    final String processorModel = pings.stream()
+    final String processorModel = pings.clone()
         .map(BaseSupplierDto::getProcDto)
         .filter(Objects::nonNull)
         .map(ProcDto::getCpuModel)
@@ -159,71 +152,69 @@ public class MetricStreamingEngine {
    * @author Henry Page
    * @since 1.0.0
    */
-  private List<ResourceState> produceResourceStatesFromExecutorInfo(
-      Resource associatedResource, List<SparkBaseSupplierWrapperDto> pings) {
-    return pings.stream()
-        .map(ping -> {
-          final long timestamp = ping.getTimestamp();
-          final String eventType = "resource active";
-          final long platformId = -1L;
-          final double availableResources = Optional.ofNullable(ping.getOsInfoDto())
-              .map(pg -> (double) pg.getAvailableProcessors())
-              .orElse(-1.0);
-          final double availableMemory = Optional.ofNullable(ping.getOsInfoDto())
-              .map(pg -> (double) pg.getFreePhysicalMemorySize() / bytesToGbDenom)
-              .orElse(-1.0);
-          final double availableDiskSpace = Optional.ofNullable(ping.getJvmFileDto())
-              .map(pg -> (double) pg.getUsableSpace() / bytesToGbDenom)
-              .orElse(-1.0);
+  private Stream<ResourceState> produceResourceStatesFromExecutorInfo(
+      Resource associatedResource, Stream<SparkBaseSupplierWrapperDto> pings) {
+    return pings.map(ping -> {
+      final long timestamp = ping.getTimestamp();
+      final String eventType = "resource active";
+      final long platformId = -1L;
+      final double availableResources = Optional.ofNullable(ping.getOsInfoDto())
+          .map(pg -> (double) pg.getAvailableProcessors())
+          .orElse(-1.0);
+      final double availableMemory = Optional.ofNullable(ping.getOsInfoDto())
+          .map(pg -> (double) pg.getFreePhysicalMemorySize() / bytesToGbDenom)
+          .orElse(-1.0);
+      final double availableDiskSpace = Optional.ofNullable(ping.getJvmFileDto())
+          .map(pg -> (double) pg.getUsableSpace() / bytesToGbDenom)
+          .orElse(-1.0);
 
-          double availableDiskIoBandwith = -1.0;
+      double availableDiskIoBandwith = -1.0;
 
-          if (ping.getIostatDto() != null) {
-            final IostatDto iostatDto = ping.getIostatDto();
-            availableDiskIoBandwith = iostatDto.getKiloByteReadPerSec() / kBpsToGbpsDenom
-                + iostatDto.getKiloByteWrtnPerSec() / kBpsToGbpsDenom;
-          }
+      if (ping.getIostatDto() != null) {
+        final IostatDto iostatDto = ping.getIostatDto();
+        availableDiskIoBandwith = iostatDto.getKiloByteReadPerSec() / kBpsToGbpsDenom
+            + iostatDto.getKiloByteWrtnPerSec() / kBpsToGbpsDenom;
+      }
 
-          final double availableNetworkBandwidth = -1.0;
+      final double availableNetworkBandwidth = -1.0;
 
-          final double numCores = Optional.ofNullable(ping.getOsInfoDto())
-              .map(OsInfoDto::getAvailableProcessors)
-              .orElse(-1);
+      final double numCores = Optional.ofNullable(ping.getOsInfoDto())
+          .map(OsInfoDto::getAvailableProcessors)
+          .orElse(-1);
 
-          final double averageUtilization1Minute = Optional.ofNullable(ping.getProcDto())
-              .map(ProcDto::getLoadAvgOneMinute)
-              .filter(loadAvg -> loadAvg != -1)
-              .map(loadAvg -> loadAvg / numCores)
-              .orElse(-1.0);
+      final double averageUtilization1Minute = Optional.ofNullable(ping.getProcDto())
+          .map(ProcDto::getLoadAvgOneMinute)
+          .filter(loadAvg -> loadAvg != -1)
+          .map(loadAvg -> loadAvg / numCores)
+          .orElse(-1.0);
 
-          final double averageUtilization5Minute = Optional.ofNullable(ping.getProcDto())
-              .map(ProcDto::getLoadAvgFiveMinutes)
-              .filter(loadAvg -> loadAvg != -1)
-              .map(loadAvg -> loadAvg / numCores)
-              .orElse(-1.0);
+      final double averageUtilization5Minute = Optional.ofNullable(ping.getProcDto())
+          .map(ProcDto::getLoadAvgFiveMinutes)
+          .filter(loadAvg -> loadAvg != -1)
+          .map(loadAvg -> loadAvg / numCores)
+          .orElse(-1.0);
 
-          final double averageUtilization15Minute = Optional.ofNullable(ping.getProcDto())
-              .map(ProcDto::getLoadAvgFifteenMinutes)
-              .filter(loadAvg -> loadAvg != -1)
-              .map(loadAvg -> loadAvg / numCores)
-              .orElse(-1.0);
+      final double averageUtilization15Minute = Optional.ofNullable(ping.getProcDto())
+          .map(ProcDto::getLoadAvgFifteenMinutes)
+          .filter(loadAvg -> loadAvg != -1)
+          .map(loadAvg -> loadAvg / numCores)
+          .orElse(-1.0);
 
-          return ResourceState.builder()
-              .resourceId(associatedResource)
-              .timestamp(timestamp)
-              .eventType(eventType)
-              .platformId(platformId)
-              .availableResources(availableResources)
-              .availableDiskSpace(availableDiskSpace)
-              .availableMemory(availableMemory)
-              .availableDiskIoBandwidth(availableDiskIoBandwith)
-              .availableNetworkBandwidth(availableNetworkBandwidth)
-              .averageUtilization1Minute(averageUtilization1Minute)
-              .averageUtilization5Minute(averageUtilization5Minute)
-              .averageUtilization15Minute(averageUtilization15Minute)
-              .build();
-        })
-        .collect(Collectors.toList());
+      return ResourceState.builder()
+          .resourceId(associatedResource)
+          .timestamp(timestamp)
+          .eventType(eventType)
+          .platformId(platformId)
+          .availableResources(availableResources)
+          .availableDiskSpace(availableDiskSpace)
+          .availableMemory(availableMemory)
+          .availableDiskIoBandwidth(availableDiskIoBandwith)
+          .availableNetworkBandwidth(availableNetworkBandwidth)
+          .averageUtilization1Minute(averageUtilization1Minute)
+          .averageUtilization5Minute(averageUtilization5Minute)
+          .averageUtilization15Minute(averageUtilization15Minute)
+          .build();
+    });
   }
 
   /**
@@ -234,8 +225,8 @@ public class MetricStreamingEngine {
    * @param <R> The type of the data supplier object
    * @return The constant information that is requested
    */
-  private <R> Optional<R> getFirstAvailable(
-      List<SparkBaseSupplierWrapperDto> pings, Function<SparkBaseSupplierWrapperDto, R> mapper) {
-    return pings.stream().map(mapper).filter(Objects::nonNull).findFirst();
+  private <R extends Serializable> Optional<R> getFirstAvailable(
+      Stream<SparkBaseSupplierWrapperDto> pings, Function<SparkBaseSupplierWrapperDto, R> mapper) {
+    return pings.map(mapper).filter(Objects::nonNull).findFirst();
   }
 }

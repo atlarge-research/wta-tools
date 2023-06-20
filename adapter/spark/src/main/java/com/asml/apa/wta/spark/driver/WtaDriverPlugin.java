@@ -16,9 +16,7 @@ import com.asml.apa.wta.spark.dto.ResourceCollectionDto;
 import com.asml.apa.wta.spark.streams.MetricStreamingEngine;
 import java.nio.file.Path;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.spark.SparkContext;
@@ -133,13 +131,10 @@ public class WtaDriverPlugin implements DriverPlugin {
    */
   private void endApplicationAndWrite() {
     removeListeners();
-    List<ResourceAndStateWrapper> resourceAndStateWrappers = metricStreamingEngine.collectResourceInformation();
-    List<Resource> resources = resourceAndStateWrappers.stream()
-        .map(ResourceAndStateWrapper::getResource)
-        .collect(Collectors.toList());
-    List<ResourceState> resourceStates = resourceAndStateWrappers.stream()
-        .flatMap(rs -> rs.getStates().stream())
-        .collect(Collectors.toList());
+    Stream<ResourceAndStateWrapper> resourceAndStateWrappers = metricStreamingEngine.collectResourceInformation();
+    Stream<Resource> resources = resourceAndStateWrappers.map(ResourceAndStateWrapper::getResource);
+    Stream<ResourceState> resourceStates = new Stream<>();
+    resourceAndStateWrappers.forEach(rs -> rs.getStates().forEach(resourceStates::addToStream));
     Workload workload = sparkDataSource
         .getApplicationLevelListener()
         .getProcessedObjects()
@@ -149,11 +144,11 @@ public class WtaDriverPlugin implements DriverPlugin {
         : sparkDataSource.getTaskLevelListener().getProcessedObjects();
     WtaWriter wtaWriter = new WtaWriter(outputFile, "schema-1.0", TOOL_VERSION);
     wtaWriter.write(Task.class, tasks.toList());
-    wtaWriter.write(Resource.class, resources);
+    wtaWriter.write(Resource.class, resources.toList());
     wtaWriter.write(
         Workflow.class,
         sparkDataSource.getJobLevelListener().getProcessedObjects().toList());
-    wtaWriter.write(ResourceState.class, resourceStates);
+    wtaWriter.write(ResourceState.class, resourceStates.toList());
     wtaWriter.write(workload);
 
     Stream.deleteAllSerializedFiles();

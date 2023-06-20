@@ -8,9 +8,9 @@ import com.asml.apa.wta.core.dto.OsInfoDto;
 import com.asml.apa.wta.core.dto.ProcDto;
 import com.asml.apa.wta.core.model.Resource;
 import com.asml.apa.wta.core.model.ResourceState;
+import com.asml.apa.wta.core.streams.Stream;
 import com.asml.apa.wta.spark.dto.ResourceAndStateWrapper;
 import com.asml.apa.wta.spark.dto.SparkBaseSupplierWrapperDto;
-import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -96,13 +96,14 @@ class MetricStreamingEngineTest {
 
   @Test
   void gettingMetricsWithEmptyResultsDoesNotCrashPlugin() {
-    assertThat(sut.collectResourceInformation()).isEmpty();
+    assertThat(sut.collectResourceInformation().isEmpty()).isTrue();
     sut.addToResourceStream(s1.getExecutorId(), s1);
 
     ResourceAndStateWrapper stateWrapperResult =
-        sut.collectResourceInformation().get(0);
+        sut.collectResourceInformation().clone().head();
 
-    assertThat(sut.collectResourceInformation().get(0).getStates()).isEmpty();
+    assertThat(sut.collectResourceInformation().head().getStates().isEmpty())
+        .isTrue();
 
     Resource result = stateWrapperResult.getResource();
     assertThat(result.getOs()).isEqualTo("unknown");
@@ -117,18 +118,17 @@ class MetricStreamingEngineTest {
     sut.addToResourceStream(s2.getExecutorId(), s2);
     sut.addToResourceStream(s3.getExecutorId(), s3);
 
-    List<ResourceAndStateWrapper> result = sut.collectResourceInformation();
+    Stream<ResourceAndStateWrapper> result = sut.collectResourceInformation();
 
     // size assertions
-    assertThat(result).hasSize(2);
+    assertThat(result.clone().count()).isEqualTo(2);
 
-    ResourceAndStateWrapper executor2 = result.stream()
+    ResourceAndStateWrapper executor2 = result.clone()
         .filter(r ->
             r.getResource().getId() == Math.abs(s2.getExecutorId().hashCode()))
         .findFirst()
         .get();
-    ResourceAndStateWrapper executor3 = result.stream()
-        .filter(r ->
+    ResourceAndStateWrapper executor3 = result.filter(r ->
             r.getResource().getId() == Math.abs(s3.getExecutorId().hashCode()))
         .findFirst()
         .get();
@@ -145,10 +145,10 @@ class MetricStreamingEngineTest {
             .os("Mac OS X")
             .build());
 
-    ResourceState state1 = executor2.getStates().get(0);
-    ResourceState state2 = executor2.getStates().get(1);
+    ResourceState state1 = executor2.getStates().clone().head();
+    ResourceState state2 = executor2.getStates().clone().drop(1).head();
 
-    assertThat(executor2.getStates()).hasSize(2);
+    assertThat(executor2.getStates().clone().count()).isEqualTo(2);
     assertThat(state1.getTimestamp()).isLessThan(state2.getTimestamp());
     assertThat(state1.getResourceId()).isEqualTo(state2.getResourceId());
     assertThat(state1.getAvailableDiskIoBandwidth()).isGreaterThan(0);
@@ -166,10 +166,11 @@ class MetricStreamingEngineTest {
 
     assertThat(executor3.getResource()).isNotEqualTo(executor2.getResource());
 
-    assertThat(executor2.getStates()).hasSize(2);
-    assertThat(executor3.getStates()).hasSize(1);
-    assertThat(sut.collectResourceInformation().get(0).getStates()).isEmpty();
-    assertThat(sut.collectResourceInformation().get(0).getResource()).isNotNull();
+    assertThat(executor2.getStates().clone().count()).isEqualTo(2);
+    assertThat(executor3.getStates().clone().count()).isEqualTo(1);
+    assertThat(sut.collectResourceInformation().head().getStates().isEmpty())
+        .isTrue();
+    assertThat(sut.collectResourceInformation().head().getResource()).isNotNull();
   }
 
   @Test
@@ -182,8 +183,8 @@ class MetricStreamingEngineTest {
     sut.addToResourceStream(s1.getExecutorId(), s1);
     sut.addToResourceStream(s3.getExecutorId(), s3);
 
-    List<ResourceAndStateWrapper> result = sut.collectResourceInformation();
-    assertThat(result).hasSize(1);
-    assertThat(result.get(0).getResource().getOs()).isEqualTo("asfasdfjasfsadfasfasdfsa");
+    Stream<ResourceAndStateWrapper> result = sut.collectResourceInformation();
+    assertThat(result.clone().count()).isEqualTo(1);
+    assertThat(result.clone().head().getResource().getOs()).isEqualTo("asfasdfjasfsadfasfasdfsa");
   }
 }
