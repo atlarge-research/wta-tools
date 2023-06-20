@@ -63,6 +63,8 @@ There are two ways to make use of the plugin
 1. Integrate the plugin into the Spark application source code
 2. Create the plugin as a JAR and run alongside the main Spark application via **spark-submit**
 
+Note that for either approaches, `sparkContext.stop()` must be specified at the end of the main Java application to invoke the plugin's application finished callback. Otherwise, the plugin doesn't end properly.
+
 ### Plugin Integration
 For the first approach, create a `SparkConf` object and set the following config:
 
