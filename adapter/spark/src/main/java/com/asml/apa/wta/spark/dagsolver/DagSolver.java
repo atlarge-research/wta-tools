@@ -14,8 +14,9 @@ import java.util.stream.Collectors;
 /**
  * This class will take in all stages within the job, generate the DAG
  * and find the critical path. It will add two additional nodes to the dependency graph
- * one as the source (node with id = 0) connecting all stages that do not have parents, the other as the sink (node with id = -1) connecting all stages
- * without children. The critical path shall be the longest path from the source to the sink.
+ * one as the source (node with id = 0) connecting all stages that do not have parents,
+ * the other as the sink (node with id = -1) connecting all stages without children.
+ * The critical path shall be the longest path from the source to the sink.
  *
  * @author Tianchen Qu
  * @since 1.0.0
