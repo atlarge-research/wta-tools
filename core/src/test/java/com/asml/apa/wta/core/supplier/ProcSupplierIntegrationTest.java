@@ -17,7 +17,7 @@ public class ProcSupplierIntegrationTest {
     Optional<ProcDto> actual = a.getSnapshot().join();
     if (a.isAvailable()) {
       assertThat(actual).isPresent();
-      assertThat(actual.get().getMemTotal()).isPresent();
+      assertThat(actual.get().getMemTotal()).isNotNegative();
     } else {
       assertThat(actual).isEmpty();
     }

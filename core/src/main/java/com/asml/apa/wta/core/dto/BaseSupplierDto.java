@@ -1,7 +1,6 @@
 package com.asml.apa.wta.core.dto;
 
 import java.io.Serializable;
-import java.util.Optional;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -19,7 +18,6 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @AllArgsConstructor
 @SuperBuilder
-@SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public class BaseSupplierDto implements Serializable {
 
   private static final long serialVersionUID = 21352L;
@@ -27,20 +25,20 @@ public class BaseSupplierDto implements Serializable {
   private long timestamp;
 
   @Builder.Default
-  private Optional<OsInfoDto> osInfoDto = Optional.empty();
+  private OsInfoDto osInfoDto = null;
 
   @Builder.Default
-  private Optional<IostatDto> iostatDto = Optional.empty();
+  private IostatDto iostatDto = null;
 
   @Builder.Default
-  private Optional<DstatDto> dstatDto = Optional.empty();
+  private DstatDto dstatDto = null;
 
   @Builder.Default
-  private Optional<PerfDto> perfDto = Optional.empty();
+  private PerfDto perfDto = null;
 
   @Builder.Default
-  private Optional<JvmFileDto> jvmFileDto = Optional.empty();
+  private JvmFileDto jvmFileDto = null;
 
   @Builder.Default
-  private Optional<ProcDto> procDto = Optional.empty();
+  private ProcDto procDto = null;
 }

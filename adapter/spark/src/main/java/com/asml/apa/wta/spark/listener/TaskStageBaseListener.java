@@ -14,6 +14,7 @@ import org.apache.spark.scheduler.SparkListenerJobStart;
  * @author Lohithsai Yadala Chanchu
  * @since 1.0.0
  */
+@SuppressWarnings("VisibilityModifier")
 public abstract class TaskStageBaseListener extends AbstractListener<Task> {
 
   @Getter

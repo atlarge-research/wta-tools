@@ -59,6 +59,9 @@ For the most part, since we are pre-release this will serve no real purpose, oth
 - Set up SPI for the connector output file implementations [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 - Added parent-child functionality to Spark stage listeners as well [@pcho](https://gitlab.ewi.tudelft.nl/pcho)
 - Filter the ConcurrentHashMap containers and remove processed entries on job end [@pcho](https://gitlab.ewi.tudelft.nl/pcho)
+- Added coherent Maven lifecycle bindings [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
+- Added Maven site generation [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
+- Added documentation on how to integrate the plugin JAR with PySpark [@pcho](https://gitlab.ewi.tudelft.nl/pcho)
 - Implemented critical path fields [@tqu](https://gitlab.ewi.tudelft.nl/tqu)
 
 ### Changed
@@ -81,6 +84,7 @@ For the most part, since we are pre-release this will serve no real purpose, oth
 - Changed the pipeline to enforce code coverage [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 - Expanded the Parquet schema generator to privates and maps [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 - Refactored the Spark listeners to improve readability and maintainability [@pcho](https://gitlab.ewi.tudelft.nl/pcho)
+- AbstractListener made to be actually abstract. [@hpage](https://gitlab.ewi.tudelft.nl/hpage)
 
 ### Fixed
 - Fixed the slf4j logging module to allow use in testing and `adapter/spark` [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
@@ -94,6 +98,9 @@ For the most part, since we are pre-release this will serve no real purpose, oth
 - Delete the serialized files left behind by unconsumed streams on application end [@lyadalachanchu](https://gitlab.ewi.tudelft.nl/lyadalachanchu)
 - Fixed the shading to be more specific in the shaded locations to avoid dependency hell for users [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 - Fixed the stage id bug in stage listener [@pcho](https://gitlab.ewi.tudelft.nl/pcho)
+- Fixed dstat command bug [@lyadalachanchu](https://gitlab.ewi.tudelft.nl/lyadalachanchu)
+- Fixed serialization bug in the new supplier POJOs [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
+- Fixed Parquet schema generation static field edge cases [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 
 ### Deprecated
 
@@ -105,3 +112,4 @@ For the most part, since we are pre-release this will serve no real purpose, oth
 - Removed WtaUtils [@hpage](https://gitlab.ewi.tudelft.nl/hpage)
 - Removed the outdated spark-benchmarking module [@pcho](https://gitlab.ewi.tudelft.nl/pcho)
 - Removed custom Log4j2 configuration [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
+- Removed PITest from the pipeline again [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)

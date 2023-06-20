@@ -6,7 +6,6 @@ import static org.mockito.Mockito.doReturn;
 
 import com.asml.apa.wta.core.dto.ProcDto;
 import com.asml.apa.wta.core.utils.ShellUtils;
-import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -36,21 +35,21 @@ public class ProcSupplierTest {
     ProcSupplier sut = new ProcSupplier(shellUtils);
 
     ProcDto expected = ProcDto.builder()
-        .readsCompleted(Optional.of(78853L))
-        .readsMerged(Optional.of(10749L))
-        .sectorsRead(Optional.of(5453564L))
-        .timeSpentReading(Optional.of(5672L))
-        .memTotal(Optional.of(10118252L))
-        .memFree(Optional.of(1921196L))
-        .memAvailable(Optional.of(5470300L))
-        .buffers(Optional.of(239068L))
-        .cpuModel(Optional.of("Intel(R) Core(TM) i7-10750H CPU @ 2.60GHz"))
-        .loadAvgOneMinute(Optional.of(0.62))
-        .loadAvgFiveMinutes(Optional.of(1.23))
-        .loadAvgFifteenMinutes(Optional.of(1.02))
-        .numberOfExecutingKernelSchedulingEntities(Optional.of(1.0))
-        .numberOfExistingKernelSchedulingEntities(Optional.of(479.0))
-        .pIdOfMostRecentlyCreatedProcess(Optional.of(278339.0))
+        .readsCompleted(78853L)
+        .readsMerged(10749L)
+        .sectorsRead(5453564L)
+        .timeSpentReading(5672L)
+        .memTotal(10118252L)
+        .memFree(1921196L)
+        .memAvailable(5470300L)
+        .buffers(239068L)
+        .cpuModel("Intel(R) Core(TM) i7-10750H CPU @ 2.60GHz")
+        .loadAvgOneMinute(0.62)
+        .loadAvgFiveMinutes(1.23)
+        .loadAvgFifteenMinutes(1.02)
+        .numberOfExecutingKernelSchedulingEntities(1.0)
+        .numberOfExistingKernelSchedulingEntities(479.0)
+        .pIdOfMostRecentlyCreatedProcess(278339.0)
         .build();
 
     if (sut.isAvailable()) {
