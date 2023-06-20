@@ -178,7 +178,7 @@ public class MetricStreamingEngine {
 
           double availableDiskIoBandwith = -1.0;
 
-          if (Objects.nonNull(ping.getIostatDto())) {
+          if (ping.getIostatDto() != null) {
             final IostatDto iostatDto = ping.getIostatDto();
             availableDiskIoBandwith = iostatDto.getKiloByteReadPerSec() / kBpsToGbpsDenom
                 + iostatDto.getKiloByteWrtnPerSec() / kBpsToGbpsDenom;
