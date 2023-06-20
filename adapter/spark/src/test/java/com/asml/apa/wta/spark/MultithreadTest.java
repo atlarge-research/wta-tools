@@ -61,7 +61,7 @@ public class MultithreadTest {
     SparkBaseSupplierWrapperDto testObj = buffer.get(0);
 
     assertThat(testObj.getExecutorId()).isEqualTo("test-executor-id");
-    assertThat(testObj.getOsInfoDto().get().getAvailableProcessors()).isGreaterThanOrEqualTo(1);
+    assertThat(testObj.getOsInfoDto().getAvailableProcessors()).isGreaterThanOrEqualTo(1);
   }
 
   @Test
@@ -73,7 +73,7 @@ public class MultithreadTest {
     CompletableFuture<Void> job2 = sutSupplierExtractionEngine.pingAndBuffer();
     job2.join();
     assertThat(sutSupplierExtractionEngine.getBuffer()).hasSize(2);
-    CompletableFuture<Void> job3 = sutSupplierExtractionEngine.pingAndBuffer();
+    sutSupplierExtractionEngine.pingAndBuffer();
     assertThat(sutSupplierExtractionEngine.getBuffer()).hasSizeGreaterThanOrEqualTo(2);
   }
 

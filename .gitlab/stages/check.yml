@@ -1,5 +1,6 @@
 variables:
-  SAST_JAVA_VERSION: "11"
+  SAST_JAVA_VERSION: 11
+  DS_JAVA_VERSION: 11
 
 include:
   - template: Jobs/SAST.gitlab-ci.yml
