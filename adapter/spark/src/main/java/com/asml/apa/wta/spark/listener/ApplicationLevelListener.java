@@ -6,11 +6,11 @@ import com.asml.apa.wta.core.model.Workflow;
 import com.asml.apa.wta.core.model.Workload;
 import com.asml.apa.wta.core.model.Workload.WorkloadBuilder;
 import com.asml.apa.wta.core.model.enums.Domain;
+import com.asml.apa.wta.core.streams.Stream;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.spark.SparkContext;
@@ -91,10 +91,10 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
    * @since 1.0.0
    */
   private void setGeneralFields(long dateEnd, WorkloadBuilder builder) {
-    final Domain domain = config.getDomain();
-    final long dateStart = sparkContext.startTime();
-    final String[] authors = config.getAuthors();
-    final String workloadDescription = config.getDescription();
+    final Domain domain = getConfig().getDomain();
+    final long dateStart = getSparkContext().startTime();
+    final String[] authors = getConfig().getAuthors();
+    final String workloadDescription = getConfig().getDescription();
     builder.authors(authors)
         .workloadDescription(workloadDescription)
         .domain(domain)
@@ -110,24 +110,24 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
    * @author Pil Kyu Cho
    * @since 1.0.0
    */
-  private void setCountFields(List<Task> tasks, WorkloadBuilder builder) {
-    final Workflow[] workflows = jobLevelListener.getProcessedObjects().toArray(new Workflow[0]);
+  private void setCountFields(Stream<Task> tasks, WorkloadBuilder builder) {
+    final Workflow[] workflows = jobLevelListener.getProcessedObjects().toArray(Workflow[]::new);
     final int totalWorkflows = workflows.length;
     final int totalTasks =
         Arrays.stream(workflows).mapToInt(Workflow::getTaskCount).sum();
     final long numSites =
-        tasks.stream().filter(task -> task.getSubmissionSite() != -1).count();
-    final long numResources = tasks.stream()
+        tasks.clone().filter(task -> task.getSubmissionSite() != -1).count();
+    final long numResources = tasks.clone()
         .map(Task::getResourceAmountRequested)
         .filter(task -> task >= 0.0)
         .reduce(Double::sum)
         .orElse(-1.0)
         .longValue();
     final long numUsers =
-        tasks.stream().filter(task -> task.getUserId() != -1).count();
+        tasks.clone().filter(task -> task.getUserId() != -1).count();
     final long numGroups =
-        tasks.stream().filter(task -> task.getGroupId() != -1).count();
-    final double totalResourceSeconds = tasks.stream()
+        tasks.clone().filter(task -> task.getGroupId() != -1).count();
+    final double totalResourceSeconds = tasks.clone()
         .filter(task -> task.getRuntime() >= 0 && task.getResourceAmountRequested() >= 0.0)
         .map(task -> task.getResourceAmountRequested() * task.getRuntime())
         .reduce(Double::sum)
@@ -161,25 +161,25 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
    * Setters for the statistical resource fields of the Workload.
    *
    * @param tasks           List of WTA Task objects
-   * @param function        Function to be applied to the tasks to get the resource field
    * @param resourceType    Type of resource to be set
    * @param builder         WorkloadBuilder to be used to build the Workload
    * @author Pil Kyu Cho
    * @since 1.0.0
    */
   @SuppressWarnings("CyclomaticComplexity")
-  private void setResourceStatisticsFields(
-      List<Task> tasks, Function<Task, Double> function, ResourceType resourceType, WorkloadBuilder builder) {
+  private void setResourceStatisticsFields(List<Double> tasks, ResourceType resourceType, WorkloadBuilder builder) {
     List<Double> sortedPositiveList =
-        tasks.stream().map(function).filter(x -> x >= 0.0).sorted().collect(Collectors.toList());
-    final double meanField = computeMean(tasks.stream().map(function), sortedPositiveList.size());
-    final double stdField =
-        computeStd(tasks.stream().map(function).filter(x -> x >= 0.0), meanField, sortedPositiveList.size());
+        tasks.stream().filter(x -> x >= 0.0).sorted().collect(Collectors.toList());
+    final double meanField = computeMean(new Stream<>(tasks), sortedPositiveList.size());
+    final double stdField = computeStd(
+        new Stream<>(tasks.stream().filter(x -> x >= 0.0).collect(Collectors.toList())),
+        meanField,
+        sortedPositiveList.size());
 
     switch (resourceType) {
       case RESOURCE:
-        builder.minResourceTask(computeMin(tasks.stream().map(function)))
-            .maxResourceTask(computeMax(tasks.stream().map(function)))
+        builder.minResourceTask(computeMin(new Stream<>(tasks)))
+            .maxResourceTask(computeMax(new Stream<>(tasks)))
             .meanResourceTask(meanField)
             .stdResourceTask(stdField)
             .covResourceTask(computeCov(meanField, stdField))
@@ -190,8 +190,8 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
                 sortedPositiveList.isEmpty() ? -1.0 : computeThirdQuantile(sortedPositiveList));
         break;
       case MEMORY:
-        builder.minMemory(computeMin(tasks.stream().map(function)))
-            .maxMemory(computeMax(tasks.stream().map(function)))
+        builder.minMemory(computeMin(new Stream<>(tasks)))
+            .maxMemory(computeMax(new Stream<>(tasks)))
             .meanMemory(meanField)
             .stdMemory(stdField)
             .covMemory(computeCov(meanField, stdField))
@@ -202,8 +202,8 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
                 sortedPositiveList.isEmpty() ? -1.0 : computeThirdQuantile(sortedPositiveList));
         break;
       case NETWORK:
-        builder.minNetworkUsage((long) computeMin(tasks.stream().map(function)))
-            .maxNetworkUsage((long) computeMax(tasks.stream().map(function)))
+        builder.minNetworkUsage((long) computeMin(new Stream<>(tasks)))
+            .maxNetworkUsage((long) computeMax(new Stream<>(tasks)))
             .meanNetworkUsage(meanField)
             .stdNetworkUsage(stdField)
             .covNetworkUsage(computeCov(meanField, stdField))
@@ -215,8 +215,8 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
                 sortedPositiveList.isEmpty() ? -1L : (long) computeThirdQuantile(sortedPositiveList));
         break;
       case DISK:
-        builder.minDiskSpaceUsage(computeMin(tasks.stream().map(function)))
-            .maxDiskSpaceUsage(computeMax(tasks.stream().map(function)))
+        builder.minDiskSpaceUsage(computeMin(new Stream<>(tasks)))
+            .maxDiskSpaceUsage(computeMax(new Stream<>(tasks)))
             .meanDiskSpaceUsage(meanField)
             .stdDiskSpaceUsage(stdField)
             .covDiskSpaceUsage(computeCov(meanField, stdField))
@@ -227,8 +227,8 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
                 sortedPositiveList.isEmpty() ? -1.0 : computeThirdQuantile(sortedPositiveList));
         break;
       case ENERGY:
-        builder.minEnergy(computeMin(tasks.stream().map(function)))
-            .maxEnergy(computeMax(tasks.stream().map(function)))
+        builder.minEnergy(computeMin(new Stream<>(tasks)))
+            .maxEnergy(computeMax(new Stream<>(tasks)))
             .meanEnergy(meanField)
             .stdEnergy(stdField)
             .covEnergy(computeCov(meanField, stdField))
@@ -252,25 +252,31 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
    */
   public void onApplicationEnd(SparkListenerApplicationEnd applicationEnd) {
     // we should never enter this branch, this is a guard since an application only terminates once.
-    if (!this.getProcessedObjects().isEmpty()) {
-      log.debug("Application end called twice, this should never happen");
+    if (containsProcessedObjects()) {
+      log.debug("Application end called twice, this should never happen.");
       return;
     }
     jobLevelListener.setWorkflows();
 
     WorkloadBuilder workloadBuilder = Workload.builder();
-    final List<Task> tasks = wtaTaskListener.getProcessedObjects();
+    final Stream<Task> tasks = wtaTaskListener.getProcessedObjects();
     Function<Task, Long> networkFunction = Task::getNetworkIoTime;
 
     setGeneralFields(applicationEnd.time(), workloadBuilder);
     setCountFields(tasks, workloadBuilder);
-    setResourceStatisticsFields(tasks, Task::getResourceAmountRequested, ResourceType.RESOURCE, workloadBuilder);
-    setResourceStatisticsFields(tasks, Task::getMemoryRequested, ResourceType.MEMORY, workloadBuilder);
     setResourceStatisticsFields(
-        tasks, networkFunction.andThen(Long::doubleValue), ResourceType.NETWORK, workloadBuilder);
-    setResourceStatisticsFields(tasks, Task::getDiskSpaceRequested, ResourceType.DISK, workloadBuilder);
-    setResourceStatisticsFields(tasks, Task::getEnergyConsumption, ResourceType.ENERGY, workloadBuilder);
-    this.getProcessedObjects().add(workloadBuilder.build());
+        tasks.clone().map(Task::getResourceAmountRequested).toList(), ResourceType.RESOURCE, workloadBuilder);
+    setResourceStatisticsFields(
+        tasks.clone().map(Task::getMemoryRequested).toList(), ResourceType.MEMORY, workloadBuilder);
+    setResourceStatisticsFields(
+        tasks.clone().map(networkFunction.andThen(Long::doubleValue)).toList(),
+        ResourceType.NETWORK,
+        workloadBuilder);
+    setResourceStatisticsFields(
+        tasks.clone().map(Task::getDiskSpaceRequested).toList(), ResourceType.DISK, workloadBuilder);
+    setResourceStatisticsFields(
+        tasks.clone().map(Task::getEnergyConsumption).toList(), ResourceType.ENERGY, workloadBuilder);
+    addProcessedObject(workloadBuilder.build());
   }
 
   /**

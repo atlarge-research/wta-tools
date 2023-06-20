@@ -111,8 +111,8 @@ class TaskLevelListenerTest extends BaseLevelListenerTest {
 
     fakeTaskListener1.onJobStart(new SparkListenerJobStart(0, 2L, stageBuffer.toList(), new Properties()));
     fakeTaskListener1.onTaskEnd(taskEndEvent);
-    assertEquals(1, fakeTaskListener1.getProcessedObjects().size());
-    Task curTask = fakeTaskListener1.getProcessedObjects().get(0);
+    assertEquals(1, fakeTaskListener1.getProcessedObjects().count());
+    Task curTask = fakeTaskListener1.getProcessedObjects().head();
     assertEquals(1, curTask.getId());
     assertEquals("testTaskType", curTask.getType());
     assertEquals(50L, curTask.getTsSubmit());

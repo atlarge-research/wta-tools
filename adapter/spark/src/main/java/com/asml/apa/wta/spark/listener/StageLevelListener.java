@@ -7,7 +7,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 import lombok.Getter;
 import org.apache.spark.SparkContext;
 import org.apache.spark.executor.TaskMetrics;
@@ -60,7 +59,7 @@ public class StageLevelListener extends TaskStageBaseListener {
         .stream()
         .mapToLong(parentId -> (Integer) parentId + 1)
         .toArray();
-    if (config.isStageLevel()) {
+    if (getConfig().isStageLevel()) {
       task.setParents(parentStageIds);
     } else {
       stageToParents.put(stageId, Arrays.stream(parentStageIds).boxed().toArray(Long[]::new));
@@ -109,8 +108,8 @@ public class StageLevelListener extends TaskStageBaseListener {
     final long runtime = curStageInfo.taskMetrics().executorRunTime();
     final long[] parents = new long[0];
     final long[] children = new long[0];
-    final int userId = Math.abs(sparkContext.sparkUser().hashCode());
-    final long workflowId = stageToJob.get(stageId);
+    final int userId = Math.abs(getSparkContext().sparkUser().hashCode());
+    final long workflowId = getStageToJob().get(stageId);
     final double diskSpaceRequested = (double) curStageMetrics.diskBytesSpilled()
         + curStageMetrics.shuffleWriteMetrics().bytesWritten();
     // final double memoryRequested = curTaskMetrics.peakExecutionMemory();
@@ -154,7 +153,7 @@ public class StageLevelListener extends TaskStageBaseListener {
         .resourceUsed(resourceUsed)
         .build();
     fillInParentChildMaps(stageId, task, curStageInfo);
-    this.getProcessedObjects().add(task);
+    addProcessedObject(task);
   }
 
   /**
@@ -168,9 +167,9 @@ public class StageLevelListener extends TaskStageBaseListener {
    * @since 1.0.0
    */
   public void setStages(long jobId) {
-    final List<Task> filteredStages = this.getProcessedObjects().stream()
+    final List<Task> filteredStages = this.getProcessedObjects()
         .filter(task -> task.getWorkflowId() == jobId)
-        .collect(Collectors.toList());
+        .toList();
     filteredStages.forEach(stage -> stage.setChildren(
         this.getParentStageToChildrenStages().getOrDefault(stage.getId(), new ArrayList<>()).stream()
             .mapToLong(Long::longValue)

@@ -73,8 +73,8 @@ class StageLevelListenerTest extends BaseLevelListenerTest {
 
     fakeStageListener1.onJobStart(new SparkListenerJobStart(0, 2L, stageBuffer.toList(), new Properties()));
     fakeStageListener1.onStageCompleted(stageEndEvent);
-    assertEquals(1, fakeStageListener1.getProcessedObjects().size());
-    Task curStage = fakeStageListener1.getProcessedObjects().get(0);
+    assertEquals(1, fakeStageListener1.getProcessedObjects().count());
+    Task curStage = fakeStageListener1.getProcessedObjects().head();
     assertEquals(1, curStage.getId());
     assertEquals("", curStage.getType());
     assertEquals(10L, curStage.getTsSubmit());

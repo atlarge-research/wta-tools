@@ -13,7 +13,7 @@ class TaskLevelListenerIntegrationTest extends BaseSparkJobIntegrationTest {
     invokeJob();
     invokeJob();
     stopJob();
-    assertThat(sut1.getTaskLevelListener().getProcessedObjects()).isNotEmpty();
+    assertThat(sut1.getTaskLevelListener().getProcessedObjects().isEmpty()).isFalse();
   }
 
   @Test
@@ -23,8 +23,8 @@ class TaskLevelListenerIntegrationTest extends BaseSparkJobIntegrationTest {
     invokeJob();
     stopJob();
     assertThat(sut1.getTaskLevelListener().getStageToJob()).isNotEmpty();
-    assertThat(sut1.getTaskLevelListener().getProcessedObjects()).hasSizeGreaterThanOrEqualTo(1);
-    assertThat(sut1.getTaskLevelListener().getProcessedObjects().get(0).getWorkflowId())
+    assertThat(sut1.getTaskLevelListener().getProcessedObjects().isEmpty()).isFalse();
+    assertThat(sut1.getTaskLevelListener().getProcessedObjects().head().getWorkflowId())
         .isInstanceOf(Long.class)
         .isNotNull();
   }

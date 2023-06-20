@@ -9,34 +9,34 @@ class SparkDataSourceIntegrationTest extends BaseSparkJobIntegrationTest {
 
   @Test
   public void taskListenerReturnsList() {
-    assertThat(sut1.getTaskLevelListener().getProcessedObjects()).isEmpty();
+    assertThat(sut1.getTaskLevelListener().getProcessedObjects().isEmpty()).isTrue();
   }
 
   @Test
   public void registeredTaskListenerCollectsMetrics() {
     sut1.registerTaskListener();
-    assertThat(sut1.getTaskLevelListener().getProcessedObjects()).isEmpty();
+    assertThat(sut1.getTaskLevelListener().getProcessedObjects().isEmpty()).isTrue();
     invokeJob();
-    assertThat(sut1.getTaskLevelListener().getProcessedObjects()).isNotEmpty();
+    assertThat(sut1.getTaskLevelListener().getProcessedObjects().isEmpty()).isFalse();
   }
 
   @Test
   public void registeredTaskListenerKeepsCollectingMetrics() {
     sut1.registerTaskListener();
-    assertThat(sut1.getTaskLevelListener().getProcessedObjects()).isEmpty();
+    assertThat(sut1.getTaskLevelListener().getProcessedObjects().isEmpty()).isTrue();
     invokeJob();
-    int size1 = sut1.getTaskLevelListener().getProcessedObjects().size();
-    assertThat(sut1.getTaskLevelListener().getProcessedObjects()).isNotEmpty();
+    long size1 = sut1.getTaskLevelListener().getProcessedObjects().count();
+    assertThat(sut1.getTaskLevelListener().getProcessedObjects().isEmpty()).isFalse();
     invokeJob();
-    int size2 = sut1.getTaskLevelListener().getProcessedObjects().size();
+    long size2 = sut1.getTaskLevelListener().getProcessedObjects().count();
     assertThat(size2).isGreaterThan(size1);
   }
 
   @Test
   public void unregisteredTaskListenerDoesNotCollect() {
-    assertThat(sut1.getTaskLevelListener().getProcessedObjects()).isEmpty();
+    assertThat(sut1.getTaskLevelListener().getProcessedObjects().isEmpty()).isTrue();
     invokeJob();
-    assertThat(sut1.getTaskLevelListener().getProcessedObjects()).isEmpty();
+    assertThat(sut1.getTaskLevelListener().getProcessedObjects().isEmpty()).isTrue();
   }
 
   @Test
@@ -44,6 +44,6 @@ class SparkDataSourceIntegrationTest extends BaseSparkJobIntegrationTest {
     sut1.registerTaskListener();
     sut1.removeTaskListener();
     invokeJob();
-    assertThat(sut1.getTaskLevelListener().getProcessedObjects()).isEmpty();
+    assertThat(sut1.getTaskLevelListener().getProcessedObjects().isEmpty()).isTrue();
   }
 }

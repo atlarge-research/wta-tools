@@ -7,7 +7,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 import lombok.Getter;
 import org.apache.spark.SparkContext;
 import org.apache.spark.executor.TaskMetrics;
@@ -90,8 +89,8 @@ public class TaskLevelListener extends TaskStageBaseListener {
     final String type = taskEnd.taskType();
     final long tsSubmit = curTaskInfo.launchTime();
     final long runtime = curTaskMetrics.executorRunTime();
-    final int userId = sparkContext.sparkUser().hashCode();
-    final long workflowId = stageToJob.get(stageId);
+    final int userId = getSparkContext().sparkUser().hashCode();
+    final long workflowId = getStageToJob().get(stageId);
     final long diskIoTime = -1L;
     final double diskSpaceRequested = (double) curTaskMetrics.diskBytesSpilled()
         + curTaskMetrics.shuffleWriteMetrics().bytesWritten();
@@ -134,7 +133,7 @@ public class TaskLevelListener extends TaskStageBaseListener {
         .energyConsumption(energyConsumption)
         .resourceUsed(resourceUsed)
         .build();
-    this.getProcessedObjects().add(task);
+    addProcessedObject(task);
     fillInParentChildMaps(taskId, stageId, task);
   }
 
@@ -150,9 +149,9 @@ public class TaskLevelListener extends TaskStageBaseListener {
    * @since 1.0.0
    */
   public void setTasks(StageLevelListener stageLevelListener, long jobId) {
-    final List<Task> filteredTasks = this.getProcessedObjects().stream()
+    final List<Task> filteredTasks = this.getProcessedObjects()
         .filter(t -> t.getWorkflowId() == jobId)
-        .collect(Collectors.toList());
+        .toList();
     for (Task task : filteredTasks) {
       // set parent field: all Tasks in are guaranteed to be in taskToStage
       final long stageId = this.getTaskToStage().get(task.getId());
@@ -186,7 +185,7 @@ public class TaskLevelListener extends TaskStageBaseListener {
       final int resourceProfileId =
           stageLevelListener.getStageToResource().getOrDefault(stageId, -1);
       final ResourceProfile resourceProfile =
-          sparkContext.resourceProfileManager().resourceProfileFromId(resourceProfileId);
+          getSparkContext().resourceProfileManager().resourceProfileFromId(resourceProfileId);
       final List<TaskResourceRequest> resources = JavaConverters.seqAsJavaList(
           resourceProfile.taskResources().values().toList());
       if (resources.size() > 0) {

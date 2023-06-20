@@ -4,11 +4,10 @@ import com.asml.apa.wta.core.config.RuntimeConfig;
 import com.asml.apa.wta.core.model.Task;
 import com.asml.apa.wta.core.model.Workflow;
 import com.asml.apa.wta.core.model.enums.Domain;
+import com.asml.apa.wta.core.streams.Stream;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Stream;
 import lombok.Getter;
 import org.apache.spark.SparkContext;
 import org.apache.spark.scheduler.SparkListenerJobEnd;
@@ -97,49 +96,46 @@ public class JobLevelListener extends AbstractListener<Workflow> {
   public void onJobEnd(SparkListenerJobEnd jobEnd) {
     final long jobId = jobEnd.jobId() + 1;
     final long tsSubmit = jobSubmitTimes.get(jobId);
-    final Task[] tasks = wtaTaskListener
-        .getWithCondition(task -> task.getWorkflowId() == jobId)
-        .toArray(Task[]::new);
-    final int taskCount = tasks.length;
+    final Stream<Task> tasks = wtaTaskListener.getProcessedObjects().filter(task -> task.getWorkflowId() == jobId);
     final long criticalPathLength = -1L;
     final int criticalPathTaskCount = criticalPathTasks.get(jobId);
     final int maxNumberOfConcurrentTasks = -1;
     final String nfrs = "";
 
     // we can also get the mode from the config, if that's what the user wants?
-    final String scheduler = sparkContext.getConf().get("spark.scheduler.mode", "FIFO");
-    final Domain domain = config.getDomain();
-    final String appName = sparkContext.appName();
+    final String scheduler = getSparkContext().getConf().get("spark.scheduler.mode", "FIFO");
+    final Domain domain = getConfig().getDomain();
+    final String appName = getSparkContext().appName();
     final String applicationField = "ETL";
     final double totalResources = -1.0;
-    final double totalMemoryUsage = computeSum(Arrays.stream(tasks).map(Task::getMemoryRequested));
-    final long totalNetworkUsage =
-        (long) computeSum(Arrays.stream(tasks).map(task -> (double) task.getNetworkIoTime()));
-    final double totalDiskSpaceUsage = computeSum(Arrays.stream(tasks).map(Task::getDiskSpaceRequested));
-    final double totalEnergyConsumption = computeSum(Arrays.stream(tasks).map(Task::getEnergyConsumption));
+    final double totalMemoryUsage = computeSum(tasks.clone().map(Task::getMemoryRequested));
+    final long totalNetworkUsage = (long) computeSum(tasks.clone().map(task -> (double) task.getNetworkIoTime()));
+    final double totalDiskSpaceUsage = computeSum(tasks.clone().map(Task::getDiskSpaceRequested));
+    final double totalEnergyConsumption = computeSum(tasks.clone().map(Task::getEnergyConsumption));
 
-    this.getProcessedObjects()
-        .add(Workflow.builder()
-            .id(jobId)
-            .tsSubmit(tsSubmit)
-            .tasks(tasks)
-            .taskCount(taskCount)
-            .criticalPathLength(criticalPathLength)
-            .criticalPathTaskCount(criticalPathTaskCount)
-            .maxConcurrentTasks(maxNumberOfConcurrentTasks)
-            .nfrs(nfrs)
-            .scheduler(scheduler)
-            .domain(domain)
-            .applicationName(appName)
-            .applicationField(applicationField)
-            .totalResources(totalResources)
-            .totalMemoryUsage(totalMemoryUsage)
-            .totalNetworkUsage(totalNetworkUsage)
-            .totalDiskSpaceUsage(totalDiskSpaceUsage)
-            .totalEnergyConsumption(totalEnergyConsumption)
-            .build());
+    Task[] taskArray = tasks.clone().toArray(Task[]::new);
 
-    if (config.isStageLevel()) {
+    addProcessedObject(Workflow.builder()
+        .id(jobId)
+        .tsSubmit(tsSubmit)
+        .tasks(taskArray)
+        .taskCount(taskArray.length)
+        .criticalPathLength(criticalPathLength)
+        .criticalPathTaskCount(criticalPathTaskCount)
+        .maxConcurrentTasks(maxNumberOfConcurrentTasks)
+        .nfrs(nfrs)
+        .scheduler(scheduler)
+        .domain(domain)
+        .applicationName(appName)
+        .applicationField(applicationField)
+        .totalResources(totalResources)
+        .totalMemoryUsage(totalMemoryUsage)
+        .totalNetworkUsage(totalNetworkUsage)
+        .totalDiskSpaceUsage(totalDiskSpaceUsage)
+        .totalEnergyConsumption(totalEnergyConsumption)
+        .build());
+
+    if (getConfig().isStageLevel()) {
       stageLevelListener.setStages(jobId);
     } else {
       TaskLevelListener taskLevelListener = (TaskLevelListener) wtaTaskListener;
@@ -164,15 +160,20 @@ public class JobLevelListener extends AbstractListener<Workflow> {
     jobSubmitTimes.remove(jobId);
     criticalPathTasks.remove(jobId);
 
-    Stream<Long> stageIds = stageLevelListener.getStageToJob().entrySet().stream()
-        .filter(e -> e.getValue().equals(jobId))
-        .map(Map.Entry::getKey);
+    Stream<Long> stageIds = new Stream<>();
+
+    for (Map.Entry<Long, Long> e : stageLevelListener.getStageToJob().entrySet()) {
+      if (e.getValue().equals(jobId)) {
+        stageIds.addToStream(e.getKey());
+      }
+    }
+
     stageIds.forEach(stageId -> {
       stageLevelListener.getStageToJob().remove(stageId);
       stageLevelListener.getStageToParents().remove(stageId);
       stageLevelListener.getParentStageToChildrenStages().remove(stageId);
       stageLevelListener.getStageToResource().remove(stageId);
-      if (!config.isStageLevel()) {
+      if (!getConfig().isStageLevel()) {
         // additional clean up for task-level plugin
         TaskLevelListener taskLevelListener = (TaskLevelListener) wtaTaskListener;
         taskLevelListener.getStageToTasks().remove(stageId);
@@ -203,7 +204,7 @@ public class JobLevelListener extends AbstractListener<Workflow> {
    * @since 1.0.0
    */
   public void setWorkflows() {
-    final List<Workflow> workflows = this.getProcessedObjects();
+    Stream<Workflow> workflows = getProcessedObjects();
     workflows.forEach(workflow -> workflow.setTotalResources(Arrays.stream(workflow.getTasks())
         .map(Task::getResourceAmountRequested)
         .filter(resourceAmount -> resourceAmount >= 0.0)

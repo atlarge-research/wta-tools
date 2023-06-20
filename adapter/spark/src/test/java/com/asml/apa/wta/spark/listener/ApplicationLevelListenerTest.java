@@ -120,12 +120,12 @@ class ApplicationLevelListenerTest extends BaseLevelListenerTest {
 
   @Test
   void workloadBuiltWithDefaultMetricValues() {
-    assertThat(fakeApplicationListener1.getProcessedObjects()).hasSize(0);
+    assertThat(fakeApplicationListener1.getProcessedObjects().isEmpty()).isTrue();
     fakeApplicationListener1.onApplicationEnd(applicationEndObj);
-    assertThat(fakeApplicationListener1.getProcessedObjects()).hasSize(1);
+    assertThat(fakeApplicationListener1.getProcessedObjects().count()).isEqualTo(1);
 
-    Workload workload = fakeApplicationListener1.getProcessedObjects().get(0);
-    assertThat(fakeApplicationListener1.getProcessedObjects().size()).isEqualTo(1);
+    Workload workload = fakeApplicationListener1.getProcessedObjects().head();
+    assertThat(fakeApplicationListener1.getProcessedObjects().count()).isEqualTo(1);
     assertThat(workload.getFirstQuartileResourceTask()).isEqualTo(-1.0);
     assertThat(workload.getMaxResourceTask()).isEqualTo(-1.0);
     assertThat(workload.getCovResourceTask()).isEqualTo(-1.0);
@@ -146,11 +146,11 @@ class ApplicationLevelListenerTest extends BaseLevelListenerTest {
 
   @Test
   void workloadGeneralMetricsCollected() {
-    assertThat(fakeApplicationListener1.getProcessedObjects()).hasSize(0);
+    assertThat(fakeApplicationListener1.getProcessedObjects().isEmpty()).isTrue();
     fakeApplicationListener1.onApplicationEnd(applicationEndObj);
-    assertThat(fakeApplicationListener1.getProcessedObjects()).hasSize(1);
+    assertThat(fakeApplicationListener1.getProcessedObjects().count()).isEqualTo(1);
 
-    Workload workload = fakeApplicationListener1.getProcessedObjects().get(0);
+    Workload workload = fakeApplicationListener1.getProcessedObjects().head();
     assertThat(workload.getDomain()).isEqualTo(fakeConfig1.getDomain());
     assertThat(workload.getAuthors()).isEqualTo(fakeConfig1.getAuthors());
     assertThat(workload.getWorkloadDescription()).isEqualTo(fakeConfig1.getDescription());
@@ -161,11 +161,11 @@ class ApplicationLevelListenerTest extends BaseLevelListenerTest {
 
   @Test
   void workloadCountMetricsCollected() {
-    assertThat(fakeApplicationListener1.getProcessedObjects()).hasSize(0);
+    assertThat(fakeApplicationListener1.getProcessedObjects().isEmpty()).isTrue();
     fakeApplicationListener1.onApplicationEnd(applicationEndObj);
-    assertThat(fakeApplicationListener1.getProcessedObjects()).hasSize(1);
+    assertThat(fakeApplicationListener1.getProcessedObjects().count()).isEqualTo(1);
 
-    Workload workload = fakeApplicationListener1.getProcessedObjects().get(0);
+    Workload workload = fakeApplicationListener1.getProcessedObjects().head();
     assertThat(workload.getTotalWorkflows()).isEqualTo(0);
     assertThat(workload.getTotalTasks()).isEqualTo(0);
     assertThat(workload.getNumUsers()).isEqualTo(0);
@@ -190,12 +190,12 @@ class ApplicationLevelListenerTest extends BaseLevelListenerTest {
     fakeTaskListener1.onTaskEnd(taskEndEvent4);
     fakeStageListener1.onStageCompleted(stageCompleted2);
 
-    assertThat(fakeApplicationListener1.getProcessedObjects()).hasSize(0);
+    assertThat(fakeApplicationListener1.getProcessedObjects().isEmpty()).isTrue();
     fakeApplicationListener1.onApplicationEnd(applicationEndObj);
-    assertThat(fakeApplicationListener1.getProcessedObjects()).hasSize(1);
+    assertThat(fakeApplicationListener1.getProcessedObjects().count()).isEqualTo(1);
 
-    Workload workload = fakeApplicationListener1.getProcessedObjects().get(0);
-    assertThat(fakeApplicationListener1.getProcessedObjects().size()).isEqualTo(1);
+    Workload workload = fakeApplicationListener1.getProcessedObjects().head();
+    assertThat(fakeApplicationListener1.getProcessedObjects().count()).isEqualTo(1);
     assertThat(workload.getMeanEnergy()).isEqualTo(-1.0);
     assertThat(workload.getMeanMemory()).isEqualTo(-1.0);
     assertThat(workload.getMeanResourceTask()).isEqualTo(-1.0);
@@ -213,12 +213,12 @@ class ApplicationLevelListenerTest extends BaseLevelListenerTest {
     fakeStageListener1.onJobStart(jobStart);
     fakeStageListener1.onStageCompleted(stageCompleted2);
 
-    assertThat(fakeApplicationListener1.getProcessedObjects()).hasSize(0);
+    assertThat(fakeApplicationListener1.getProcessedObjects().isEmpty()).isTrue();
     fakeApplicationListener1.onApplicationEnd(applicationEndObj);
-    assertThat(fakeApplicationListener1.getProcessedObjects()).hasSize(1);
+    assertThat(fakeApplicationListener1.getProcessedObjects().count()).isEqualTo(1);
 
-    Workload workload = fakeApplicationListener1.getProcessedObjects().get(0);
-    assertThat(fakeApplicationListener1.getProcessedObjects().size()).isEqualTo(1);
+    Workload workload = fakeApplicationListener1.getProcessedObjects().head();
+    assertThat(fakeApplicationListener1.getProcessedObjects().count()).isEqualTo(1);
     assertThat(workload.getFirstQuartileResourceTask()).isEqualTo(-1);
     assertThat(workload.getMaxResourceTask()).isEqualTo(-1);
     assertThat(workload.getCovResourceTask()).isEqualTo(-1);
@@ -250,17 +250,17 @@ class ApplicationLevelListenerTest extends BaseLevelListenerTest {
     fakeTaskListener1.onTaskEnd(taskEndEvent1);
     fakeTaskListener1.onTaskEnd(taskEndEvent2);
     fakeStageListener1.onStageCompleted(stageCompleted1);
-    assertThat(fakeApplicationListener1.getProcessedObjects()).hasSize(0);
+    assertThat(fakeApplicationListener1.getProcessedObjects().isEmpty()).isTrue();
     fakeApplicationListener1.onApplicationEnd(applicationEndObj);
-    assertThat(fakeApplicationListener1.getProcessedObjects()).hasSize(1);
+    assertThat(fakeApplicationListener1.getProcessedObjects().count()).isEqualTo(1);
 
     fakeTaskListener1.onJobStart(jobStart2);
     fakeStageListener1.onJobStart(jobStart2);
     fakeTaskListener1.onTaskEnd(taskEndEvent3);
     fakeTaskListener1.onTaskEnd(taskEndEvent4);
     fakeStageListener1.onStageCompleted(stageCompleted2);
-    assertThat(fakeApplicationListener1.getProcessedObjects()).hasSize(1);
+    assertThat(fakeApplicationListener1.getProcessedObjects().count()).isEqualTo(1);
     fakeApplicationListener1.onApplicationEnd(applicationEndObj);
-    assertThat(fakeApplicationListener1.getProcessedObjects()).hasSize(1);
+    assertThat(fakeApplicationListener1.getProcessedObjects().count()).isEqualTo(1);
   }
 }

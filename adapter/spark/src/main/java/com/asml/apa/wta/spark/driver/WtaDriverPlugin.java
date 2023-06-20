@@ -133,10 +133,6 @@ public class WtaDriverPlugin implements DriverPlugin {
    */
   private void endApplicationAndWrite() {
     removeListeners();
-    List<Task> tasks = sparkDataSource.getRuntimeConfig().isStageLevel()
-        ? sparkDataSource.getStageLevelListener().getProcessedObjects()
-        : sparkDataSource.getTaskLevelListener().getProcessedObjects();
-    List<Workflow> workflows = sparkDataSource.getJobLevelListener().getProcessedObjects();
     List<ResourceAndStateWrapper> resourceAndStateWrappers = metricStreamingEngine.collectResourceInformation();
     List<Resource> resources = resourceAndStateWrappers.stream()
         .map(ResourceAndStateWrapper::getResource)
@@ -147,11 +143,16 @@ public class WtaDriverPlugin implements DriverPlugin {
     Workload workload = sparkDataSource
         .getApplicationLevelListener()
         .getProcessedObjects()
-        .get(0);
+        .head();
+    Stream<Task> tasks = sparkDataSource.getRuntimeConfig().isStageLevel()
+        ? sparkDataSource.getStageLevelListener().getProcessedObjects()
+        : sparkDataSource.getTaskLevelListener().getProcessedObjects();
     WtaWriter wtaWriter = new WtaWriter(outputFile, "schema-1.0", TOOL_VERSION);
-    wtaWriter.write(Task.class, tasks);
+    wtaWriter.write(Task.class, tasks.toList());
     wtaWriter.write(Resource.class, resources);
-    wtaWriter.write(Workflow.class, workflows);
+    wtaWriter.write(
+        Workflow.class,
+        sparkDataSource.getJobLevelListener().getProcessedObjects().toList());
     wtaWriter.write(ResourceState.class, resourceStates);
     wtaWriter.write(workload);
 
