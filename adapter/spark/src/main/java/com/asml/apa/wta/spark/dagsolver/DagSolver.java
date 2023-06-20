@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 /**
  * This class will take in all stages within the job, generate the DAG
  * and find the critical path. It will add two additional nodes to the dependency graph
- * one as the source connecting all stages that do not have parents, the other as the sink connecting all stages
+ * one as the source (node with id = 0) connecting all stages that do not have parents, the other as the sink (node with id = -1) connecting all stages
  * without children. The critical path shall be the longest path from the source to the sink.
  *
  * @author Tianchen Qu
@@ -54,9 +54,9 @@ public class DagSolver {
 
   private Map<Long, Node> nodes = new ConcurrentHashMap<>();
 
-  private Map<Long, Map<Long, Long>> adjMap = new ConcurrentHashMap<>();
+  private Map<Long, Map<Long, Long>> adjacencyMap = new ConcurrentHashMap<>();
 
-  private Map<Long, Map<Long, Long>> adjMapReversed = new ConcurrentHashMap<>();
+  private Map<Long, Map<Long, Long>> adjacencyMapReversed = new ConcurrentHashMap<>();
 
   private List<Task> stages;
 
@@ -98,7 +98,7 @@ public class DagSolver {
   }
 
   /**
-   * This method is used to create the source and sink node.
+   * This method is used to create the additional source and sink node.
    *
    * @param id id of the source (id = 0) and sink (id = -1) node
    * @author Tianchen Qu
@@ -110,10 +110,10 @@ public class DagSolver {
     // if the node is the ending node
     if (id == -1L) {
       setFinalEdges();
-      adjMap.put(-1L, new ConcurrentHashMap<>());
+      adjacencyMap.put(-1L, new ConcurrentHashMap<>());
     } else if (id == 0) { // if the node is the starting node
       node.distance = 0;
-      adjMapReversed.put(0L, new ConcurrentHashMap<>());
+      adjacencyMapReversed.put(0L, new ConcurrentHashMap<>());
     }
   }
 
@@ -127,14 +127,14 @@ public class DagSolver {
    * @since 1.0.0
    */
   private void addEdge(long vertex1, long vertex2, long weight) {
-    if (adjMap.get(vertex1) == null) {
-      adjMap.put(vertex1, new ConcurrentHashMap<>());
+    if (adjacencyMap.get(vertex1) == null) {
+      adjacencyMap.put(vertex1, new ConcurrentHashMap<>());
     }
-    if (adjMapReversed.get(vertex2) == null) {
-      adjMapReversed.put(vertex2, new ConcurrentHashMap<>());
+    if (adjacencyMapReversed.get(vertex2) == null) {
+      adjacencyMapReversed.put(vertex2, new ConcurrentHashMap<>());
     }
-    adjMap.get(vertex1).put(vertex2, weight);
-    adjMapReversed.get(vertex2).put(vertex1, weight);
+    adjacencyMap.get(vertex1).put(vertex2, weight);
+    adjacencyMapReversed.get(vertex2).put(vertex1, weight);
   }
 
   /**
@@ -144,7 +144,7 @@ public class DagSolver {
    */
   private void setFinalEdges() {
     for (Long node : nodes.keySet()) {
-      if (adjMap.get(node) == null && node != -1) {
+      if (adjacencyMap.get(node) == null && node != -1) {
         addEdge(node, -1L, 0);
       }
     }
@@ -174,7 +174,7 @@ public class DagSolver {
    */
   private void topoUtil(Map<Long, Boolean> visited, Long node, Deque<Long> stack) {
     visited.put(node, true);
-    for (Long children : adjMap.get(node).keySet()) {
+    for (Long children : adjacencyMap.get(node).keySet()) {
       if (visited.get(children) == null) {
         topoUtil(visited, children, stack);
       }
@@ -193,10 +193,10 @@ public class DagSolver {
     Deque<Long> stack = topologicalSort();
     while (!stack.isEmpty()) {
       Node node = nodes.get(stack.pop());
-      for (Long childId : adjMap.get(node.id).keySet()) {
+      for (Long childId : adjacencyMap.get(node.id).keySet()) {
         Node child = nodes.get(childId);
-        if (child.distance < node.distance + adjMap.get(node.id).get(childId)) {
-          child.distance = node.distance + adjMap.get(node.id).get(childId);
+        if (child.distance < node.distance + adjacencyMap.get(node.id).get(childId)) {
+          child.distance = node.distance + adjacencyMap.get(node.id).get(childId);
         }
       }
     }
@@ -215,7 +215,7 @@ public class DagSolver {
     List<Long> criticalPath = new ArrayList<>();
     while (pointer.get() != 0) {
       criticalPath.add(pointer.get());
-      adjMapReversed.get(pointer.get()).forEach((adjNode, weight) -> {
+      adjacencyMapReversed.get(pointer.get()).forEach((adjNode, weight) -> {
         if (weight + nodes.get(adjNode).distance == nodes.get(pointer.get()).distance) {
           pointer.set(adjNode);
         }
