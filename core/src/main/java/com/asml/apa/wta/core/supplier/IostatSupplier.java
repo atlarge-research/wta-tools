@@ -50,6 +50,9 @@ public class IostatSupplier implements InformationSupplier<IostatDto> {
    */
   @Override
   public boolean isAvailable() {
+    if (!System.getProperty("os.name").toLowerCase().contains("linux")) {
+      return false;
+    }
     try {
       if (shellUtils.executeCommand("iostat", true).get() != null) {
         return true;

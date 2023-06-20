@@ -110,6 +110,9 @@ public class DstatSupplier implements InformationSupplier<DstatDto> {
    */
   @Override
   public boolean isAvailable() {
+    if (!System.getProperty("os.name").toLowerCase().contains("linux")) {
+      return false;
+    }
     try {
       if (shellUtils.executeCommand("dstat -cdngy 1 1", true).get() != null) {
         return true;
