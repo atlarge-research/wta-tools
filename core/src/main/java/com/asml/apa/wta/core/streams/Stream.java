@@ -467,11 +467,11 @@ public class Stream<V extends Serializable> implements Cloneable {
    * @author Atour Mousavi Gourabi
    */
   public synchronized Optional<V> reduce(@NonNull BinaryOperator<V> accumulator) {
-    V acc = head();
-    if (acc == null) {
+    try {
+      return Optional.of(foldLeft(head(), accumulator));
+    } catch (NoSuchElementException e) {
       return Optional.empty();
     }
-    return Optional.of(foldLeft(acc, accumulator));
   }
 
   /**
