@@ -54,19 +54,19 @@ sbt package
 
 For Ubuntu:
 ```shell
-`sudo apt-get install gcc-9 g++-9 make flex bison byacc git`
+`sudo apt-get install gcc make flex bison byacc git`
 ```
 
 For CentOS:
 ```shell
-`sudo yum install gcc-9 g++-9 make flex bison byacc git`
+`sudo yum install gcc make flex bison byacc git`
 ```
 
 Download and compile **tpcds-toolkit**:
 ```shell
 git clone https://github.com/databricks/tpcds-kit.git
 cd tpcds-kit/tools
-make CC=gcc-9 OS=LINUX
+make OS=LINUX
 ```
 
 ### Generate test data ##
