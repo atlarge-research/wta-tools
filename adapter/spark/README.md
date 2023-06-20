@@ -95,8 +95,8 @@ Note: this way, the plugin will be compiled for Scala 2.12. If you want to compi
 you will need to set the `spark.scala.version` flag to 2.13, such as in
 `mvn -pl adapter/spark -Dspark.scala.version=2.13 clean package`.
 
-### Integration with Pyspark
-PySpark is the Python API for Apache Spark and the plugin can also be used with Python scripts that make use of Pyspark.
+### Integration with PySpark
+PySpark is the Python API for Apache Spark and the plugin can also be used with Python scripts that make use of PySpark.
 
 For Spark 3.2.4, a Python version between 3.7 to 3.10 needs to be installed. In addition, add the following environment variables in your `.bashrc` file (adjust the version accordingly):
 
@@ -105,7 +105,7 @@ export PYSPARK_PYTHON=/usr/bin/python3.10
 export PYSPARK_DRIVER_PYTHON=/usr/bin/python3.10
 ```
 
-After specifying the above environment variables, adjust your spark configuration as follows:
+After specifying the above environment variables, adjust your Spark configuration as follows:
 
 ```Python
 from pyspark import SparkConf, SparkContext
