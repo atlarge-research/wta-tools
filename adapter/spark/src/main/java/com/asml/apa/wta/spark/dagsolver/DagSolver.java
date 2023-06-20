@@ -12,10 +12,10 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
 /**
- * This class will take in all stages within the job, generate the dependency DAG
- * and find the longest path(critical path). It will add two additional nodes to the dependency graph
- * one as the source connecting all stages that don't have parents, the other as the sink connecting all stages
- * without a children. The critical path shall be the longest path from the source to the sink.
+ * This class will take in all stages within the job, generate the DAG
+ * and find the critical path. It will add two additional nodes to the dependency graph
+ * one as the source connecting all stages that do not have parents, the other as the sink connecting all stages
+ * without children. The critical path shall be the longest path from the source to the sink.
  *
  * @author Tianchen Qu
  * @since 1.0.0
