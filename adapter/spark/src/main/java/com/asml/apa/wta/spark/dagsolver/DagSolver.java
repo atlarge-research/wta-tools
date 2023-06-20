@@ -52,7 +52,7 @@ public class DagSolver {
     }
   }
 
-  private Map<Long, Node> nodes= new ConcurrentHashMap<>();
+  private Map<Long, Node> nodes = new ConcurrentHashMap<>();
 
   private Map<Long, Map<Long, Long>> adjMap = new ConcurrentHashMap<>();
 
