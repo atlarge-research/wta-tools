@@ -117,8 +117,7 @@ public class MetricStreamingEngine {
         .map(BaseSupplierDto::getProcDto)
         .filter(Objects::nonNull)
         .map(ProcDto::getCpuModel)
-        .filter(Objects::nonNull)
-        .filter(s -> !s.equals("unknown"))
+        .filter(pModel -> pModel != null && !pModel.equals("unknown"))
         .findFirst()
         .orElse("unknown");
 
