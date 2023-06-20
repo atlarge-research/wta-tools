@@ -117,8 +117,8 @@ public class JobLevelListener extends AbstractListener<Workflow> {
         .getWithCondition(task -> task.getWorkflowId() == jobId)
         .toArray(Task[]::new);
     final int taskCount = tasks.length;
-    final long criticalPathLength = -1L;
-    final int criticalPathTaskCount = -1;
+    long criticalPathLength = -1L;
+    int criticalPathTaskCount = -1;
     final int maxNumberOfConcurrentTasks = -1;
     final String nfrs = "";
 
@@ -133,6 +133,39 @@ public class JobLevelListener extends AbstractListener<Workflow> {
         (long) computeSum(Arrays.stream(tasks).map(task -> (double) task.getNetworkIoTime()));
     final double totalDiskSpaceUsage = computeSum(Arrays.stream(tasks).map(Task::getDiskSpaceRequested));
     final double totalEnergyConsumption = computeSum(Arrays.stream(tasks).map(Task::getEnergyConsumption));
+
+    if (config.isStageLevel()) {
+      stageLevelListener.setStages(jobId);
+    } else {
+      TaskLevelListener taskLevelListener = (TaskLevelListener) wtaTaskListener;
+      taskLevelListener.setTasks(stageLevelListener, jobId);
+
+      List<Task> jobStages = stageLevelListener.getProcessedObjects().stream()
+          .filter(stage -> stage.getWorkflowId() == jobId)
+          .collect(Collectors.toList());
+      jobStages.addAll(jobToStages.get(jobId).stream()
+          .filter(stage -> !jobStages.stream()
+              .map(Task::getId)
+              .collect(Collectors.toList())
+              .contains(stage.getId()))
+          .collect(Collectors.toList()));
+
+      final List<Task> criticalPath = solveCriticalPath(jobStages);
+      TaskLevelListener listener = (TaskLevelListener) wtaTaskListener;
+
+      final Map<Long, List<Task>> stageToTasks = listener.getStageToTasks();
+      criticalPathTaskCount = criticalPath.stream()
+          .map(stage -> stageToTasks.get(stage.getId()).size())
+          .reduce(Integer::sum)
+          .orElse(-1);
+      criticalPathLength = criticalPath.stream()
+          .map(stage -> stageToTasks.getOrDefault(stage.getId(), new ArrayList<>()).stream()
+              .map(Task::getRuntime)
+              .reduce(Long::max)
+              .orElse(0L))
+          .reduce(Long::sum)
+          .orElse(-1L);
+    }
 
     this.getProcessedObjects()
         .add(Workflow.builder()
@@ -154,13 +187,6 @@ public class JobLevelListener extends AbstractListener<Workflow> {
             .totalDiskSpaceUsage(totalDiskSpaceUsage)
             .totalEnergyConsumption(totalEnergyConsumption)
             .build());
-
-    if (config.isStageLevel()) {
-      stageLevelListener.setStages(jobId);
-    } else {
-      TaskLevelListener taskLevelListener = (TaskLevelListener) wtaTaskListener;
-      taskLevelListener.setTasks(stageLevelListener, jobId);
-    }
     cleanUpContainers(jobEnd);
   }
 
@@ -221,39 +247,11 @@ public class JobLevelListener extends AbstractListener<Workflow> {
   public void setWorkflows() {
     final List<Workflow> workflows = this.getProcessedObjects();
     workflows.forEach(workflow -> {
-      if (!config.isStageLevel()) {
-        List<Task> jobStages = stageLevelListener.getProcessedObjects().stream()
-                .filter(stage -> stage.getWorkflowId() == workflow.getId())
-                .collect(Collectors.toList());
-        jobStages.addAll(jobToStages.get(workflow.getId()).stream()
-                .filter(stage -> !jobStages.stream()
-                        .map(Task::getId)
-                        .collect(Collectors.toList())
-                        .contains(stage.getId()))
-                .collect(Collectors.toList()));
-
-        final List<Task> criticalPath = solveCriticalPath(jobStages);
-        TaskLevelListener listener = (TaskLevelListener) wtaTaskListener;
-
-        final Map<Long, List<Task>> stageToTasks = listener.getStageToTasks();
-        workflow.setCriticalPathTaskCount(criticalPath.stream()
-                .map(stage -> stageToTasks.get(stage.getId()).size())
-                .reduce(Integer::sum)
-                .orElse(-1));
-        workflow.setCriticalPathLength(criticalPath.stream()
-                .map(stage -> stageToTasks.getOrDefault(stage.getId(), new ArrayList<>()).stream()
-                        .map(Task::getRuntime)
-                        .reduce(Long::max)
-                        .orElse(0L))
-                .reduce(Long::sum)
-                .orElse(-1L));
-      }
-
       workflow.setTotalResources(Arrays.stream(workflow.getTasks())
-              .map(Task::getResourceAmountRequested)
-              .filter(resourceAmount -> resourceAmount >= 0.0)
-              .reduce(Double::sum)
-              .orElse(-1.0));
+          .map(Task::getResourceAmountRequested)
+          .filter(resourceAmount -> resourceAmount >= 0.0)
+          .reduce(Double::sum)
+          .orElse(-1.0));
     });
   }
 

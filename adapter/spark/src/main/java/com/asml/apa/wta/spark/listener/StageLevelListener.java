@@ -63,7 +63,7 @@ public class StageLevelListener extends TaskStageBaseListener {
         .mapToLong(parentId -> (Integer) parentId + 1)
         .toArray();
     task.setParents(parentStageIds);
-    if (!config.isStageLevel()){
+    if (!config.isStageLevel()) {
       stageToParents.put(stageId, Arrays.stream(parentStageIds).boxed().toArray(Long[]::new));
     }
 

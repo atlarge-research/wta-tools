@@ -248,6 +248,8 @@ class JobLevelListenerTest extends BaseLevelListenerTest {
     ListBuffer<StageInfo> stageBuffer2 = new ListBuffer<>();
     stageBuffer1.$plus$eq(testStageInfo1);
     stageBuffer1.$plus$eq(testStageInfo2);
+    stageBuffer2.$plus$eq(testStageInfo1);
+    stageBuffer2.$plus$eq(testStageInfo2);
     stageBuffer2.$plus$eq(testStageInfo3);
     stageBuffer2.$plus$eq(testStageInfo4);
     SparkListenerJobStart jobStart1 =
@@ -287,21 +289,26 @@ class JobLevelListenerTest extends BaseLevelListenerTest {
     fakeTaskListener1.onJobStart(jobStart2);
     fakeStageListener1.onJobStart(jobStart2);
     fakeJobListener1.onJobStart(jobStart2);
+    fakeTaskListener1.onTaskEnd(taskEndEvent1);
+    fakeStageListener1.onStageCompleted(stageCompleted1);
+    fakeTaskListener1.onTaskEnd(taskEndEvent2);
+    fakeStageListener1.onStageCompleted(stageCompleted2);
     fakeTaskListener1.onTaskEnd(taskEndEvent3);
     fakeStageListener1.onStageCompleted(stageCompleted3);
     fakeTaskListener1.onTaskEnd(taskEndEvent4);
     fakeStageListener1.onStageCompleted(stageCompleted4);
     fakeJobListener1.onJobEnd(jobEndEvent2);
-    assertThat(fakeTaskListener1.getProcessedObjects()).hasSize(4);
+    assertThat(fakeTaskListener1.getProcessedObjects()).hasSize(6);
 
-    Task task3 = fakeTaskListener1.getProcessedObjects().get(2);
-    assertThat(task3.getParents().length).isEqualTo(0);
+    Task task3 = fakeTaskListener1.getProcessedObjects().get(4);
+    assertThat(task3.getParents().length).isEqualTo(1);
     assertThat(task3.getChildren().length).isEqualTo(1);
     assertThat(task3.getChildren()).contains(taskId4 + 1);
 
-    Task task4 = fakeTaskListener1.getProcessedObjects().get(3);
-    assertThat(task4.getParents().length).isEqualTo(1);
+    Task task4 = fakeTaskListener1.getProcessedObjects().get(5);
+    assertThat(task4.getParents().length).isEqualTo(2);
     assertThat(task4.getParents()).contains(taskId3 + 1);
+    assertThat(task4.getParents()).contains(taskId2 + 1);
     assertThat(task4.getChildren().length).isEqualTo(0);
   }
 

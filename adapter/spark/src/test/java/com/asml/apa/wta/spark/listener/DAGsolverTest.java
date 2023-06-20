@@ -6,7 +6,6 @@ import static org.mockito.Mockito.when;
 
 import com.asml.apa.wta.core.model.Task;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

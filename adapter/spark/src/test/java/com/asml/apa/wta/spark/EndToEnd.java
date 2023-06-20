@@ -147,14 +147,13 @@ public class EndToEnd {
         .set("spark.plugins", "com.asml.apa.wta.spark.WtaPlugin")
         .set("spark.executor.instances", "2")
         .set("spark.executor.cores", "2")
-        .set("spark.driver.extraJavaOptions", "-DconfigFile=" + args[0]);
-    //        .set("spark.driver.extraJavaOptions", "-DconfigFile=" +
-    //                "adapter/spark/src/test/resources/config-stage.json");
+        //    .set("spark.driver.extraJavaOptions", "-DconfigFile=" + args[0]);
+        .set("spark.driver.extraJavaOptions", "-DconfigFile=" + "adapter/spark/src/test/resources/config.json");
     SparkSession spark = SparkSession.builder().config(conf).getOrCreate();
     SparkContext sc = spark.sparkContext();
-    sparkOperation(JavaSparkContext.fromSparkContext(sc).textFile(args[1]));
-    //  sparkOperation(
-    //      JavaSparkContext.fromSparkContext(sc).textFile("adapter/spark/src/test/resources/e2e-input.txt"));
+    // sparkOperation(JavaSparkContext.fromSparkContext(sc).textFile(args[1]));
+    sparkOperation(
+        JavaSparkContext.fromSparkContext(sc).textFile("adapter/spark/src/test/resources/e2e-input.txt"));
     sc.stop();
   }
 }

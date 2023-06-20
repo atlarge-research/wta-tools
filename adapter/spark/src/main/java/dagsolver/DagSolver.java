@@ -86,7 +86,7 @@ public class DagSolver {
     nodes.put(stage.getId(), node);
 
     long runtime = 0L;
-    List<Task> tasks = listener.getStageToTasks().get((int) stage.getId());
+    List<Task> tasks = listener.getStageToTasks().get(stage.getId());
     if (tasks != null) {
       runtime = tasks.stream().map(Task::getRuntime).reduce(Long::max).orElse(0L);
     }
@@ -147,7 +147,7 @@ public class DagSolver {
    */
   private void setFinalEdges() {
     for (Long node : nodes.keySet()) {
-      if (adjMap.get(node) == null && node != 1) {
+      if (adjMap.get(node) == null && node != -1) {
         addEdge(node, -1L, 0);
       }
     }
@@ -213,18 +213,15 @@ public class DagSolver {
    * @since 1.0.0
    */
   private List<Task> backTracing() {
-    long pointer = -1L;
+    AtomicLong pointer = new AtomicLong(-1L);
     List<Long> criticalPath = new ArrayList<>();
-    while (pointer != 0) {
-      criticalPath.add(pointer);
-      AtomicLong nextPointer = new AtomicLong();
-      long edgeWeight = -1;
-      adjMapReversed.get(pointer).forEach((adjNode, weight) -> {
-        if (weight > edgeWeight) {
-          nextPointer.set(adjNode);
+    while (pointer.get() != 0) {
+      criticalPath.add(pointer.get());
+      adjMapReversed.get(pointer.get()).forEach((adjNode, weight) -> {
+        if (weight + nodes.get(adjNode).dist == nodes.get(pointer.get()).dist) {
+          pointer.set(adjNode);
         }
       });
-      pointer = nextPointer.get();
     }
     List<Long> finalCriticalPath = criticalPath.stream().filter(x -> x >= 1).collect(Collectors.toList());
     return stages.stream()
