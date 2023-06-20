@@ -208,15 +208,27 @@ public class Stream<V extends Serializable> implements Cloneable, Serializable {
     Stream<V> clone = new Stream<>();
     clone.additionsSinceLastWriteToDisk = additionsSinceLastWriteToDisk;
     clone.serializationTrigger = serializationTrigger;
-    clone.deserializationStart = deserializationStart != null ? deserializationStart.clone() : null;
     clone.deserializationEnd = deserializationEnd != null ? deserializationEnd.clone() : null;
     clone.head = head != null ? head.clone() : null;
-    clone.tail = tail != null ? tail.clone() : null;
+    StreamNode<V> tailTraverser = clone.deserializationEnd;
+    while (tailTraverser != null) {
+      if (tailTraverser.getNext() == null) {
+        clone.tail = tailTraverser;
+      }
+      tailTraverser = tailTraverser.getNext();
+    }
+    StreamNode<V> headTraverser = clone.head;
+    while (headTraverser != null) {
+      if (headTraverser.getNext() == null) {
+        clone.deserializationStart = headTraverser;
+      }
+      headTraverser = headTraverser.getNext();
+    }
     try {
       for (String diskLocation : diskLocations) {
         String newDiskLocation = diskLocation.substring(0, diskLocation.length() - 4) + "_clone.ser";
         Files.copy(Path.of(diskLocation), Path.of(newDiskLocation), StandardCopyOption.REPLACE_EXISTING);
-        clone.diskLocations.add(newDiskLocation);
+        clone.diskLocations.offer(newDiskLocation);
       }
     } catch (IOException e) {
       log.error("Could not serialize the clone because {}.", e.getMessage());
