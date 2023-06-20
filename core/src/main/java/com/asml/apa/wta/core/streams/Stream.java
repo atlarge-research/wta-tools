@@ -1,6 +1,7 @@
 package com.asml.apa.wta.core.streams;
 
 import com.asml.apa.wta.core.exceptions.FailedToDeserializeStreamException;
+import com.asml.apa.wta.core.exceptions.FailedToSerializeStreamException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -10,6 +11,7 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.time.Instant;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -38,7 +40,7 @@ import lombok.extern.slf4j.Slf4j;
  * @since 1.0.0
  */
 @Slf4j
-public class Stream<V extends Serializable> {
+public class Stream<V extends Serializable> implements Cloneable {
 
   /**
    * Internal node of the {@link com.asml.apa.wta.core.streams.Stream}.
@@ -48,7 +50,7 @@ public class Stream<V extends Serializable> {
    * @since 1.0.0
    */
   @Getter
-  private static class StreamNode<V extends Serializable> implements Serializable {
+  private static class StreamNode<V extends Serializable> implements Serializable, Cloneable {
 
     private static final long serialVersionUID = -1846183914651125999L;
 
@@ -67,15 +69,28 @@ public class Stream<V extends Serializable> {
     StreamNode(V content) {
       this.content = content;
     }
+
+    /**
+     * Clones the {@link StreamNode}.
+     *
+     * @return a clone of the {@link StreamNode}
+     * @author Atour Mousavi Gourabi
+     */
+    @Override
+    protected StreamNode<V> clone() {
+      StreamNode<V> clone = new StreamNode<>(content);
+      clone.next = next != null ? next.clone() : null;
+      return clone;
+    }
   }
+
+  private static final String TEMP_SERIALIZATION_DIRECTORY = "tmp/wta/streams/serialization/";
 
   private final UUID id;
 
   private final Queue<String> diskLocations;
   private int additionsSinceLastWriteToDisk;
-  private final int serializationTrigger;
-
-  private static final String TEMP_SERIALIZATION_DIRECTORY = "tmp/wta/streams/serialization/";
+  private int serializationTrigger;
 
   private StreamNode<V> deserializationStart;
   private StreamNode<V> deserializationEnd;
@@ -180,6 +195,35 @@ public class Stream<V extends Serializable> {
   }
 
   /**
+   * Clones the {@link Stream}.
+   *
+   * @return a shallow copy of the current {@link Stream}
+   * @author Atour Mousavi Gourabi
+   * @since 1.0.0
+   */
+  @Override
+  public synchronized Stream<V> clone() {
+    Stream<V> clone = new Stream<>();
+    clone.additionsSinceLastWriteToDisk = additionsSinceLastWriteToDisk;
+    clone.serializationTrigger = serializationTrigger;
+    clone.deserializationStart = deserializationStart != null ? deserializationStart.clone() : null;
+    clone.deserializationEnd = deserializationEnd != null ? deserializationEnd.clone() : null;
+    clone.head = head != null ? head.clone() : null;
+    clone.tail = tail != null ? tail.clone() : null;
+    try {
+      for (String diskLocation : diskLocations) {
+        String newDiskLocation = diskLocation.substring(0, diskLocation.length() - 4) + "_clone.ser";
+        Files.copy(Path.of(diskLocation), Path.of(newDiskLocation), StandardCopyOption.REPLACE_EXISTING);
+        clone.diskLocations.add(newDiskLocation);
+      }
+    } catch (IOException e) {
+      log.error("Could not serialize the clone because {}.", e.getMessage());
+      throw new FailedToSerializeStreamException();
+    }
+    return clone;
+  }
+
+  /**
    * Deserializes the internals of the stream on demand.
    *
    * @param filePath the chunk of internals to deserialize, to not be {@code null}
@@ -255,6 +299,36 @@ public class Stream<V extends Serializable> {
       tail = null;
     }
     return ret;
+  }
+
+  /**
+   * Drops the specified amount of elements from the head of the {@link Stream}.
+   * If the specified amount of elements is larger than the size of the {@link Stream},
+   * the {@link Stream} will be fully emptied. Consumes the {@link Stream}.
+   *
+   * @param amount the amount of elements to drop from the {@link Stream}
+   * @return the {@link Stream} after the elements were dropped
+   * @author Atour Mousavi Gourabi
+   * @since 1.0.0
+   */
+  public synchronized Stream<V> drop(long amount) {
+    for (int i = 0; i < amount; i++) {
+      if (head == null) {
+        tail = null;
+        log.error("Stream#drop called for {} elements, but only able to drop {}.", amount, i);
+        break;
+      }
+      additionsSinceLastWriteToDisk--;
+      if (head == deserializationStart) {
+        if (diskLocations.isEmpty()) {
+          deserializationStart = head.getNext();
+        } else {
+          additionsSinceLastWriteToDisk += deserializeInternals(diskLocations.poll());
+        }
+      }
+      head = head.getNext();
+    }
+    return this;
   }
 
   /**
