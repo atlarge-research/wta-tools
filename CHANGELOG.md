@@ -111,3 +111,4 @@ For the most part, since we are pre-release this will serve no real purpose, oth
 - Removed WtaUtils [@hpage](https://gitlab.ewi.tudelft.nl/hpage)
 - Removed the outdated spark-benchmarking module [@pcho](https://gitlab.ewi.tudelft.nl/pcho)
 - Removed custom Log4j2 configuration [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
+- Removed PITest from the pipeline again [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
