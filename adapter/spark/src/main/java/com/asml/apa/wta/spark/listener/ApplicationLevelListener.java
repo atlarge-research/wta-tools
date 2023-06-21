@@ -116,18 +116,18 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
     final int totalTasks =
         Arrays.stream(workflows).mapToInt(Workflow::getTaskCount).sum();
     final long numSites =
-        tasks.clone().filter(task -> task.getSubmissionSite() != -1).count();
-    final long numResources = tasks.clone()
+        tasks.copy().filter(task -> task.getSubmissionSite() != -1).count();
+    final long numResources = tasks.copy()
         .map(Task::getResourceAmountRequested)
         .filter(task -> task >= 0.0)
         .reduce(Double::sum)
         .orElse(-1.0)
         .longValue();
     final long numUsers =
-        tasks.clone().filter(task -> task.getUserId() != -1).count();
+        tasks.copy().filter(task -> task.getUserId() != -1).count();
     final long numGroups =
-        tasks.clone().filter(task -> task.getGroupId() != -1).count();
-    final double totalResourceSeconds = tasks.clone()
+        tasks.copy().filter(task -> task.getGroupId() != -1).count();
+    final double totalResourceSeconds = tasks.copy()
         .filter(task -> task.getRuntime() >= 0 && task.getResourceAmountRequested() >= 0.0)
         .map(task -> task.getResourceAmountRequested() * task.getRuntime())
         .reduce(Double::sum)
@@ -263,17 +263,17 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
     setGeneralFields(applicationEnd.time(), workloadBuilder);
     setCountFields(tasks, workloadBuilder);
     setResourceStatisticsFields(
-        tasks.clone().map(Task::getResourceAmountRequested).toList(), ResourceType.RESOURCE, workloadBuilder);
+        tasks.copy().map(Task::getResourceAmountRequested).toList(), ResourceType.RESOURCE, workloadBuilder);
     setResourceStatisticsFields(
-        tasks.clone().map(Task::getMemoryRequested).toList(), ResourceType.MEMORY, workloadBuilder);
+        tasks.copy().map(Task::getMemoryRequested).toList(), ResourceType.MEMORY, workloadBuilder);
     setResourceStatisticsFields(
-        tasks.clone().map(networkFunction.andThen(Long::doubleValue)).toList(),
+        tasks.copy().map(networkFunction.andThen(Long::doubleValue)).toList(),
         ResourceType.NETWORK,
         workloadBuilder);
     setResourceStatisticsFields(
-        tasks.clone().map(Task::getDiskSpaceRequested).toList(), ResourceType.DISK, workloadBuilder);
+        tasks.copy().map(Task::getDiskSpaceRequested).toList(), ResourceType.DISK, workloadBuilder);
     setResourceStatisticsFields(
-        tasks.clone().map(Task::getEnergyConsumption).toList(), ResourceType.ENERGY, workloadBuilder);
+        tasks.copy().map(Task::getEnergyConsumption).toList(), ResourceType.ENERGY, workloadBuilder);
     addProcessedObject(workloadBuilder.build());
   }
 

@@ -44,7 +44,7 @@ public abstract class AbstractListener<T extends BaseTraceObject> extends SparkL
    * @since 1.0.0
    */
   public Stream<T> getProcessedObjects() {
-    return processedObjects.clone();
+    return processedObjects.copy();
   }
 
   /**

@@ -233,7 +233,7 @@ public class StreamIntegrationTest {
     }
     originalStream.addToStream(10);
     originalStream.addToStream(5);
-    Stream<Integer> clone = originalStream.clone();
+    Stream<Integer> clone = originalStream.copy();
     for (Stream<Integer> stream : List.of(originalStream, clone)) {
       assertThat(stream.head()).isEqualTo(0);
       assertThat(stream.head()).isEqualTo(1);
@@ -274,7 +274,7 @@ public class StreamIntegrationTest {
     for (int i = 1; i <= 10; i++) {
       originalStream.addToStream(i);
     }
-    Stream<Integer> clone = originalStream.clone();
+    Stream<Integer> clone = originalStream.copy();
     for (Stream<Integer> stream : List.of(originalStream, clone)) {
       assertThat(stream.head()).isEqualTo(1);
       assertThat(stream.head()).isEqualTo(2);

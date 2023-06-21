@@ -108,12 +108,12 @@ public class JobLevelListener extends AbstractListener<Workflow> {
     final String appName = getSparkContext().appName();
     final String applicationField = "ETL";
     final double totalResources = -1.0;
-    final double totalMemoryUsage = computeSum(tasks.clone().map(Task::getMemoryRequested));
-    final long totalNetworkUsage = (long) computeSum(tasks.clone().map(task -> (double) task.getNetworkIoTime()));
-    final double totalDiskSpaceUsage = computeSum(tasks.clone().map(Task::getDiskSpaceRequested));
-    final double totalEnergyConsumption = computeSum(tasks.clone().map(Task::getEnergyConsumption));
+    final double totalMemoryUsage = computeSum(tasks.copy().map(Task::getMemoryRequested));
+    final long totalNetworkUsage = (long) computeSum(tasks.copy().map(task -> (double) task.getNetworkIoTime()));
+    final double totalDiskSpaceUsage = computeSum(tasks.copy().map(Task::getDiskSpaceRequested));
+    final double totalEnergyConsumption = computeSum(tasks.copy().map(Task::getEnergyConsumption));
 
-    Task[] taskArray = tasks.clone().toArray(Task[]::new);
+    Task[] taskArray = tasks.copy().toArray(Task[]::new);
 
     addProcessedObject(Workflow.builder()
         .id(jobId)

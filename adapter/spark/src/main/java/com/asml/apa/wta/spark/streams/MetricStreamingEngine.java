@@ -97,8 +97,8 @@ public class MetricStreamingEngine {
    */
   private Resource produceResourceFromExecutorInfo(long executorId, Stream<SparkBaseSupplierWrapperDto> pings) {
 
-    Optional<OsInfoDto> sampleOsInfo = getFirstAvailable(pings.clone(), BaseSupplierDto::getOsInfoDto);
-    Optional<JvmFileDto> sampleJvmInfo = getFirstAvailable(pings.clone(), BaseSupplierDto::getJvmFileDto);
+    Optional<OsInfoDto> sampleOsInfo = getFirstAvailable(pings.copy(), BaseSupplierDto::getOsInfoDto);
+    Optional<JvmFileDto> sampleJvmInfo = getFirstAvailable(pings.copy(), BaseSupplierDto::getJvmFileDto);
     // do not sample proc info, later pings might actually have useful information
 
     final String type = "cluster node";
@@ -106,7 +106,7 @@ public class MetricStreamingEngine {
 
     StringBuilder processorInformation = new StringBuilder();
 
-    final String processorModel = pings.clone()
+    final String processorModel = pings.copy()
         .map(BaseSupplierDto::getProcDto)
         .filter(Objects::nonNull)
         .map(ProcDto::getCpuModel)

@@ -42,6 +42,8 @@ public class KeyedStream<K, V extends Serializable> {
    * Consumes the {@link KeyedStream}.
    *
    * @param mapper the mapping function, takes in the key and value of the element to map
+   * @param <R> the type parameter for the mapper's return type
+   * @return the result of the mapping operation
    * @author Atour Mousavi Gourabi
    * @since 1.0.0
    */

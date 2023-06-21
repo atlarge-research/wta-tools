@@ -142,7 +142,7 @@ class StreamTest {
     stream.addToStream(1);
     int two = stream.head();
     stream.addToStream(2);
-    int sumClone = stream.clone().foldLeft(0, Integer::sum);
+    int sumClone = stream.copy().foldLeft(0, Integer::sum);
     int sumOriginal = stream.foldLeft(0, Integer::sum);
     assertThat(one).isEqualTo(1);
     assertThat(two).isEqualTo(2);

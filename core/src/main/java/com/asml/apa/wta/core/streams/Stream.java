@@ -40,7 +40,7 @@ import lombok.extern.slf4j.Slf4j;
  * @since 1.0.0
  */
 @Slf4j
-public class Stream<V extends Serializable> implements Cloneable, Serializable {
+public class Stream<V extends Serializable> implements Serializable {
 
   private static final long serialVersionUID = 7414918352615022254L;
 
@@ -52,7 +52,7 @@ public class Stream<V extends Serializable> implements Cloneable, Serializable {
    * @since 1.0.0
    */
   @Getter
-  private static class StreamNode<V extends Serializable> implements Serializable, Cloneable {
+  private static class StreamNode<V extends Serializable> implements Serializable {
 
     private static final long serialVersionUID = -1846183914651125999L;
 
@@ -70,17 +70,6 @@ public class Stream<V extends Serializable> implements Cloneable, Serializable {
      */
     StreamNode(V content) {
       this.content = content;
-    }
-
-    /**
-     * Clones the {@link StreamNode}.
-     *
-     * @return a clone of the {@link StreamNode}
-     * @author Atour Mousavi Gourabi
-     */
-    @Override
-    protected StreamNode<V> clone() {
-      return new StreamNode<>(content);
     }
   }
 
@@ -232,14 +221,13 @@ public class Stream<V extends Serializable> implements Cloneable, Serializable {
   }
 
   /**
-   * Clones the {@link Stream}.
+   * Clones the {@link Stream}. Creates a shallow copy, so it points to the same elements.
    *
    * @return a shallow copy of the current {@link Stream}
    * @author Atour Mousavi Gourabi
    * @since 1.0.0
    */
-  @Override
-  public synchronized Stream<V> clone() {
+  public synchronized Stream<V> copy() {
     try {
       Stream<V> clone = (Stream<V>) super.clone();
       clone.id = UUID.randomUUID();
@@ -552,6 +540,7 @@ public class Stream<V extends Serializable> implements Cloneable, Serializable {
   /**
    * Counts the number of elements in the {@link Stream}. Consumes the {@link Stream}.
    *
+   * @return the size of the {@link Stream}
    * @author Atour Mousavi Gourabi
    * @since 1.0.0
    */
@@ -574,6 +563,7 @@ public class Stream<V extends Serializable> implements Cloneable, Serializable {
   /**
    * Converts the {@link Stream} to an array, and consumes the {@link Stream}.
    *
+   * @param generator the generator of the array
    * @return an array with the {@link Stream}s elements
    * @author Atour Mousavi Gourabi
    * @since 1.0.0

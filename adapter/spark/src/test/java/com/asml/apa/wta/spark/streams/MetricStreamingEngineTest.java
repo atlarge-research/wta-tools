@@ -100,7 +100,7 @@ class MetricStreamingEngineTest {
     sut.addToResourceStream(s1.getExecutorId(), s1);
 
     ResourceAndStateWrapper stateWrapperResult =
-        sut.collectResourceInformation().clone().head();
+        sut.collectResourceInformation().copy().head();
 
     assertThat(sut.collectResourceInformation().head().getStates().isEmpty())
         .isTrue();
@@ -121,9 +121,9 @@ class MetricStreamingEngineTest {
     Stream<ResourceAndStateWrapper> result = sut.collectResourceInformation();
 
     // size assertions
-    assertThat(result.clone().count()).isEqualTo(2);
+    assertThat(result.copy().count()).isEqualTo(2);
 
-    ResourceAndStateWrapper executor2 = result.clone()
+    ResourceAndStateWrapper executor2 = result.copy()
         .filter(r ->
             r.getResource().getId() == Math.abs(s2.getExecutorId().hashCode()))
         .findFirst()
@@ -145,10 +145,10 @@ class MetricStreamingEngineTest {
             .os("Mac OS X")
             .build());
 
-    ResourceState state1 = executor2.getStates().clone().head();
-    ResourceState state2 = executor2.getStates().clone().drop(1).head();
+    ResourceState state1 = executor2.getStates().copy().head();
+    ResourceState state2 = executor2.getStates().copy().drop(1).head();
 
-    assertThat(executor2.getStates().clone().count()).isEqualTo(2);
+    assertThat(executor2.getStates().copy().count()).isEqualTo(2);
     assertThat(state1.getTimestamp()).isLessThan(state2.getTimestamp());
     assertThat(state1.getResourceId()).isEqualTo(state2.getResourceId());
     assertThat(state1.getAvailableDiskIoBandwidth()).isGreaterThan(0);
@@ -166,8 +166,8 @@ class MetricStreamingEngineTest {
 
     assertThat(executor3.getResource()).isNotEqualTo(executor2.getResource());
 
-    assertThat(executor2.getStates().clone().count()).isEqualTo(2);
-    assertThat(executor3.getStates().clone().count()).isEqualTo(1);
+    assertThat(executor2.getStates().copy().count()).isEqualTo(2);
+    assertThat(executor3.getStates().copy().count()).isEqualTo(1);
     assertThat(sut.collectResourceInformation().head().getStates().isEmpty())
         .isTrue();
     assertThat(sut.collectResourceInformation().head().getResource()).isNotNull();
@@ -184,7 +184,7 @@ class MetricStreamingEngineTest {
     sut.addToResourceStream(s3.getExecutorId(), s3);
 
     Stream<ResourceAndStateWrapper> result = sut.collectResourceInformation();
-    assertThat(result.clone().count()).isEqualTo(1);
-    assertThat(result.clone().head().getResource().getOs()).isEqualTo("asfasdfjasfsadfasfasdfsa");
+    assertThat(result.copy().count()).isEqualTo(1);
+    assertThat(result.copy().head().getResource().getOs()).isEqualTo("asfasdfjasfsadfasfasdfsa");
   }
 }
