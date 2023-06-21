@@ -86,7 +86,7 @@ public class Stream<V extends Serializable> implements Cloneable, Serializable {
 
   private static final String TEMP_SERIALIZATION_DIRECTORY = "tmp/wta/streams/serialization/";
 
-  private final UUID id;
+  private UUID id;
 
   private final Queue<String> diskLocations;
   private int additionsSinceLastWriteToDisk;
@@ -240,53 +240,22 @@ public class Stream<V extends Serializable> implements Cloneable, Serializable {
    */
   @Override
   public synchronized Stream<V> clone() {
-    Stream<V> clone = new Stream<>();
-    clone.additionsSinceLastWriteToDisk = additionsSinceLastWriteToDisk;
-    clone.serializationTrigger = serializationTrigger;
-    clone.deserializationEnd = deserializationEnd != null ? deserializationEnd.clone() : null;
-    if (deserializationEnd != null) {
-      clone.deserializationEnd = deserializationEnd.clone();
-      StreamNode<V> tempEnd = deserializationEnd;
-      StreamNode<V> cloneEndTraversal = clone.deserializationEnd;
-      if (tempEnd == tail) {
-        clone.tail = cloneEndTraversal;
-      }
-      while (tempEnd.getNext() != null) {
-        tempEnd = tempEnd.getNext();
-        cloneEndTraversal.setNext(tempEnd.clone());
-        cloneEndTraversal = cloneEndTraversal.getNext();
-        if (tempEnd == tail) {
-          clone.tail = cloneEndTraversal;
-        }
-      }
-    }
-    if (head != null) {
-      clone.head = head.clone();
-      StreamNode<V> tempHead = head;
-      StreamNode<V> cloneHeadTraversal = clone.head;
-      if (tempHead == deserializationStart) {
-        clone.deserializationStart = cloneHeadTraversal;
-      }
-      while (tempHead.getNext() != null) {
-        tempHead = tempHead.getNext();
-        cloneHeadTraversal.setNext(tempHead.clone());
-        cloneHeadTraversal = cloneHeadTraversal.getNext();
-        if (tempHead == deserializationStart) {
-          clone.deserializationStart = cloneHeadTraversal;
-        }
-      }
-    }
     try {
+      Stream<V> clone = (Stream<V>) super.clone();
+      clone.id = UUID.randomUUID();
       for (String diskLocation : diskLocations) {
         String newDiskLocation = diskLocation.substring(0, diskLocation.length() - 4) + "_clone.ser";
         Files.copy(Path.of(diskLocation), Path.of(newDiskLocation), StandardCopyOption.REPLACE_EXISTING);
         clone.diskLocations.offer(newDiskLocation);
       }
+      return clone;
     } catch (IOException e) {
       log.error("Could not serialize the clone because {}.", e.getMessage());
       throw new FailedToSerializeStreamException();
+    } catch (CloneNotSupportedException e) {
+      log.error("Could not clone Stream because {}.", e.getMessage());
+      throw new FailedToSerializeStreamException();
     }
-    return clone;
   }
 
   /**
