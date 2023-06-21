@@ -59,7 +59,7 @@ public class Stream<V extends Serializable> implements Serializable, Cloneable {
     private final V content;
 
     @Setter
-    private transient StreamNode<V> next;
+    private StreamNode<V> next;
 
     /**
      * Constructs a node.
