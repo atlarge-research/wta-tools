@@ -77,7 +77,7 @@ public class Stream<V extends Serializable> implements Serializable, Cloneable {
 
   private UUID id;
 
-  private final Queue<String> diskLocations;
+  private Queue<String> diskLocations;
   private int additionsSinceLastWriteToDisk;
   private int serializationTrigger;
 
@@ -231,10 +231,11 @@ public class Stream<V extends Serializable> implements Serializable, Cloneable {
     try {
       Stream<V> clone = (Stream<V>) super.clone();
       clone.id = UUID.randomUUID();
+      clone.diskLocations = new ArrayDeque<>();
       for (String diskLocation : diskLocations) {
         String newDiskLocation = diskLocation.substring(0, diskLocation.length() - 4) + "_clone.ser";
         Files.copy(Path.of(diskLocation), Path.of(newDiskLocation), StandardCopyOption.REPLACE_EXISTING);
-        clone.diskLocations.offer(newDiskLocation);
+        clone.diskLocations.add(newDiskLocation);
       }
       return clone;
     } catch (IOException e) {
