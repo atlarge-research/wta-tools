@@ -1,6 +1,5 @@
 package com.asml.apa.wta.core.supplier;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
@@ -11,8 +10,6 @@ import com.asml.apa.wta.core.utils.ShellUtils;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.condition.EnabledOnOs;
-import org.junit.jupiter.api.condition.OS;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -53,7 +50,7 @@ public class DstatSupplierTest {
         .systemCsw(2116L)
         .build();
 
-    if(sut.isAvailable()) {
+    if (sut.isAvailable()) {
       assertEquals(expected, actual.get());
     } else {
       assertEquals(Optional.empty(), actual);
@@ -67,6 +64,44 @@ public class DstatSupplierTest {
     DstatSupplier sut = spy(new DstatSupplier(shellUtils));
 
     Optional<DstatDto> actual = sut.getSnapshot().join();
+
+    assertEquals(Optional.empty(), actual);
+  }
+
+  @Test
+  void getSnapshotWithDifferentOutputReturnsEmptyDstatDto() {
+    ShellUtils shellUtils = mock(ShellUtils.class);
+    doReturn(CompletableFuture.completedFuture(
+            "----total-usage---- -dsk/total- -net/total- ---paging-- ---system--\n"
+                + "usr sys idl wai stl|  recv  send|  in   out | int   csw\n"
+                + "  0   1M  98k   0   0|  10B     0 |   0B     0B | 516G  2116"))
+        .when(shellUtils)
+        .executeCommand("dstat -cdngy 1 1", false);
+    doReturn(CompletableFuture.completedFuture(
+            "----total-usage---- -dsk/total- -net/total- ---paging-- ---system--\n"
+                + "usr sys idl wai stl|  recv  send|  in   out | int   csw\n"
+                + "  0   1M  98k   0   0|  10B     0 |   0B     0B | 516G  2116"))
+        .when(shellUtils)
+        .executeCommand("dstat -cdngy 1 1", true);
+    DstatSupplier sut = spy(new DstatSupplier(shellUtils));
+
+    Optional<DstatDto> actual = sut.getSnapshot().join();
+
+    DstatDto expected = DstatDto.builder()
+        .totalUsageUsr(0L)
+        .totalUsageSys(1000000L)
+        .totalUsageIdl(98000L)
+        .totalUsageWai(0L)
+        .totalUsageStl(0L)
+        .dskRead(0L)
+        .dskWrite(0L)
+        .netRecv(10L)
+        .netSend(0L)
+        .pagingIn(0L)
+        .pagingOut(0L)
+        .systemInt(516000000000L)
+        .systemCsw(2116L)
+        .build();
 
     assertEquals(Optional.empty(), actual);
   }

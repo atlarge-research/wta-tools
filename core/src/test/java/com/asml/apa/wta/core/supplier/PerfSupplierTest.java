@@ -75,10 +75,9 @@ public class PerfSupplierTest {
     sut = spy(new PerfSupplier(shellUtils));
     assertThat(sut.isAvailable()).isTrue();
     Optional<PerfDto> result = sut.getSnapshot().join();
-    if(sut.isAvailable()) {
+    if (sut.isAvailable()) {
       assertThat(result.get().getWatt()).isEqualTo(12.34);
-    }
-    else {
+    } else {
       assertEquals(Optional.empty(), result);
     }
   }

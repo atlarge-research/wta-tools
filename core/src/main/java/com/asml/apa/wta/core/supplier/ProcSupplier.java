@@ -29,10 +29,25 @@ import lombok.extern.slf4j.Slf4j;
 public class ProcSupplier implements InformationSupplier<ProcDto> {
   private final ShellUtils shell;
   private final boolean isProcAvailable;
+  private final boolean isDiskMetricsAvailable;
+  private final boolean isMemMetricsAvailable;
+  private final boolean isCpuMetricsAvailable;
+  private final boolean isLoadAvgMetricsAvailable;
 
   public ProcSupplier(ShellUtils shellUtils) {
     shell = shellUtils;
     isProcAvailable = isAvailable();
+    this.isDiskMetricsAvailable =
+        shell.executeCommand("cat /proc/diskstats", true).join() != null;
+    this.isMemMetricsAvailable =
+        shell.executeCommand("cat /proc/meminfo", true).join() != null;
+    this.isCpuMetricsAvailable = shell.executeCommand(
+                "grep -m 1 \"model name\" /proc/cpuinfo | awk -F: '{print $2}' | sed 's/^[ \\t]*//'",
+                true)
+            .join()
+        != null;
+    this.isLoadAvgMetricsAvailable =
+        shell.executeCommand("cat /proc/loadavg", true).join() != null;
   }
 
   /**
@@ -59,17 +74,42 @@ public class ProcSupplier implements InformationSupplier<ProcDto> {
       return notAvailableResult();
     }
 
-    CompletableFuture<Optional<Long>[]> diskStatsFuture = getDiskMetrics();
-    CompletableFuture<Optional<Long>[]> memStatsFuture = getMemMetrics();
-    CompletableFuture<Optional<String>> cpuModelFuture = getCpuModel();
-    CompletableFuture<Optional<Double>[]> loadAvgStatsFuture = getLoadAvgMetrics();
+    CompletableFuture<Optional<Long>[]> diskStatsFuture;
+    CompletableFuture<Optional<Long>[]> memStatsFuture;
+    CompletableFuture<Optional<String>> cpuModelFuture;
+    CompletableFuture<Optional<Double>[]> loadAvgStatsFuture;
+    if (this.isDiskMetricsAvailable) {
+      diskStatsFuture = getDiskMetrics();
+    } else {
+      diskStatsFuture = CompletableFuture.completedFuture(
+          Stream.generate(Optional::empty).limit(17).toArray(Optional[]::new));
+    }
+    if (this.isMemMetricsAvailable) {
+      memStatsFuture = getMemMetrics();
+    } else {
+      memStatsFuture = CompletableFuture.completedFuture(
+          Stream.generate(Optional::empty).limit(60).toArray(Optional[]::new));
+    }
+    if (this.isCpuMetricsAvailable) {
+      cpuModelFuture = getCpuModel();
+    } else {
+      cpuModelFuture = CompletableFuture.completedFuture(Optional.empty());
+    }
+    if (this.isLoadAvgMetricsAvailable) {
+      loadAvgStatsFuture = getLoadAvgMetrics();
+    } else {
+      loadAvgStatsFuture = CompletableFuture.completedFuture(
+          Stream.generate(Optional::empty).limit(6).toArray(Optional[]::new));
+    }
 
+    CompletableFuture<Optional<String>> finalCpuModelFuture = cpuModelFuture;
+    CompletableFuture<Optional<Double>[]> finalLoadAvgStatsFuture = loadAvgStatsFuture;
     return CompletableFuture.allOf(diskStatsFuture, memStatsFuture, cpuModelFuture, loadAvgStatsFuture)
         .thenApply((v) -> {
           Optional<Long>[] diskResult = diskStatsFuture.join();
           Optional<Long>[] memResult = memStatsFuture.join();
-          Optional<String> cpuModel = cpuModelFuture.join();
-          Optional<Double>[] loadAvgResult = loadAvgStatsFuture.join();
+          Optional<String> cpuModel = finalCpuModelFuture.join();
+          Optional<Double>[] loadAvgResult = finalLoadAvgStatsFuture.join();
 
           return Optional.of(ProcDto.builder()
               .readsCompleted(diskResult[0].orElse(-1L))

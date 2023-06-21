@@ -86,19 +86,25 @@ public class IostatSupplier implements InformationSupplier<IostatDto> {
           List<OutputLine> rows = parseIostat(result);
           double[] metrics = aggregateIostat(rows);
 
-          return Optional.of(IostatDto.builder()
-              .tps(metrics[0])
-              .kiloByteReadPerSec(metrics[1])
-              .kiloByteWrtnPerSec(metrics[2])
-              .kiloByteDscdPerSec(metrics[3])
-              .kiloByteRead(metrics[4])
-              .kiloByteWrtn(metrics[5])
-              .kiloByteDscd(metrics[6])
-              .build());
+          if (metrics.length == 7) {
+            return Optional.of(IostatDto.builder()
+                .tps(metrics[0])
+                .kiloByteReadPerSec(metrics[1])
+                .kiloByteWrtnPerSec(metrics[2])
+                .kiloByteDscdPerSec(metrics[3])
+                .kiloByteRead(metrics[4])
+                .kiloByteWrtn(metrics[5])
+                .kiloByteDscd(metrics[6])
+                .build());
+          }
         } catch (NullPointerException npe) {
           log.error("Iostat returned a malformed output: {}", npe.toString());
+        } catch (IndexOutOfBoundsException e) {
+          log.error("A different number of iostat metrics were found than expected");
+        } catch (NumberFormatException e) {
+          log.error("Something went wrong while parsing iostat terminal output");
         } catch (Exception e) {
-          log.error("Something went wrong while receiving the iostat bash command outputs.");
+          log.error("Something went wrong while handling iostat metrics");
         }
       }
       return Optional.empty();

@@ -9,8 +9,6 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.condition.EnabledOnOs;
-import org.junit.jupiter.api.condition.OS;
 import org.mockito.Mockito;
 
 public class IostatSupplierTest {
@@ -48,10 +46,9 @@ public class IostatSupplierTest {
 
     Optional<IostatDto> result = sut.getSnapshot().join();
 
-    if(sut.isAvailable()) {
+    if (sut.isAvailable()) {
       assertEquals(expected, result.get());
-    }
-    else {
+    } else {
       assertEquals(Optional.empty(), result);
     }
   }
@@ -64,9 +61,9 @@ public class IostatSupplierTest {
 
     Optional<IostatDto> result = sut.getSnapshot().join();
 
-    if(sut.isAvailable()) {
+    if (sut.isAvailable()) {
       assertEquals(expected, result.get());
-    }else {
+    } else {
       assertEquals(Optional.empty(), result);
     }
   }
@@ -84,10 +81,32 @@ public class IostatSupplierTest {
 
     Optional<IostatDto> result = sut.getSnapshot().join();
 
-    if(sut.isAvailable()) {
+    if (sut.isAvailable()) {
       assertEquals(expected, result.get());
-    }else {
+    } else {
       assertEquals(Optional.empty(), result);
     }
+  }
+
+  public void getSnapshotDifferentOutputReturnsEmptyIostatDto() {
+    doReturn(CompletableFuture.completedFuture(
+            "Device           kB_read/s    kB_wrtn/s    kB_dscd/s    kB_read    kB_wrtn    kB_dscd\n"
+                + "sda                  0.54         0.00         0.00      70941          0          0\n"
+                + "str                  2.0          3.0          4.0       5.0        6.0        7.0"))
+        .when(shellUtils)
+        .executeCommand("iostat -d", false);
+
+    IostatDto expected = IostatDto.builder()
+        .tps(1.01)
+        .kiloByteReadPerSec(2.54)
+        .kiloByteWrtnPerSec(3.0)
+        .kiloByteDscdPerSec(4.0)
+        .kiloByteRead(70946.0)
+        .kiloByteWrtn(6.0)
+        .kiloByteDscd(7.0)
+        .build();
+
+    Optional<IostatDto> result = sut.getSnapshot().join();
+    assertEquals(Optional.empty(), result);
   }
 }

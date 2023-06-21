@@ -44,25 +44,33 @@ public class DstatSupplier implements InformationSupplier<DstatDto> {
 
     return allMetrics.thenApply(result -> {
       if (result != null) {
-        List<Long> metrics = extractNumbers(result);
         try {
-          return Optional.of(DstatDto.builder()
-              .totalUsageUsr(metrics.get(0))
-              .totalUsageSys(metrics.get(1))
-              .totalUsageIdl(metrics.get(2))
-              .totalUsageWai(metrics.get(3))
-              .totalUsageStl(metrics.get(4))
-              .dskRead(metrics.get(5))
-              .dskWrite(metrics.get(6))
-              .netRecv(metrics.get(7))
-              .netSend(metrics.get(8))
-              .pagingIn(metrics.get(9))
-              .pagingOut(metrics.get(10))
-              .systemInt(metrics.get(11))
-              .systemCsw(metrics.get(12))
-              .build());
+          List<Long> metrics = extractNumbers(result);
+          if (metrics.size() == 13) {
+            return Optional.of(DstatDto.builder()
+                .totalUsageUsr(metrics.get(0))
+                .totalUsageSys(metrics.get(1))
+                .totalUsageIdl(metrics.get(2))
+                .totalUsageWai(metrics.get(3))
+                .totalUsageStl(metrics.get(4))
+                .dskRead(metrics.get(5))
+                .dskWrite(metrics.get(6))
+                .netRecv(metrics.get(7))
+                .netSend(metrics.get(8))
+                .pagingIn(metrics.get(9))
+                .pagingOut(metrics.get(10))
+                .systemInt(metrics.get(11))
+                .systemCsw(metrics.get(12))
+                .build());
+          }
+        } catch (NullPointerException e) {
+          log.error("A null pointer exception when gather metrics from dstat");
+        } catch (IndexOutOfBoundsException e) {
+          log.error("A different number of dstat metrics were found than expected");
+        } catch (NumberFormatException e) {
+          log.error("Something went wrong while parsing dstat terminal output");
         } catch (Exception e) {
-          log.error("Something went wrong with dstat bash command outputs.");
+          log.error("Something went wrong while handling dstat metrics");
         }
       }
       return Optional.empty();
@@ -77,6 +85,7 @@ public class DstatSupplier implements InformationSupplier<DstatDto> {
    * @since 1.0.0
    */
   private static List<Long> extractNumbers(String input) {
+
     List<Long> numbers = new ArrayList<>();
     Pattern pattern = Pattern.compile("\\b(\\d+)(k|B|G|M)?\\b");
     Matcher matcher = pattern.matcher(input);
@@ -97,7 +106,6 @@ public class DstatSupplier implements InformationSupplier<DstatDto> {
       }
       numbers.add(number);
     }
-
     return numbers;
   }
 
