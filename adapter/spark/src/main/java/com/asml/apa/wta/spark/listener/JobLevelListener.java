@@ -89,8 +89,8 @@ public class JobLevelListener extends AbstractListener<Workflow> {
       stages.add(Task.builder()
           .id((long) stageInfo.stageId() + 1)
           .parents(JavaConverters.seqAsJavaList(stageInfo.parentIds()).stream()
-              .mapToInt(x -> (int) x + 1)
-              .mapToLong(x -> (long) x)
+              .mapToInt(parentId -> (int) parentId + 1)
+              .mapToLong(parentId -> (long) parentId)
               .toArray())
           .build());
     });

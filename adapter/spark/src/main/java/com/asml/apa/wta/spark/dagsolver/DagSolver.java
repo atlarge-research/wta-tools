@@ -225,9 +225,10 @@ public class DagSolver {
         }
       });
     }
-    List<Long> finalCriticalPath = criticalPath.stream().filter(x -> x >= 1).collect(Collectors.toList());
+    List<Long> finalCriticalPath =
+        criticalPath.stream().filter(nodeId -> nodeId >= 1).collect(Collectors.toList());
     return stages.stream()
-        .filter(x -> finalCriticalPath.contains(x.getId()))
+        .filter(stage -> finalCriticalPath.contains(stage.getId()))
         .collect(Collectors.toList());
   }
 }
