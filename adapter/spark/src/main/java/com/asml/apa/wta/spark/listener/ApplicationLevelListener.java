@@ -148,13 +148,11 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
    * @since 1.0.0
    */
   private enum ResourceType {
-    RESOURCE(),
-    MEMORY(),
-    DISK(),
-    NETWORK(),
-    ENERGY();
-
-    ResourceType() {}
+    RESOURCE,
+    MEMORY,
+    DISK,
+    NETWORK,
+    ENERGY
   }
 
   /**

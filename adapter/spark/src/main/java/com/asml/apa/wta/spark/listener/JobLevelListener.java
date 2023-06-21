@@ -95,7 +95,7 @@ public class JobLevelListener extends AbstractListener<Workflow> {
   @Override
   public void onJobEnd(SparkListenerJobEnd jobEnd) {
     final long jobId = jobEnd.jobId() + 1;
-    final long tsSubmit = jobSubmitTimes.get(jobId);
+    final Long tsSubmit = jobSubmitTimes.get(jobId);
     final Stream<Task> tasks = wtaTaskListener.getProcessedObjects().filter(task -> task.getWorkflowId() == jobId);
     final long criticalPathLength = -1L;
     final int criticalPathTaskCount = criticalPathTasks.get(jobId);
