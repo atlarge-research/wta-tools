@@ -80,9 +80,7 @@ public class Stream<V extends Serializable> implements Cloneable, Serializable {
      */
     @Override
     protected StreamNode<V> clone() {
-      StreamNode<V> clone = new StreamNode<>(content);
-      clone.next = next != null ? next.clone() : null;
-      return clone;
+      return new StreamNode<>(content);
     }
   }
 
@@ -197,47 +195,6 @@ public class Stream<V extends Serializable> implements Cloneable, Serializable {
   }
 
   /**
-   * Clones the {@link Stream}.
-   *
-   * @return a shallow copy of the current {@link Stream}
-   * @author Atour Mousavi Gourabi
-   * @since 1.0.0
-   */
-  @Override
-  public synchronized Stream<V> clone() {
-    Stream<V> clone = new Stream<>();
-    clone.additionsSinceLastWriteToDisk = additionsSinceLastWriteToDisk;
-    clone.serializationTrigger = serializationTrigger;
-    clone.deserializationEnd = deserializationEnd != null ? deserializationEnd.clone() : null;
-    clone.head = head != null ? head.clone() : null;
-    StreamNode<V> tailTraverser = clone.deserializationEnd;
-    while (tailTraverser != null) {
-      if (tailTraverser.getNext() == null) {
-        clone.tail = tailTraverser;
-      }
-      tailTraverser = tailTraverser.getNext();
-    }
-    StreamNode<V> headTraverser = clone.head;
-    while (headTraverser != null) {
-      if (headTraverser.getNext() == null) {
-        clone.deserializationStart = headTraverser;
-      }
-      headTraverser = headTraverser.getNext();
-    }
-    try {
-      for (String diskLocation : diskLocations) {
-        String newDiskLocation = diskLocation.substring(0, diskLocation.length() - 4) + "_clone.ser";
-        Files.copy(Path.of(diskLocation), Path.of(newDiskLocation), StandardCopyOption.REPLACE_EXISTING);
-        clone.diskLocations.offer(newDiskLocation);
-      }
-    } catch (IOException e) {
-      log.error("Could not serialize the clone because {}.", e.getMessage());
-      throw new FailedToSerializeStreamException();
-    }
-    return clone;
-  }
-
-  /**
    * Deserializes the internals of the stream on demand.
    *
    * @param filePath the chunk of internals to deserialize, to not be {@code null}
@@ -250,6 +207,7 @@ public class Stream<V extends Serializable> implements Cloneable, Serializable {
     int amountOfNodes;
     try (ObjectInputStream objectInputStream = new ObjectInputStream(new FileInputStream(filePath))) {
       List<StreamNode<V>> nodes = (ArrayList<StreamNode<V>>) objectInputStream.readObject();
+      head = deserializationStart;
       StreamNode<V> previous = null;
       for (StreamNode<V> node : nodes) {
         if (previous != null) {
@@ -261,7 +219,7 @@ public class Stream<V extends Serializable> implements Cloneable, Serializable {
       }
       if (previous != null) {
         deserializationStart = previous;
-        previous.setNext(deserializationEnd);
+        deserializationStart.setNext(deserializationEnd);
       }
       amountOfNodes = nodes.size();
     } catch (IOException | ClassNotFoundException | ClassCastException e) {
@@ -271,6 +229,22 @@ public class Stream<V extends Serializable> implements Cloneable, Serializable {
       new File(filePath).delete();
     }
     return amountOfNodes;
+  }
+
+  /**
+   * Clones the {@link Stream}.
+   *
+   * @return a shallow copy of the current {@link Stream}
+   * @author Atour Mousavi Gourabi
+   * @since 1.0.0
+   */
+  @Override
+  public synchronized Stream<V> clone() {
+    try {
+      return (Stream<V>) super.clone();
+    } catch (CloneNotSupportedException e) {
+      return null;
+    }
   }
 
   /**
@@ -389,6 +363,10 @@ public class Stream<V extends Serializable> implements Cloneable, Serializable {
       tail = head;
       deserializationStart = head;
       deserializationEnd = head;
+    } else if (head == tail) {
+      tail = new StreamNode<>(content);
+      deserializationEnd = tail;
+      head.setNext(tail);
     } else {
       tail.setNext(new StreamNode<>(content));
       tail = tail.getNext();

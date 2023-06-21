@@ -134,4 +134,19 @@ class StreamTest {
     stream.foldLeft(0, Integer::sum);
     assertThat(stream.isEmpty()).isTrue();
   }
+
+  @Test
+  void clonePartiallyConsumedStream() {
+    Stream<Integer> stream = createStreamOfNaturalNumbers(10);
+    int one = stream.head();
+    stream.addToStream(1);
+    int two = stream.head();
+    stream.addToStream(2);
+    int sumClone = stream.clone().foldLeft(0, Integer::sum);
+    int sumOriginal = stream.foldLeft(0, Integer::sum);
+    assertThat(one).isEqualTo(1);
+    assertThat(two).isEqualTo(2);
+    assertThat(sumClone).isEqualTo(55);
+    assertThat(sumOriginal).isEqualTo(55);
+  }
 }
