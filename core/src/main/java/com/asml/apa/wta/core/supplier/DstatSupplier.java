@@ -119,6 +119,7 @@ public class DstatSupplier implements InformationSupplier<DstatDto> {
   @Override
   public boolean isAvailable() {
     if (!System.getProperty("os.name").toLowerCase().contains("linux")) {
+      log.info("The dstat dependency is not available.");
       return false;
     }
     try {

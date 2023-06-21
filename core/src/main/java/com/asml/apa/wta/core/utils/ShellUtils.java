@@ -26,19 +26,18 @@ public class ShellUtils {
         int exitValue = process.waitFor();
 
         if (exitValue != 0) {
-          if (suppressErrors) {
-            return null;
+          if (!suppressErrors) {
+            log.error(
+                "Shell command {} failed to execute correctly with exit code: {}", command, exitValue);
           }
-          log.error("Shell command {} failed to execute correctly with exit code: {}", command, exitValue);
           return null;
         }
 
         return readProcessOutput(process);
       } catch (Exception e) {
-        if (suppressErrors) {
-          return null;
+        if (!suppressErrors) {
+          log.error("Something went wrong while trying to execute the shell command.");
         }
-        log.error("Something went wrong while trying to execute the shell command.");
         return null;
       }
     });

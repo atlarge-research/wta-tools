@@ -51,6 +51,7 @@ public class IostatSupplier implements InformationSupplier<IostatDto> {
   @Override
   public boolean isAvailable() {
     if (!System.getProperty("os.name").toLowerCase().contains("linux")) {
+      log.info("The iostat dependency is not available.");
       return false;
     }
     try {
