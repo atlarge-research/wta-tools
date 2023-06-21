@@ -83,6 +83,7 @@ For the most part, since we are pre-release this will serve no real purpose, oth
 - Changed the pipeline to enforce code coverage [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 - Expanded the Parquet schema generator to privates and maps [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 - Refactored the Spark listeners to improve readability and maintainability [@pcho](https://gitlab.ewi.tudelft.nl/pcho)
+- AbstractListener made to be actually abstract. [@hpage](https://gitlab.ewi.tudelft.nl/hpage)
 
 ### Fixed
 - Fixed the slf4j logging module to allow use in testing and `adapter/spark` [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
