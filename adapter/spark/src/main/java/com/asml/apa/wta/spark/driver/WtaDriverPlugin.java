@@ -132,7 +132,7 @@ public class WtaDriverPlugin implements DriverPlugin {
   private void endApplicationAndWrite() {
     removeListeners();
     Stream<ResourceAndStateWrapper> resourceAndStateWrappers = metricStreamingEngine.collectResourceInformation();
-    Stream<Resource> resources = resourceAndStateWrappers.map(ResourceAndStateWrapper::getResource);
+    Stream<Resource> resources = resourceAndStateWrappers.copy().map(ResourceAndStateWrapper::getResource);
     Stream<ResourceState> resourceStates = new Stream<>();
     resourceAndStateWrappers.forEach(rs -> rs.getStates().forEach(resourceStates::addToStream));
     Workload workload = sparkDataSource
