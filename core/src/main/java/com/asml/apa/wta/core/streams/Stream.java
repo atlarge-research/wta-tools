@@ -496,11 +496,23 @@ public class Stream<V extends Serializable> implements Cloneable, Serializable {
    * @author Atour Mousavi Gourabi
    */
   public synchronized Optional<V> reduce(@NonNull BinaryOperator<V> accumulator) {
-    try {
-      return Optional.of(foldLeft(head(), accumulator));
-    } catch (NoSuchElementException e) {
+    if (head == null) {
       return Optional.empty();
     }
+    additionsSinceLastWriteToDisk--;
+    if (head == deserializationStart) {
+      if (diskLocations.isEmpty()) {
+        deserializationStart = head.getNext();
+      } else {
+        additionsSinceLastWriteToDisk += deserializeInternals(diskLocations.poll());
+      }
+    }
+    V ret = head.getContent();
+    head = head.getNext();
+    if (head == null) {
+      tail = null;
+    }
+    return Optional.of(foldLeft(ret, accumulator));
   }
 
   /**
