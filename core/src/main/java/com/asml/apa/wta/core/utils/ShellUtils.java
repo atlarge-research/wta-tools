@@ -29,8 +29,7 @@ public class ShellUtils {
           if (suppressErrors) {
             return null;
           }
-          log.error("Command was: {}", command);
-          log.error("Shell command execution failed with exit code: {}", exitValue);
+          log.error("Shell command {} failed to execute correctly with exit code: {}", command, exitValue);
           return null;
         }
 
