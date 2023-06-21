@@ -1,9 +1,9 @@
 package com.asml.apa.wta.core.supplier;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.when;
 
 import com.asml.apa.wta.core.dto.DstatDto;
 import com.asml.apa.wta.core.utils.ShellUtils;
@@ -18,18 +18,19 @@ public class DstatSupplierTest {
   @Test
   void getSnapshotReturnsDstatDto() {
     ShellUtils shellUtils = mock(ShellUtils.class);
-    doReturn(CompletableFuture.completedFuture(
-            "----total-usage---- -dsk/total- -net/total- ---paging-- ---system--\n"
-                + "usr sys idl wai stl| read  writ| recv  send|  in   out | int   csw\n"
-                + "  0   1M  98k   0   0|   0     0 |   10B     0 |   0B     0B | 516G  2116"))
-        .when(shellUtils)
-        .executeCommand("dstat -cdngy 1 1", false);
-    doReturn(CompletableFuture.completedFuture(
-            "----total-usage---- -dsk/total- -net/total- ---paging-- ---system--\n"
-                + "usr sys idl wai stl| read  writ| recv  send|  in   out | int   csw\n"
-                + "  0   1M  98k   0   0|   0     0 |   10B     0 |   0B     0B | 516G  2116"))
-        .when(shellUtils)
-        .executeCommand("dstat -cdngy 1 1", true);
+    if (System.getProperty("os.name").toLowerCase().contains("linux")) {
+      when(shellUtils.executeCommand("dstat -cdngy 1 1", false))
+          .thenReturn(CompletableFuture.completedFuture(
+              "----total-usage---- -dsk/total- -net/total- ---paging-- ---system--\n"
+                  + "usr sys idl wai stl| read  writ| recv  send|  in   out | int   csw\n"
+                  + "  0   1M  98k   0   0|   0     0 |   10B     0 |   0B     0B | 516G  2116"));
+
+      when(shellUtils.executeCommand("dstat -cdngy 1 1", true))
+          .thenReturn(CompletableFuture.completedFuture(
+              "----total-usage---- -dsk/total- -net/total- ---paging-- ---system--\n"
+                  + "usr sys idl wai stl| read  writ| recv  send|  in   out | int   csw\n"
+                  + "  0   1M  98k   0   0|   0     0 |   10B     0 |   0B     0B | 516G  2116"));
+    }
     DstatSupplier sut = spy(new DstatSupplier(shellUtils));
 
     Optional<DstatDto> actual = sut.getSnapshot().join();
@@ -60,7 +61,10 @@ public class DstatSupplierTest {
   @Test
   void dstatNotAvailable() {
     ShellUtils shellUtils = mock(ShellUtils.class);
-    doReturn(CompletableFuture.completedFuture(null)).when(shellUtils).executeCommand("dstat -cdngy 1 1", true);
+    if (System.getProperty("os.name").toLowerCase().contains("linux")) {
+      when(shellUtils.executeCommand("dstat -cdngy 1 1", true))
+          .thenReturn(CompletableFuture.completedFuture(null));
+    }
     DstatSupplier sut = spy(new DstatSupplier(shellUtils));
 
     Optional<DstatDto> actual = sut.getSnapshot().join();
@@ -71,18 +75,19 @@ public class DstatSupplierTest {
   @Test
   void getSnapshotWithDifferentOutputReturnsEmptyDstatDto() {
     ShellUtils shellUtils = mock(ShellUtils.class);
-    doReturn(CompletableFuture.completedFuture(
-            "----total-usage---- -dsk/total- -net/total- ---paging-- ---system--\n"
-                + "usr sys idl wai stl|  recv  send|  in   out | int   csw\n"
-                + "  0   1M  98k   0   0|  10B     0 |   0B     0B | 516G  2116"))
-        .when(shellUtils)
-        .executeCommand("dstat -cdngy 1 1", false);
-    doReturn(CompletableFuture.completedFuture(
-            "----total-usage---- -dsk/total- -net/total- ---paging-- ---system--\n"
-                + "usr sys idl wai stl|  recv  send|  in   out | int   csw\n"
-                + "  0   1M  98k   0   0|  10B     0 |   0B     0B | 516G  2116"))
-        .when(shellUtils)
-        .executeCommand("dstat -cdngy 1 1", true);
+    if (System.getProperty("os.name").toLowerCase().contains("linux")) {
+      when(shellUtils.executeCommand("dstat -cdngy 1 1", false))
+          .thenReturn(CompletableFuture.completedFuture(
+              "----total-usage---- -dsk/total- -net/total- ---paging-- ---system--\n"
+                  + "usr sys idl wai stl|  recv  send|  in   out | int   csw\n"
+                  + "  0   1M  98k   0   0|  10B     0 |   0B     0B | 516G  2116"));
+
+      when(shellUtils.executeCommand("dstat -cdngy 1 1", true))
+          .thenReturn(CompletableFuture.completedFuture(
+              "----total-usage---- -dsk/total- -net/total- ---paging-- ---system--\n"
+                  + "usr sys idl wai stl|  recv  send|  in   out | int   csw\n"
+                  + "  0   1M  98k   0   0|  10B     0 |   0B     0B | 516G  2116"));
+    }
     DstatSupplier sut = spy(new DstatSupplier(shellUtils));
 
     Optional<DstatDto> actual = sut.getSnapshot().join();
