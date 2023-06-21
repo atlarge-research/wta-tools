@@ -26,4 +26,9 @@
 
   <!-- Generated code should not be subjected to checkstyle. -->
   <suppress files="[/\\].*[/\\]generated.*[/\\]" checks="." />
+
+  <!-- custom checkstyle suppressions -->
+
+  <!-- suppress the LF newline rule to avoid trouble on Windows, Spotless still mandates a newline -->
+  <suppress files=".*" checks="NewlineAtEndOfFile" />
 </suppressions>

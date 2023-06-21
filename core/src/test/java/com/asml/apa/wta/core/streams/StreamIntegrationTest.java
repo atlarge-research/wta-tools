@@ -18,6 +18,8 @@ public class StreamIntegrationTest {
 
   private static final int defaultSerTrigger = 10;
 
+  private static final Path serializationDirectory = Path.of("tmp/wta/streams/serialization/");
+
   Stream<Integer> createSerializingStreamOfNaturalNumbers(int positiveSize, int serializationTrigger) {
     Stream<Integer> stream = new Stream<>(0, serializationTrigger);
     for (int i = 1; i <= positiveSize; i++) {
@@ -206,6 +208,7 @@ public class StreamIntegrationTest {
 
   @Test
   void serializationFilesActuallyGetGeneratedAndDeleted() throws IOException {
+    long startingFileCount = Files.list(serializationDirectory).count();
     Stream<Integer> stream = createSerializingStreamOfNaturalNumbers(10, 10);
     for (int i = 1; i <= 10; i++) {
       stream.addToStream(i);
@@ -216,10 +219,9 @@ public class StreamIntegrationTest {
     for (int i = 1; i <= 10; i++) {
       stream.addToStream(i);
     }
-    Path directory = Path.of("tmp/wta/streams/serialization/");
-    long fileCount = Files.list(directory).count();
-    assertThat(fileCount).isEqualTo(3);
+    long fileCount = Files.list(serializationDirectory).count();
+    assertThat(fileCount).isEqualTo(startingFileCount + 3);
     Stream.deleteAllSerializedFiles();
-    assertThat(!Files.exists(Path.of("tmp/wta/streams/serialization/"))).isTrue();
+    assertThat(Files.exists(serializationDirectory)).isFalse();
   }
 }
