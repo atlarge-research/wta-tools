@@ -190,7 +190,7 @@ Aggregation of all the resource utilisation metrics are done at the driver's end
     - This limitation arises because the plugin relies on dependencies that are only available on UNIX-based systems.
 - Logs will be generated indicating that certain resource utilization metrics cannot be collected.
   - This can potentially cause performance issues if the resource ping interval is small since the plugin will write to the log each time a non-available resource is pinged. I/O operations can be expensive.
-- It is highly recommended to set the `resourcePingInterval` to at least 2000 and `executorSynchornizationInterval` to 1000.
+- It is highly recommended to set the `resourcePingInterval` to 2000 and `executorSynchornizationInterval` to 1000.
 
 #### Stage Level Metrics
 - Stage level metrics are only outputted in the trace if they are submitted and successfully completed. The scheduler sometimes creates stages which are later skipped or removed.
