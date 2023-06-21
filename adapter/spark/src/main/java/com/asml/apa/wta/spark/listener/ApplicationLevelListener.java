@@ -92,7 +92,7 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
    */
   private void setGeneralFields(long dateEnd, WorkloadBuilder builder) {
     final Domain domain = getConfig().getDomain();
-    final long dateStart = getSparkContext().startTime();
+    final Long dateStart = getSparkContext().startTime();
     final String[] authors = getConfig().getAuthors();
     final String workloadDescription = getConfig().getDescription();
     builder.authors(authors)

@@ -90,7 +90,7 @@ public class TaskLevelListener extends TaskStageBaseListener {
     final long tsSubmit = curTaskInfo.launchTime();
     final long runtime = curTaskMetrics.executorRunTime();
     final int userId = getSparkContext().sparkUser().hashCode();
-    final long workflowId = getStageToJob().get(stageId);
+    final Long workflowId = getStageToJob().get(stageId);
     final long diskIoTime = -1L;
     final double diskSpaceRequested = (double) curTaskMetrics.diskBytesSpilled()
         + curTaskMetrics.shuffleWriteMetrics().bytesWritten();
@@ -154,7 +154,7 @@ public class TaskLevelListener extends TaskStageBaseListener {
         .toList();
     for (Task task : filteredTasks) {
       // set parent field: all Tasks in are guaranteed to be in taskToStage
-      final long stageId = this.getTaskToStage().get(task.getId());
+      final Long stageId = this.getTaskToStage().get(task.getId());
       final Long[] parentStages = stageLevelListener.getStageToParents().get(stageId);
       if (parentStages != null) {
         final long[] parents = Arrays.stream(parentStages)
