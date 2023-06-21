@@ -19,7 +19,8 @@ public class IostatSupplierTest {
   @BeforeEach
   void setup() {
     shellUtils = Mockito.mock(ShellUtils.class);
-    doReturn(CompletableFuture.completedFuture("str")).when(shellUtils).executeCommand("iostat");
+    doReturn(CompletableFuture.completedFuture("str")).when(shellUtils).executeCommand("iostat", true);
+
     sut = Mockito.spy(new IostatSupplier(shellUtils));
   }
 
@@ -31,7 +32,7 @@ public class IostatSupplierTest {
                     + "sda               0,01         0.54         0.00         0.00      70941          0          0\n"
                     + "str               1.0          2.0          3.0          4.0       5.0        6.0        7.0"))
         .when(shellUtils)
-        .executeCommand("iostat -d");
+        .executeCommand("iostat -d", false);
 
     IostatDto expected = IostatDto.builder()
         .tps(1.01)
@@ -45,18 +46,26 @@ public class IostatSupplierTest {
 
     Optional<IostatDto> result = sut.getSnapshot().join();
 
-    assertEquals(expected, result.get());
+    if (sut.isAvailable()) {
+      assertEquals(expected, result.get());
+    } else {
+      assertEquals(Optional.empty(), result);
+    }
   }
 
   @Test
   public void aggregateIostatWorksCorrectlyWithZeroRows() {
-    doReturn(CompletableFuture.completedFuture("")).when(shellUtils).executeCommand("iostat -d");
+    doReturn(CompletableFuture.completedFuture("")).when(shellUtils).executeCommand("iostat -d", false);
 
     IostatDto expected = IostatDto.builder().build();
 
     Optional<IostatDto> result = sut.getSnapshot().join();
 
-    assertEquals(expected, result.get());
+    if (sut.isAvailable()) {
+      assertEquals(expected, result.get());
+    } else {
+      assertEquals(Optional.empty(), result);
+    }
   }
 
   @Test
@@ -66,12 +75,38 @@ public class IostatSupplierTest {
                 + "sda               0,01         0.54         0.00         0.00      70941          0\n"
                 + "str               1.0          2.0          3.0          4.0       5.0        6.0"))
         .when(shellUtils)
-        .executeCommand("iostat -d");
+        .executeCommand("iostat -d", false);
 
     IostatDto expected = IostatDto.builder().build();
 
     Optional<IostatDto> result = sut.getSnapshot().join();
 
-    assertEquals(expected, result.get());
+    if (sut.isAvailable()) {
+      assertEquals(expected, result.get());
+    } else {
+      assertEquals(Optional.empty(), result);
+    }
+  }
+
+  public void getSnapshotDifferentOutputReturnsEmptyIostatDto() {
+    doReturn(CompletableFuture.completedFuture(
+            "Device           kB_read/s    kB_wrtn/s    kB_dscd/s    kB_read    kB_wrtn    kB_dscd\n"
+                + "sda                  0.54         0.00         0.00      70941          0          0\n"
+                + "str                  2.0          3.0          4.0       5.0        6.0        7.0"))
+        .when(shellUtils)
+        .executeCommand("iostat -d", false);
+
+    IostatDto expected = IostatDto.builder()
+        .tps(1.01)
+        .kiloByteReadPerSec(2.54)
+        .kiloByteWrtnPerSec(3.0)
+        .kiloByteDscdPerSec(4.0)
+        .kiloByteRead(70946.0)
+        .kiloByteWrtn(6.0)
+        .kiloByteDscd(7.0)
+        .build();
+
+    Optional<IostatDto> result = sut.getSnapshot().join();
+    assertEquals(Optional.empty(), result);
   }
 }
