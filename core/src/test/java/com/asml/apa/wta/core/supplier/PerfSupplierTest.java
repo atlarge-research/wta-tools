@@ -94,9 +94,12 @@ public class PerfSupplierTest {
       when(shellUtils.executeCommand(isAvailableBashCommand, true))
           .thenReturn(CompletableFuture.completedFuture("power/energy-pkg/"));
       when(shellUtils.executeCommand(getEnergyMetricsBashCommand, false)).thenReturn(nullCompletableFuture);
+      sut = spy(new PerfSupplier(shellUtils));
+      assertThat(sut.isAvailable()).isTrue();
+    } else {
+      sut = spy(new PerfSupplier(shellUtils));
+      assertThat(sut.isAvailable()).isFalse();
     }
-    sut = spy(new PerfSupplier(shellUtils));
-    assertThat(sut.isAvailable()).isTrue();
     Optional<PerfDto> result = sut.getSnapshot().join();
     assertThat(result).isEmpty();
   }
@@ -108,9 +111,12 @@ public class PerfSupplierTest {
           .thenReturn(CompletableFuture.completedFuture("power/energy-pkg/"));
       when(shellUtils.executeCommand(getEnergyMetricsBashCommand, false))
           .thenReturn(CompletableFuture.completedFuture("12,34"));
+      sut = spy(new PerfSupplier(shellUtils));
+      assertThat(sut.isAvailable()).isTrue();
+    } else {
+      sut = spy(new PerfSupplier(shellUtils));
+      assertThat(sut.isAvailable()).isFalse();
     }
-    sut = spy(new PerfSupplier(shellUtils));
-    assertThat(sut.isAvailable()).isTrue();
     Optional<PerfDto> result = sut.getSnapshot().join();
     assertThat(result).isEmpty();
   }
