@@ -40,7 +40,7 @@ import lombok.extern.slf4j.Slf4j;
  * @since 1.0.0
  */
 @Slf4j
-public class Stream<V extends Serializable> implements Serializable {
+public class Stream<V extends Serializable> implements Serializable, Cloneable {
 
   private static final long serialVersionUID = 7414918352615022254L;
 
