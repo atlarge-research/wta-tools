@@ -26,9 +26,9 @@ public class Workflow implements BaseTraceObject {
 
   private final int taskCount;
 
-  private final long criticalPathLength;
+  private long criticalPathLength;
 
-  private final int criticalPathTaskCount;
+  private int criticalPathTaskCount;
 
   private final int maxConcurrentTasks;
 

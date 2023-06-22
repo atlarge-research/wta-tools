@@ -4,15 +4,19 @@ import com.asml.apa.wta.core.config.RuntimeConfig;
 import com.asml.apa.wta.core.model.Task;
 import com.asml.apa.wta.core.model.Workflow;
 import com.asml.apa.wta.core.model.enums.Domain;
+import com.asml.apa.wta.spark.dagsolver.DagSolver;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.Getter;
 import org.apache.spark.SparkContext;
 import org.apache.spark.scheduler.SparkListenerJobEnd;
 import org.apache.spark.scheduler.SparkListenerJobStart;
+import scala.collection.JavaConverters;
 
 /**
  * This class is a job-level listener for the Spark data source.
@@ -29,7 +33,7 @@ public class JobLevelListener extends AbstractListener<Workflow> {
 
   private final Map<Long, Long> jobSubmitTimes = new ConcurrentHashMap<>();
 
-  private final Map<Long, Integer> criticalPathTasks = new ConcurrentHashMap<>();
+  private final Map<Long, List<Task>> jobToStages = new ConcurrentHashMap<>();
 
   /**
    * Constructor for the job-level listener.
@@ -70,15 +74,27 @@ public class JobLevelListener extends AbstractListener<Workflow> {
 
   /**
    * Callback for job start event, tracks the submit time of the job.
+   * Also tracks the stages and their parents in the job.
    *
    * @param jobStart The SparkListenerJobStart event object containing information upon job start.
    * @author Henry Page
+   * @author Tianchen Qu
    * @since 1.0.0
    */
   @Override
   public void onJobStart(SparkListenerJobStart jobStart) {
     jobSubmitTimes.put((long) jobStart.jobId() + 1, jobStart.time());
-    criticalPathTasks.put(jobStart.jobId() + 1L, jobStart.stageIds().length());
+    List<Task> stages = new ArrayList<>();
+    JavaConverters.seqAsJavaList(jobStart.stageInfos()).forEach(stageInfo -> {
+      stages.add(Task.builder()
+          .id((long) stageInfo.stageId() + 1)
+          .parents(JavaConverters.seqAsJavaList(stageInfo.parentIds()).stream()
+              .mapToInt(parentId -> (int) parentId + 1)
+              .mapToLong(parentId -> (long) parentId)
+              .toArray())
+          .build());
+    });
+    jobToStages.put((long) jobStart.jobId() + 1, stages);
   }
 
   /**
@@ -101,8 +117,8 @@ public class JobLevelListener extends AbstractListener<Workflow> {
         .getWithCondition(task -> task.getWorkflowId() == jobId)
         .toArray(Task[]::new);
     final int taskCount = tasks.length;
-    final long criticalPathLength = -1L;
-    final int criticalPathTaskCount = criticalPathTasks.get(jobId);
+    long criticalPathLength = -1L;
+    int criticalPathTaskCount = -1;
     final int maxNumberOfConcurrentTasks = -1;
     final String nfrs = "";
 
@@ -117,6 +133,39 @@ public class JobLevelListener extends AbstractListener<Workflow> {
         (long) computeSum(Arrays.stream(tasks).map(task -> (double) task.getNetworkIoTime()));
     final double totalDiskSpaceUsage = computeSum(Arrays.stream(tasks).map(Task::getDiskSpaceRequested));
     final double totalEnergyConsumption = computeSum(Arrays.stream(tasks).map(Task::getEnergyConsumption));
+
+    if (config.isStageLevel()) {
+      stageLevelListener.setStages(jobId);
+    } else {
+      TaskLevelListener taskLevelListener = (TaskLevelListener) wtaTaskListener;
+      taskLevelListener.setTasks(stageLevelListener, jobId);
+
+      List<Task> jobStages = stageLevelListener.getProcessedObjects().stream()
+          .filter(stage -> stage.getWorkflowId() == jobId)
+          .collect(Collectors.toList());
+      jobStages.addAll(jobToStages.get(jobId).stream()
+          .filter(stage -> !jobStages.stream()
+              .map(Task::getId)
+              .collect(Collectors.toList())
+              .contains(stage.getId()))
+          .collect(Collectors.toList()));
+
+      final List<Task> criticalPath = solveCriticalPath(jobStages);
+      TaskLevelListener listener = (TaskLevelListener) wtaTaskListener;
+
+      final Map<Long, List<Task>> stageToTasks = listener.getStageToTasks();
+      criticalPathTaskCount = criticalPath.stream()
+          .map(stage -> stageToTasks.get(stage.getId()).size())
+          .reduce(Integer::sum)
+          .orElse(-1);
+      criticalPathLength = criticalPath.stream()
+          .map(stage -> stageToTasks.getOrDefault(stage.getId(), new ArrayList<>()).stream()
+              .map(Task::getRuntime)
+              .reduce(Long::max)
+              .orElse(0L))
+          .reduce(Long::sum)
+          .orElse(-1L);
+    }
 
     this.getProcessedObjects()
         .add(Workflow.builder()
@@ -138,13 +187,6 @@ public class JobLevelListener extends AbstractListener<Workflow> {
             .totalDiskSpaceUsage(totalDiskSpaceUsage)
             .totalEnergyConsumption(totalEnergyConsumption)
             .build());
-
-    if (config.isStageLevel()) {
-      stageLevelListener.setStages(jobId);
-    } else {
-      TaskLevelListener taskLevelListener = (TaskLevelListener) wtaTaskListener;
-      taskLevelListener.setTasks(stageLevelListener, jobId);
-    }
     cleanUpContainers(jobEnd);
   }
 
@@ -162,7 +204,6 @@ public class JobLevelListener extends AbstractListener<Workflow> {
   private void cleanUpContainers(SparkListenerJobEnd jobEnd) {
     long jobId = jobEnd.jobId() + 1;
     jobSubmitTimes.remove(jobId);
-    criticalPathTasks.remove(jobId);
 
     Stream<Long> stageIds = stageLevelListener.getStageToJob().entrySet().stream()
         .filter(e -> e.getValue().equals(jobId))
@@ -197,6 +238,7 @@ public class JobLevelListener extends AbstractListener<Workflow> {
 
   /**
    * This is a method called on application end. it sets up the resources used in the spark workflow.
+   * It also calculated the critical path for the job.
    *
    * @author Tianchen Qu
    * @author Pil Kyu Cho
@@ -204,10 +246,32 @@ public class JobLevelListener extends AbstractListener<Workflow> {
    */
   public void setWorkflows() {
     final List<Workflow> workflows = this.getProcessedObjects();
-    workflows.forEach(workflow -> workflow.setTotalResources(Arrays.stream(workflow.getTasks())
-        .map(Task::getResourceAmountRequested)
-        .filter(resourceAmount -> resourceAmount >= 0.0)
-        .reduce(Double::sum)
-        .orElse(-1.0)));
+    workflows.forEach(workflow -> {
+      workflow.setTotalResources(Arrays.stream(workflow.getTasks())
+          .map(Task::getResourceAmountRequested)
+          .filter(resourceAmount -> resourceAmount >= 0.0)
+          .reduce(Double::sum)
+          .orElse(-1.0));
+    });
+  }
+
+  /**
+   * This method takes the stages inside this job and return the critical path.
+   * it will filter out all dummy caches nodes.
+   *
+   * @param stages all stages in the job(including the cached ones)
+   * @return critical path
+   * @author Tianchen Qu
+   * @since 1.0.0
+   */
+  List<Task> solveCriticalPath(List<Task> stages) {
+    try {
+      DagSolver dag = new DagSolver(stages, (TaskLevelListener) wtaTaskListener);
+      return dag.longestPath().stream()
+          .filter(stage -> stage.getRuntime() != 0)
+          .collect(Collectors.toList());
+    } catch (Exception e) {
+      return new ArrayList<>();
+    }
   }
 }

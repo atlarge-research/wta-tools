@@ -62,6 +62,7 @@ For the most part, since we are pre-release this will serve no real purpose, oth
 - Added coherent Maven lifecycle bindings [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 - Added Maven site generation [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 - Added documentation on how to integrate the plugin JAR with PySpark [@pcho](https://gitlab.ewi.tudelft.nl/pcho)
+- Implemented critical path fields [@tqu](https://gitlab.ewi.tudelft.nl/tqu)
 
 ### Changed
 - Refactored listeners into a generic interface to reduce code duplication and increase cc [@hpage](https://gitlab.ewi.tudelft.nl/hpage)
