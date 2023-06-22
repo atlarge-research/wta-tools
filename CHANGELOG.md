@@ -101,6 +101,7 @@ For the most part, since we are pre-release this will serve no real purpose, oth
 - Fixed dstat command bug [@lyadalachanchu](https://gitlab.ewi.tudelft.nl/lyadalachanchu)
 - Fixed serialization bug in the new supplier POJOs [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 - Fixed Parquet schema generation static field edge cases [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
+- Fixed shellUtils execution bug [@lyadalachanchu](https://gitlab.ewi.tudelft.nl/lyadalachanchu)
 
 ### Deprecated
 
