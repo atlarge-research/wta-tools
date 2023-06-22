@@ -261,7 +261,7 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
     Function<Task, Long> networkFunction = Task::getNetworkIoTime;
 
     setGeneralFields(applicationEnd.time(), workloadBuilder);
-    setCountFields(tasks, workloadBuilder);
+    setCountFields(tasks.copy(), workloadBuilder);
     setResourceStatisticsFields(
         tasks.copy().map(Task::getResourceAmountRequested).toList(), ResourceType.RESOURCE, workloadBuilder);
     setResourceStatisticsFields(
