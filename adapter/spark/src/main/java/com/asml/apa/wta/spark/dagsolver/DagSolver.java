@@ -55,6 +55,10 @@ public class DagSolver {
     }
   }
 
+  private static final long sourceId = 0;
+
+  private static final long sinkId = -1;
+
   private Map<Long, Node> nodes = new ConcurrentHashMap<>();
 
   private Map<Long, Map<Long, Long>> adjacencyMap = new ConcurrentHashMap<>();
@@ -66,11 +70,11 @@ public class DagSolver {
   public DagSolver(List<Task> stages, TaskLevelListener listener) {
     this.stages = stages;
 
-    addNode(0L);
+    addNode(sourceId);
     for (Task stage : stages) {
       addNode(stage, listener);
     }
-    addNode(-1L);
+    addNode(sinkId);
   }
 
   /**
@@ -96,7 +100,7 @@ public class DagSolver {
         addEdge(id, stage.getId(), runtime);
       }
     } else {
-      addEdge(0, stage.getId(), runtime);
+      addEdge(sourceId, stage.getId(), runtime);
     }
   }
 
@@ -112,12 +116,12 @@ public class DagSolver {
     Node node = new Node(id);
     nodes.put(id, node);
     // if the node is the ending node
-    if (id == -1L) {
+    if (id == sinkId) {
       setFinalEdges();
-      adjacencyMap.put(-1L, new ConcurrentHashMap<>());
-    } else if (id == 0) { // if the node is the starting node
+      adjacencyMap.put(sinkId, new ConcurrentHashMap<>());
+    } else if (id == sourceId) { // if the node is the starting node
       node.distance = 0;
-      adjacencyMapReversed.put(0L, new ConcurrentHashMap<>());
+      adjacencyMapReversed.put(sourceId, new ConcurrentHashMap<>());
     }
   }
 
@@ -148,8 +152,8 @@ public class DagSolver {
    */
   private void setFinalEdges() {
     for (Long node : nodes.keySet()) {
-      if (adjacencyMap.get(node) == null && node != -1) {
-        addEdge(node, -1L, 0);
+      if (adjacencyMap.get(node) == null && node != sinkId) {
+        addEdge(node, sinkId, 0);
       }
     }
   }
@@ -163,7 +167,7 @@ public class DagSolver {
   private Deque<Long> topologicalSort() {
     Deque<Long> stack = new ConcurrentLinkedDeque<>();
     Map<Long, Boolean> visited = new ConcurrentHashMap<>();
-    topoUtil(visited, 0L, stack);
+    topoUtil(visited, sourceId, stack);
     return stack;
   }
 
@@ -215,9 +219,9 @@ public class DagSolver {
    * @since 1.0.0
    */
   private List<Task> backTracing() {
-    AtomicLong pointer = new AtomicLong(-1L);
+    AtomicLong pointer = new AtomicLong(sinkId);
     List<Long> criticalPath = new ArrayList<>();
-    while (pointer.get() != 0) {
+    while (pointer.get() != sourceId) {
       criticalPath.add(pointer.get());
       adjacencyMapReversed.get(pointer.get()).forEach((adjNode, weight) -> {
         if (weight + nodes.get(adjNode).distance == nodes.get(pointer.get()).distance) {
