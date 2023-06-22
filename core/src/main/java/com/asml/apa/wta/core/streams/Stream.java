@@ -166,15 +166,19 @@ public class Stream<V extends Serializable> implements Serializable, Cloneable {
     }
     String filePath = Stream.TEMP_SERIALIZATION_DIRECTORY + id + "-" + System.currentTimeMillis() + "-"
         + Instant.now().getNano() + ".ser";
-    List<StreamNode<V>> toSerialize = new ArrayList<>();
+    StreamNode<V> toSerialize = current;
     while (current != tail && current != null) {
-      toSerialize.add(current);
-      current = current.getNext();
+      if (current.getNext() != null && current.getNext() != tail) {
+        current = current.getNext();
+      } else {
+        current.setNext(null);
+        break;
+      }
     }
     try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream(filePath))) {
       objectOutputStream.writeObject(toSerialize);
     } catch (IOException e) {
-      log.error("Failed to serialize stream internals to {}", filePath);
+      log.error("Failed to serialize stream internals to {}.", filePath);
       return;
     }
     deserializationEnd.setNext(null);
@@ -193,26 +197,23 @@ public class Stream<V extends Serializable> implements Serializable, Cloneable {
    * @since 1.0.0
    */
   private synchronized int deserializeInternals(@NonNull String filePath) {
-    int amountOfNodes;
+    int amountOfNodes = 0;
     try (ObjectInputStream objectInputStream = new ObjectInputStream(new FileInputStream(filePath))) {
-      List<StreamNode<V>> nodes = (ArrayList<StreamNode<V>>) objectInputStream.readObject();
+      StreamNode<V> node = (StreamNode<V>) objectInputStream.readObject();
       head = deserializationStart;
-      StreamNode<V> previous = null;
-      for (StreamNode<V> node : nodes) {
-        if (previous != null) {
-          previous.setNext(node);
-        } else {
-          deserializationStart.setNext(node);
-        }
-        previous = node;
+      deserializationStart.setNext(node);
+      StreamNode<V> traverser = deserializationStart;
+      while (traverser.getNext() != null) {
+        traverser = traverser.getNext();
+        amountOfNodes++;
       }
-      if (previous != null) {
+      StreamNode<V> previous = traverser;
+      if (previous != deserializationStart) {
         deserializationStart = previous;
         deserializationStart.setNext(deserializationEnd);
       }
-      amountOfNodes = nodes.size();
     } catch (IOException | ClassNotFoundException | ClassCastException e) {
-      log.error("Failed to deserialize stream internals from {}", filePath);
+      log.error("Failed to deserialize stream internals from {}.", filePath);
       throw new FailedToDeserializeStreamException();
     } finally {
       new File(filePath).delete();
