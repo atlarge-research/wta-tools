@@ -171,7 +171,7 @@ public class Stream<V extends Serializable> implements Cloneable {
     try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream(filePath))) {
       objectOutputStream.writeObject(toSerialize);
     } catch (IOException e) {
-      log.error("Failed to serialize stream internals to {}.", filePath);
+      log.error("Failed to serialize stream internals to {}", filePath);
       return;
     }
     deserializationEnd.setNext(null);
@@ -193,19 +193,23 @@ public class Stream<V extends Serializable> implements Cloneable {
     int amountOfNodes;
     try (ObjectInputStream objectInputStream = new ObjectInputStream(new FileInputStream(filePath))) {
       List<StreamNode> nodes = (ArrayList<StreamNode>) objectInputStream.readObject();
-      StreamNode traverser = deserializationStart;
       head = deserializationStart;
+      StreamNode previous = null;
       for (StreamNode node : nodes) {
-        traverser.setNext(node);
-        traverser = node;
+        if (previous != null) {
+          previous.setNext(node);
+        } else {
+          deserializationStart.setNext(node);
+        }
+        previous = node;
       }
-      amountOfNodes = nodes.size();
-      if (traverser != deserializationStart) {
-        deserializationStart = traverser;
+      if (previous != null) {
+        deserializationStart = previous;
         deserializationStart.setNext(deserializationEnd);
       }
+      amountOfNodes = nodes.size();
     } catch (IOException | ClassNotFoundException | ClassCastException e) {
-      log.error("Failed to deserialize stream internals from {}.", filePath);
+      log.error("Failed to deserialize stream internals from {}", filePath);
       throw new FailedToDeserializeStreamException();
     } finally {
       new File(filePath).delete();
