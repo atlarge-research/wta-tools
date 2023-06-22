@@ -14,6 +14,8 @@ import com.asml.apa.wta.spark.dto.SparkBaseSupplierWrapperDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
+
 class MetricStreamingEngineTest {
 
   MetricStreamingEngine sut;
@@ -100,9 +102,9 @@ class MetricStreamingEngineTest {
     sut.addToResourceStream(s1.getExecutorId(), s1);
 
     ResourceAndStateWrapper stateWrapperResult =
-        sut.collectResourceInformation().copy().head();
+        sut.collectResourceInformation().get(0);
 
-    assertThat(sut.collectResourceInformation().head().getStates().isEmpty())
+    assertThat(sut.collectResourceInformation().get(0).getStates().isEmpty())
         .isTrue();
 
     Resource result = stateWrapperResult.getResource();
@@ -118,17 +120,17 @@ class MetricStreamingEngineTest {
     sut.addToResourceStream(s2.getExecutorId(), s2);
     sut.addToResourceStream(s3.getExecutorId(), s3);
 
-    Stream<ResourceAndStateWrapper> result = sut.collectResourceInformation();
+    List<ResourceAndStateWrapper> result = sut.collectResourceInformation();
 
     // size assertions
-    assertThat(result.copy().count()).isEqualTo(2);
+    assertThat(result.size()).isEqualTo(2);
 
-    ResourceAndStateWrapper executor2 = result.copy()
+    ResourceAndStateWrapper executor2 = result.stream()
         .filter(r ->
             r.getResource().getId() == Math.abs(s2.getExecutorId().hashCode()))
         .findFirst()
         .get();
-    ResourceAndStateWrapper executor3 = result.filter(r ->
+    ResourceAndStateWrapper executor3 = result.stream().filter(r ->
             r.getResource().getId() == Math.abs(s3.getExecutorId().hashCode()))
         .findFirst()
         .get();
@@ -168,9 +170,9 @@ class MetricStreamingEngineTest {
 
     assertThat(executor2.getStates().copy().count()).isEqualTo(2);
     assertThat(executor3.getStates().copy().count()).isEqualTo(1);
-    assertThat(sut.collectResourceInformation().head().getStates().isEmpty())
+    assertThat(sut.collectResourceInformation().get(0).getStates().isEmpty())
         .isTrue();
-    assertThat(sut.collectResourceInformation().head().getResource()).isNotNull();
+    assertThat(sut.collectResourceInformation().get(0).getResource()).isNotNull();
   }
 
   @Test
@@ -183,8 +185,8 @@ class MetricStreamingEngineTest {
     sut.addToResourceStream(s1.getExecutorId(), s1);
     sut.addToResourceStream(s3.getExecutorId(), s3);
 
-    Stream<ResourceAndStateWrapper> result = sut.collectResourceInformation();
-    assertThat(result.copy().count()).isEqualTo(1);
-    assertThat(result.copy().head().getResource().getOs()).isEqualTo("asfasdfjasfsadfasfasdfsa");
+    List<ResourceAndStateWrapper> result = sut.collectResourceInformation();
+    assertThat(result.size()).isEqualTo(1);
+    assertThat(result.get(0).getResource().getOs()).isEqualTo("asfasdfjasfsadfasfasdfsa");
   }
 }

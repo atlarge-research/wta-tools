@@ -1,6 +1,7 @@
 package com.asml.apa.wta.core.streams;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -47,10 +48,10 @@ public class KeyedStream<K, V extends Serializable> {
    * @author Atour Mousavi Gourabi
    * @since 1.0.0
    */
-  public <R extends Serializable> Stream<R> mapKey(@NonNull BiFunction<K, Stream<V>, R> mapper) {
-    Stream<R> stream = new Stream<>();
+  public <R> List<R> mapKeyList(@NonNull BiFunction<K, Stream<V>, R> mapper) {
+    List<R> stream = new ArrayList<>();
     for (K key : streams.keySet()) {
-      stream.addToStream(mapper.apply(key, streams.get(key)));
+      stream.add(mapper.apply(key, streams.get(key)));
     }
     return stream;
   }

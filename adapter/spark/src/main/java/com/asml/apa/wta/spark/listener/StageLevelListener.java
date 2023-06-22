@@ -104,7 +104,7 @@ public class StageLevelListener extends TaskStageBaseListener {
     final long stageId = curStageInfo.stageId() + 1;
     stageToResource.put(stageId, curStageInfo.resourceProfileId());
 
-    final Long tsSubmit = curStageInfo.submissionTime().getOrElse(() -> -1L);
+    final long tsSubmit = curStageInfo.submissionTime().getOrElse(() -> -1L);
     final long runtime = curStageInfo.taskMetrics().executorRunTime();
     final long[] parents = new long[0];
     final long[] children = new long[0];

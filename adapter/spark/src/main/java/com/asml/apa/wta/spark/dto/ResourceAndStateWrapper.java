@@ -3,7 +3,6 @@ package com.asml.apa.wta.spark.dto;
 import com.asml.apa.wta.core.model.Resource;
 import com.asml.apa.wta.core.model.ResourceState;
 import com.asml.apa.wta.core.streams.Stream;
-import java.io.Serializable;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -17,9 +16,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class ResourceAndStateWrapper implements Serializable {
-
-  private static final long serialVersionUID = -3898787892522983215L;
+public class ResourceAndStateWrapper {
 
   private Resource resource;
 

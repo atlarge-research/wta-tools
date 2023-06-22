@@ -12,6 +12,7 @@ import com.asml.apa.wta.core.streams.Stream;
 import com.asml.apa.wta.spark.dto.ResourceAndStateWrapper;
 import com.asml.apa.wta.spark.dto.SparkBaseSupplierWrapperDto;
 import java.io.Serializable;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
@@ -77,8 +78,8 @@ public class MetricStreamingEngine {
    * @author Henry Page
    * @since 1.0.0
    */
-  public Stream<ResourceAndStateWrapper> collectResourceInformation() {
-    return executorResourceStream.mapKey((key, value) -> {
+  public List<ResourceAndStateWrapper> collectResourceInformation() {
+    return executorResourceStream.mapKeyList((key, value) -> {
       long transformedId = Math.abs(key.hashCode());
       Resource resource = produceResourceFromExecutorInfo(transformedId, value);
       Stream<ResourceState> states = produceResourceStatesFromExecutorInfo(resource, value);

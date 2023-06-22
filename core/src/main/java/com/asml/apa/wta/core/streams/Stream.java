@@ -40,26 +40,23 @@ import lombok.extern.slf4j.Slf4j;
  * @since 1.0.0
  */
 @Slf4j
-public class Stream<V extends Serializable> implements Serializable, Cloneable {
-
-  private static final long serialVersionUID = 7414918352615022254L;
+public class Stream<V extends Serializable> implements Cloneable {
 
   /**
    * Internal node of the {@link com.asml.apa.wta.core.streams.Stream}.
    *
-   * @param <V> the metrics class to hold, to extend {@link java.io.Serializable}
    * @author Atour Mousavi Gourabi
    * @since 1.0.0
    */
   @Getter
-  private static class StreamNode<V extends Serializable> implements Serializable {
+  private class StreamNode implements Serializable {
 
     private static final long serialVersionUID = -1846183914651125999L;
 
     private final V content;
 
     @Setter
-    private StreamNode<V> next;
+    private transient StreamNode next;
 
     /**
      * Constructs a node.
@@ -79,13 +76,13 @@ public class Stream<V extends Serializable> implements Serializable, Cloneable {
 
   private Queue<String> diskLocations;
   private int additionsSinceLastWriteToDisk;
-  private int serializationTrigger;
+  private final int serializationTrigger;
 
-  private StreamNode<V> deserializationStart;
-  private StreamNode<V> deserializationEnd;
+  private StreamNode deserializationStart;
+  private StreamNode deserializationEnd;
 
-  private StreamNode<V> head;
-  private StreamNode<V> tail;
+  private StreamNode head;
+  private StreamNode tail;
 
   /**
    * Constructs a stream with one element.
@@ -98,7 +95,7 @@ public class Stream<V extends Serializable> implements Serializable, Cloneable {
    */
   public Stream(V content, int serializationTrigger) {
     new File(Stream.TEMP_SERIALIZATION_DIRECTORY).mkdirs();
-    head = new StreamNode<>(content);
+    head = new StreamNode(content);
     tail = head;
     diskLocations = new ArrayDeque<>();
     deserializationStart = head;
@@ -158,7 +155,7 @@ public class Stream<V extends Serializable> implements Serializable, Cloneable {
    * @since 1.0.0
    */
   private synchronized void serializeInternals() {
-    StreamNode<V> current;
+    StreamNode current;
     if (head == deserializationEnd) {
       current = head.getNext();
     } else {
@@ -166,14 +163,10 @@ public class Stream<V extends Serializable> implements Serializable, Cloneable {
     }
     String filePath = Stream.TEMP_SERIALIZATION_DIRECTORY + id + "-" + System.currentTimeMillis() + "-"
         + Instant.now().getNano() + ".ser";
-    StreamNode<V> toSerialize = current;
+    List<StreamNode> toSerialize = new ArrayList<>();
     while (current != tail && current != null) {
-      if (current.getNext() != null && current.getNext() != tail) {
-        current = current.getNext();
-      } else {
-        current.setNext(null);
-        break;
-      }
+      toSerialize.add(current);
+      current = current.getNext();
     }
     try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream(filePath))) {
       objectOutputStream.writeObject(toSerialize);
@@ -197,19 +190,18 @@ public class Stream<V extends Serializable> implements Serializable, Cloneable {
    * @since 1.0.0
    */
   private synchronized int deserializeInternals(@NonNull String filePath) {
-    int amountOfNodes = 0;
+    int amountOfNodes;
     try (ObjectInputStream objectInputStream = new ObjectInputStream(new FileInputStream(filePath))) {
-      StreamNode<V> node = (StreamNode<V>) objectInputStream.readObject();
+      List<StreamNode> nodes = (ArrayList<StreamNode>) objectInputStream.readObject();
+      StreamNode traverser = deserializationStart;
       head = deserializationStart;
-      deserializationStart.setNext(node);
-      StreamNode<V> traverser = deserializationStart;
-      while (traverser.getNext() != null) {
-        traverser = traverser.getNext();
-        amountOfNodes++;
+      for (StreamNode node : nodes) {
+        traverser.setNext(node);
+        traverser = node;
       }
-      StreamNode<V> previous = traverser;
-      if (previous != deserializationStart) {
-        deserializationStart = previous;
+      amountOfNodes = nodes.size();
+      if (traverser != deserializationStart) {
+        deserializationStart = traverser;
         deserializationStart.setNext(deserializationEnd);
       }
     } catch (IOException | ClassNotFoundException | ClassCastException e) {
@@ -360,16 +352,16 @@ public class Stream<V extends Serializable> implements Serializable, Cloneable {
    */
   public synchronized void addToStream(V content) {
     if (head == null) {
-      head = new StreamNode<>(content);
+      head = new StreamNode(content);
       tail = head;
       deserializationStart = head;
       deserializationEnd = head;
     } else if (head == tail) {
-      tail = new StreamNode<>(content);
+      tail = new StreamNode(content);
       deserializationEnd = tail;
       head.setNext(tail);
     } else {
-      tail.setNext(new StreamNode<>(content));
+      tail.setNext(new StreamNode(content));
       tail = tail.getNext();
     }
     additionsSinceLastWriteToDisk++;
@@ -394,7 +386,7 @@ public class Stream<V extends Serializable> implements Serializable, Cloneable {
    * @since 1.0.0
    */
   public synchronized <R extends Serializable> Stream<R> map(@NonNull Function<V, R> op) {
-    StreamNode<V> next = head;
+    StreamNode next = head;
     Stream<R> ret = new Stream<>();
     while (next != null) {
       if (next == deserializationStart && !diskLocations.isEmpty()) {
@@ -421,7 +413,7 @@ public class Stream<V extends Serializable> implements Serializable, Cloneable {
    * @since 1.0.0
    */
   public synchronized Stream<V> filter(@NonNull Predicate<V> predicate) {
-    StreamNode<V> next = head;
+    StreamNode next = head;
     Stream<V> ret = new Stream<>();
     while (next != null) {
       if (next == deserializationStart && !diskLocations.isEmpty()) {
@@ -453,7 +445,7 @@ public class Stream<V extends Serializable> implements Serializable, Cloneable {
    */
   public synchronized <R> R foldLeft(R init, @NonNull BiFunction<R, V, R> op) {
     R acc = init;
-    StreamNode<V> next = head;
+    StreamNode next = head;
     while (next != null) {
       if (next == deserializationStart && !diskLocations.isEmpty()) {
         head = next;
@@ -503,7 +495,7 @@ public class Stream<V extends Serializable> implements Serializable, Cloneable {
    * @since 1.0.0
    */
   public synchronized List<V> toList() {
-    StreamNode<V> next = head;
+    StreamNode next = head;
     List<V> ret = new ArrayList<>();
     while (next != null) {
       if (next == deserializationStart && !diskLocations.isEmpty()) {
@@ -526,7 +518,7 @@ public class Stream<V extends Serializable> implements Serializable, Cloneable {
    * @since 1.0.0
    */
   public synchronized void forEach(Consumer<? super V> action) {
-    StreamNode<V> next = head;
+    StreamNode next = head;
     while (next != null) {
       if (next == deserializationStart && !diskLocations.isEmpty()) {
         head = next;
@@ -547,7 +539,7 @@ public class Stream<V extends Serializable> implements Serializable, Cloneable {
    * @since 1.0.0
    */
   public synchronized long count() {
-    StreamNode<V> next = head;
+    StreamNode next = head;
     long count = 0;
     while (next != null) {
       if (next == deserializationStart && !diskLocations.isEmpty()) {

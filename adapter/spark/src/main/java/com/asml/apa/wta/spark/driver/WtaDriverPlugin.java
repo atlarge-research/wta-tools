@@ -16,6 +16,7 @@ import com.asml.apa.wta.spark.dto.ResourceCollectionDto;
 import com.asml.apa.wta.spark.streams.MetricStreamingEngine;
 import java.nio.file.Path;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -131,8 +132,11 @@ public class WtaDriverPlugin implements DriverPlugin {
    */
   private void endApplicationAndWrite() {
     removeListeners();
-    Stream<ResourceAndStateWrapper> resourceAndStateWrappers = metricStreamingEngine.collectResourceInformation();
-    Stream<Resource> resources = resourceAndStateWrappers.copy().map(ResourceAndStateWrapper::getResource);
+    List<ResourceAndStateWrapper> resourceAndStateWrappers = metricStreamingEngine.collectResourceInformation();
+    Stream<Resource> resources = new Stream<>();
+    for (ResourceAndStateWrapper resourceAndState : resourceAndStateWrappers) {
+      resources.addToStream(resourceAndState.getResource());
+    }
     Stream<ResourceState> resourceStates = new Stream<>();
     resourceAndStateWrappers.forEach(rs -> rs.getStates().forEach(resourceStates::addToStream));
     Workload workload = sparkDataSource
