@@ -390,7 +390,8 @@ public class Stream<V extends Serializable> implements Cloneable {
     Stream<R> ret = new Stream<>();
     while (next != null) {
       if (next.getNext() == null) {
-        next = deserializationStart;
+        deserializationStart = next;
+        deserializationEnd = null;
       }
       if (next == deserializationStart && !diskLocations.isEmpty()) {
         head = next;
@@ -420,7 +421,8 @@ public class Stream<V extends Serializable> implements Cloneable {
     Stream<V> ret = new Stream<>();
     while (next != null) {
       if (next.getNext() == null) {
-        next = deserializationStart;
+        deserializationStart = next;
+        deserializationEnd = null;
       }
       if (next == deserializationStart && !diskLocations.isEmpty()) {
         head = next;
@@ -454,7 +456,8 @@ public class Stream<V extends Serializable> implements Cloneable {
     StreamNode<V> next = head;
     while (next != null) {
       if (next.getNext() == null) {
-        next = deserializationStart;
+        deserializationStart = next;
+        deserializationEnd = null;
       }
       if (next == deserializationStart && !diskLocations.isEmpty()) {
         head = next;
@@ -508,7 +511,8 @@ public class Stream<V extends Serializable> implements Cloneable {
     List<V> ret = new ArrayList<>();
     while (next != null) {
       if (next.getNext() == null) {
-        next = deserializationStart;
+        deserializationStart = next;
+        deserializationEnd = null;
       }
       if (next == deserializationStart && !diskLocations.isEmpty()) {
         head = next;
@@ -533,7 +537,8 @@ public class Stream<V extends Serializable> implements Cloneable {
     StreamNode<V> next = head;
     while (next != null) {
       if (next.getNext() == null) {
-        next = deserializationStart;
+        deserializationStart = next;
+        deserializationEnd = null;
       }
       if (next == deserializationStart && !diskLocations.isEmpty()) {
         head = next;
@@ -558,7 +563,8 @@ public class Stream<V extends Serializable> implements Cloneable {
     long count = 0;
     while (next != null) {
       if (next.getNext() == null) {
-        next = deserializationStart;
+        deserializationStart = next;
+        deserializationEnd = null;
       }
       if (next == deserializationStart && !diskLocations.isEmpty()) {
         head = next;
