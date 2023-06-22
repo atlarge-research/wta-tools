@@ -8,13 +8,11 @@ import com.asml.apa.wta.core.dto.OsInfoDto;
 import com.asml.apa.wta.core.dto.ProcDto;
 import com.asml.apa.wta.core.model.Resource;
 import com.asml.apa.wta.core.model.ResourceState;
-import com.asml.apa.wta.core.streams.Stream;
 import com.asml.apa.wta.spark.dto.ResourceAndStateWrapper;
 import com.asml.apa.wta.spark.dto.SparkBaseSupplierWrapperDto;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import java.util.List;
 
 class MetricStreamingEngineTest {
 
@@ -130,7 +128,8 @@ class MetricStreamingEngineTest {
             r.getResource().getId() == Math.abs(s2.getExecutorId().hashCode()))
         .findFirst()
         .get();
-    ResourceAndStateWrapper executor3 = result.stream().filter(r ->
+    ResourceAndStateWrapper executor3 = result.stream()
+        .filter(r ->
             r.getResource().getId() == Math.abs(s3.getExecutorId().hashCode()))
         .findFirst()
         .get();
