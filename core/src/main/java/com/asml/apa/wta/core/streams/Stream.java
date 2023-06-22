@@ -286,7 +286,7 @@ public class Stream<V extends Serializable> implements Cloneable {
       if (diskLocations.isEmpty()) {
         deserializationStart = head.getNext();
       } else {
-        additionsSinceLastWriteToDisk += deserializeInternals(diskLocations.poll());
+        deserializeInternals(diskLocations.poll());
       }
     }
     V ret = head.getContent();
@@ -319,7 +319,7 @@ public class Stream<V extends Serializable> implements Cloneable {
         if (diskLocations.isEmpty()) {
           deserializationStart = head.getNext();
         } else {
-          additionsSinceLastWriteToDisk += deserializeInternals(diskLocations.poll());
+          deserializeInternals(diskLocations.poll());
         }
       }
       head = head.getNext();
@@ -389,6 +389,9 @@ public class Stream<V extends Serializable> implements Cloneable {
     StreamNode<V> next = head;
     Stream<R> ret = new Stream<>();
     while (next != null) {
+      if (next.getNext() == null) {
+        next = deserializationStart;
+      }
       if (next == deserializationStart && !diskLocations.isEmpty()) {
         head = next;
         deserializeInternals(diskLocations.poll());
@@ -416,6 +419,9 @@ public class Stream<V extends Serializable> implements Cloneable {
     StreamNode<V> next = head;
     Stream<V> ret = new Stream<>();
     while (next != null) {
+      if (next.getNext() == null) {
+        next = deserializationStart;
+      }
       if (next == deserializationStart && !diskLocations.isEmpty()) {
         head = next;
         deserializeInternals(diskLocations.poll());
@@ -447,6 +453,9 @@ public class Stream<V extends Serializable> implements Cloneable {
     R acc = init;
     StreamNode<V> next = head;
     while (next != null) {
+      if (next.getNext() == null) {
+        next = deserializationStart;
+      }
       if (next == deserializationStart && !diskLocations.isEmpty()) {
         head = next;
         deserializeInternals(diskLocations.poll());
@@ -475,7 +484,7 @@ public class Stream<V extends Serializable> implements Cloneable {
       if (diskLocations.isEmpty()) {
         deserializationStart = head.getNext();
       } else {
-        additionsSinceLastWriteToDisk += deserializeInternals(diskLocations.poll());
+        deserializeInternals(diskLocations.poll());
       }
     }
     V ret = head.getContent();
@@ -498,6 +507,9 @@ public class Stream<V extends Serializable> implements Cloneable {
     StreamNode<V> next = head;
     List<V> ret = new ArrayList<>();
     while (next != null) {
+      if (next.getNext() == null) {
+        next = deserializationStart;
+      }
       if (next == deserializationStart && !diskLocations.isEmpty()) {
         head = next;
         deserializeInternals(diskLocations.poll());
@@ -520,6 +532,9 @@ public class Stream<V extends Serializable> implements Cloneable {
   public synchronized void forEach(Consumer<? super V> action) {
     StreamNode<V> next = head;
     while (next != null) {
+      if (next.getNext() == null) {
+        next = deserializationStart;
+      }
       if (next == deserializationStart && !diskLocations.isEmpty()) {
         head = next;
         deserializeInternals(diskLocations.poll());
@@ -542,6 +557,9 @@ public class Stream<V extends Serializable> implements Cloneable {
     StreamNode<V> next = head;
     long count = 0;
     while (next != null) {
+      if (next.getNext() == null) {
+        next = deserializationStart;
+      }
       if (next == deserializationStart && !diskLocations.isEmpty()) {
         head = next;
         deserializeInternals(diskLocations.poll());
