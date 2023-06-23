@@ -69,7 +69,6 @@ public class ParquetSchema {
         for (Field field : nonStaticValidFields) {
           if (fieldHandles.get(field).invoke(object) == null) {
             nonStaticValidFields.remove(field);
-            break;
           }
         }
       }
