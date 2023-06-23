@@ -30,6 +30,13 @@ public class SparkDataSource {
 
   private final RuntimeConfig runtimeConfig;
 
+  /**
+   * Joins the thread pools.
+   *
+   * @throws InterruptedException when an {@link InterruptedException} occurs while joining the threads
+   * @author Atour Mousavi Gourabi
+   * @since 1.0.0
+   */
   public void join() throws InterruptedException {
     if (taskLevelListener != null) {
       taskLevelListener.getThreadPool().shutdown();
