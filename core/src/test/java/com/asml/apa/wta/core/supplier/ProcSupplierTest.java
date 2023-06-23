@@ -1,8 +1,8 @@
 package com.asml.apa.wta.core.supplier;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.when;
 
 import com.asml.apa.wta.core.dto.ProcDto;
 import com.asml.apa.wta.core.utils.ShellUtils;
@@ -51,7 +51,8 @@ public class ProcSupplierTest {
     doReturn(CompletableFuture.completedFuture("0,62 1.23 1.02 1/479 278339"))
         .when(shellUtils)
         .executeCommand("cat /proc/loadavg", true);
-    ProcSupplier sut = new ProcSupplier(shellUtils);
+    ProcSupplier sut = Mockito.spy(new ProcSupplier(shellUtils));
+    when(sut.isAvailable()).thenReturn(true);
 
     ProcDto expected = ProcDto.builder()
         .readsCompleted(78853L)
@@ -71,11 +72,7 @@ public class ProcSupplierTest {
         .pIdOfMostRecentlyCreatedProcess(278339.0)
         .build();
 
-    if (sut.isAvailable()) {
-      assertEquals(expected, sut.getSnapshot().join().get());
-    } else {
-      assertThat(sut.getSnapshot().join()).isEmpty();
-    }
+    assertEquals(expected, sut.getSnapshot().join().get());
   }
 
   @Test
@@ -98,15 +95,12 @@ public class ProcSupplierTest {
 
     doReturn(CompletableFuture.completedFuture("")).when(shellUtils).executeCommand("cat /proc/loadavg", false);
     doReturn(CompletableFuture.completedFuture("")).when(shellUtils).executeCommand("cat /proc/loadavg", true);
-    ProcSupplier sut = new ProcSupplier(shellUtils);
+    ProcSupplier sut = Mockito.spy(new ProcSupplier(shellUtils));
+    when(sut.isAvailable()).thenReturn(true);
 
     ProcDto expected = ProcDto.builder().build();
 
-    if (sut.isAvailable()) {
-      assertEquals(expected, sut.getSnapshot().join().get());
-    } else {
-      assertThat(sut.getSnapshot().join()).isEmpty();
-    }
+    assertEquals(expected, sut.getSnapshot().join().get());
   }
 
   @Test
@@ -129,14 +123,11 @@ public class ProcSupplierTest {
 
     doReturn(CompletableFuture.completedFuture(null)).when(shellUtils).executeCommand("cat /proc/loadavg", false);
     doReturn(CompletableFuture.completedFuture(null)).when(shellUtils).executeCommand("cat /proc/loadavg", true);
-    ProcSupplier sut = new ProcSupplier(shellUtils);
+    ProcSupplier sut = Mockito.spy(new ProcSupplier(shellUtils));
+    when(sut.isAvailable()).thenReturn(true);
 
     ProcDto expected = ProcDto.builder().build();
 
-    if (sut.isAvailable()) {
-      assertEquals(expected, sut.getSnapshot().join().get());
-    } else {
-      assertThat(sut.getSnapshot().join()).isEmpty();
-    }
+    assertEquals(expected, sut.getSnapshot().join().get());
   }
 }
