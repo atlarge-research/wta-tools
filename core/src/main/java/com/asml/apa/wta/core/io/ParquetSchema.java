@@ -66,11 +66,13 @@ public class ParquetSchema {
       }
       while (!objects.isEmpty()) {
         T object = objects.head();
+        List<Field> toRemove = new ArrayList<>();
         for (Field field : nonStaticValidFields) {
           if (fieldHandles.get(field).invoke(object) == null) {
-            nonStaticValidFields.remove(field);
+            toRemove.add(field);
           }
         }
+        nonStaticValidFields.removeAll(toRemove);
       }
       for (Field field : nonStaticValidFields) {
         VarHandle typeInfoHandle = lookup.unreflectVarHandle(field);
