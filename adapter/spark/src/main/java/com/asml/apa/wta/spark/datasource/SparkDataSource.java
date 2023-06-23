@@ -5,7 +5,6 @@ import com.asml.apa.wta.spark.listener.ApplicationLevelListener;
 import com.asml.apa.wta.spark.listener.JobLevelListener;
 import com.asml.apa.wta.spark.listener.StageLevelListener;
 import com.asml.apa.wta.spark.listener.TaskLevelListener;
-import java.util.concurrent.TimeUnit;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.spark.SparkContext;
@@ -33,19 +32,11 @@ public class SparkDataSource {
 
   public void join() throws InterruptedException {
     if (taskLevelListener != null) {
-      if (taskLevelListener.getThreadPool().awaitTermination(100, TimeUnit.SECONDS)) {
-        log.error("Could not get all task related information.");
-      }
+      taskLevelListener.getThreadPool().shutdown();
     }
-    if (stageLevelListener.getThreadPool().awaitTermination(100, TimeUnit.SECONDS)) {
-      log.error("Could not get all stage related information.");
-    }
-    if (jobLevelListener.getThreadPool().awaitTermination(100, TimeUnit.SECONDS)) {
-      log.error("Could not get all workflow related information.");
-    }
-    if (applicationLevelListener.getThreadPool().awaitTermination(100, TimeUnit.SECONDS)) {
-      log.error("Could not get all workload related information.");
-    }
+    stageLevelListener.getThreadPool().shutdown();
+    jobLevelListener.getThreadPool().shutdown();
+    applicationLevelListener.getThreadPool().shutdown();
   }
 
   /**

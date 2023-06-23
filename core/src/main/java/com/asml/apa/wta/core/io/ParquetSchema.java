@@ -84,6 +84,7 @@ public class ParquetSchema {
           } else if (double.class.isAssignableFrom(fieldType)) {
             schemaBuilder = schemaBuilder.requiredDouble(fieldName);
           } else if (long[].class.isAssignableFrom(fieldType)
+              || Long[].class.isAssignableFrom(fieldType)
               || BaseTraceObject[].class.isAssignableFrom(fieldType)) {
             schemaBuilder = schemaBuilder
                 .name(fieldName)

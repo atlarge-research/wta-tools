@@ -23,6 +23,7 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Queue;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.function.BiFunction;
 import java.util.function.BinaryOperator;
 import java.util.function.Consumer;
@@ -99,7 +100,7 @@ public class Stream<V extends Serializable> implements Cloneable {
     new File(Stream.TEMP_SERIALIZATION_DIRECTORY).mkdirs();
     head = new StreamNode<>(content);
     tail = head;
-    diskLocations = new ArrayDeque<>();
+    diskLocations = new ConcurrentLinkedDeque<>();
     deserializationStart = head;
     deserializationEnd = head;
     id = UUID.randomUUID();
@@ -130,7 +131,7 @@ public class Stream<V extends Serializable> implements Cloneable {
     deserializationEnd = null;
     head = null;
     tail = null;
-    diskLocations = new ArrayDeque<>();
+    diskLocations = new ConcurrentLinkedDeque<>();
     id = UUID.randomUUID();
     additionsSinceLastWriteToDisk = 0;
     serializationTrigger = 1800;
