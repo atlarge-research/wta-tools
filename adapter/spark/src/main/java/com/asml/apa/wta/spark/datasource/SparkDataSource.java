@@ -2,7 +2,6 @@ package com.asml.apa.wta.spark.datasource;
 
 import com.asml.apa.wta.core.WtaWriter;
 import com.asml.apa.wta.core.config.RuntimeConfig;
-import com.asml.apa.wta.core.io.OutputFile;
 import com.asml.apa.wta.spark.listener.AbstractListener;
 import com.asml.apa.wta.spark.listener.ApplicationLevelListener;
 import com.asml.apa.wta.spark.listener.JobLevelListener;

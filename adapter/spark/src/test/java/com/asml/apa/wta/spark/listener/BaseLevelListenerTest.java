@@ -94,13 +94,19 @@ class BaseLevelListenerTest {
 
     fakeJobListener1 = new JobLevelListener(mockedSparkContext, fakeConfig1, fakeTaskListener1, fakeStageListener1);
 
+    SparkDataSource sparkDataSource = mock(SparkDataSource.class);
+    when(sparkDataSource.getRuntimeConfig()).thenReturn(mock(RuntimeConfig.class));
+    when(sparkDataSource.getTaskLevelListener()).thenReturn(mock(TaskLevelListener.class));
+    when(sparkDataSource.getStageLevelListener()).thenReturn(mock(StageLevelListener.class));
+    when(sparkDataSource.getJobLevelListener()).thenReturn(mock(JobLevelListener.class));
+
     fakeApplicationListener1 = new ApplicationLevelListener(
         mockedSparkContext,
         fakeConfig1,
         fakeTaskListener1,
         fakeStageListener1,
         fakeJobListener1,
-        mock(SparkDataSource.class),
+        sparkDataSource,
         mock(MetricStreamingEngine.class),
         mock(WtaWriter.class));
 
@@ -125,7 +131,7 @@ class BaseLevelListenerTest {
         fakeTaskListener2,
         fakeStageListener2,
         fakeJobListener2,
-        mock(SparkDataSource.class),
+        sparkDataSource,
         mock(MetricStreamingEngine.class),
         mock(WtaWriter.class));
   }

@@ -49,6 +49,9 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
 
   private final JobLevelListener jobLevelListener;
 
+  @Getter
+  private Workload workload;
+
   /**
    * Constructor for the application-level listener.
    *
@@ -114,11 +117,10 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
   /**
    * Writes the trace to file.
    *
-   * @param workload the {@link Workload} to write as part of the trace
    * @author Atour Mousavi Gourabi
    * @since 1.0.0
    */
-  public void writeTrace(Workload workload) {
+  public void writeTrace() {
     List<ResourceAndStateWrapper> resourceAndStateWrappers = metricStreamingEngine.collectResourceInformation();
     Stream<Resource> resources = new Stream<>();
     resourceAndStateWrappers.stream()
@@ -199,9 +201,10 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
     final Stream<Workflow> workflows = jobLevelListener.getProcessedObjects();
     final long totalWorkflows = workflows.copy().count();
     final long totalTasks =
-        workflows.map(Workflow::getTaskCount).reduce(Long::sum).orElse(-1L);
-    final long numSites =
-        tasks.copy().filter(task -> task.getSubmissionSite() != -1).count();
+        workflows.map(Workflow::getTaskCount).reduce(Long::sum).orElse(0L);
+    long numSites =
+        tasks.copy().filter(task -> task.getSubmissionSite() >= 0).count();
+    numSites = numSites < 1 ? -1 : numSites;
     final long numResources = tasks.copy()
         .map(Task::getResourceAmountRequested)
         .filter(task -> task >= 0.0)
@@ -361,7 +364,8 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
 
     removeListeners();
 
-    writeTrace(workloadBuilder.build());
+    workload = workloadBuilder.build();
+    writeTrace();
   }
 
   /**
