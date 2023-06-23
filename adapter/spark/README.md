@@ -269,4 +269,7 @@ It is important to note that the benchmarking module is not part of the plugin i
 
 ## Logging
 The plugin uses the [SLF4J](http://www.slf4j.org/) logging API. This allows the end-user to choose the desired logging frameworks (e.g. java.util.logging, logback, log4j) . The plugin itself does not depend on any logging implementation.
-The plugin log level corresponds to the Spark log level. More details on how to modify this can be found [here](https://stackoverflow.com/questions/40608412/how-can-set-the-default-spark-logging-level)
+The plugin log level corresponds to the Spark log level. This means that the plugin log level can be configured using the Spark configuration through the following:
+```java
+sc.setLogLevel("INFO");
+```
