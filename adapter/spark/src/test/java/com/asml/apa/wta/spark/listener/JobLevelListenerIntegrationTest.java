@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 class JobLevelListenerIntegrationTest extends BaseSparkJobIntegrationTest {
 
   @Test
-  void testGetJobMetricsHasJobsAfterSparkJobAndYieldsNoErrors() {
+  void getJobMetricsHasJobsAfterSparkJobAndYieldsNoErrors() {
     sut1.registerTaskListener();
     sut1.registerStageListener();
     sut1.registerJobListener();
