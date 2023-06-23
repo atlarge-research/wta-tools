@@ -3,8 +3,8 @@ package com.asml.apa.wta.spark.listener;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.asml.apa.wta.core.WtaWriter;
 import com.asml.apa.wta.core.config.RuntimeConfig;
-import com.asml.apa.wta.core.io.OutputFile;
 import com.asml.apa.wta.core.model.Domain;
 import com.asml.apa.wta.spark.datasource.SparkDataSource;
 import com.asml.apa.wta.spark.streams.MetricStreamingEngine;
@@ -102,7 +102,7 @@ class BaseLevelListenerTest {
         fakeJobListener1,
         mock(SparkDataSource.class),
         mock(MetricStreamingEngine.class),
-        mock(OutputFile.class));
+        mock(WtaWriter.class));
 
     fakeConfig2 = RuntimeConfig.builder()
         .authors(new String[] {"Harry Potter"})
@@ -127,6 +127,6 @@ class BaseLevelListenerTest {
         fakeJobListener2,
         mock(SparkDataSource.class),
         mock(MetricStreamingEngine.class),
-        mock(OutputFile.class));
+        mock(WtaWriter.class));
   }
 }

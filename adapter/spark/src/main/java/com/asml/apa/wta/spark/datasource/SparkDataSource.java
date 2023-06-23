@@ -1,5 +1,6 @@
 package com.asml.apa.wta.spark.datasource;
 
+import com.asml.apa.wta.core.WtaWriter;
 import com.asml.apa.wta.core.config.RuntimeConfig;
 import com.asml.apa.wta.core.io.OutputFile;
 import com.asml.apa.wta.spark.listener.AbstractListener;
@@ -51,7 +52,7 @@ public class SparkDataSource {
    * @param sparkContext  SparkContext of the running Spark session
    * @param config Additional config specified by the user for the plugin
    * @param metricStreamingEngine the driver's {@link MetricStreamingEngine} to inject
-   * @param outputFile the {@link OutputFile} to write to
+   * @param wtaWriter the {@link WtaWriter} to write to
    * @author Pil Kyu Cho
    * @author Henry Page
    * @author Tianchen Qu
@@ -62,19 +63,13 @@ public class SparkDataSource {
       SparkContext sparkContext,
       RuntimeConfig config,
       MetricStreamingEngine metricStreamingEngine,
-      OutputFile outputFile) {
+      WtaWriter wtaWriter) {
     taskLevelListener = new TaskLevelListener(sparkContext, config);
     stageLevelListener = new StageLevelListener(sparkContext, config);
     if (config.isStageLevel()) {
       jobLevelListener = new JobLevelListener(sparkContext, config, stageLevelListener);
       applicationLevelListener = new ApplicationLevelListener(
-          sparkContext,
-          config,
-          stageLevelListener,
-          jobLevelListener,
-          this,
-          metricStreamingEngine,
-          outputFile);
+          sparkContext, config, stageLevelListener, jobLevelListener, this, metricStreamingEngine, wtaWriter);
     } else {
       jobLevelListener = new JobLevelListener(sparkContext, config, taskLevelListener, stageLevelListener);
       applicationLevelListener = new ApplicationLevelListener(
@@ -85,7 +80,7 @@ public class SparkDataSource {
           jobLevelListener,
           this,
           metricStreamingEngine,
-          outputFile);
+          wtaWriter);
     }
 
     runtimeConfig = config;

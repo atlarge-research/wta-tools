@@ -2,7 +2,6 @@ package com.asml.apa.wta.spark.listener;
 
 import com.asml.apa.wta.core.WtaWriter;
 import com.asml.apa.wta.core.config.RuntimeConfig;
-import com.asml.apa.wta.core.io.OutputFile;
 import com.asml.apa.wta.core.model.Domain;
 import com.asml.apa.wta.core.model.Resource;
 import com.asml.apa.wta.core.model.ResourceState;
@@ -38,13 +37,11 @@ import org.apache.spark.scheduler.SparkListenerApplicationStart;
 @Slf4j
 public class ApplicationLevelListener extends AbstractListener<Workload> {
 
-  private static final String TOOL_VERSION = "spark-wta-generator-1_0";
-
   private final MetricStreamingEngine metricStreamingEngine;
 
   private final SparkDataSource sparkDataSource;
 
-  private final OutputFile outputFile;
+  private final WtaWriter wtaWriter;
 
   private final TaskStageBaseListener taskLevelListener;
 
@@ -62,7 +59,7 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
    * @param wtaJobLevelListener The job-level listener to be used by this listener
    * @param dataSource the {@link SparkDataSource} to inject
    * @param streamingEngine the driver's {@link MetricStreamingEngine} to use
-   * @param outputPath the {@link OutputFile} to write to
+   * @param traceWriter the {@link WtaWriter} to write the traces with
    * @author Henry Page
    * @since 1.0.0
    */
@@ -74,14 +71,14 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
       JobLevelListener wtaJobLevelListener,
       SparkDataSource dataSource,
       MetricStreamingEngine streamingEngine,
-      OutputFile outputPath) {
+      WtaWriter traceWriter) {
     super(sparkContext, config);
     taskLevelListener = wtaTaskLevelListener;
     stageLevelListener = wtaStageLevelListener;
     jobLevelListener = wtaJobLevelListener;
     sparkDataSource = dataSource;
     metricStreamingEngine = streamingEngine;
-    outputFile = outputPath;
+    wtaWriter = traceWriter;
   }
 
   /**
@@ -93,7 +90,7 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
    * @param wtaJobLevelListener The job-level listener to be used by this listener
    * @param dataSource the {@link SparkDataSource} to inject
    * @param streamingEngine the driver's {@link MetricStreamingEngine} to use
-   * @param outputPath the {@link OutputFile} to write to
+   * @param traceWriter the {@link WtaWriter} to write the traces with
    * @author Tianchen Qu
    * @since 1.0.0
    */
@@ -104,14 +101,14 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
       JobLevelListener wtaJobLevelListener,
       SparkDataSource dataSource,
       MetricStreamingEngine streamingEngine,
-      OutputFile outputPath) {
+      WtaWriter traceWriter) {
     super(sparkContext, config);
     taskLevelListener = wtaStageLevelListener;
     stageLevelListener = wtaStageLevelListener;
     jobLevelListener = wtaJobLevelListener;
     sparkDataSource = dataSource;
     metricStreamingEngine = streamingEngine;
-    outputFile = outputPath;
+    wtaWriter = traceWriter;
   }
 
   /**
@@ -133,7 +130,6 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
         ? sparkDataSource.getStageLevelListener().getProcessedObjects()
         : sparkDataSource.getTaskLevelListener().getProcessedObjects();
     joinThreadPool();
-    WtaWriter wtaWriter = new WtaWriter(outputFile, "schema-1.0", TOOL_VERSION);
     wtaWriter.write(Task.class, tasks);
     wtaWriter.write(Resource.class, resources);
     wtaWriter.write(Workflow.class, sparkDataSource.getJobLevelListener().getProcessedObjects());
@@ -165,9 +161,7 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
    * @since 1.0.0
    */
   public void removeListeners() {
-    if (!sparkDataSource.getRuntimeConfig().isStageLevel()) {
-      sparkDataSource.removeTaskListener();
-    }
+    sparkDataSource.removeTaskListener();
     sparkDataSource.removeStageListener();
     sparkDataSource.removeJobListener();
     sparkDataSource.removeApplicationListener();

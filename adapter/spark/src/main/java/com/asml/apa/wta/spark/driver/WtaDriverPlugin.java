@@ -1,5 +1,6 @@
 package com.asml.apa.wta.spark.driver;
 
+import com.asml.apa.wta.core.WtaWriter;
 import com.asml.apa.wta.core.config.RuntimeConfig;
 import com.asml.apa.wta.core.io.DiskOutputFile;
 import com.asml.apa.wta.core.io.OutputFile;
@@ -28,11 +29,11 @@ import org.apache.spark.api.plugin.PluginContext;
 @Slf4j
 public class WtaDriverPlugin implements DriverPlugin {
 
+  private static final String TOOL_VERSION = "spark-wta-generator-1_0";
+
   private MetricStreamingEngine metricStreamingEngine;
 
   private SparkDataSource sparkDataSource;
-
-  private OutputFile outputFile;
 
   private boolean error = false;
 
@@ -57,8 +58,9 @@ public class WtaDriverPlugin implements DriverPlugin {
           sparkCtx.conf().get("spark.driver.extraJavaOptions").split("-DconfigFile=")[1];
       RuntimeConfig runtimeConfig = RuntimeConfig.readConfig(configFile);
       metricStreamingEngine = new MetricStreamingEngine();
-      outputFile = new DiskOutputFile(Path.of(runtimeConfig.getOutputPath()));
-      sparkDataSource = new SparkDataSource(sparkCtx, runtimeConfig, metricStreamingEngine, outputFile);
+      OutputFile outputFile = new DiskOutputFile(Path.of(runtimeConfig.getOutputPath()));
+      WtaWriter wtaWriter = new WtaWriter(outputFile, "schema-1.0", TOOL_VERSION);
+      sparkDataSource = new SparkDataSource(sparkCtx, runtimeConfig, metricStreamingEngine, wtaWriter);
       initListeners();
       executorVars.put("resourcePingInterval", String.valueOf(runtimeConfig.getResourcePingInterval()));
       executorVars.put(

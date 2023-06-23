@@ -5,6 +5,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.asml.apa.wta.core.model.Workload;
+import com.asml.apa.wta.spark.streams.MetricStreamingEngine;
+import java.util.List;
 import java.util.Properties;
 import org.apache.spark.executor.ExecutorMetrics;
 import org.apache.spark.executor.ShuffleWriteMetrics;
@@ -53,6 +55,8 @@ class ApplicationLevelListenerTest extends BaseLevelListenerTest {
   int stageId2;
 
   long applicationDateEnd;
+
+  MetricStreamingEngine metricStreamingEngine;
 
   @BeforeEach
   void setup() {
@@ -116,6 +120,9 @@ class ApplicationLevelListenerTest extends BaseLevelListenerTest {
 
     applicationDateEnd = mockedSparkContext.startTime() + 1000L;
     applicationEndObj = new SparkListenerApplicationEnd(applicationDateEnd);
+
+    metricStreamingEngine = mock(MetricStreamingEngine.class);
+    when(metricStreamingEngine.collectResourceInformation()).thenReturn(List.of());
   }
 
   @Test
