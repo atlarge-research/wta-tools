@@ -175,6 +175,9 @@ public class WtaDriverPlugin implements DriverPlugin {
     log.trace("Initializing listeners.");
     if (!sparkDataSource.getRuntimeConfig().isStageLevel()) {
       this.sparkDataSource.registerTaskListener();
+      log.info("Task level metrics are enabled.");
+    } else {
+      log.info("Stage level metrics are enabled.");
     }
     this.sparkDataSource.registerStageListener();
     this.sparkDataSource.registerJobListener();
