@@ -4,7 +4,10 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.asml.apa.wta.core.config.RuntimeConfig;
+import com.asml.apa.wta.core.io.OutputFile;
 import com.asml.apa.wta.core.model.Domain;
+import com.asml.apa.wta.spark.datasource.SparkDataSource;
+import com.asml.apa.wta.spark.streams.MetricStreamingEngine;
 import org.apache.spark.SparkConf;
 import org.apache.spark.SparkContext;
 import org.apache.spark.resource.ResourceProfile;
@@ -68,8 +71,7 @@ class BaseLevelListenerTest {
     mockedSparkContext2 = mock(SparkContext.class);
     mockedResourceProfileManager2 = mock(ResourceProfileManager.class);
     mockedResource2 = mock(ResourceProfile.class);
-    mapResource2 = new HashMap<String, TaskResourceRequest>();
-    SparkConf conf2 = new SparkConf().set("spark.app.name", "testApp");
+    mapResource2 = new HashMap<>();
     when(mockedSparkContext2.sparkUser()).thenReturn("testUser");
     when(mockedSparkContext2.getConf()).thenReturn(conf);
     when(mockedSparkContext2.appName()).thenReturn("testApp");
@@ -93,7 +95,14 @@ class BaseLevelListenerTest {
     fakeJobListener1 = new JobLevelListener(mockedSparkContext, fakeConfig1, fakeTaskListener1, fakeStageListener1);
 
     fakeApplicationListener1 = new ApplicationLevelListener(
-        mockedSparkContext, fakeConfig1, fakeTaskListener1, fakeStageListener1, fakeJobListener1);
+        mockedSparkContext,
+        fakeConfig1,
+        fakeTaskListener1,
+        fakeStageListener1,
+        fakeJobListener1,
+        mock(SparkDataSource.class),
+        mock(MetricStreamingEngine.class),
+        mock(OutputFile.class));
 
     fakeConfig2 = RuntimeConfig.builder()
         .authors(new String[] {"Harry Potter"})
@@ -111,6 +120,13 @@ class BaseLevelListenerTest {
         new JobLevelListener(mockedSparkContext2, fakeConfig2, fakeTaskListener2, fakeStageListener2);
 
     fakeApplicationListener2 = new ApplicationLevelListener(
-        mockedSparkContext2, fakeConfig2, fakeTaskListener2, fakeStageListener2, fakeJobListener2);
+        mockedSparkContext2,
+        fakeConfig2,
+        fakeTaskListener2,
+        fakeStageListener2,
+        fakeJobListener2,
+        mock(SparkDataSource.class),
+        mock(MetricStreamingEngine.class),
+        mock(OutputFile.class));
   }
 }

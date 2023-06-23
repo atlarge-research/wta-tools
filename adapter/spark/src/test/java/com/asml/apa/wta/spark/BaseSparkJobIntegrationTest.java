@@ -1,6 +1,9 @@
 package com.asml.apa.wta.spark;
 
+import static org.mockito.Mockito.mock;
+
 import com.asml.apa.wta.core.config.RuntimeConfig;
+import com.asml.apa.wta.core.io.OutputFile;
 import com.asml.apa.wta.core.model.Domain;
 import com.asml.apa.wta.spark.datasource.SparkDataSource;
 import com.asml.apa.wta.spark.streams.MetricStreamingEngine;
@@ -56,8 +59,10 @@ public class BaseSparkJobIntegrationTest {
 
     fakeMetricStreamingEngine = new MetricStreamingEngine();
 
-    sut1 = new SparkDataSource(spark.sparkContext(), fakeConfig);
-    sut2 = new SparkDataSource(spark.sparkContext(), fakeConfig2);
+    sut1 = new SparkDataSource(
+        spark.sparkContext(), fakeConfig, mock(MetricStreamingEngine.class), mock(OutputFile.class));
+    sut2 = new SparkDataSource(
+        spark.sparkContext(), fakeConfig2, mock(MetricStreamingEngine.class), mock(OutputFile.class));
     String resourcePath = "src/test/resources/wordcount.txt";
     textFile = JavaSparkContext.fromSparkContext(spark.sparkContext()).textFile(resourcePath);
   }

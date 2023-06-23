@@ -1,22 +1,13 @@
 package com.asml.apa.wta.spark.driver;
 
-import com.asml.apa.wta.core.WtaWriter;
 import com.asml.apa.wta.core.config.RuntimeConfig;
 import com.asml.apa.wta.core.io.DiskOutputFile;
 import com.asml.apa.wta.core.io.OutputFile;
-import com.asml.apa.wta.core.model.Resource;
-import com.asml.apa.wta.core.model.ResourceState;
-import com.asml.apa.wta.core.model.Task;
-import com.asml.apa.wta.core.model.Workflow;
-import com.asml.apa.wta.core.model.Workload;
-import com.asml.apa.wta.core.streams.Stream;
 import com.asml.apa.wta.spark.datasource.SparkDataSource;
-import com.asml.apa.wta.spark.dto.ResourceAndStateWrapper;
 import com.asml.apa.wta.spark.dto.ResourceCollectionDto;
 import com.asml.apa.wta.spark.streams.MetricStreamingEngine;
 import java.nio.file.Path;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -36,8 +27,6 @@ import org.apache.spark.api.plugin.PluginContext;
 @Getter
 @Slf4j
 public class WtaDriverPlugin implements DriverPlugin {
-
-  private static final String TOOL_VERSION = "spark-wta-generator-1_0";
 
   private MetricStreamingEngine metricStreamingEngine;
 
@@ -67,9 +56,9 @@ public class WtaDriverPlugin implements DriverPlugin {
       String configFile =
           sparkCtx.conf().get("spark.driver.extraJavaOptions").split("-DconfigFile=")[1];
       RuntimeConfig runtimeConfig = RuntimeConfig.readConfig(configFile);
-      this.metricStreamingEngine = new MetricStreamingEngine();
-      sparkDataSource = new SparkDataSource(sparkCtx, runtimeConfig);
+      metricStreamingEngine = new MetricStreamingEngine();
       outputFile = new DiskOutputFile(Path.of(runtimeConfig.getOutputPath()));
+      sparkDataSource = new SparkDataSource(sparkCtx, runtimeConfig, metricStreamingEngine, outputFile);
       initListeners();
       executorVars.put("resourcePingInterval", String.valueOf(runtimeConfig.getResourcePingInterval()));
       executorVars.put(
@@ -115,45 +104,7 @@ public class WtaDriverPlugin implements DriverPlugin {
   public void shutdown() {
     if (error) {
       log.error("Plugin shutting down without generating files.");
-      return;
     }
-    try {
-      endApplicationAndWrite();
-    } catch (Exception e) {
-      log.error("A {} error occurred while generating files: {}.", e.getClass(), e.getMessage());
-    }
-  }
-
-  /**
-   * Removes the listeners and writes the collected data to the output file.
-   *
-   * @author Henry Page
-   * @since 1.0.0
-   */
-  private void endApplicationAndWrite() {
-    removeListeners();
-    List<ResourceAndStateWrapper> resourceAndStateWrappers = metricStreamingEngine.collectResourceInformation();
-    Stream<Resource> resources = new Stream<>();
-    resourceAndStateWrappers.stream()
-        .map(ResourceAndStateWrapper::getResource)
-        .forEach(resources::addToStream);
-    Stream<ResourceState> resourceStates = new Stream<>();
-    resourceAndStateWrappers.forEach(rs -> rs.getStates().forEach(resourceStates::addToStream));
-    Workload workload = sparkDataSource
-        .getApplicationLevelListener()
-        .getProcessedObjects()
-        .head();
-    Stream<Task> tasks = sparkDataSource.getRuntimeConfig().isStageLevel()
-        ? sparkDataSource.getStageLevelListener().getProcessedObjects()
-        : sparkDataSource.getTaskLevelListener().getProcessedObjects();
-    WtaWriter wtaWriter = new WtaWriter(outputFile, "schema-1.0", TOOL_VERSION);
-    wtaWriter.write(Task.class, tasks);
-    wtaWriter.write(Resource.class, resources);
-    wtaWriter.write(Workflow.class, sparkDataSource.getJobLevelListener().getProcessedObjects());
-    wtaWriter.write(ResourceState.class, resourceStates);
-    wtaWriter.write(workload);
-
-    Stream.deleteAllSerializedFiles();
   }
 
   /**
@@ -164,31 +115,10 @@ public class WtaDriverPlugin implements DriverPlugin {
    */
   public void initListeners() {
     if (!sparkDataSource.getRuntimeConfig().isStageLevel()) {
-      this.sparkDataSource.registerTaskListener();
+      sparkDataSource.registerTaskListener();
     }
-    this.sparkDataSource.registerStageListener();
-    this.sparkDataSource.registerJobListener();
-    this.sparkDataSource.registerApplicationListener();
-  }
-
-  /**
-   * Removes the listeners.
-   *
-   * @author Pil Kyu Cho
-   * @since 1.0.0
-   */
-  public void removeListeners() {
-    try {
-      sparkDataSource.join();
-    } catch (InterruptedException e) {
-      log.error("Could not join the threads because of {}.", e.getMessage());
-      throw new RuntimeException(e);
-    }
-    if (!sparkDataSource.getRuntimeConfig().isStageLevel()) {
-      sparkDataSource.removeTaskListener();
-    }
-    sparkDataSource.removeStageListener();
-    sparkDataSource.removeJobListener();
-    sparkDataSource.removeApplicationListener();
+    sparkDataSource.registerStageListener();
+    sparkDataSource.registerJobListener();
+    sparkDataSource.registerApplicationListener();
   }
 }

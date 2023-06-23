@@ -60,7 +60,6 @@ class WtaDriverPluginTest {
     assertThat(sut.isError()).isFalse();
     assertThat(sut.getSparkDataSource().getRuntimeConfig().isStageLevel()).isFalse();
     verify(sut, times(1)).initListeners();
-    verify(sut, times(0)).removeListeners();
 
     verify(mockedSparkContext, times(1))
         .addSparkListener(sut.getSparkDataSource().getTaskLevelListener());
@@ -75,7 +74,6 @@ class WtaDriverPluginTest {
     } catch (Exception ignored) {
     }
 
-    verify(sut, times(1)).removeListeners();
     verify(mockedSparkContext, times(1))
         .removeSparkListener(sut.getSparkDataSource().getTaskLevelListener());
     verify(mockedSparkContext, times(1))
@@ -93,7 +91,6 @@ class WtaDriverPluginTest {
 
     assertThat(sut.getSparkDataSource().getRuntimeConfig().isStageLevel()).isTrue();
     verify(sut, times(1)).initListeners();
-    verify(sut, times(0)).removeListeners();
 
     verify(mockedSparkContext, times(0))
         .addSparkListener(sut.getSparkDataSource().getTaskLevelListener());
@@ -108,7 +105,6 @@ class WtaDriverPluginTest {
     } catch (Exception ignored) {
     }
 
-    verify(sut, times(1)).removeListeners();
     verify(mockedSparkContext, times(0))
         .removeSparkListener(sut.getSparkDataSource().getTaskLevelListener());
     verify(mockedSparkContext, times(1))
@@ -140,7 +136,6 @@ class WtaDriverPluginTest {
       sut.shutdown();
     } catch (Exception ignored) {
     }
-    verify(sut, times(0)).removeListeners();
   }
 
   @Test
@@ -155,7 +150,6 @@ class WtaDriverPluginTest {
       sut.shutdown();
     } catch (Exception ignored) {
     }
-    verify(sut, times(0)).removeListeners();
   }
 
   @Test
@@ -169,7 +163,6 @@ class WtaDriverPluginTest {
       sut.shutdown();
     } catch (Exception ignored) {
     }
-    verify(sut, times(0)).removeListeners();
   }
 
   @Test

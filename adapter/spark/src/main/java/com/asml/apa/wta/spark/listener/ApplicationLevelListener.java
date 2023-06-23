@@ -1,12 +1,19 @@
 package com.asml.apa.wta.spark.listener;
 
+import com.asml.apa.wta.core.WtaWriter;
 import com.asml.apa.wta.core.config.RuntimeConfig;
+import com.asml.apa.wta.core.io.OutputFile;
 import com.asml.apa.wta.core.model.Domain;
+import com.asml.apa.wta.core.model.Resource;
+import com.asml.apa.wta.core.model.ResourceState;
 import com.asml.apa.wta.core.model.Task;
 import com.asml.apa.wta.core.model.Workflow;
 import com.asml.apa.wta.core.model.Workload;
 import com.asml.apa.wta.core.model.Workload.WorkloadBuilder;
 import com.asml.apa.wta.core.streams.Stream;
+import com.asml.apa.wta.spark.datasource.SparkDataSource;
+import com.asml.apa.wta.spark.dto.ResourceAndStateWrapper;
+import com.asml.apa.wta.spark.streams.MetricStreamingEngine;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -31,7 +38,15 @@ import org.apache.spark.scheduler.SparkListenerApplicationStart;
 @Slf4j
 public class ApplicationLevelListener extends AbstractListener<Workload> {
 
-  private final TaskStageBaseListener wtaTaskListener;
+  private static final String TOOL_VERSION = "spark-wta-generator-1_0";
+
+  private final MetricStreamingEngine metricStreamingEngine;
+
+  private final SparkDataSource sparkDataSource;
+
+  private final OutputFile outputFile;
+
+  private final TaskStageBaseListener taskLevelListener;
 
   private final StageLevelListener stageLevelListener;
 
@@ -42,22 +57,28 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
    *
    * @param sparkContext The current spark context
    * @param config Additional config specified by the user for the plugin
-   * @param wtaTaskListener The task-level listener to be used by this listener
-   * @param stageLevelListener The stage-level listener to be used by this listener
-   * @param jobLevelListener The job-level listener to be used by this listener
+   * @param wtaTaskLevelListener The task-level listener to be used by this listener
+   * @param wtaStageLevelListener The stage-level listener to be used by this listener
+   * @param wtaJobLevelListener The job-level listener to be used by this listener
    * @author Henry Page
    * @since 1.0.0
    */
   public ApplicationLevelListener(
       SparkContext sparkContext,
       RuntimeConfig config,
-      TaskStageBaseListener wtaTaskListener,
-      StageLevelListener stageLevelListener,
-      JobLevelListener jobLevelListener) {
+      TaskStageBaseListener wtaTaskLevelListener,
+      StageLevelListener wtaStageLevelListener,
+      JobLevelListener wtaJobLevelListener,
+      SparkDataSource dataSource,
+      MetricStreamingEngine streamingEngine,
+      OutputFile outputPath) {
     super(sparkContext, config);
-    this.wtaTaskListener = wtaTaskListener;
-    this.stageLevelListener = stageLevelListener;
-    this.jobLevelListener = jobLevelListener;
+    taskLevelListener = wtaTaskLevelListener;
+    stageLevelListener = wtaStageLevelListener;
+    jobLevelListener = wtaJobLevelListener;
+    sparkDataSource = dataSource;
+    metricStreamingEngine = streamingEngine;
+    outputFile = outputPath;
   }
 
   /**
@@ -65,20 +86,66 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
    *
    * @param sparkContext The current spark context
    * @param config Additional config specified by the user for the plugin
-   * @param stageLevelListener The stage-level listener to be used by this listener
-   * @param jobLevelListener The job-level listener to be used by this listener
+   * @param wtaStageLevelListener The stage-level listener to be used by this listener
+   * @param wtaJobLevelListener The job-level listener to be used by this listener
    * @author Tianchen Qu
    * @since 1.0.0
    */
   public ApplicationLevelListener(
       SparkContext sparkContext,
       RuntimeConfig config,
-      StageLevelListener stageLevelListener,
-      JobLevelListener jobLevelListener) {
+      StageLevelListener wtaStageLevelListener,
+      JobLevelListener wtaJobLevelListener,
+      SparkDataSource dataSource,
+      MetricStreamingEngine streamingEngine,
+      OutputFile outputPath) {
     super(sparkContext, config);
-    this.wtaTaskListener = stageLevelListener;
-    this.stageLevelListener = stageLevelListener;
-    this.jobLevelListener = jobLevelListener;
+    taskLevelListener = wtaStageLevelListener;
+    stageLevelListener = wtaStageLevelListener;
+    jobLevelListener = wtaJobLevelListener;
+    sparkDataSource = dataSource;
+    metricStreamingEngine = streamingEngine;
+    outputFile = outputPath;
+  }
+
+  public void writeWta(Workload workload) {
+    List<ResourceAndStateWrapper> resourceAndStateWrappers = metricStreamingEngine.collectResourceInformation();
+    Stream<Resource> resources = new Stream<>();
+    resourceAndStateWrappers.stream()
+        .map(ResourceAndStateWrapper::getResource)
+        .forEach(resources::addToStream);
+    Stream<ResourceState> resourceStates = new Stream<>();
+    resourceAndStateWrappers.forEach(rs -> rs.getStates().forEach(resourceStates::addToStream));
+    Stream<Task> tasks = sparkDataSource.getRuntimeConfig().isStageLevel()
+        ? sparkDataSource.getStageLevelListener().getProcessedObjects()
+        : sparkDataSource.getTaskLevelListener().getProcessedObjects();
+    joinThreadPool();
+    WtaWriter wtaWriter = new WtaWriter(outputFile, "schema-1.0", TOOL_VERSION);
+    wtaWriter.write(Task.class, tasks);
+    wtaWriter.write(Resource.class, resources);
+    wtaWriter.write(Workflow.class, sparkDataSource.getJobLevelListener().getProcessedObjects());
+    wtaWriter.write(ResourceState.class, resourceStates);
+    wtaWriter.write(workload);
+
+    Stream.deleteAllSerializedFiles();
+  }
+
+  public void joinThreadPool() {
+    try {
+      sparkDataSource.join();
+    } catch (InterruptedException e) {
+      log.error("Could not join the threads because of {}.", e.getMessage());
+      throw new RuntimeException(e);
+    }
+  }
+
+  public void removeListeners() {
+    if (!sparkDataSource.getRuntimeConfig().isStageLevel()) {
+      sparkDataSource.removeTaskListener();
+    }
+    sparkDataSource.removeStageListener();
+    sparkDataSource.removeJobListener();
+    sparkDataSource.removeApplicationListener();
   }
 
   /**
@@ -255,7 +322,7 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
     }
 
     WorkloadBuilder workloadBuilder = Workload.builder();
-    final Stream<Task> tasks = wtaTaskListener.getProcessedObjects();
+    final Stream<Task> tasks = taskLevelListener.getProcessedObjects();
     Function<Task, Long> networkFunction = Task::getNetworkIoTime;
 
     setGeneralFields(applicationEnd.time(), workloadBuilder);
@@ -273,7 +340,9 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
     setResourceStatisticsFields(
         tasks.copy().map(Task::getEnergyConsumption).toList(), ResourceType.ENERGY, workloadBuilder);
 
-    getThreadPool().execute(() -> addProcessedObject(workloadBuilder.build()));
+    removeListeners();
+
+    writeWta(workloadBuilder.build());
   }
 
   /**

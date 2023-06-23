@@ -1,10 +1,12 @@
 package com.asml.apa.wta.spark.datasource;
 
 import com.asml.apa.wta.core.config.RuntimeConfig;
+import com.asml.apa.wta.core.io.OutputFile;
 import com.asml.apa.wta.spark.listener.ApplicationLevelListener;
 import com.asml.apa.wta.spark.listener.JobLevelListener;
 import com.asml.apa.wta.spark.listener.StageLevelListener;
 import com.asml.apa.wta.spark.listener.TaskLevelListener;
+import com.asml.apa.wta.spark.streams.MetricStreamingEngine;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.spark.SparkContext;
@@ -58,17 +60,34 @@ public class SparkDataSource {
    * @author Lohithsai Yadala Chanchu
    * @since 1.0.0
    */
-  public SparkDataSource(SparkContext sparkContext, RuntimeConfig config) {
+  public SparkDataSource(
+      SparkContext sparkContext,
+      RuntimeConfig config,
+      MetricStreamingEngine metricStreamingEngine,
+      OutputFile outputFile) {
     taskLevelListener = new TaskLevelListener(sparkContext, config);
     stageLevelListener = new StageLevelListener(sparkContext, config);
     if (config.isStageLevel()) {
       jobLevelListener = new JobLevelListener(sparkContext, config, stageLevelListener);
-      applicationLevelListener =
-          new ApplicationLevelListener(sparkContext, config, stageLevelListener, jobLevelListener);
+      applicationLevelListener = new ApplicationLevelListener(
+          sparkContext,
+          config,
+          stageLevelListener,
+          jobLevelListener,
+          this,
+          metricStreamingEngine,
+          outputFile);
     } else {
       jobLevelListener = new JobLevelListener(sparkContext, config, taskLevelListener, stageLevelListener);
       applicationLevelListener = new ApplicationLevelListener(
-          sparkContext, config, taskLevelListener, stageLevelListener, jobLevelListener);
+          sparkContext,
+          config,
+          taskLevelListener,
+          stageLevelListener,
+          jobLevelListener,
+          this,
+          metricStreamingEngine,
+          outputFile);
     }
 
     runtimeConfig = config;
