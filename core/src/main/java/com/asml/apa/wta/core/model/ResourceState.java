@@ -66,7 +66,7 @@ public class ResourceState implements BaseTraceObject {
    */
   @Override
   public GenericRecord convertToRecord(ParquetSchema schema) {
-    log.trace("Converting ResourceState with Resource id {} to record", this.resourceId.getId());
+    log.trace("Converting ResourceState with Resource id to record");
     return schema.convertFromPojo(this, ResourceState.class);
   }
 }

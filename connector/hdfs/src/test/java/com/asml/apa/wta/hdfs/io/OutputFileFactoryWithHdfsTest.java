@@ -19,6 +19,7 @@ class OutputFileFactoryWithHdfsTest {
   }
 
   @Test
+  @EnabledOnOs({OS.LINUX, OS.MAC})
   void creatRelativeLocation() {
     OutputFileFactory factory = new OutputFileFactory();
     OutputFile file = factory.create("path/to/output");

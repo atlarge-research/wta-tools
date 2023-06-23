@@ -57,9 +57,6 @@ public class OperatingSystemSupplier implements InformationSupplier<OsInfoDto> {
   /**
    * Retrieves the amount of free physical memory in bytes.
    *
-   * @implNote deprecation suppress warnings is enabled as the bean method
-   * was only deprecated in Java 14 and this project is currently in Java 11.
-   *
    * @return the amount of free physical memory in bytes
    * @author Atour Mousavi Gourabi
    * @since 1.0.0
@@ -96,9 +93,6 @@ public class OperatingSystemSupplier implements InformationSupplier<OsInfoDto> {
 
   /**
    * Retrieves the amount of total physical memory in bytes.
-   *
-   * @implNote deprecation suppress warnings is enabled as the bean method
-   * was only deprecated in Java 14 and this project is currently in Java 11.
    *
    * @return the amount of total physical memory in bytes
    * @author Atour Mousavi Gourabi

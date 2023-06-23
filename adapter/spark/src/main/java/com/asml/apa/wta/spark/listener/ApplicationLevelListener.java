@@ -4,9 +4,9 @@ import com.asml.apa.wta.core.config.RuntimeConfig;
 import com.asml.apa.wta.core.model.Task;
 import com.asml.apa.wta.core.model.Workflow;
 import com.asml.apa.wta.core.model.Workload;
+import com.asml.apa.wta.core.model.Workload.WorkloadBuilder;
 import com.asml.apa.wta.core.model.enums.Domain;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -19,8 +19,9 @@ import org.apache.spark.scheduler.SparkListenerApplicationStart;
 
 /**
  * This class is an application-level listener for the Spark data source.
- * It's important that one does not override {@link org.apache.spark.scheduler.SparkListenerInterface#onApplicationStart(SparkListenerApplicationStart)} here, as the event is already sent
- * before the listener is registered unless the listener is explicitly registered in the Spark configuration as per <a href="https://stackoverflow.com/questions/36401238/spark-onapplicationstart-is-never-gets-called">SO</a>
+ * It's important that one does not override {@link org.apache.spark.scheduler.SparkListenerInterface#onApplicationStart(SparkListenerApplicationStart)}
+ * here, as the event is already sent before the listener is registered unless the listener is explicitly registered in
+ * the Spark configuration as per <a href="https://stackoverflow.com/questions/36401238/spark-onapplicationstart-is-never-gets-called">SO</a>
  *
  * @author Pil Kyu Cho
  * @author Henry Page
@@ -31,33 +32,33 @@ import org.apache.spark.scheduler.SparkListenerApplicationStart;
 @Slf4j
 public class ApplicationLevelListener extends AbstractListener<Workload> {
 
-  private final JobLevelListener jobLevelListener;
-
-  private final TaskStageBaseListener taskLevelListener;
+  private final TaskStageBaseListener wtaTaskListener;
 
   private final StageLevelListener stageLevelListener;
+
+  private final JobLevelListener jobLevelListener;
 
   /**
    * Constructor for the application-level listener.
    *
    * @param sparkContext The current spark context
    * @param config Additional config specified by the user for the plugin
-   * @param jobLevelListener The job-level listener to be used by this listener
-   * @param taskLevelListener The task-level listener to be used by this listener
+   * @param wtaTaskListener The task-level listener to be used by this listener
    * @param stageLevelListener The stage-level listener to be used by this listener
+   * @param jobLevelListener The job-level listener to be used by this listener
    * @author Henry Page
    * @since 1.0.0
    */
   public ApplicationLevelListener(
       SparkContext sparkContext,
       RuntimeConfig config,
-      JobLevelListener jobLevelListener,
-      TaskStageBaseListener taskLevelListener,
-      StageLevelListener stageLevelListener) {
+      TaskStageBaseListener wtaTaskListener,
+      StageLevelListener stageLevelListener,
+      JobLevelListener jobLevelListener) {
     super(sparkContext, config);
-    this.jobLevelListener = jobLevelListener;
-    this.taskLevelListener = taskLevelListener;
+    this.wtaTaskListener = wtaTaskListener;
     this.stageLevelListener = stageLevelListener;
+    this.jobLevelListener = jobLevelListener;
   }
 
   /**
@@ -65,81 +66,55 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
    *
    * @param sparkContext The current spark context
    * @param config Additional config specified by the user for the plugin
-   * @param jobLevelListener The job-level listener to be used by this listener
    * @param stageLevelListener The stage-level listener to be used by this listener
+   * @param jobLevelListener The job-level listener to be used by this listener
    * @author Tianchen Qu
    * @since 1.0.0
    */
   public ApplicationLevelListener(
       SparkContext sparkContext,
       RuntimeConfig config,
-      JobLevelListener jobLevelListener,
-      StageLevelListener stageLevelListener) {
+      StageLevelListener stageLevelListener,
+      JobLevelListener jobLevelListener) {
     super(sparkContext, config);
-    this.jobLevelListener = jobLevelListener;
-    this.taskLevelListener = stageLevelListener;
+    this.wtaTaskListener = stageLevelListener;
     this.stageLevelListener = stageLevelListener;
+    this.jobLevelListener = jobLevelListener;
   }
 
   /**
-   * Callback function that is called right at the end of the application. Further experimentation
-   * is needed to determine if applicationEnd is called first or shutdown.
+   * Setters for the general fields of the Workload.
    *
-   * @param applicationEnd The event corresponding to the end of the application
-   * @author Henry Page
-   * @author Tianchen Qu
+   * @param dateEnd     End date of the application
+   * @param builder     WorkloadBuilder to be used to build the Workload
+   * @author Pil Kyu Cho
    * @since 1.0.0
    */
-  public void onApplicationEnd(SparkListenerApplicationEnd applicationEnd) {
-    Workload.WorkloadBuilder builder = Workload.builder();
-    if (config.isStageLevel()) {
-      stageLevelListener.setStages();
-    } else {
-      TaskLevelListener listener = (TaskLevelListener) taskLevelListener;
-      listener.setTasks(stageLevelListener);
-    }
-    jobLevelListener.setWorkflows();
-    final List<Task> tasks = taskLevelListener.getProcessedObjects();
-    List<Workload> processedObjects = this.getProcessedObjects();
-
-    if (!processedObjects.isEmpty()) {
-      log.debug("Application end called twice, this should never happen");
-      return;
-    }
-
-    final Workflow[] workflows = jobLevelListener.getProcessedObjects().toArray(new Workflow[0]);
-    final int numWorkflows = workflows.length;
-    final int totalTasks =
-        Arrays.stream(workflows).mapToInt(Workflow::getTaskCount).sum();
+  private void setGeneralFields(long dateEnd, WorkloadBuilder builder) {
     final Domain domain = config.getDomain();
-    final long startDate = sparkContext.startTime();
-    final long endDate = applicationEnd.time();
+    final long dateStart = sparkContext.startTime();
     final String[] authors = config.getAuthors();
     final String workloadDescription = config.getDescription();
-
-    setCounters(tasks, builder);
-    setMinMax(tasks, builder);
-    setMeanStdCov(tasks, builder);
-    setMedianAndQuartiles(tasks, builder);
-    processedObjects.add(builder.totalWorkflows(numWorkflows)
-        .totalTasks(totalTasks)
-        .domain(domain)
-        .dateStart(startDate)
-        .dateEnd(endDate)
-        .authors(authors)
+    builder.authors(authors)
         .workloadDescription(workloadDescription)
-        .build());
+        .domain(domain)
+        .dateStart(dateStart)
+        .dateEnd(dateEnd);
   }
 
   /**
-   * This method sets all statistics about accumulators of the workload.
+   * Setters for the count fields of the Workload.
    *
-   * @param tasks all tasks
-   * @param builder builder for workload
-   * @author Tianchen Qu
+   * @param tasks       List of WTA Task objects
+   * @param builder     WorkloadBuilder to be used to build the Workload
+   * @author Pil Kyu Cho
    * @since 1.0.0
    */
-  private void setCounters(List<Task> tasks, Workload.WorkloadBuilder builder) {
+  private void setCountFields(List<Task> tasks, WorkloadBuilder builder) {
+    final Workflow[] workflows = jobLevelListener.getProcessedObjects().toArray(new Workflow[0]);
+    final int totalWorkflows = workflows.length;
+    final int totalTasks =
+        Arrays.stream(workflows).mapToInt(Workflow::getTaskCount).sum();
     final long numSites =
         tasks.stream().filter(task -> task.getSubmissionSite() != -1).count();
     final long numResources = tasks.stream()
@@ -157,8 +132,9 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
         .map(task -> task.getResourceAmountRequested() * task.getRuntime())
         .reduce(Double::sum)
         .orElse(-1.0);
-
-    builder.numSites(numSites)
+    builder.totalWorkflows(totalWorkflows)
+        .totalTasks(totalTasks)
+        .numSites(numSites)
         .numResources(numResources)
         .numUsers(numUsers)
         .numGroups(numGroups)
@@ -166,302 +142,256 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
   }
 
   /**
-   * This method sets all statistics about minimum value and maximum value.
+   * Private enum to represent the different types of resources for resource fields.
    *
-   * @param tasks all tasks
-   * @param builder builder for workload
-   * @author Tianchen Qu
+   * @author Pil Kyu Cho
    * @since 1.0.0
    */
-  private void setMinMax(List<Task> tasks, Workload.WorkloadBuilder builder) {
-    min(tasks.stream().map(Task::getResourceAmountRequested), builder::minResourceTask);
+  private enum ResourceType {
+    RESOURCE(),
+    MEMORY(),
+    DISK(),
+    NETWORK(),
+    ENERGY();
 
-    max(tasks.stream().map(Task::getResourceAmountRequested), builder::maxResourceTask);
-
-    min(tasks.stream().map(Task::getMemoryRequested), builder::minMemory);
-
-    max(tasks.stream().map(Task::getMemoryRequested), builder::maxMemory);
-
-    minLong(tasks.stream().map(Task::getNetworkIoTime), builder::minNetworkUsage);
-
-    maxLong(tasks.stream().map(Task::getNetworkIoTime), builder::maxNetworkUsage);
-
-    min(tasks.stream().map(Task::getDiskSpaceRequested), builder::minDiskSpaceUsage);
-
-    max(tasks.stream().map(Task::getDiskSpaceRequested), builder::maxDiskSpaceUsage);
-
-    min(tasks.stream().map(Task::getEnergyConsumption), builder::minEnergy);
-
-    max(tasks.stream().map(Task::getEnergyConsumption), builder::maxEnergy);
+    ResourceType() {}
   }
 
   /**
-   * This method sets all statistics about mean, standard deviation and normalized standard deviation.
+   * Setters for the statistical resource fields of the Workload.
    *
-   * @param tasks all tasks
-   * @param builder builder for workload
-   * @author Tianchen Qu
+   * @param tasks           List of WTA Task objects
+   * @param function        Function to be applied to the tasks to get the resource field
+   * @param resourceType    Type of resource to be set
+   * @param builder         WorkloadBuilder to be used to build the Workload
+   * @author Pil Kyu Cho
    * @since 1.0.0
    */
-  private void setMeanStdCov(List<Task> tasks, Workload.WorkloadBuilder builder) {
-    final long resourceTaskSize = validSize(tasks.stream().map(Task::getResourceAmountRequested));
+  @SuppressWarnings("CyclomaticComplexity")
+  private void setResourceStatisticsFields(
+      List<Task> tasks, Function<Task, Double> function, ResourceType resourceType, WorkloadBuilder builder) {
+    List<Double> sortedPositiveList =
+        tasks.stream().map(function).filter(x -> x >= 0.0).sorted().collect(Collectors.toList());
+    final double meanField = computeMean(tasks.stream().map(function), sortedPositiveList.size());
+    final double stdField =
+        computeStd(tasks.stream().map(function).filter(x -> x >= 0.0), meanField, sortedPositiveList.size());
 
-    final double meanResourceTask =
-        mean(tasks.stream().map(Task::getResourceAmountRequested), resourceTaskSize, builder::meanResourceTask);
-
-    stdAndCov(
-        tasks.stream().map(Task::getResourceAmountRequested).filter(resourceAmount -> resourceAmount >= 0.0),
-        meanResourceTask,
-        resourceTaskSize,
-        builder::stdResourceTask,
-        builder::covResourceTask);
-    long memorySize = validSize(tasks.stream().map(Task::getMemoryRequested));
-
-    final double meanMemory = mean(tasks.stream().map(Task::getMemoryRequested), memorySize, builder::meanMemory);
-
-    stdAndCov(
-        tasks.stream().map(Task::getMemoryRequested).filter(memory -> memory >= 0.0),
-        meanMemory,
-        memorySize,
-        builder::stdMemory,
-        builder::covMemory);
-    final long diskSpaceSize = validSize(tasks.stream().map(Task::getDiskSpaceRequested));
-    final double meanDiskSpaceUsage =
-        mean(tasks.stream().map(Task::getDiskSpaceRequested), diskSpaceSize, builder::meanDiskSpaceUsage);
-
-    stdAndCov(
-        tasks.stream().map(Task::getDiskSpaceRequested).filter(diskSpace -> diskSpace >= 0.0),
-        meanDiskSpaceUsage,
-        diskSpaceSize,
-        builder::stdDiskSpaceUsage,
-        builder::covDiskSpaceUsage);
-    final long networkUsageSize =
-        validSize(tasks.stream().mapToDouble(Task::getNetworkIoTime).boxed());
-    final double meanNetworkUsage = mean(
-        tasks.stream().mapToDouble(Task::getNetworkIoTime).boxed(),
-        networkUsageSize,
-        builder::meanNetworkUsage);
-
-    stdAndCov(
-        tasks.stream()
-            .map(Task::getNetworkIoTime)
-            .filter(networkIo -> networkIo >= 0.0)
-            .map(Long::doubleValue),
-        meanNetworkUsage,
-        networkUsageSize,
-        builder::stdNetworkUsage,
-        builder::covNetworkUsage);
-    final long energySize = validSize(tasks.stream().map(Task::getEnergyConsumption));
-    final double meanEnergy = mean(tasks.stream().map(Task::getEnergyConsumption), energySize, builder::meanEnergy);
-
-    stdAndCov(
-        tasks.stream().map(Task::getEnergyConsumption).filter(energy -> energy >= 0.0),
-        meanEnergy,
-        energySize,
-        builder::stdEnergy,
-        builder::covEnergy);
-  }
-
-  /**
-   * This method sets all statistics about median and Quartiles.
-   *
-   * @param tasks all tasks
-   * @param builder builder for workload
-   * @author Tianchen Qu
-   * @since 1.0.0
-   */
-  private void setMedianAndQuartiles(List<Task> tasks, Workload.WorkloadBuilder builder) {
-    medianAndQuartiles(
-        tasks.stream()
-            .map(Task::getResourceAmountRequested)
-            .filter(resourceAmount -> resourceAmount >= 0.0)
-            .collect(Collectors.toList()),
-        -1.0,
-        builder::medianResourceTask,
-        builder::firstQuartileResourceTask,
-        builder::thirdQuartileResourceTask);
-
-    medianAndQuartiles(
-        tasks.stream()
-            .map(Task::getMemoryRequested)
-            .filter(memory -> memory >= 0.0)
-            .collect(Collectors.toList()),
-        -1.0,
-        builder::medianMemory,
-        builder::firstQuartileMemory,
-        builder::thirdQuartileMemory);
-
-    medianAndQuartiles(
-        tasks.stream()
-            .map(Task::getNetworkIoTime)
-            .filter(networkIo -> networkIo >= 0)
-            .collect(Collectors.toList()),
-        -1L,
-        builder::medianNetworkUsage,
-        builder::firstQuartileNetworkUsage,
-        builder::thirdQuartileNetworkUsage);
-
-    medianAndQuartiles(
-        tasks.stream()
-            .map(Task::getDiskSpaceRequested)
-            .filter(diskSpace -> diskSpace >= 0.0)
-            .collect(Collectors.toList()),
-        -1.0,
-        builder::medianDiskSpaceUsage,
-        builder::firstQuartileDiskSpaceUsage,
-        builder::thirdQuartileDiskSpaceUsage);
-
-    medianAndQuartiles(
-        tasks.stream()
-            .map(Task::getEnergyConsumption)
-            .filter(energy -> energy >= 0.0)
-            .collect(Collectors.toList()),
-        -1.0,
-        builder::medianEnergy,
-        builder::firstQuartileEnergy,
-        builder::thirdQuartileEnergy);
-  }
-
-  /**
-   * This return the size of the data after filtering for positive ones.
-   * It is needed for calculation of mean and standard deviation.
-   *
-   * @param data stream of data
-   * @return the size of positive elements
-   * @author Tianchen Qu
-   * @since 1.0.0
-   */
-  private long validSize(Stream<Double> data) {
-    return data.filter(x -> x >= 0.0).count();
-  }
-
-  /**
-   * Find the maximum element inside the double valued stream and give it to the field of the builder.
-   *
-   * @param data data
-   * @param builder builder
-   * @author Tianchen Qu
-   * @since 1.0.0
-   */
-  private void max(Stream<Double> data, Function<Double, Workload.WorkloadBuilder> builder) {
-    builder.apply(data.filter(x -> x >= 0.0).reduce(Double::max).orElse(-1.0));
-  }
-
-  /**
-   * Find the minimum element of the double valued stream and set the corresponding field in the builder as that value.
-   *
-   * @param data data stream
-   * @param builder builder
-   * @author Tianchen Qu
-   * @since 1.0.0
-   */
-  private void min(Stream<Double> data, Function<Double, Workload.WorkloadBuilder> builder) {
-    builder.apply(data.filter(x -> x >= 0.0).reduce(Double::min).orElse(-1.0));
-  }
-
-  /**
-   * Maximum function for long value.
-   *
-   * @param data data stream
-   * @param builder builder
-   * @author Tianchen Qu
-   * @since 1.0.0
-   */
-  private void maxLong(Stream<Long> data, Function<Long, Workload.WorkloadBuilder> builder) {
-    builder.apply(data.filter(x -> x >= 0).reduce(Long::max).orElse(-1L));
-  }
-
-  /**
-   * Minimum function for long value.
-   *
-   * @param data data stream
-   * @param builder builder
-   * @author Tianchen Qu
-   * @since 1.0.0
-   */
-  private void minLong(Stream<Long> data, Function<Long, Workload.WorkloadBuilder> builder) {
-    builder.apply(data.filter(x -> x >= 0).reduce(Long::min).orElse(-1L));
-  }
-
-  /**
-   * Mean value for the data stream with invalid stream handling.
-   * Will set up the corresponding field with the builder parameter that is passed.
-   *
-   * @param data data stream
-   * @param validSize size of the stream
-   * @param builder builder
-   * @return the mean value
-   * @author Tianchen Qu
-   * @since 1.0.0
-   */
-  private double mean(Stream<Double> data, long validSize, Function<Double, Workload.WorkloadBuilder> builder) {
-    double mean = -1.0;
-    if (validSize != 0) {
-      mean = data.filter(x -> x >= 0.0).reduce(Double::sum).orElse((double) -validSize) / validSize;
-    }
-    builder.apply(mean);
-    return mean;
-  }
-
-  /**
-   *  Standard deviation value and normalized standard deviation value for the data stream with invalid stream handling.
-   *
-   * @param data data stream
-   * @param mean mean value from previous method
-   * @param validSize size from previous method
-   * @param std the builder for the standard deviation field
-   * @param cov the builder for the normalized standard deviation field
-   * @author Tianchen Qu
-   * @since 1.0.0
-   */
-  private void stdAndCov(
-      Stream<Double> data,
-      Double mean,
-      long validSize,
-      Function<Double, Workload.WorkloadBuilder> std,
-      Function<Double, Workload.WorkloadBuilder> cov) {
-    if (validSize == 0 || mean == -1.0) {
-      std.apply(-1.0);
-      cov.apply(-1.0);
-    } else {
-      double temp = data.map(x -> x * x).reduce(Double::sum).orElse(-1.0);
-      temp = Math.pow(temp / validSize - mean * mean, 0.5);
-      std.apply(temp);
-      if (mean == 0.0) {
-        cov.apply(-1.0);
-      } else {
-        cov.apply(temp / mean);
-      }
+    switch (resourceType) {
+      case RESOURCE:
+        builder.minResourceTask(computeMin(tasks.stream().map(function)))
+            .maxResourceTask(computeMax(tasks.stream().map(function)))
+            .meanResourceTask(meanField)
+            .stdResourceTask(stdField)
+            .covResourceTask(computeCov(meanField, stdField))
+            .medianResourceTask(sortedPositiveList.isEmpty() ? -1.0 : computeMedian(sortedPositiveList))
+            .firstQuartileResourceTask(
+                sortedPositiveList.isEmpty() ? -1.0 : computeFirstQuantile(sortedPositiveList))
+            .thirdQuartileResourceTask(
+                sortedPositiveList.isEmpty() ? -1.0 : computeThirdQuantile(sortedPositiveList));
+        break;
+      case MEMORY:
+        builder.minMemory(computeMin(tasks.stream().map(function)))
+            .maxMemory(computeMax(tasks.stream().map(function)))
+            .meanMemory(meanField)
+            .stdMemory(stdField)
+            .covMemory(computeCov(meanField, stdField))
+            .medianMemory(sortedPositiveList.isEmpty() ? -1.0 : computeMedian(sortedPositiveList))
+            .firstQuartileMemory(
+                sortedPositiveList.isEmpty() ? -1.0 : computeFirstQuantile(sortedPositiveList))
+            .thirdQuartileMemory(
+                sortedPositiveList.isEmpty() ? -1.0 : computeThirdQuantile(sortedPositiveList));
+        break;
+      case NETWORK:
+        builder.minNetworkUsage((long) computeMin(tasks.stream().map(function)))
+            .maxNetworkUsage((long) computeMax(tasks.stream().map(function)))
+            .meanNetworkUsage(meanField)
+            .stdNetworkUsage(stdField)
+            .covNetworkUsage(computeCov(meanField, stdField))
+            .medianNetworkUsage(
+                sortedPositiveList.isEmpty() ? -1L : (long) computeMedian(sortedPositiveList))
+            .firstQuartileNetworkUsage(
+                sortedPositiveList.isEmpty() ? -1L : (long) computeFirstQuantile(sortedPositiveList))
+            .thirdQuartileNetworkUsage(
+                sortedPositiveList.isEmpty() ? -1L : (long) computeThirdQuantile(sortedPositiveList));
+        break;
+      case DISK:
+        builder.minDiskSpaceUsage(computeMin(tasks.stream().map(function)))
+            .maxDiskSpaceUsage(computeMax(tasks.stream().map(function)))
+            .meanDiskSpaceUsage(meanField)
+            .stdDiskSpaceUsage(stdField)
+            .covDiskSpaceUsage(computeCov(meanField, stdField))
+            .medianDiskSpaceUsage(sortedPositiveList.isEmpty() ? -1.0 : computeMedian(sortedPositiveList))
+            .firstQuartileDiskSpaceUsage(
+                sortedPositiveList.isEmpty() ? -1.0 : computeFirstQuantile(sortedPositiveList))
+            .thirdQuartileDiskSpaceUsage(
+                sortedPositiveList.isEmpty() ? -1.0 : computeThirdQuantile(sortedPositiveList));
+        break;
+      case ENERGY:
+        builder.minEnergy(computeMin(tasks.stream().map(function)))
+            .maxEnergy(computeMax(tasks.stream().map(function)))
+            .meanEnergy(meanField)
+            .stdEnergy(stdField)
+            .covEnergy(computeCov(meanField, stdField))
+            .medianEnergy(sortedPositiveList.isEmpty() ? -1.0 : computeMedian(sortedPositiveList))
+            .firstQuartileEnergy(
+                sortedPositiveList.isEmpty() ? -1.0 : computeFirstQuantile(sortedPositiveList))
+            .thirdQuartileEnergy(
+                sortedPositiveList.isEmpty() ? -1.0 : computeThirdQuantile(sortedPositiveList));
     }
   }
 
   /**
-   * This method will set the median, first quartile and third quartile elements for the given data list.
+   * Callback function that is called right at the end of the application. Further experimentation
+   * is needed to determine if applicationEnd is called first or shutdown.
    *
-   * @param data data list
-   * @param defaultValue the default median,first quartile, third quartile value given invalid list
-   * @param median builder for median value
-   * @param firstQuartile builder for first quartile value
-   * @param thirdQuartile builder for third quartile value
-   * @param <T> the type of the list, needs to be comparable to sort the list
+   * @param applicationEnd    The event corresponding to the end of the application
+   * @author Henry Page
    * @author Tianchen Qu
+   * @author Pil Kyu Cho
    * @since 1.0.0
    */
-  private <T extends Comparable<T>> void medianAndQuartiles(
-      List<T> data,
-      T defaultValue,
-      Function<T, Workload.WorkloadBuilder> median,
-      Function<T, Workload.WorkloadBuilder> firstQuartile,
-      Function<T, Workload.WorkloadBuilder> thirdQuartile) {
-    if (data.size() == 0) {
-      median.apply(defaultValue);
-      firstQuartile.apply(defaultValue);
-      thirdQuartile.apply(defaultValue);
-    } else {
-      Collections.sort(data);
-      median.apply(data.get(data.size() / 2));
-      firstQuartile.apply(data.get(data.size() / 4));
-      thirdQuartile.apply(data.get(data.size() * 3 / 4));
+  public void onApplicationEnd(SparkListenerApplicationEnd applicationEnd) {
+    // we should never enter this branch, this is a guard since an application only terminates once.
+    if (!this.getProcessedObjects().isEmpty()) {
+      log.debug("Application end called twice, this should never happen");
+      return;
     }
+    jobLevelListener.setWorkflows();
+
+    WorkloadBuilder workloadBuilder = Workload.builder();
+    final List<Task> tasks = wtaTaskListener.getProcessedObjects();
+    Function<Task, Long> networkFunction = Task::getNetworkIoTime;
+
+    setGeneralFields(applicationEnd.time(), workloadBuilder);
+    setCountFields(tasks, workloadBuilder);
+    setResourceStatisticsFields(tasks, Task::getResourceAmountRequested, ResourceType.RESOURCE, workloadBuilder);
+    setResourceStatisticsFields(tasks, Task::getMemoryRequested, ResourceType.MEMORY, workloadBuilder);
+    setResourceStatisticsFields(
+        tasks, networkFunction.andThen(Long::doubleValue), ResourceType.NETWORK, workloadBuilder);
+    setResourceStatisticsFields(tasks, Task::getDiskSpaceRequested, ResourceType.DISK, workloadBuilder);
+    setResourceStatisticsFields(tasks, Task::getEnergyConsumption, ResourceType.ENERGY, workloadBuilder);
+    this.getProcessedObjects().add(workloadBuilder.build());
+  }
+
+  /**
+   * Finds the maximum element inside the double valued stream.
+   *
+   * @param data              stream of data
+   * @return                  double maximum value from data
+   * @author Tianchen Qu
+   * @author Pil Kyu Cho
+   * @since 1.0.0
+   */
+  private double computeMax(Stream<Double> data) {
+    return data.reduce(Double::max).orElse(-1.0);
+  }
+
+  /**
+   * Finds the minimum element of the double valued stream.
+   *
+   * @param data              stream of data
+   * @return                  double minimum value from data
+   * @author Tianchen Qu
+   * @author Pil Kyu Cho
+   * @since 1.0.0
+   */
+  private double computeMin(Stream<Double> data) {
+    return data.filter(x -> x >= 0.0).reduce(Double::min).orElse(-1.0);
+  }
+
+  /**
+   * Mean value for the double type data stream with invalid stream handling.
+   *
+   * @param data              stream of data
+   * @param size              size of the stream
+   * @return                  mean value from data or -1.0
+   * @author Tianchen Qu
+   * @author Pil Kyu Cho
+   * @since 1.0.0
+   */
+  private double computeMean(Stream<Double> data, long size) {
+    if (size == 0) {
+      return -1.0;
+    }
+    return data.filter(x -> x >= 0.0).reduce(Double::sum).orElse((double) -size) / size;
+  }
+
+  /**
+   * Standard deviation value for data stream with invalid stream handling. Assumes the data has
+   * positive elements only.
+   *
+   * @param data              stream of data
+   * @param mean              mean value from {@link #computeMean(Stream, long)}
+   * @param size              size from data
+   * @return                  standard deviation value from data or -1.0
+   * @author Tianchen Qu
+   * @author Pil Kyu Cho
+   * @since 1.0.0
+   */
+  private double computeStd(Stream<Double> data, double mean, long size) {
+    if (size == 0 || mean == -1.0) {
+      return -1.0;
+    }
+    double numerator = data.map(x -> x * x).reduce(Double::sum).orElse(-1.0);
+    if (numerator == -1.0) {
+      return -1.0;
+    }
+    return Math.pow(numerator / size - mean * mean, 0.5);
+  }
+
+  /**
+   * Normalized deviation value for data stream with invalid stream handling.
+   *
+   * @param mean              mean value from {@link #computeMean(Stream, long)}
+   * @param std               standard deviation from {@link #computeStd(Stream, double, long)}
+   * @return                  normalized standard deviation value from data or -1.0
+   * @author Tianchen Qu
+   * @author Pil Kyu Cho
+   * @since 1.0.0
+   */
+  private double computeCov(double mean, double std) {
+    if (mean == 0.0 || mean == -1.0 || std == -1.0) {
+      return -1.0;
+    }
+    return std / mean;
+  }
+
+  /**
+   * Median value for data stream. Assumes that data is not empty, sorted, and positive elements only.
+   *
+   * @param data            stream of data
+   * return                 median value of the data
+   * @author Tianchen Qu
+   * @author Pil Kyu Cho
+   * @since 1.0.0
+   */
+  private double computeMedian(List<Double> data) {
+    return data.get(data.size() / 2);
+  }
+
+  /**
+   * First quantile value for data stream. Assumes that data is not empty, sorted, and positive elements only.
+   *
+   * @param data            stream of data
+   * return                 first quantile value of the data
+   * @author Tianchen Qu
+   * @author Pil Kyu Cho
+   * @since 1.0.0
+   */
+  private double computeFirstQuantile(List<Double> data) {
+    return data.get(data.size() / 4);
+  }
+
+  /**
+   * Third quantile value for data stream. Assumes that data is not empty, sorted, and positive elements only.
+   *
+   * @param data            stream of data
+   * return                 third quantile value of the data
+   * @author Tianchen Qu
+   * @author Pil Kyu Cho
+   * @since 1.0.0
+   */
+  private double computeThirdQuantile(List<Double> data) {
+    return data.get(data.size() * 3 / 4);
   }
 }

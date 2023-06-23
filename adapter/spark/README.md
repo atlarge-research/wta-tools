@@ -78,15 +78,16 @@ There are two ways to make use of the plugin
 1. Integrate the plugin into the Spark application source code
 2. Create the plugin as a JAR and run alongside the main Spark application via **spark-submit**
 
+Note that for either approaches, `sparkContext.stop()` must be specified at the end of the main Java application to invoke the plugin's application finished callback. Otherwise, the plugin doesn't end properly.
+
 ### Plugin Integration
 For the first approach, create a `SparkConf` object and set the following config:
 
 ```java
 conf.set("spark.plugins", "com.asml.apa.wta.spark.WtaPlugin");
-System.setProperty("configFile", "adapter/spark/src/test/resources/config.json");
+conf.set("spark.driver.extraJavaOptions", "-DconfigFile=<config.json_location>");
 ```
-The first line registers the main plugin class within the Spark session. The second line creates an environment variable
-for the plugin class to use.
+The first line registers the main plugin class within the Spark session. The second line sets the config filepath value to the *spark.driver.extraJavaOptions* key for the driver component to access.
 
 ### CLI Execution
 For the second approach, create a JAR file of the plugin and run it alongside the main Spark application using
@@ -97,10 +98,10 @@ For the second approach, create a JAR file of the plugin and run it alongside th
 - Execute the following command in the directory where the jar file is located:
 
 ```shell
-spark-submit --class <main class path to spark application> --master local[1]
---conf spark.plugins=com.asml.apa.wta.spark.WtaPlugin
---conf "spark.driver.extraJavaOptions=-DconfigFile=<config.json_location>"
---jars <plugin_jar_location> <Spark_jar_location>
+spark-submit --class <main class path to spark application> --master local \
+--conf spark.plugins=com.asml.apa.wta.spark.WtaPlugin \
+--conf spark.driver.extraJavaOptions=-DconfigFile=<config.json_location> \
+--jars <plugin_jar_location> <Spark_jar_location> \
 <optional arguments for spark application>
 ```
 - The Parquet files should now be located in the `outputPath` as specified in the config file.
@@ -108,6 +109,43 @@ spark-submit --class <main class path to spark application> --master local[1]
 Note: this way, the plugin will be compiled for Scala 2.12. If you want to compile for a Scala 2.13 version of Spark,
 you will need to set the `spark.scala.version` flag to 2.13, such as in
 `mvn -pl adapter/spark -Dspark.scala.version=2.13 clean package`.
+
+### Integration with PySpark
+PySpark is the Python API for Apache Spark and the plugin can also be used with Python scripts that make use of PySpark.
+
+For Spark 3.2.4, a Python version between 3.7 to 3.10 needs to be installed. In addition, add the following environment variables in your `.bashrc` file (adjust the version accordingly):
+
+```
+export PYSPARK_PYTHON=/usr/bin/python3.10
+export PYSPARK_DRIVER_PYTHON=/usr/bin/python3.10
+```
+
+After specifying the above environment variables, adjust your Spark configuration as follows:
+
+```Python
+from pyspark import SparkConf, SparkContext
+
+conf = SparkConf().setAppName("MyApp").set("spark.plugins", "com.asml.apa.wta.spark.WtaPlugin").set("spark.driver.extraJavaOptions", "-DconfigFile=/home/user/sp_resources/config.json")
+sc = SparkContext(conf=conf)
+
+...
+
+sc.stop()
+```
+
+Note that in the Python script, `sc.stop()` must also be specified at the end to invoke the plugin's application finished callback.
+
+Now execute the following command and submit the Python script along with the JAR file of the plugin to **spark-submit**.
+
+```shell
+spark-submit --jars <path-to-plugin-jar> <path-to-python-script>
+```
+
+Another way to specify the plugin config is to use the `--conf` flag in the command line directly:
+
+```shell
+spark-submit --conf spark.plugins=com.asml.apa.wta.spark.WtaPlugin --conf spark.driver.extraJavaOptions=-DconfigFile=<path-to-config-file> --jars <path-to-plugin-jar> <path-to-python-script>
+```
 
 ## Configuration
 General configuration instructions are located [here](/../../README.md#configuration). See above for [instructions](#installation-and-usage) on how to provide the configuration to the plugin.
@@ -167,6 +205,7 @@ Aggregation of all the resource utilisation metrics are done at the driver's end
     - This limitation arises because the plugin relies on dependencies that are only available on UNIX-based systems.
 - Logs will be generated indicating that certain resource utilization metrics cannot be collected.
   - This can potentially cause performance issues if the resource ping interval is small since the plugin will write to the log each time a non-available resource is pinged. I/O operations can be expensive.
+- It is highly recommended to set the `resourcePingInterval` to 2000 and `executorSynchornizationInterval` to 1000.
 
 #### Stage Level Metrics
 - Stage level metrics are only outputted in the trace if they are submitted and successfully completed. The scheduler sometimes creates stages which are later skipped or removed.

@@ -1,6 +1,5 @@
 package com.asml.apa.wta.core.dto;
 
-import java.util.Optional;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,231 +15,231 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public class ProcDto implements SupplierDto {
+
   private static final long serialVersionUID = -5587452226552818612L;
 
   @Builder.Default
-  private Optional<Long> readsCompleted = Optional.empty();
+  private long readsCompleted = -1;
 
   @Builder.Default
-  private Optional<Long> readsMerged = Optional.empty();
+  private long readsMerged = -1;
 
   @Builder.Default
-  private Optional<Long> sectorsRead = Optional.empty();
+  private long sectorsRead = -1;
 
   @Builder.Default
-  private Optional<Long> timeSpentReading = Optional.empty();
+  private long timeSpentReading = -1;
 
   @Builder.Default
-  private Optional<Long> writesCompleted = Optional.empty();
+  private long writesCompleted = -1;
 
   @Builder.Default
-  private Optional<Long> writesMerged = Optional.empty();
+  private long writesMerged = -1;
 
   @Builder.Default
-  private Optional<Long> sectorsWritten = Optional.empty();
+  private long sectorsWritten = -1;
 
   @Builder.Default
-  private Optional<Long> timeSpentWriting = Optional.empty();
+  private long timeSpentWriting = -1;
 
   @Builder.Default
-  private Optional<Long> iosInProgress = Optional.empty();
+  private long iosInProgress = -1;
 
   @Builder.Default
-  private Optional<Long> timeSpentDoingIos = Optional.empty();
+  private long timeSpentDoingIos = -1;
 
   @Builder.Default
-  private Optional<Long> weightedTimeSpentDoingIos = Optional.empty();
+  private long weightedTimeSpentDoingIos = -1;
 
   @Builder.Default
-  private Optional<Long> discardsCompleted = Optional.empty();
+  private long discardsCompleted = -1;
 
   @Builder.Default
-  private Optional<Long> discardsMerged = Optional.empty();
+  private long discardsMerged = -1;
 
   @Builder.Default
-  private Optional<Long> sectorsDiscarded = Optional.empty();
+  private long sectorsDiscarded = -1;
 
   @Builder.Default
-  private Optional<Long> timeSpentDiscarding = Optional.empty();
+  private long timeSpentDiscarding = -1;
 
   @Builder.Default
-  private Optional<Long> flushReqCompleted = Optional.empty();
+  private long flushReqCompleted = -1;
 
   @Builder.Default
-  private Optional<Long> timeSpentFlushing = Optional.empty();
+  private long timeSpentFlushing = -1;
 
   @Builder.Default
-  private Optional<Long> hugePagesTotal = Optional.empty();
+  private long hugePagesTotal = -1;
 
   @Builder.Default
-  private Optional<Long> hugePagesFree = Optional.empty();
+  private long hugePagesFree = -1;
 
   @Builder.Default
-  private Optional<Long> hugePagesRsvd = Optional.empty();
+  private long hugePagesRsvd = -1;
 
   @Builder.Default
-  private Optional<Long> hugePagesSurp = Optional.empty();
+  private long hugePagesSurp = -1;
 
   // Units for below metrics are all in kB
 
   @Builder.Default
-  private Optional<Long> memTotal = Optional.empty();
+  private long memTotal = -1;
 
   @Builder.Default
-  private Optional<Long> memFree = Optional.empty();
+  private long memFree = -1;
 
   @Builder.Default
-  private Optional<Long> memAvailable = Optional.empty();
+  private long memAvailable = -1;
 
   @Builder.Default
-  private Optional<Long> buffers = Optional.empty();
+  private long buffers = -1;
 
   @Builder.Default
-  private Optional<Long> cached = Optional.empty();
+  private long cached = -1;
 
   @Builder.Default
-  private Optional<Long> swapCached = Optional.empty();
+  private long swapCached = -1;
 
   @Builder.Default
-  private Optional<Long> active = Optional.empty();
+  private long active = -1;
 
   @Builder.Default
-  private Optional<Long> inactive = Optional.empty();
+  private long inactive = -1;
 
   @Builder.Default
-  private Optional<Long> activeAnon = Optional.empty();
+  private long activeAnon = -1;
 
   @Builder.Default
-  private Optional<Long> inactiveAnon = Optional.empty();
+  private long inactiveAnon = -1;
 
   @Builder.Default
-  private Optional<Long> activeFile = Optional.empty();
+  private long activeFile = -1;
 
   @Builder.Default
-  private Optional<Long> inactiveFile = Optional.empty();
+  private long inactiveFile = -1;
 
   @Builder.Default
-  private Optional<Long> unevictable = Optional.empty();
+  private long unevictable = -1;
 
   @Builder.Default
-  private Optional<Long> mLocked = Optional.empty();
+  private long mLocked = -1;
 
   @Builder.Default
-  private Optional<Long> swapTotal = Optional.empty();
+  private long swapTotal = -1;
 
   @Builder.Default
-  private Optional<Long> swapFree = Optional.empty();
+  private long swapFree = -1;
 
   @Builder.Default
-  private Optional<Long> dirty = Optional.empty();
+  private long dirty = -1;
 
   @Builder.Default
-  private Optional<Long> writeback = Optional.empty();
+  private long writeback = -1;
 
   @Builder.Default
-  private Optional<Long> anonPages = Optional.empty();
+  private long anonPages = -1;
 
   @Builder.Default
-  private Optional<Long> mapped = Optional.empty();
+  private long mapped = -1;
 
   @Builder.Default
-  private Optional<Long> shmem = Optional.empty();
+  private long shmem = -1;
 
   @Builder.Default
-  private Optional<Long> kReclaimable = Optional.empty();
+  private long kReclaimable = -1;
 
   @Builder.Default
-  private Optional<Long> slab = Optional.empty();
+  private long slab = -1;
 
   @Builder.Default
-  private Optional<Long> sReclaimable = Optional.empty();
+  private long sReclaimable = -1;
 
   @Builder.Default
-  private Optional<Long> sUnreclaim = Optional.empty();
+  private long sUnreclaim = -1;
 
   @Builder.Default
-  private Optional<Long> kernelStack = Optional.empty();
+  private long kernelStack = -1;
 
   @Builder.Default
-  private Optional<Long> pageTables = Optional.empty();
+  private long pageTables = -1;
 
   @Builder.Default
-  private Optional<Long> nfsUnstable = Optional.empty();
+  private long nfsUnstable = -1;
 
   @Builder.Default
-  private Optional<Long> bounce = Optional.empty();
+  private long bounce = -1;
 
   @Builder.Default
-  private Optional<Long> writebackTmp = Optional.empty();
+  private long writebackTmp = -1;
 
   @Builder.Default
-  private Optional<Long> commitLimit = Optional.empty();
+  private long commitLimit = -1;
 
   @Builder.Default
-  private Optional<Long> committedAs = Optional.empty();
+  private long committedAs = -1;
 
   @Builder.Default
-  private Optional<Long> vMallocTotal = Optional.empty();
+  private long vMallocTotal = -1;
 
   @Builder.Default
-  private Optional<Long> vMallocUsed = Optional.empty();
+  private long vMallocUsed = -1;
 
   @Builder.Default
-  private Optional<Long> vMallocChunk = Optional.empty();
+  private long vMallocChunk = -1;
 
   @Builder.Default
-  private Optional<Long> percpu = Optional.empty();
+  private long percpu = -1;
 
   @Builder.Default
-  private Optional<Long> anonHugePages = Optional.empty();
+  private long anonHugePages = -1;
 
   @Builder.Default
-  private Optional<Long> shmemHugePages = Optional.empty();
+  private long shmemHugePages = -1;
 
   @Builder.Default
-  private Optional<Long> shmemPmdMapped = Optional.empty();
+  private long shmemPmdMapped = -1;
 
   @Builder.Default
-  private Optional<Long> fileHugePages = Optional.empty();
+  private long fileHugePages = -1;
 
   @Builder.Default
-  private Optional<Long> filePmdMapped = Optional.empty();
+  private long filePmdMapped = -1;
 
   @Builder.Default
-  private Optional<Long> hugePageSize = Optional.empty();
+  private long hugePageSize = -1;
 
   @Builder.Default
-  private Optional<Long> hugetlb = Optional.empty();
+  private long hugetlb = -1;
 
   @Builder.Default
-  private Optional<Long> directMap4k = Optional.empty();
+  private long directMap4k = -1;
 
   @Builder.Default
-  private Optional<Long> directMap2M = Optional.empty();
+  private long directMap2M = -1;
 
   @Builder.Default
-  private Optional<Long> directMap1G = Optional.empty();
+  private long directMap1G = -1;
 
   @Builder.Default
-  private Optional<String> cpuModel = Optional.empty();
+  private String cpuModel = "unknown";
 
   @Builder.Default
-  private Optional<Double> loadAvgOneMinute = Optional.empty();
+  private double loadAvgOneMinute = -1.0;
 
   @Builder.Default
-  private Optional<Double> loadAvgFiveMinutes = Optional.empty();
+  private double loadAvgFiveMinutes = -1.0;
 
   @Builder.Default
-  private Optional<Double> loadAvgFifteenMinutes = Optional.empty();
+  private double loadAvgFifteenMinutes = -1.0;
 
   @Builder.Default
-  private Optional<Double> numberOfExecutingKernelSchedulingEntities = Optional.empty();
+  private double numberOfExecutingKernelSchedulingEntities = -1.0;
 
   @Builder.Default
-  private Optional<Double> numberOfExistingKernelSchedulingEntities = Optional.empty();
+  private double numberOfExistingKernelSchedulingEntities = -1.0;
 
   @Builder.Default
-  private Optional<Double> pIdOfMostRecentlyCreatedProcess = Optional.empty();
+  private double pIdOfMostRecentlyCreatedProcess = -1.0;
 }

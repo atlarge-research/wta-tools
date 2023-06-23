@@ -93,12 +93,12 @@ public abstract class SupplierExtractionEngine<T extends BaseSupplierDto> {
             procDtoCompletableFuture)
         .thenCompose((v) -> {
           long timestamp = System.currentTimeMillis();
-          Optional<OsInfoDto> osInfoDto = osInfoDtoCompletableFuture.join();
-          Optional<IostatDto> iostatDto = iostatDtoCompletableFuture.join();
-          Optional<DstatDto> dstatDto = dstatDtoCompletableFuture.join();
-          Optional<PerfDto> perfDto = perfDtoCompletableFuture.join();
-          Optional<JvmFileDto> jvmFileDto = jvmFileDtoCompletableFuture.join();
-          Optional<ProcDto> procDto = procDtoCompletableFuture.join();
+          OsInfoDto osInfoDto = osInfoDtoCompletableFuture.join().orElse(null);
+          IostatDto iostatDto = iostatDtoCompletableFuture.join().orElse(null);
+          DstatDto dstatDto = dstatDtoCompletableFuture.join().orElse(null);
+          PerfDto perfDto = perfDtoCompletableFuture.join().orElse(null);
+          JvmFileDto jvmFileDto = jvmFileDtoCompletableFuture.join().orElse(null);
+          ProcDto procDto = procDtoCompletableFuture.join().orElse(null);
           return CompletableFuture.completedFuture(transform(new BaseSupplierDto(
               timestamp, osInfoDto, iostatDto, dstatDto, perfDto, jvmFileDto, procDto)));
         });
