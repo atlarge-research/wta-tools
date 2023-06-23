@@ -9,6 +9,7 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.Getter;
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.spark.SparkContext;
 import org.apache.spark.scheduler.SparkListenerJobEnd;
 import org.apache.spark.scheduler.SparkListenerJobStart;
@@ -107,19 +108,21 @@ public class JobLevelListener extends AbstractListener<Workflow> {
     final Domain domain = getConfig().getDomain();
     final String appName = getSparkContext().appName();
     final String applicationField = "ETL";
-    final double totalResources = -1.0;
     final double totalMemoryUsage = computeSum(tasks.copy().map(Task::getMemoryRequested));
     final long totalNetworkUsage = (long) computeSum(tasks.copy().map(task -> (double) task.getNetworkIoTime()));
     final double totalDiskSpaceUsage = computeSum(tasks.copy().map(Task::getDiskSpaceRequested));
     final double totalEnergyConsumption = computeSum(tasks.copy().map(Task::getEnergyConsumption));
-
-    Task[] taskArray = tasks.copy().toArray(Task[]::new);
+    final double totalResources = tasks.copy()
+            .map(Task::getResourceAmountRequested)
+            .filter(resourceAmount -> resourceAmount >= 0.0)
+            .reduce(Double::sum)
+            .orElse(-1.0);
 
     getThreadPool().execute(() -> addProcessedObject(Workflow.builder()
             .id(jobId)
             .tsSubmit(tsSubmit)
-            .tasks(taskArray)
-            .taskCount(taskArray.length)
+            .taskIds(ArrayUtils.toPrimitive(tasks.map(Task::getId).toArray(Long[]::new)))
+            .taskCount(tasks.count())
             .criticalPathLength(criticalPathLength)
             .criticalPathTaskCount(criticalPathTaskCount)
             .maxConcurrentTasks(maxNumberOfConcurrentTasks)
@@ -194,21 +197,5 @@ public class JobLevelListener extends AbstractListener<Workflow> {
    */
   private double computeSum(Stream<Double> data) {
     return data.filter(task -> task >= 0.0).reduce(Double::sum).orElse(-1.0);
-  }
-
-  /**
-   * This is a method called on application end. it sets up the resources used in the spark workflow.
-   *
-   * @author Tianchen Qu
-   * @author Pil Kyu Cho
-   * @since 1.0.0
-   */
-  public void setWorkflows() {
-    Stream<Workflow> workflows = getProcessedObjects();
-    workflows.forEach(workflow -> workflow.setTotalResources(Arrays.stream(workflow.getTasks())
-        .map(Task::getResourceAmountRequested)
-        .filter(resourceAmount -> resourceAmount >= 0.0)
-        .reduce(Double::sum)
-        .orElse(-1.0)));
   }
 }

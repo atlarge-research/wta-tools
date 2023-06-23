@@ -82,7 +82,7 @@ public class MetricStreamingEngine {
     return executorResourceStream.mapKeyList((key, value) -> {
       long transformedId = Math.abs(key.hashCode());
       Resource resource = produceResourceFromExecutorInfo(transformedId, value);
-      Stream<ResourceState> states = produceResourceStatesFromExecutorInfo(resource, value);
+      Stream<ResourceState> states = produceResourceStatesFromExecutorInfo(resource.getId(), value);
       return new ResourceAndStateWrapper(resource, states);
     });
   }
@@ -147,14 +147,14 @@ public class MetricStreamingEngine {
   /**
    * Constructs a list of resource states from a stream of pings.
    *
-   * @param associatedResource The associated resource object
-   * @param pings The stream of pings that are to be transformed to states
-   * @return A list of resource states that is constructed from the given information
+   * @param resourceId    associated resource id
+   * @param pings         stream of pings that are to be transformed to states
+   * @return              list of resource states that is constructed from the given information
    * @author Henry Page
    * @since 1.0.0
    */
   private Stream<ResourceState> produceResourceStatesFromExecutorInfo(
-      Resource associatedResource, Stream<SparkBaseSupplierWrapperDto> pings) {
+      long resourceId, Stream<SparkBaseSupplierWrapperDto> pings) {
     return pings.map(ping -> {
       final long timestamp = ping.getTimestamp();
       final String eventType = "resource active";
@@ -202,7 +202,7 @@ public class MetricStreamingEngine {
           .orElse(-1.0);
 
       return ResourceState.builder()
-          .resourceId(associatedResource)
+          .resourceId(resourceId)
           .timestamp(timestamp)
           .eventType(eventType)
           .platformId(platformId)

@@ -113,8 +113,8 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
   private void setCountFields(Stream<Task> tasks, WorkloadBuilder builder) {
     final Workflow[] workflows = jobLevelListener.getProcessedObjects().toArray(Workflow[]::new);
     final int totalWorkflows = workflows.length;
-    final int totalTasks =
-        Arrays.stream(workflows).mapToInt(Workflow::getTaskCount).sum();
+    final long totalTasks =
+        Arrays.stream(workflows).mapToLong(Workflow::getTaskCount).sum();
     final long numSites =
         tasks.copy().filter(task -> task.getSubmissionSite() != -1).count();
     final long numResources = tasks.copy()
@@ -254,7 +254,6 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
       log.debug("Application end called twice, this should never happen.");
       return;
     }
-    jobLevelListener.setWorkflows();
 
     WorkloadBuilder workloadBuilder = Workload.builder();
     final Stream<Task> tasks = wtaTaskListener.getProcessedObjects();

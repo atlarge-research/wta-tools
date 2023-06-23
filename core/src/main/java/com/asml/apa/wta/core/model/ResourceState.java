@@ -19,7 +19,7 @@ public class ResourceState implements BaseTraceObject {
 
   private static final long serialVersionUID = 8912154769719138654L;
 
-  private final Resource resourceId;
+  private final long resourceId;
 
   private final long timestamp;
 
