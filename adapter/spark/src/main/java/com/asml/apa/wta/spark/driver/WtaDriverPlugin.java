@@ -66,8 +66,10 @@ public class WtaDriverPlugin implements DriverPlugin {
     log.info("Initialising WTA driver plugin.");
     Map<String, String> executorVars = new HashMap<>();
     try {
-      String configFile =
-          sparkCtx.conf().get("spark.driver.extraJavaOptions").split("-DconfigFile=")[1];
+      String configFile = sparkCtx.conf()
+          .get("spark.driver.extraJavaOptions")
+          .split("-DconfigFile=")[1]
+          .split(" ")[0];
       RuntimeConfig runtimeConfig = RuntimeConfig.readConfig(configFile);
       this.metricStreamingEngine = new MetricStreamingEngine();
       sparkDataSource = new SparkDataSource(sparkCtx, runtimeConfig);
