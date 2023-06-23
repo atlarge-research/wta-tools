@@ -29,7 +29,7 @@ class JobLevelListenerIntegrationTest extends BaseSparkJobIntegrationTest {
         .isEqualTo(spark.sparkContext().getConf().get("spark.app.name"));
     assertThat(workflow.getScheduler()).isEqualTo("FIFO");
 
-    assertThat(workflowp.getTasks()).isNotEmpty().isSortedAccordingTo(Comparator.comparing(Task::getTsSubmit));
+    assertThat(workflow.getTaskCount()).isGreaterThan(0L);
     assertThat(sut1.getJobLevelListener().getProcessedObjects().toList())
         .hasSize(2)
         .isSortedAccordingTo(Comparator.comparing(Workflow::getTsSubmit));
@@ -43,7 +43,7 @@ class JobLevelListenerIntegrationTest extends BaseSparkJobIntegrationTest {
     stopJob();
     assertThat(sut1.getJobLevelListener().getProcessedObjects().toList())
         .hasSizeGreaterThan(0)
-        .allMatch(wf -> wf.getTasks().length == 0);
+        .allMatch(wf -> wf.getTaskCount() == 0);
   }
 
   @Test
