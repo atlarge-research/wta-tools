@@ -4,10 +4,10 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 import com.asml.apa.wta.core.model.Domain;
 import com.asml.apa.wta.core.model.Workflow;
+import com.asml.apa.wta.core.streams.Stream;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.List;
 import org.apache.avro.generic.GenericRecord;
 import org.apache.avro.util.Utf8;
 import org.junit.jupiter.api.Test;
@@ -24,7 +24,7 @@ public class ParquetReadWriteIntegrationTest {
 
     Path testPath = Path.of("test.parquet");
     OutputFile file = new DiskOutputFile(testPath);
-    ParquetSchema parquetSchema = new ParquetSchema(Workflow.class, List.of(workflow), "workflows");
+    ParquetSchema parquetSchema = new ParquetSchema(Workflow.class, new Stream<>(workflow), "workflows");
 
     try (ParquetWriter<Workflow> writer = new ParquetWriter<>(file, parquetSchema)) {
       writer.write(workflow);

@@ -103,7 +103,7 @@ public class WtaDriverPlugin implements DriverPlugin {
 
   /**
    * Gets called just before shutdown. If no prior error occurred, it collects all the
-   * tasks, workflows, and workloads from the Spark job and writes them to a parquet file.
+   * tasks, workflows, and workloads from the Spark job and writes them to a Parquet file.
    * Otherwise, logs the error and just shuts down.
    * Recommended that no Spark functions are used here.
    *
@@ -114,13 +114,13 @@ public class WtaDriverPlugin implements DriverPlugin {
   @Override
   public void shutdown() {
     if (error) {
-      log.error("Plugin shutting down without generating files");
+      log.error("Plugin shutting down without generating files.");
       return;
     }
     try {
       endApplicationAndWrite();
     } catch (Exception e) {
-      log.error("A {} error occurred while generating files: {}", e.getClass(), e.getMessage());
+      log.error("A {} error occurred while generating files: {}.", e.getClass(), e.getMessage());
     }
   }
 
@@ -147,12 +147,10 @@ public class WtaDriverPlugin implements DriverPlugin {
         ? sparkDataSource.getStageLevelListener().getProcessedObjects()
         : sparkDataSource.getTaskLevelListener().getProcessedObjects();
     WtaWriter wtaWriter = new WtaWriter(outputFile, "schema-1.0", TOOL_VERSION);
-    wtaWriter.write(Task.class, tasks.toList());
-    wtaWriter.write(Resource.class, resources.toList());
-    wtaWriter.write(
-        Workflow.class,
-        sparkDataSource.getJobLevelListener().getProcessedObjects().toList());
-    wtaWriter.write(ResourceState.class, resourceStates.toList());
+    wtaWriter.write(Task.class, tasks);
+    wtaWriter.write(Resource.class, resources);
+    wtaWriter.write(Workflow.class, sparkDataSource.getJobLevelListener().getProcessedObjects());
+    wtaWriter.write(ResourceState.class, resourceStates);
     wtaWriter.write(workload);
 
     Stream.deleteAllSerializedFiles();

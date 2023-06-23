@@ -10,13 +10,12 @@ import com.asml.apa.wta.core.model.ResourceState;
 import com.asml.apa.wta.core.model.Task;
 import com.asml.apa.wta.core.model.Workflow;
 import com.asml.apa.wta.core.model.Workload;
+import com.asml.apa.wta.core.streams.Stream;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Comparator;
-import java.util.List;
-import java.util.stream.Stream;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -49,7 +48,7 @@ class WtaWriterIntegrationTest {
   @Test
   void writeWorkflows() {
     Workflow workflow = Workflow.builder().build();
-    sut.write(Workflow.class, List.of(workflow));
+    sut.write(Workflow.class, new com.asml.apa.wta.core.streams.Stream<>(workflow));
     assertThat(new File("wta-output/" + TOOL_VERSION + "/workflows/schema-1.0/workflows.parquet").exists())
         .isTrue();
   }
@@ -57,7 +56,7 @@ class WtaWriterIntegrationTest {
   @Test
   void writeTasks() {
     Task task = Task.builder().build();
-    sut.write(Task.class, List.of(task));
+    sut.write(Task.class, new Stream<>(task));
     assertThat(new File("wta-output/" + TOOL_VERSION + "/tasks/schema-1.0/tasks.parquet").exists())
         .isTrue();
   }
@@ -65,7 +64,7 @@ class WtaWriterIntegrationTest {
   @Test
   void writeResources() {
     Resource resource = Resource.builder().build();
-    sut.write(Resource.class, List.of(resource));
+    sut.write(Resource.class, new Stream<>(resource));
     assertThat(new File("wta-output/" + TOOL_VERSION + "/resources/schema-1.0/resources.parquet").exists())
         .isTrue();
   }
@@ -73,7 +72,7 @@ class WtaWriterIntegrationTest {
   @Test
   void writeResourceStates() {
     ResourceState resourceState = ResourceState.builder().build();
-    sut.write(ResourceState.class, List.of(resourceState));
+    sut.write(ResourceState.class, new Stream<>(resourceState));
     assertThat(new File("wta-output/" + TOOL_VERSION + "/resource_states/schema-1.0/resource_states.parquet")
             .exists())
         .isTrue();
@@ -81,8 +80,9 @@ class WtaWriterIntegrationTest {
 
   @AfterAll
   static void cleanUp() throws IOException {
-    try (Stream<Path> stream = Files.walk(Path.of("wta-output"))) {
-      stream.sorted(Comparator.reverseOrder()).map(Path::toFile).forEach(File::delete);
-    }
+    Files.walk(Path.of("wta-output"))
+        .sorted(Comparator.reverseOrder())
+        .map(Path::toFile)
+        .forEach(File::delete);
   }
 }

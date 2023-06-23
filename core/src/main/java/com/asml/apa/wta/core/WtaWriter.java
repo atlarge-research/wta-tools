@@ -10,8 +10,8 @@ import com.asml.apa.wta.core.model.ResourceState;
 import com.asml.apa.wta.core.model.Task;
 import com.asml.apa.wta.core.model.Workflow;
 import com.asml.apa.wta.core.model.Workload;
+import com.asml.apa.wta.core.streams.Stream;
 import java.io.IOException;
-import java.util.List;
 import java.util.Map;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -64,7 +64,7 @@ public class WtaWriter {
   }
 
   /**
-   * Writes a {@link List} of WTA objects to their corresponding Parquet file.
+   * Writes a {@link Stream} of WTA objects to their corresponding Parquet file.
    *
    * @param clazz the class of WTA objects to write
    * @param wtaObjects the WTA objects to write
@@ -72,13 +72,13 @@ public class WtaWriter {
    * @author Atour Mousavi Gourabi
    * @since 1.0.0
    */
-  public <T extends BaseTraceObject> void write(Class<T> clazz, List<T> wtaObjects) {
+  public <T extends BaseTraceObject> void write(Class<T> clazz, Stream<T> wtaObjects) {
     String label = parquetLabels.get(clazz);
-    ParquetSchema schema = new ParquetSchema(clazz, wtaObjects, label);
+    ParquetSchema schema = new ParquetSchema(clazz, wtaObjects.copy(), label);
     OutputFile path = file.resolve(label).resolve(schemaVersion).resolve(label + ".parquet");
     try (ParquetWriter<T> wtaParquetWriter = new ParquetWriter<>(path, schema)) {
-      for (T wtaObject : wtaObjects) {
-        wtaParquetWriter.write(wtaObject);
+      while (!wtaObjects.isEmpty()) {
+        wtaParquetWriter.write(wtaObjects.head());
       }
     } catch (IOException e) {
       log.error("Could not write {} to file.", label);
