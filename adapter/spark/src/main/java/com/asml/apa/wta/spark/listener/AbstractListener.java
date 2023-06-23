@@ -2,7 +2,7 @@ package com.asml.apa.wta.spark.listener;
 
 import com.asml.apa.wta.core.config.RuntimeConfig;
 import com.asml.apa.wta.core.model.BaseTraceObject;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -36,7 +36,7 @@ public abstract class AbstractListener<T extends BaseTraceObject> extends SparkL
    * A list of processed domain objects.
    */
   @Getter
-  private final List<T> processedObjects = new LinkedList<>();
+  private final List<T> processedObjects = new ArrayList<>();
 
   /**
    * Filters the list of processed objects by the given condition.

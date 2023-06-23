@@ -43,6 +43,7 @@ public class WtaExecutorPlugin implements ExecutorPlugin {
    */
   @Override
   public void init(PluginContext pCtx, Map<String, String> extraConf) {
+    log.info("Attempting to initialise WTA executor plugin on executor {}.", pCtx.executorID());
     if (extraConf == null
         || extraConf.isEmpty()
         || !extraConf.containsKey("errorStatus")
@@ -117,6 +118,6 @@ public class WtaExecutorPlugin implements ExecutorPlugin {
     }
     supplierEngine.stopPinging();
     supplierEngine.stopSynchronizing();
-    log.info("Shutting down WTA executor with no error.");
+    log.info("Shutting down WTA executor.");
   }
 }

@@ -109,7 +109,7 @@ class WtaDriverPluginTest {
     }
 
     verify(sut, times(1)).removeListeners();
-    verify(mockedSparkContext, times(0))
+    verify(mockedSparkContext, times(1))
         .removeSparkListener(sut.getSparkDataSource().getTaskLevelListener());
     verify(mockedSparkContext, times(1))
         .removeSparkListener(sut.getSparkDataSource().getStageLevelListener());

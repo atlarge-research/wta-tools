@@ -4,6 +4,7 @@ import com.asml.apa.wta.core.io.ParquetSchema;
 import com.asml.apa.wta.core.model.enums.Domain;
 import lombok.Builder;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.avro.generic.GenericRecord;
 
 /**
@@ -14,6 +15,7 @@ import org.apache.avro.generic.GenericRecord;
  */
 @Data
 @Builder
+@Slf4j
 public class Workflow implements BaseTraceObject {
 
   private static final long serialVersionUID = 9065743819019553490L;
@@ -63,6 +65,7 @@ public class Workflow implements BaseTraceObject {
    */
   @Override
   public GenericRecord convertToRecord(ParquetSchema schema) {
+    log.trace("Converting Workflow with id {} to record", this.id);
     return schema.convertFromPojo(this, Workflow.class);
   }
 }

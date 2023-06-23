@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 import lombok.Builder;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.avro.generic.GenericRecord;
 
 /**
@@ -15,6 +16,7 @@ import org.apache.avro.generic.GenericRecord;
  */
 @Data
 @Builder
+@Slf4j
 public class Resource implements BaseTraceObject {
 
   private static final long serialVersionUID = 3002249398331752973L;
@@ -51,6 +53,7 @@ public class Resource implements BaseTraceObject {
    */
   @Override
   public GenericRecord convertToRecord(ParquetSchema schema) {
+    log.trace("Converting Resource with id {} to record", this.id);
     return schema.convertFromPojo(this, Resource.class);
   }
 }

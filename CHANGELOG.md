@@ -57,6 +57,7 @@ For the most part, since we are pre-release this will serve no real purpose, oth
 - Enhanced documentation relating to Spark [@hpage](https://gitlab.ewi.tudelft.nl/hpage)
 - Added Spark aggregations [@tqu](https://gitlab.ewi.tudelft.nl/tqu)
 - Set up SPI for the connector output file implementations [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
+- Added enhanced trace level logs [@hpage](https://gitlab.ewi.tudelft.nl/hpage)
 - Added parent-child functionality to Spark stage listeners as well [@pcho](https://gitlab.ewi.tudelft.nl/pcho)
 - Filter the ConcurrentHashMap containers and remove processed entries on job end [@pcho](https://gitlab.ewi.tudelft.nl/pcho)
 - Added coherent Maven lifecycle bindings [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)

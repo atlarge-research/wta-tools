@@ -2,7 +2,7 @@
 
 ## Overview
 
-![img.png](architecture.png)
+![architecture.png](architecture.png)
 
 The Spark Adapter is responsible for parsing Spark execution information into WTA objects.
 The diagram above illustrates the workflow of the adapter.
@@ -14,6 +14,21 @@ The diagram above illustrates the workflow of the adapter.
 - **Label 3:** At each stage, the task scheduler gets sets of tasks from the DAG and the task scheduler
   sends the tasks to each executor.
 - **Label 4:** Once the job has ended, all objects will be serialised into parquet format.
+
+By leveraging the architecture discussed above, the transmission of data across various stages within the plugin can be discussed in further detail.
+The SparkListenerInterface is used to gather Task and Job level data, while additional resource utilization metrics are acquired at the executor level.
+These metrics are then transmitted periodically to the driver using the Spark Plugin API.
+
+
+![dataflow.png](dataflow_diagram.png)
+
+To address the limitation of excessive memory consumption, it is impractical to store all this information solely in the driver's memory.
+As a solution, serialization and deserialization techniques are applied.
+The rate of serialization is configurable by the user.
+Upon completion of the application, all of the data is ultimately outputted to Parquet format.
+
+
+
 
 ## Installation and Usage
 1.  Clone the repository
@@ -90,6 +105,14 @@ spark-submit --class <main class path to spark application> --master local \
 <optional arguments for spark application>
 ```
 - The Parquet files should now be located in the `outputPath` as specified in the config file.
+
+#### Additional Java Options
+- If the user wants to specify additional java options within a `--conf` flag of `spark-submit`, use the following format:
+
+  ```shell
+   --conf "spark.driver.extraJavaOptions=-DconfigFile=<config.json_location> -Dlog4j.rootCategory=TRACE,console" \
+  ```
+  - The arguments have to be seperated with `-D` as shown above, where the config location is always the first argument.
 
 Note: this way, the plugin will be compiled for Scala 2.12. If you want to compile for a Scala 2.13 version of Spark,
 you will need to set the `spark.scala.version` flag to 2.13, such as in
@@ -243,3 +266,10 @@ This snippet can be found [here](src/main/java/com/asml/apa/wta/spark/streams/Me
 [The benchmarking module](../../submodules/benchmarking/README.md) is used to benchmark the performance of the plugin. Any changes to the plugin should be benchmarked to ensure no significant performance degradation.
 
 It is important to note that the benchmarking module is not part of the plugin itself but a separate tool.
+
+## Logging
+The plugin uses the [SLF4J](http://www.slf4j.org/) logging API. This allows the end-user to choose the desired logging frameworks (e.g. java.util.logging, logback, log4j) . The plugin itself does not depend on any logging implementation.
+The plugin log level corresponds to the Spark log level. This means that the plugin log level can be configured using the Spark configuration through the following:
+```java
+sc.setLogLevel("INFO");
+```
