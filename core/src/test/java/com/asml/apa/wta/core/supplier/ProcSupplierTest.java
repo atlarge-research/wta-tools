@@ -1,6 +1,5 @@
 package com.asml.apa.wta.core.supplier;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.doReturn;
 
@@ -52,6 +51,7 @@ public class ProcSupplierTest {
         .when(shellUtils)
         .executeCommand("cat /proc/loadavg", true);
     ProcSupplier sut = new ProcSupplier(shellUtils);
+    sut.setProcAvailable(true);
 
     ProcDto expected = ProcDto.builder()
         .readsCompleted(78853L)
@@ -71,11 +71,7 @@ public class ProcSupplierTest {
         .pIdOfMostRecentlyCreatedProcess(278339.0)
         .build();
 
-    if (sut.isAvailable()) {
-      assertEquals(expected, sut.getSnapshot().join().get());
-    } else {
-      assertThat(sut.getSnapshot().join()).isEmpty();
-    }
+    assertEquals(expected, sut.getSnapshot().join().get());
   }
 
   @Test
@@ -99,14 +95,11 @@ public class ProcSupplierTest {
     doReturn(CompletableFuture.completedFuture("")).when(shellUtils).executeCommand("cat /proc/loadavg", false);
     doReturn(CompletableFuture.completedFuture("")).when(shellUtils).executeCommand("cat /proc/loadavg", true);
     ProcSupplier sut = new ProcSupplier(shellUtils);
+    sut.setProcAvailable(true);
 
     ProcDto expected = ProcDto.builder().build();
 
-    if (sut.isAvailable()) {
-      assertEquals(expected, sut.getSnapshot().join().get());
-    } else {
-      assertThat(sut.getSnapshot().join()).isEmpty();
-    }
+    assertEquals(expected, sut.getSnapshot().join().get());
   }
 
   @Test
@@ -130,13 +123,10 @@ public class ProcSupplierTest {
     doReturn(CompletableFuture.completedFuture(null)).when(shellUtils).executeCommand("cat /proc/loadavg", false);
     doReturn(CompletableFuture.completedFuture(null)).when(shellUtils).executeCommand("cat /proc/loadavg", true);
     ProcSupplier sut = new ProcSupplier(shellUtils);
+    sut.setProcAvailable(true);
 
     ProcDto expected = ProcDto.builder().build();
 
-    if (sut.isAvailable()) {
-      assertEquals(expected, sut.getSnapshot().join().get());
-    } else {
-      assertThat(sut.getSnapshot().join()).isEmpty();
-    }
+    assertEquals(expected, sut.getSnapshot().join().get());
   }
 }

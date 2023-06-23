@@ -17,6 +17,7 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -28,7 +29,10 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class ProcSupplier implements InformationSupplier<ProcDto> {
   private final ShellUtils shell;
-  private final boolean isProcAvailable;
+
+  @Setter
+  private boolean isProcAvailable;
+
   private final boolean isDiskMetricsAvailable;
   private final boolean isMemMetricsAvailable;
   private final boolean isCpuMetricsAvailable;
