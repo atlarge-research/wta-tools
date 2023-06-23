@@ -210,6 +210,7 @@ public class Stream<V extends Serializable> implements Cloneable {
         new File(filePath).delete();
       }
     });
+    thread.start();
     try {
       thread.join();
     } catch (InterruptedException e) {
