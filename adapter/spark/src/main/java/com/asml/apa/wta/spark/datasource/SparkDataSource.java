@@ -54,6 +54,8 @@ public class SparkDataSource {
    *
    * @param sparkContext  SparkContext of the running Spark session
    * @param config Additional config specified by the user for the plugin
+   * @param metricStreamingEngine the driver's {@link MetricStreamingEngine} to inject
+   * @param outputFile the {@link OutputFile} to write to
    * @author Pil Kyu Cho
    * @author Henry Page
    * @author Tianchen Qu

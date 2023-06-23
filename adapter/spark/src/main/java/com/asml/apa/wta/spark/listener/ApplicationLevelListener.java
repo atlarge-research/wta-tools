@@ -60,6 +60,9 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
    * @param wtaTaskLevelListener The task-level listener to be used by this listener
    * @param wtaStageLevelListener The stage-level listener to be used by this listener
    * @param wtaJobLevelListener The job-level listener to be used by this listener
+   * @param dataSource the {@link SparkDataSource} to inject
+   * @param streamingEngine the driver's {@link MetricStreamingEngine} to use
+   * @param outputPath the {@link OutputFile} to write to
    * @author Henry Page
    * @since 1.0.0
    */
@@ -88,6 +91,9 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
    * @param config Additional config specified by the user for the plugin
    * @param wtaStageLevelListener The stage-level listener to be used by this listener
    * @param wtaJobLevelListener The job-level listener to be used by this listener
+   * @param dataSource the {@link SparkDataSource} to inject
+   * @param streamingEngine the driver's {@link MetricStreamingEngine} to use
+   * @param outputPath the {@link OutputFile} to write to
    * @author Tianchen Qu
    * @since 1.0.0
    */
@@ -108,7 +114,14 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
     outputFile = outputPath;
   }
 
-  public void writeWta(Workload workload) {
+  /**
+   * Writes the trace to file.
+   *
+   * @param workload the {@link Workload} to write as part of the trace
+   * @author Atour Mousavi Gourabi
+   * @since 1.0.0
+   */
+  public void writeTrace(Workload workload) {
     List<ResourceAndStateWrapper> resourceAndStateWrappers = metricStreamingEngine.collectResourceInformation();
     Stream<Resource> resources = new Stream<>();
     resourceAndStateWrappers.stream()
@@ -130,6 +143,12 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
     Stream.deleteAllSerializedFiles();
   }
 
+  /**
+   * Shuts down the thread pool and joins all of its threads.
+   *
+   * @author Atour Mousavi Gourabi
+   * @since 1.0.0
+   */
   public void joinThreadPool() {
     try {
       sparkDataSource.join();
@@ -139,6 +158,12 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
     }
   }
 
+  /**
+   * Removes the listeners from the Spark context on application end.
+   *
+   * @author Atour Mousavi Gourabi
+   * @since 1.0.0
+   */
   public void removeListeners() {
     if (!sparkDataSource.getRuntimeConfig().isStageLevel()) {
       sparkDataSource.removeTaskListener();
@@ -342,7 +367,7 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
 
     removeListeners();
 
-    writeWta(workloadBuilder.build());
+    writeTrace(workloadBuilder.build());
   }
 
   /**
