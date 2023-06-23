@@ -6,7 +6,10 @@ import com.asml.apa.wta.spark.listener.JobLevelListener;
 import com.asml.apa.wta.spark.listener.StageLevelListener;
 import com.asml.apa.wta.spark.listener.TaskLevelListener;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.spark.SparkContext;
+
+import java.util.concurrent.TimeUnit;
 
 /**
  * This class is a Stage data source.
@@ -15,6 +18,7 @@ import org.apache.spark.SparkContext;
  * @author Henry Page
  * @since 1.0.0
  */
+@Slf4j
 @Getter
 public class SparkDataSource {
 
@@ -27,6 +31,23 @@ public class SparkDataSource {
   private final ApplicationLevelListener applicationLevelListener;
 
   private final RuntimeConfig runtimeConfig;
+
+  public void join() throws InterruptedException {
+    if (taskLevelListener != null) {
+      if (taskLevelListener.getThreadPool().awaitTermination(100, TimeUnit.SECONDS)) {
+        log.error("Could not get all task related information.");
+      }
+    }
+    if (stageLevelListener.getThreadPool().awaitTermination(100, TimeUnit.SECONDS)) {
+      log.error("Could not get all stage related information.");
+    }
+    if (jobLevelListener.getThreadPool().awaitTermination(100, TimeUnit.SECONDS)) {
+      log.error("Could not get all workflow related information.");
+    }
+    if (applicationLevelListener.getThreadPool().awaitTermination(100, TimeUnit.SECONDS)) {
+      log.error("Could not get all workload related information.");
+    }
+  }
 
   /**
    * Constructor for the Spark data source. This requires a Spark context to ensure a Spark session

@@ -180,6 +180,12 @@ public class WtaDriverPlugin implements DriverPlugin {
    * @since 1.0.0
    */
   public void removeListeners() {
+    try {
+      sparkDataSource.join();
+    } catch (InterruptedException e) {
+      log.error("Could not join the threads because of {}.", e.getMessage());
+      throw new RuntimeException(e);
+    }
     if (!sparkDataSource.getRuntimeConfig().isStageLevel()) {
       sparkDataSource.removeTaskListener();
     }

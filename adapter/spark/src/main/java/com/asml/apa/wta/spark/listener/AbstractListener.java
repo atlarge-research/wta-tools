@@ -8,6 +8,9 @@ import lombok.RequiredArgsConstructor;
 import org.apache.spark.SparkContext;
 import org.apache.spark.scheduler.SparkListener;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 /**
  * This class is an abstract listener that can be used to implement listeners for different domain objects.
  *
@@ -35,6 +38,12 @@ public abstract class AbstractListener<T extends BaseTraceObject> extends SparkL
    * A list of processed domain objects.
    */
   private final Stream<T> processedObjects = new Stream<>();
+
+  /**
+   * The thread pool.
+   */
+  @Getter
+  private final ExecutorService threadPool = Executors.newCachedThreadPool();
 
   /**
    * Returns a clone of the processed objects {@link Stream}.

@@ -149,4 +149,13 @@ class StreamTest {
     assertThat(sumClone).isEqualTo(55);
     assertThat(sumOriginal).isEqualTo(55);
   }
+
+  @Test
+  void cloneStreamWithOneElement() {
+    Stream<Integer> stream = new Stream<>();
+    stream.addToStream(1);
+    Stream<Integer> clone = stream.copy();
+    assertThat(clone.head()).isEqualTo(1);
+    assertThat(stream.head()).isEqualTo(1);
+  }
 }

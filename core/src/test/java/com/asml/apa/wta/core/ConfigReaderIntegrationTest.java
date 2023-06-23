@@ -4,7 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.asml.apa.wta.core.config.RuntimeConfig;
-import com.asml.apa.wta.core.model.enums.Domain;
+import com.asml.apa.wta.core.model.Domain;
 import org.junit.jupiter.api.Test;
 
 class ConfigReaderIntegrationTest {

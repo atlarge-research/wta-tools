@@ -133,7 +133,8 @@ public class TaskLevelListener extends TaskStageBaseListener {
         .energyConsumption(energyConsumption)
         .resourceUsed(resourceUsed)
         .build();
-    addProcessedObject(task);
+
+    getThreadPool().execute(() -> addProcessedObject(task));
     fillInParentChildMaps(taskId, stageId, task);
   }
 

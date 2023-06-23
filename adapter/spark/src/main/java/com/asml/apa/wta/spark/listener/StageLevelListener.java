@@ -153,7 +153,8 @@ public class StageLevelListener extends TaskStageBaseListener {
         .resourceUsed(resourceUsed)
         .build();
     fillInParentChildMaps(stageId, task, curStageInfo);
-    addProcessedObject(task);
+
+    getThreadPool().execute(() -> addProcessedObject(task));
   }
 
   /**

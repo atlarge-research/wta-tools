@@ -5,7 +5,7 @@ import com.asml.apa.wta.core.model.Task;
 import com.asml.apa.wta.core.model.Workflow;
 import com.asml.apa.wta.core.model.Workload;
 import com.asml.apa.wta.core.model.Workload.WorkloadBuilder;
-import com.asml.apa.wta.core.model.enums.Domain;
+import com.asml.apa.wta.core.model.Domain;
 import com.asml.apa.wta.core.streams.Stream;
 import java.util.Arrays;
 import java.util.List;
@@ -92,7 +92,7 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
    */
   private void setGeneralFields(long dateEnd, WorkloadBuilder builder) {
     final Domain domain = getConfig().getDomain();
-    final Long dateStart = getSparkContext().startTime();
+    final long dateStart = getSparkContext().startTime();
     final String[] authors = getConfig().getAuthors();
     final String workloadDescription = getConfig().getDescription();
     builder.authors(authors)
@@ -274,7 +274,8 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
         tasks.copy().map(Task::getDiskSpaceRequested).toList(), ResourceType.DISK, workloadBuilder);
     setResourceStatisticsFields(
         tasks.copy().map(Task::getEnergyConsumption).toList(), ResourceType.ENERGY, workloadBuilder);
-    addProcessedObject(workloadBuilder.build());
+
+    getThreadPool().execute(() -> addProcessedObject(workloadBuilder.build()));
   }
 
   /**

@@ -3,7 +3,7 @@ package com.asml.apa.wta.spark.listener;
 import com.asml.apa.wta.core.config.RuntimeConfig;
 import com.asml.apa.wta.core.model.Task;
 import com.asml.apa.wta.core.model.Workflow;
-import com.asml.apa.wta.core.model.enums.Domain;
+import com.asml.apa.wta.core.model.Domain;
 import com.asml.apa.wta.core.streams.Stream;
 import java.util.Arrays;
 import java.util.Map;
@@ -115,25 +115,25 @@ public class JobLevelListener extends AbstractListener<Workflow> {
 
     Task[] taskArray = tasks.copy().toArray(Task[]::new);
 
-    addProcessedObject(Workflow.builder()
-        .id(jobId)
-        .tsSubmit(tsSubmit)
-        .tasks(taskArray)
-        .taskCount(taskArray.length)
-        .criticalPathLength(criticalPathLength)
-        .criticalPathTaskCount(criticalPathTaskCount)
-        .maxConcurrentTasks(maxNumberOfConcurrentTasks)
-        .nfrs(nfrs)
-        .scheduler(scheduler)
-        .domain(domain)
-        .applicationName(appName)
-        .applicationField(applicationField)
-        .totalResources(totalResources)
-        .totalMemoryUsage(totalMemoryUsage)
-        .totalNetworkUsage(totalNetworkUsage)
-        .totalDiskSpaceUsage(totalDiskSpaceUsage)
-        .totalEnergyConsumption(totalEnergyConsumption)
-        .build());
+    getThreadPool().execute(() -> addProcessedObject(Workflow.builder()
+            .id(jobId)
+            .tsSubmit(tsSubmit)
+            .tasks(taskArray)
+            .taskCount(taskArray.length)
+            .criticalPathLength(criticalPathLength)
+            .criticalPathTaskCount(criticalPathTaskCount)
+            .maxConcurrentTasks(maxNumberOfConcurrentTasks)
+            .nfrs(nfrs)
+            .scheduler(scheduler)
+            .domain(domain)
+            .applicationName(appName)
+            .applicationField(applicationField)
+            .totalResources(totalResources)
+            .totalMemoryUsage(totalMemoryUsage)
+            .totalNetworkUsage(totalNetworkUsage)
+            .totalDiskSpaceUsage(totalDiskSpaceUsage)
+            .totalEnergyConsumption(totalEnergyConsumption)
+            .build()));
 
     if (getConfig().isStageLevel()) {
       stageLevelListener.setStages(jobId);

@@ -185,32 +185,36 @@ public class Stream<V extends Serializable> implements Cloneable {
    * @author Atour Mousavi Gourabi
    * @since 1.0.0
    */
-  private synchronized int deserializeInternals(@NonNull String filePath) {
-    int amountOfNodes;
-    try (ObjectInputStream objectInputStream = new ObjectInputStream(new FileInputStream(filePath))) {
-      List<StreamNode<V>> nodes = (ArrayList<StreamNode<V>>) objectInputStream.readObject();
-      head = deserializationStart;
-      StreamNode<V> previous = null;
-      for (StreamNode<V> node : nodes) {
-        if (previous != null) {
-          previous.setNext(node);
-        } else {
-          deserializationStart.setNext(node);
+  private synchronized void deserializeInternals(@NonNull String filePath) {
+    Thread thread = new Thread(() -> {
+      try (ObjectInputStream objectInputStream = new ObjectInputStream(new FileInputStream(filePath))) {
+        List<StreamNode<V>> nodes = (ArrayList<StreamNode<V>>) objectInputStream.readObject();
+        head = deserializationStart;
+        StreamNode<V> previous = null;
+        for (StreamNode<V> node : nodes) {
+          if (previous != null) {
+            previous.setNext(node);
+          } else {
+            deserializationStart.setNext(node);
+          }
+          previous = node;
         }
-        previous = node;
+        if (previous != null) {
+          deserializationStart = previous;
+          deserializationStart.setNext(deserializationEnd);
+        }
+      } catch (IOException | ClassNotFoundException | ClassCastException e) {
+        log.error("Failed to deserialize stream internals from {}.", filePath);
+        throw new FailedToDeserializeStreamException();
+      } finally {
+        new File(filePath).delete();
       }
-      if (previous != null) {
-        deserializationStart = previous;
-        deserializationStart.setNext(deserializationEnd);
-      }
-      amountOfNodes = nodes.size();
-    } catch (IOException | ClassNotFoundException | ClassCastException e) {
-      log.error("Failed to deserialize stream internals from {}", filePath);
-      throw new FailedToDeserializeStreamException();
-    } finally {
-      new File(filePath).delete();
+    });
+    try {
+      thread.join();
+    } catch (InterruptedException e) {
+      log.error("Failed to deserialize stream internals from {} because of {}.", filePath, e.getMessage());
     }
-    return amountOfNodes;
   }
 
   /**

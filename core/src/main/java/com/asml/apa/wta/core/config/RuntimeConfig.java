@@ -1,6 +1,6 @@
 package com.asml.apa.wta.core.config;
 
-import com.asml.apa.wta.core.model.enums.Domain;
+import com.asml.apa.wta.core.model.Domain;
 import com.google.gson.Gson;
 import com.google.gson.JsonParseException;
 import java.io.FileNotFoundException;
