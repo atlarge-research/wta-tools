@@ -17,6 +17,7 @@ class JobLevelListenerIntegrationTest extends BaseSparkJobIntegrationTest {
     invokeJob();
     invokeJob();
     stopJob();
+    AbstractListener.getThreadPool().shutdown();
     assertThat(sut1.getJobLevelListener().getJobSubmitTimes()).isEmpty();
     assertThat(sut1.getJobLevelListener().getCriticalPathTasks()).isEmpty();
 
@@ -40,6 +41,7 @@ class JobLevelListenerIntegrationTest extends BaseSparkJobIntegrationTest {
     invokeJob();
     invokeJob();
     stopJob();
+    AbstractListener.getThreadPool().shutdown();
     assertThat(sut1.getJobLevelListener().getProcessedObjects().toList())
         .hasSizeGreaterThan(0)
         .allMatch(wf -> wf.getTaskCount() == 0);
@@ -53,6 +55,7 @@ class JobLevelListenerIntegrationTest extends BaseSparkJobIntegrationTest {
     invokeJob();
     invokeJob();
     stopJob();
+    AbstractListener.getThreadPool().shutdown();
     assertThat(sut1.getTaskLevelListener().getProcessedObjects().toList()).hasSizeGreaterThan(0);
     assertThat(sut1.getStageLevelListener().getProcessedObjects().toList()).hasSizeGreaterThan(0);
     assertThat(sut1.getJobLevelListener().getProcessedObjects().toList()).hasSizeGreaterThan(0);
@@ -65,6 +68,7 @@ class JobLevelListenerIntegrationTest extends BaseSparkJobIntegrationTest {
     invokeJob();
     invokeJob();
     stopJob();
+    AbstractListener.getThreadPool().shutdown();
     assertThat(sut2.getTaskLevelListener().getProcessedObjects().toList()).hasSize(0);
     assertThat(sut2.getStageLevelListener().getProcessedObjects().toList()).hasSizeGreaterThan(0);
     assertThat(sut2.getJobLevelListener().getProcessedObjects().toList()).hasSizeGreaterThan(0);
@@ -78,6 +82,7 @@ class JobLevelListenerIntegrationTest extends BaseSparkJobIntegrationTest {
     invokeJob();
     invokeJob();
     stopJob();
+    AbstractListener.getThreadPool().shutdown();
     assertThat(((TaskLevelListener) sut1.getJobLevelListener().getWtaTaskListener()).getStageToTasks())
         .isEmpty();
     assertThat(((TaskLevelListener) sut1.getJobLevelListener().getWtaTaskListener()).getTaskToStage())
@@ -100,6 +105,7 @@ class JobLevelListenerIntegrationTest extends BaseSparkJobIntegrationTest {
     invokeJob();
     invokeJob();
     stopJob();
+    AbstractListener.getThreadPool().shutdown();
     assertThat(sut2.getStageLevelListener().getStageToJob()).isEmpty();
     assertThat(sut2.getStageLevelListener().getStageToParents()).isEmpty();
     assertThat(sut2.getStageLevelListener().getParentStageToChildrenStages())

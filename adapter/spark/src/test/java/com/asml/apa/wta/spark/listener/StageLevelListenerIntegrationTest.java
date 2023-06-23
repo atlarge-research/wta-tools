@@ -13,6 +13,7 @@ public class StageLevelListenerIntegrationTest extends BaseSparkJobIntegrationTe
     invokeJob();
     invokeJob();
     stopJob();
+    AbstractListener.getThreadPool().shutdown();
     assertThat(sut1.getStageLevelListener().getProcessedObjects().isEmpty()).isFalse();
   }
 
@@ -23,6 +24,7 @@ public class StageLevelListenerIntegrationTest extends BaseSparkJobIntegrationTe
     invokeJob();
     stopJob();
     assertThat(sut1.getStageLevelListener().getStageToJob()).isNotEmpty();
+    AbstractListener.getThreadPool().shutdown();
     assertThat(sut1.getStageLevelListener().getProcessedObjects().isEmpty()).isFalse();
     assertThat(sut1.getStageLevelListener().getProcessedObjects().head().getWorkflowId())
         .isInstanceOf(Long.class)
