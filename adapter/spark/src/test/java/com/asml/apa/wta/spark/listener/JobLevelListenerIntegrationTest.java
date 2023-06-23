@@ -2,7 +2,6 @@ package com.asml.apa.wta.spark.listener;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.asml.apa.wta.core.model.Task;
 import com.asml.apa.wta.core.model.Workflow;
 import com.asml.apa.wta.spark.BaseSparkJobIntegrationTest;
 import java.util.Comparator;

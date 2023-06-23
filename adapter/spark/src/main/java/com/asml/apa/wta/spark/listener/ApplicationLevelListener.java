@@ -1,11 +1,11 @@
 package com.asml.apa.wta.spark.listener;
 
 import com.asml.apa.wta.core.config.RuntimeConfig;
+import com.asml.apa.wta.core.model.Domain;
 import com.asml.apa.wta.core.model.Task;
 import com.asml.apa.wta.core.model.Workflow;
 import com.asml.apa.wta.core.model.Workload;
 import com.asml.apa.wta.core.model.Workload.WorkloadBuilder;
-import com.asml.apa.wta.core.model.Domain;
 import com.asml.apa.wta.core.streams.Stream;
 import java.util.List;
 import java.util.function.Function;
@@ -112,7 +112,8 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
   private void setCountFields(Stream<Task> tasks, WorkloadBuilder builder) {
     final Stream<Workflow> workflows = jobLevelListener.getProcessedObjects();
     final long totalWorkflows = workflows.copy().count();
-    final long totalTasks = workflows.map(Workflow::getTaskCount).reduce(Long::sum).orElse(-1L);
+    final long totalTasks =
+        workflows.map(Workflow::getTaskCount).reduce(Long::sum).orElse(-1L);
     final long numSites =
         tasks.copy().filter(task -> task.getSubmissionSite() != -1).count();
     final long numResources = tasks.copy()
@@ -121,11 +122,9 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
         .reduce(Double::sum)
         .orElse(-1.0)
         .longValue();
-    long numUsers =
-        tasks.copy().filter(task -> task.getUserId() >= 0).count();
+    long numUsers = tasks.copy().filter(task -> task.getUserId() >= 0).count();
     numUsers = numUsers < 1 ? -1 : numUsers;
-    long numGroups =
-        tasks.copy().filter(task -> task.getGroupId() >= 0).count();
+    long numGroups = tasks.copy().filter(task -> task.getGroupId() >= 0).count();
     numGroups = numGroups < 1 ? -1 : numGroups;
     final double totalResourceSeconds = tasks.copy()
         .filter(task -> task.getRuntime() >= 0 && task.getResourceAmountRequested() >= 0.0)

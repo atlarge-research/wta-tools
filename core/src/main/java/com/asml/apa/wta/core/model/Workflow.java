@@ -21,7 +21,7 @@ public class Workflow implements BaseTraceObject {
 
   private final long tsSubmit;
 
-  private final long[] taskIds;
+  private final Long[] taskIds;
 
   private final long taskCount;
 

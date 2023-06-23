@@ -1,15 +1,13 @@
 package com.asml.apa.wta.spark.listener;
 
 import com.asml.apa.wta.core.config.RuntimeConfig;
+import com.asml.apa.wta.core.model.Domain;
 import com.asml.apa.wta.core.model.Task;
 import com.asml.apa.wta.core.model.Workflow;
-import com.asml.apa.wta.core.model.Domain;
 import com.asml.apa.wta.core.streams.Stream;
-import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.Getter;
-import org.apache.commons.lang.ArrayUtils;
 import org.apache.spark.SparkContext;
 import org.apache.spark.scheduler.SparkListenerJobEnd;
 import org.apache.spark.scheduler.SparkListenerJobStart;
@@ -113,15 +111,16 @@ public class JobLevelListener extends AbstractListener<Workflow> {
     final double totalDiskSpaceUsage = computeSum(tasks.copy().map(Task::getDiskSpaceRequested));
     final double totalEnergyConsumption = computeSum(tasks.copy().map(Task::getEnergyConsumption));
     final double totalResources = tasks.copy()
-            .map(Task::getResourceAmountRequested)
-            .filter(resourceAmount -> resourceAmount >= 0.0)
-            .reduce(Double::sum)
-            .orElse(-1.0);
+        .map(Task::getResourceAmountRequested)
+        .filter(resourceAmount -> resourceAmount >= 0.0)
+        .reduce(Double::sum)
+        .orElse(-1.0);
 
-    getThreadPool().execute(() -> addProcessedObject(Workflow.builder()
+    getThreadPool()
+        .execute(() -> addProcessedObject(Workflow.builder()
             .id(jobId)
             .tsSubmit(tsSubmit)
-            .taskIds(ArrayUtils.toPrimitive(tasks.map(Task::getId).toArray(Long[]::new)))
+            .taskIds(tasks.copy().map(Task::getId).toArray(Long[]::new))
             .taskCount(tasks.count())
             .criticalPathLength(criticalPathLength)
             .criticalPathTaskCount(criticalPathTaskCount)

@@ -3,13 +3,12 @@ package com.asml.apa.wta.spark.listener;
 import com.asml.apa.wta.core.config.RuntimeConfig;
 import com.asml.apa.wta.core.model.BaseTraceObject;
 import com.asml.apa.wta.core.streams.Stream;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.apache.spark.SparkContext;
 import org.apache.spark.scheduler.SparkListener;
-
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 /**
  * This class is an abstract listener that can be used to implement listeners for different domain objects.

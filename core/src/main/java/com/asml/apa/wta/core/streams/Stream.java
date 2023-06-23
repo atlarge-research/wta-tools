@@ -2,6 +2,8 @@ package com.asml.apa.wta.core.streams;
 
 import com.asml.apa.wta.core.exceptions.FailedToDeserializeStreamException;
 import com.asml.apa.wta.core.exceptions.FailedToSerializeStreamException;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -164,7 +166,8 @@ public class Stream<V extends Serializable> implements Cloneable {
       toSerialize.add(current);
       current = current.getNext();
     }
-    try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream(filePath))) {
+    try (ObjectOutputStream objectOutputStream =
+        new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(filePath)))) {
       objectOutputStream.writeObject(toSerialize);
     } catch (IOException e) {
       log.error("Failed to serialize stream internals to {}", filePath);
@@ -180,14 +183,14 @@ public class Stream<V extends Serializable> implements Cloneable {
    * Deserializes the internals of the stream on demand.
    *
    * @param filePath the chunk of internals to deserialize, to not be {@code null}
-   * @return the amount of {@link com.asml.apa.wta.core.streams.Stream.StreamNode} objects deserialized
    * @throws FailedToDeserializeStreamException if an exception occurred when deserializing this batch of the stream
    * @author Atour Mousavi Gourabi
    * @since 1.0.0
    */
   private synchronized void deserializeInternals(@NonNull String filePath) {
     Thread thread = new Thread(() -> {
-      try (ObjectInputStream objectInputStream = new ObjectInputStream(new FileInputStream(filePath))) {
+      try (ObjectInputStream objectInputStream =
+          new ObjectInputStream(new BufferedInputStream(new FileInputStream(filePath)))) {
         List<StreamNode<V>> nodes = (ArrayList<StreamNode<V>>) objectInputStream.readObject();
         head = deserializationStart;
         StreamNode<V> previous = null;

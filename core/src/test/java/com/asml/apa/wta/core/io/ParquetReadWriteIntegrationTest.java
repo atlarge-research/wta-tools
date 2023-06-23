@@ -2,8 +2,8 @@ package com.asml.apa.wta.core.io;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
-import com.asml.apa.wta.core.model.Workflow;
 import com.asml.apa.wta.core.model.Domain;
+import com.asml.apa.wta.core.model.Workflow;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
