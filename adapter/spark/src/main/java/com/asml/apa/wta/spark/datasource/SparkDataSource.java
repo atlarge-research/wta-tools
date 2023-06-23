@@ -2,6 +2,7 @@ package com.asml.apa.wta.spark.datasource;
 
 import com.asml.apa.wta.core.config.RuntimeConfig;
 import com.asml.apa.wta.core.io.OutputFile;
+import com.asml.apa.wta.spark.listener.AbstractListener;
 import com.asml.apa.wta.spark.listener.ApplicationLevelListener;
 import com.asml.apa.wta.spark.listener.JobLevelListener;
 import com.asml.apa.wta.spark.listener.StageLevelListener;
@@ -40,12 +41,7 @@ public class SparkDataSource {
    * @since 1.0.0
    */
   public void join() throws InterruptedException {
-    if (taskLevelListener != null) {
-      taskLevelListener.getThreadPool().shutdown();
-    }
-    stageLevelListener.getThreadPool().shutdown();
-    jobLevelListener.getThreadPool().shutdown();
-    applicationLevelListener.getThreadPool().shutdown();
+    AbstractListener.getThreadPool().shutdown();
   }
 
   /**
