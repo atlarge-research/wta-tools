@@ -8,6 +8,7 @@ import com.asml.apa.wta.spark.listener.JobLevelListener;
 import com.asml.apa.wta.spark.listener.StageLevelListener;
 import com.asml.apa.wta.spark.listener.TaskLevelListener;
 import com.asml.apa.wta.spark.streams.MetricStreamingEngine;
+import java.util.concurrent.TimeUnit;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.spark.SparkContext;
@@ -34,12 +35,18 @@ public class SparkDataSource {
   private final RuntimeConfig runtimeConfig;
 
   /**
-   * Shuts down the thread pools.
+   * Awaits the thread pool.
    *
+   * @param awaitSeconds the amount of seconds to wait for
    * @author Atour Mousavi Gourabi
    * @since 1.0.0
    */
-  public void shutdownThreadPool() {
+  public void awaitAndShutdownThreadPool(int awaitSeconds) {
+    try {
+      AbstractListener.getThreadPool().awaitTermination(awaitSeconds, TimeUnit.SECONDS);
+    } catch (InterruptedException e) {
+      log.error("Could not await the thread pool because InterruptedException {}.", e.getMessage());
+    }
     AbstractListener.getThreadPool().shutdown();
   }
 

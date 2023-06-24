@@ -84,15 +84,14 @@ public class JobLevelListener extends AbstractListener<Workflow> {
   public void onJobStart(SparkListenerJobStart jobStart) {
     jobSubmitTimes.put(jobStart.jobId() + 1L, jobStart.time());
     List<Task> stages = new ArrayList<>();
-    JavaConverters.seqAsJavaList(jobStart.stageInfos()).forEach(stageInfo -> {
-      stages.add(Task.builder()
-          .id((long) stageInfo.stageId() + 1)
-          .parents(JavaConverters.seqAsJavaList(stageInfo.parentIds()).stream()
-              .mapToInt(parentId -> (int) parentId + 1)
-              .mapToLong(parentId -> (long) parentId)
-              .toArray())
-          .build());
-    });
+    JavaConverters.seqAsJavaList(jobStart.stageInfos())
+        .forEach(stageInfo -> stages.add(Task.builder()
+            .id((long) stageInfo.stageId() + 1)
+            .parents(JavaConverters.seqAsJavaList(stageInfo.parentIds()).stream()
+                .mapToInt(parentId -> (int) parentId + 1)
+                .mapToLong(parentId -> (long) parentId)
+                .toArray())
+            .build()));
     jobToStages.put((long) jobStart.jobId() + 1, stages);
   }
 
@@ -154,7 +153,9 @@ public class JobLevelListener extends AbstractListener<Workflow> {
 
       final Map<Long, List<Task>> stageToTasks = listener.getStageToTasks();
       criticalPathTaskCount = criticalPath.stream()
-          .map(stage -> stageToTasks.getOrDefault(stage.getId(), new ArrayList<>()).size())
+          .map(stage -> stageToTasks
+              .getOrDefault(stage.getId(), new ArrayList<>())
+              .size())
           .reduce(Integer::sum)
           .orElse(-1);
       criticalPathLength = criticalPath.stream()
@@ -258,7 +259,7 @@ public class JobLevelListener extends AbstractListener<Workflow> {
    * @author Tianchen Qu
    * @since 1.0.0
    */
-  List<Task> solveCriticalPath(List<Task> stages) {
+  public List<Task> solveCriticalPath(List<Task> stages) {
     try {
       DagSolver dag = new DagSolver(stages, (TaskLevelListener) wtaTaskListener);
       return dag.longestPath().stream()

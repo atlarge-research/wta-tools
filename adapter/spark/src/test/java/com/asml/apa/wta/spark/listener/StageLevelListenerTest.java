@@ -10,6 +10,7 @@ import com.asml.apa.wta.core.model.Task;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import org.apache.spark.executor.ShuffleWriteMetrics;
 import org.apache.spark.executor.TaskMetrics;
@@ -67,12 +68,15 @@ class StageLevelListenerTest extends BaseLevelListenerTest {
   }
 
   @Test
-  void testStageEndMetricExtraction() {
+  void testStageEndMetricExtraction() throws InterruptedException {
     ListBuffer<StageInfo> stageBuffer = new ListBuffer<>();
     stageBuffer.$plus$eq(spyStageInfo);
 
     fakeStageListener1.onJobStart(new SparkListenerJobStart(0, 2L, stageBuffer.toList(), new Properties()));
     fakeStageListener1.onStageCompleted(stageEndEvent);
+
+    AbstractListener.getThreadPool().awaitTermination(1, TimeUnit.SECONDS);
+
     assertEquals(1, fakeStageListener1.getProcessedObjects().count());
     Task curStage = fakeStageListener1.getProcessedObjects().head();
     assertEquals(1, curStage.getId());

@@ -8,7 +8,6 @@ import com.asml.apa.wta.core.model.Task;
 import com.asml.apa.wta.core.model.Workflow;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
-
 import org.apache.spark.executor.ExecutorMetrics;
 import org.apache.spark.executor.ShuffleWriteMetrics;
 import org.apache.spark.executor.TaskMetrics;

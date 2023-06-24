@@ -132,7 +132,7 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
         ? sparkDataSource.getStageLevelListener().getProcessedObjects()
         : sparkDataSource.getTaskLevelListener().getProcessedObjects();
 
-    sparkDataSource.shutdownThreadPool();
+    sparkDataSource.awaitAndShutdownThreadPool(5);
 
     wtaWriter.write(Task.class, tasks);
     wtaWriter.write(Resource.class, resources);
