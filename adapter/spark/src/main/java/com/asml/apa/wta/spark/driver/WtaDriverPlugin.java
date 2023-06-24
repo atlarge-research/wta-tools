@@ -97,9 +97,8 @@ public class WtaDriverPlugin implements DriverPlugin {
   }
 
   /**
-   * Gets called just before shutdown. If no prior error occurred, it collects all the
-   * tasks, workflows, and workloads from the Spark job and writes them to a Parquet file.
-   * Otherwise, logs the error and just shuts down.
+   * Gets called just before shutdown.
+   * If an error occurred, it is logged before shutdown.
    * Recommended that no Spark functions are used here.
    *
    * @author Pil Kyu Cho

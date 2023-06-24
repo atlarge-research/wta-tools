@@ -102,7 +102,7 @@ public class SparkDataSource {
    * @since 1.0.0
    */
   public void registerTaskListener() {
-    log.trace("Registering task listener.");
+    log.debug("Registering task listener.");
     taskLevelListener.register();
   }
 
@@ -113,7 +113,7 @@ public class SparkDataSource {
    * @since 1.0.0
    */
   public void registerJobListener() {
-    log.trace("Registering job listener.");
+    log.debug("Registering job listener.");
     jobLevelListener.register();
   }
 
@@ -124,7 +124,7 @@ public class SparkDataSource {
    * @since 1.0.0
    */
   public void registerApplicationListener() {
-    log.trace("Registering application listener.");
+    log.debug("Registering application listener.");
     applicationLevelListener.register();
   }
 
@@ -135,7 +135,7 @@ public class SparkDataSource {
    * @since 1.0.0
    */
   public void registerStageListener() {
-    log.trace("Registering stage level listener.");
+    log.debug("Registering stage level listener.");
     stageLevelListener.register();
   }
 
@@ -146,6 +146,7 @@ public class SparkDataSource {
    * @since 1.0.0
    */
   public void removeListeners() {
+    log.debug("Removing the listeners from the Spark context.");
     taskLevelListener.remove();
     stageLevelListener.remove();
     jobLevelListener.remove();
