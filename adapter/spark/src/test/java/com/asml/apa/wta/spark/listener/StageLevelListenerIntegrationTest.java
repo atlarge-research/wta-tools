@@ -9,22 +9,19 @@ import org.junit.jupiter.api.Test;
 public class StageLevelListenerIntegrationTest extends BaseSparkJobIntegrationTest {
 
   @Test
-  void testGetStageMetricsHasTasksAfterSparkJobAndYieldsNoErrors() throws InterruptedException {
+  void testGetStageMetricsHasTasksAfterSparkJobAndYieldsNoErrors() {
     sut1.registerStageListener();
     invokeJob();
     stopJob();
-    AbstractListener.getThreadPool().awaitTermination(1, TimeUnit.SECONDS);
     assertThat(sut1.getStageLevelListener().getProcessedObjects().isEmpty()).isFalse();
   }
 
   @Test
-  void runningAJobShouldInitializeWorkflow() throws InterruptedException {
+  void runningAJobShouldInitializeWorkflow() {
     sut1.registerStageListener();
     invokeJob();
     stopJob();
     assertThat(sut1.getStageLevelListener().getStageToJob()).isNotEmpty();
-    AbstractListener.getThreadPool().awaitTermination(1, TimeUnit.SECONDS);
-
     assertThat(sut1.getStageLevelListener().getProcessedObjects().isEmpty()).isFalse();
     assertThat(sut1.getStageLevelListener().getProcessedObjects().head().getWorkflowId())
         .isInstanceOf(Long.class)
