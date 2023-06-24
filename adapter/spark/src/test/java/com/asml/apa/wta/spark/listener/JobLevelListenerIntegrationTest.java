@@ -5,18 +5,20 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.asml.apa.wta.core.model.Workflow;
 import com.asml.apa.wta.spark.BaseSparkJobIntegrationTest;
 import java.util.Comparator;
+import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.Test;
 
 class JobLevelListenerIntegrationTest extends BaseSparkJobIntegrationTest {
 
   @Test
-  void getJobMetricsHasJobsAfterSparkJobAndYieldsNoErrors() {
+  void getJobMetricsHasJobsAfterSparkJobAndYieldsNoErrors() throws InterruptedException {
     sut1.registerTaskListener();
     sut1.registerStageListener();
     sut1.registerJobListener();
     invokeJob();
     invokeJob();
     stopJob();
+    AbstractListener.getThreadPool().awaitTermination(5, TimeUnit.SECONDS);
 
     assertThat(sut1.getJobLevelListener().getJobSubmitTimes()).isEmpty();
     assertThat(sut1.getJobLevelListener().getProcessedObjects().isEmpty()).isFalse();
@@ -35,10 +37,11 @@ class JobLevelListenerIntegrationTest extends BaseSparkJobIntegrationTest {
   }
 
   @Test
-  void jobsHaveNoTasksIfTaskListenerNotInvoked() {
+  void jobsHaveNoTasksIfTaskListenerNotInvoked() throws InterruptedException {
     sut1.registerJobListener();
     invokeJob();
     stopJob();
+    AbstractListener.getThreadPool().awaitTermination(5, TimeUnit.SECONDS);
 
     assertThat(sut1.getJobLevelListener().getJobSubmitTimes()).isEmpty();
     assertThat(sut1.getJobLevelListener().containsProcessedObjects()).isTrue();
@@ -49,12 +52,13 @@ class JobLevelListenerIntegrationTest extends BaseSparkJobIntegrationTest {
   }
 
   @Test
-  void testSparkTaskProcessedObjects() {
+  void testSparkTaskProcessedObjects() throws InterruptedException {
     sut1.registerTaskListener();
     sut1.registerStageListener();
     sut1.registerJobListener();
     invokeJob();
     stopJob();
+    AbstractListener.getThreadPool().awaitTermination(5, TimeUnit.SECONDS);
 
     assertThat(sut1.getTaskLevelListener().getProcessedObjects().toList()).hasSizeGreaterThan(0);
     assertThat(sut1.getStageLevelListener().getProcessedObjects().toList()).hasSizeGreaterThan(0);
@@ -62,11 +66,12 @@ class JobLevelListenerIntegrationTest extends BaseSparkJobIntegrationTest {
   }
 
   @Test
-  void testSparkStageProcessedObjects() {
+  void testSparkStageProcessedObjects() throws InterruptedException {
     sut2.registerStageListener();
     sut2.registerJobListener();
     invokeJob();
     stopJob();
+    AbstractListener.getThreadPool().awaitTermination(5, TimeUnit.SECONDS);
 
     assertThat(sut2.getTaskLevelListener().getProcessedObjects().toList()).hasSize(0);
     assertThat(sut2.getStageLevelListener().getProcessedObjects().toList()).hasSizeGreaterThan(0);
@@ -74,12 +79,13 @@ class JobLevelListenerIntegrationTest extends BaseSparkJobIntegrationTest {
   }
 
   @Test
-  void endOfJobShouldClearTheMapOfEntriesAfterJobIsDoneButNotProcessedObjectsTaskLevel() {
+  void endOfJobShouldClearTheMapOfEntriesAfterJobIsDoneButNotProcessedObjectsTaskLevel() throws InterruptedException {
     sut1.registerTaskListener();
     sut1.registerStageListener();
     sut1.registerJobListener();
     invokeJob();
     stopJob();
+    AbstractListener.getThreadPool().awaitTermination(5, TimeUnit.SECONDS);
 
     assertThat(((TaskLevelListener) sut1.getJobLevelListener().getWtaTaskListener()).getStageToTasks())
         .isEmpty();
@@ -97,11 +103,13 @@ class JobLevelListenerIntegrationTest extends BaseSparkJobIntegrationTest {
   }
 
   @Test
-  void endOfJobShouldClearTheMapOfEntriesAfterJobIsDoneButNotProcessedObjectsStageLevel() {
+  void endOfJobShouldClearTheMapOfEntriesAfterJobIsDoneButNotProcessedObjectsStageLevel()
+      throws InterruptedException {
     sut2.registerStageListener();
     sut2.registerJobListener();
     invokeJob();
     stopJob();
+    AbstractListener.getThreadPool().awaitTermination(5, TimeUnit.SECONDS);
 
     assertThat(sut2.getStageLevelListener().getStageToJob()).isEmpty();
     assertThat(sut2.getStageLevelListener().getStageToParents()).isEmpty();
