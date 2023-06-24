@@ -12,7 +12,7 @@ public class StageLevelListenerIntegrationTest extends BaseSparkJobIntegrationTe
   void testGetStageMetricsHasTasksAfterSparkJobAndYieldsNoErrors() throws InterruptedException {
     sut1.registerStageListener();
     invokeJob();
-    invokeJob();
+    stopJob();
     AbstractListener.getThreadPool().awaitTermination(1, TimeUnit.SECONDS);
     assertThat(sut1.getStageLevelListener().getProcessedObjects().isEmpty()).isFalse();
   }
@@ -21,9 +21,10 @@ public class StageLevelListenerIntegrationTest extends BaseSparkJobIntegrationTe
   void runningAJobShouldInitializeWorkflow() throws InterruptedException {
     sut1.registerStageListener();
     invokeJob();
-    invokeJob();
+    stopJob();
     assertThat(sut1.getStageLevelListener().getStageToJob()).isNotEmpty();
     AbstractListener.getThreadPool().awaitTermination(1, TimeUnit.SECONDS);
+
     assertThat(sut1.getStageLevelListener().getProcessedObjects().isEmpty()).isFalse();
     assertThat(sut1.getStageLevelListener().getProcessedObjects().head().getWorkflowId())
         .isInstanceOf(Long.class)
