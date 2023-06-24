@@ -50,7 +50,6 @@ public class DiskOutputFile implements OutputFile {
    * Sets the path of the disk output file.
    *
    * @param path a {@link String} representation of the {@link Path} to point to
-   * @throws IOException when something goes wrong during I/O
    * @author Atour Mousavi Gourabi
    * @since 1.0.0
    */
@@ -60,6 +59,7 @@ public class DiskOutputFile implements OutputFile {
 
   /**
    * Open a writer resource for the {@link OutputFile}.
+   * Overwrites existing files when necessary.
    *
    * @return an opened {@link OutputFile} writer
    * @throws IOException when no writer can be opened for the location of this {@link OutputFile}
