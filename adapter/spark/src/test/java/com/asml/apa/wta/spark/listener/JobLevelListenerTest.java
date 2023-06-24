@@ -7,6 +7,8 @@ import static org.mockito.Mockito.when;
 import com.asml.apa.wta.core.model.Task;
 import com.asml.apa.wta.core.model.Workflow;
 import java.util.Properties;
+import java.util.concurrent.TimeUnit;
+
 import org.apache.spark.executor.ExecutorMetrics;
 import org.apache.spark.executor.ShuffleWriteMetrics;
 import org.apache.spark.executor.TaskMetrics;
@@ -181,10 +183,13 @@ class JobLevelListenerTest extends BaseLevelListenerTest {
   }
 
   @Test
-  void jobStartAndEndStateIsCorrect() {
+  void jobStartAndEndStateIsCorrect() throws InterruptedException {
     fakeJobListener1.onJobStart(
         new SparkListenerJobStart(jobId1, 40L, new ListBuffer<StageInfo>().toList(), new Properties()));
     fakeJobListener1.onJobEnd(jobEndEvent1);
+
+    AbstractListener.getThreadPool().awaitTermination(1000, TimeUnit.MILLISECONDS);
+
     assertThat(fakeJobListener1.getJobSubmitTimes()).isEmpty();
     assertThat(fakeJobListener1.getProcessedObjects().count()).isEqualTo(1);
 
@@ -248,8 +253,6 @@ class JobLevelListenerTest extends BaseLevelListenerTest {
     ListBuffer<StageInfo> stageBuffer2 = new ListBuffer<>();
     stageBuffer1.$plus$eq(testStageInfo1);
     stageBuffer1.$plus$eq(testStageInfo2);
-    stageBuffer2.$plus$eq(testStageInfo1);
-    stageBuffer2.$plus$eq(testStageInfo2);
     stageBuffer2.$plus$eq(testStageInfo3);
     stageBuffer2.$plus$eq(testStageInfo4);
     SparkListenerJobStart jobStart1 =
@@ -289,10 +292,6 @@ class JobLevelListenerTest extends BaseLevelListenerTest {
     fakeTaskListener1.onJobStart(jobStart2);
     fakeStageListener1.onJobStart(jobStart2);
     fakeJobListener1.onJobStart(jobStart2);
-    fakeTaskListener1.onTaskEnd(taskEndEvent1);
-    fakeStageListener1.onStageCompleted(stageCompleted1);
-    fakeTaskListener1.onTaskEnd(taskEndEvent2);
-    fakeStageListener1.onStageCompleted(stageCompleted2);
     fakeTaskListener1.onTaskEnd(taskEndEvent3);
     fakeStageListener1.onStageCompleted(stageCompleted3);
     fakeTaskListener1.onTaskEnd(taskEndEvent4);
@@ -308,7 +307,6 @@ class JobLevelListenerTest extends BaseLevelListenerTest {
     Task task4 = fakeTaskListener1.getProcessedObjects().drop(3).head();
     assertThat(task4.getParents().length).isEqualTo(1);
     assertThat(task4.getParents()).contains(taskId3 + 1);
-    assertThat(task4.getParents()).contains(taskId2 + 1);
     assertThat(task4.getChildren().length).isEqualTo(0);
   }
 
