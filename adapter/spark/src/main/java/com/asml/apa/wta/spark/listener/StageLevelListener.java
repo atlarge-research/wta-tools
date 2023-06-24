@@ -109,7 +109,7 @@ public class StageLevelListener extends TaskStageBaseListener {
     final long[] parents = new long[0];
     final long[] children = new long[0];
     final int userId = Math.abs(getSparkContext().sparkUser().hashCode());
-    final Long workflowId = getStageToJob().get(stageId);
+    final long workflowId = getStageToJob().get(stageId);
     final double diskSpaceRequested = (double) curStageMetrics.diskBytesSpilled()
         + curStageMetrics.shuffleWriteMetrics().bytesWritten();
     // final double memoryRequested = curTaskMetrics.peakExecutionMemory();

@@ -3,10 +3,8 @@ package com.asml.apa.wta.spark.listener;
 import com.asml.apa.wta.core.config.RuntimeConfig;
 import com.asml.apa.wta.core.model.BaseTraceObject;
 import com.asml.apa.wta.core.streams.Stream;
-import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.Executors;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.apache.spark.SparkContext;
@@ -44,8 +42,7 @@ public abstract class AbstractListener<T extends BaseTraceObject> extends SparkL
    * The thread pool.
    */
   @Getter
-  private static final ExecutorService threadPool =
-      new ThreadPoolExecutor(1, 10, 0, TimeUnit.SECONDS, new ArrayBlockingQueue<>(2, true));
+  private static final ExecutorService threadPool = Executors.newSingleThreadExecutor();
 
   /**
    * Returns a clone of the processed objects {@link Stream}.

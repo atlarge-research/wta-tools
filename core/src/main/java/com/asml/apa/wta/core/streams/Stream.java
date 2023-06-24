@@ -13,7 +13,6 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
 import java.time.Instant;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -209,8 +208,6 @@ public class Stream<V extends Serializable> implements Cloneable {
       } catch (IOException | ClassNotFoundException | ClassCastException e) {
         log.error("Failed to deserialize stream internals from {}.", filePath);
         throw new FailedToDeserializeStreamException();
-      } finally {
-        new File(filePath).delete();
       }
   }
 
@@ -226,15 +223,8 @@ public class Stream<V extends Serializable> implements Cloneable {
       Stream<V> clone = (Stream<V>) super.clone();
       clone.id = UUID.randomUUID();
       clone.diskLocations = new ArrayDeque<>();
-      for (String diskLocation : diskLocations) {
-        String newDiskLocation = diskLocation.substring(0, diskLocation.length() - 4) + "_clone.ser";
-        Files.copy(Path.of(diskLocation), Path.of(newDiskLocation), StandardCopyOption.REPLACE_EXISTING);
-        clone.diskLocations.add(newDiskLocation);
-      }
+      clone.diskLocations.addAll(diskLocations);
       return clone;
-    } catch (IOException e) {
-      log.error("Could not serialize the clone because {}.", e.getMessage());
-      throw new FailedToSerializeStreamException();
     } catch (CloneNotSupportedException e) {
       log.error("Could not clone Stream because {}.", e.getMessage());
       throw new FailedToSerializeStreamException();
