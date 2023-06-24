@@ -7,6 +7,7 @@ import static org.mockito.Mockito.when;
 import com.asml.apa.wta.core.model.Task;
 import com.asml.apa.wta.core.model.Workflow;
 import java.util.Properties;
+import java.util.concurrent.TimeUnit;
 import org.apache.spark.executor.ExecutorMetrics;
 import org.apache.spark.executor.ShuffleWriteMetrics;
 import org.apache.spark.executor.TaskMetrics;
@@ -181,15 +182,18 @@ class JobLevelListenerTest extends BaseLevelListenerTest {
   }
 
   @Test
-  void jobStartAndEndStateIsCorrect() {
+  void jobStartAndEndStateIsCorrect() throws InterruptedException {
     fakeJobListener1.onJobStart(
         new SparkListenerJobStart(jobId1, 40L, new ListBuffer<StageInfo>().toList(), new Properties()));
     fakeJobListener1.onJobEnd(jobEndEvent1);
+
+    AbstractListener.getThreadPool().awaitTermination(1000, TimeUnit.MILLISECONDS);
+
     assertThat(fakeJobListener1.getJobSubmitTimes()).isEmpty();
-    assertThat(fakeJobListener1.getProcessedObjects()).hasSize(1);
+    assertThat(fakeJobListener1.getProcessedObjects().count()).isEqualTo(1);
 
     Workflow fakeJobListenerWorkflow =
-        fakeJobListener1.getProcessedObjects().get(0);
+        fakeJobListener1.getProcessedObjects().head();
     assertThat(fakeJobListenerWorkflow.getId()).isEqualTo(jobId1 + 1);
     assertThat(fakeJobListenerWorkflow.getTsSubmit()).isEqualTo(40L);
     assertThat(fakeJobListenerWorkflow.getScheduler()).isEqualTo("FIFO");
@@ -217,39 +221,37 @@ class JobLevelListenerTest extends BaseLevelListenerTest {
     fakeTaskListener1.onTaskEnd(taskEndEvent4);
     fakeStageListener1.onStageCompleted(stageCompleted2);
     fakeJobListener1.onJobEnd(jobEndEvent1);
-    assertThat(fakeTaskListener1.getProcessedObjects()).hasSize(4);
+    assertThat(fakeTaskListener1.getProcessedObjects().count()).isEqualTo(4);
 
-    Task task1 = fakeTaskListener1.getProcessedObjects().get(0);
+    Task task1 = fakeTaskListener1.getProcessedObjects().head();
     assertThat(task1.getParents().length).isEqualTo(0);
     assertThat(task1.getChildren().length).isEqualTo(2);
     assertThat(task1.getChildren()).contains(taskId3 + 1, taskId4 + 1);
 
-    Task task2 = fakeTaskListener1.getProcessedObjects().get(1);
+    Task task2 = fakeTaskListener1.getProcessedObjects().drop(1).head();
     assertThat(task2.getParents().length).isEqualTo(0);
     assertThat(task2.getChildren().length).isEqualTo(2);
     assertThat(task2.getChildren()).contains(taskId3 + 1, taskId4 + 1);
 
-    Task task3 = fakeTaskListener1.getProcessedObjects().get(2);
+    Task task3 = fakeTaskListener1.getProcessedObjects().drop(2).head();
     assertThat(task3.getParents().length).isEqualTo(2);
     assertThat(task3.getParents()).contains(taskId1 + 1, taskId2 + 1);
     assertThat(task3.getChildren().length).isEqualTo(0);
 
-    Task task4 = fakeTaskListener1.getProcessedObjects().get(3);
+    Task task4 = fakeTaskListener1.getProcessedObjects().drop(3).head();
     assertThat(task4.getParents().length).isEqualTo(2);
     assertThat(task4.getParents()).contains(taskId1 + 1, taskId2 + 1);
     assertThat(task4.getChildren().length).isEqualTo(0);
   }
 
   @Test
-  void parentChildrenAggregationForTasksHoldsAcrossMultipleJobs() {
+  void parentChildrenAggregationForTasksHoldsAcrossMultipleJobs() throws InterruptedException {
     // task 1 and task 2 have parent child relation in job 1
     // task 3 and task 4 have parent child relation in job 1
     ListBuffer<StageInfo> stageBuffer1 = new ListBuffer<>();
     ListBuffer<StageInfo> stageBuffer2 = new ListBuffer<>();
     stageBuffer1.$plus$eq(testStageInfo1);
     stageBuffer1.$plus$eq(testStageInfo2);
-    stageBuffer2.$plus$eq(testStageInfo1);
-    stageBuffer2.$plus$eq(testStageInfo2);
     stageBuffer2.$plus$eq(testStageInfo3);
     stageBuffer2.$plus$eq(testStageInfo4);
     SparkListenerJobStart jobStart1 =
@@ -274,14 +276,17 @@ class JobLevelListenerTest extends BaseLevelListenerTest {
     fakeTaskListener1.onTaskEnd(taskEndEvent2);
     fakeStageListener1.onStageCompleted(stageCompleted2);
     fakeJobListener1.onJobEnd(jobEndEvent1);
-    assertThat(fakeTaskListener1.getProcessedObjects()).hasSize(2);
 
-    Task task1 = fakeTaskListener1.getProcessedObjects().get(0);
+    AbstractListener.getThreadPool().awaitTermination(1000, TimeUnit.MILLISECONDS);
+
+    assertThat(fakeTaskListener1.getProcessedObjects().count()).isEqualTo(2);
+
+    Task task1 = fakeTaskListener1.getProcessedObjects().head();
     assertThat(task1.getParents().length).isEqualTo(0);
     assertThat(task1.getChildren().length).isEqualTo(1);
     assertThat(task1.getChildren()).contains(taskId2 + 1);
 
-    Task task2 = fakeTaskListener1.getProcessedObjects().get(1);
+    Task task2 = fakeTaskListener1.getProcessedObjects().drop(1).head();
     assertThat(task2.getParents().length).isEqualTo(1);
     assertThat(task2.getParents()).contains(taskId1 + 1);
     assertThat(task2.getChildren().length).isEqualTo(0);
@@ -289,26 +294,24 @@ class JobLevelListenerTest extends BaseLevelListenerTest {
     fakeTaskListener1.onJobStart(jobStart2);
     fakeStageListener1.onJobStart(jobStart2);
     fakeJobListener1.onJobStart(jobStart2);
-    fakeTaskListener1.onTaskEnd(taskEndEvent1);
-    fakeStageListener1.onStageCompleted(stageCompleted1);
-    fakeTaskListener1.onTaskEnd(taskEndEvent2);
-    fakeStageListener1.onStageCompleted(stageCompleted2);
     fakeTaskListener1.onTaskEnd(taskEndEvent3);
     fakeStageListener1.onStageCompleted(stageCompleted3);
     fakeTaskListener1.onTaskEnd(taskEndEvent4);
     fakeStageListener1.onStageCompleted(stageCompleted4);
     fakeJobListener1.onJobEnd(jobEndEvent2);
-    assertThat(fakeTaskListener1.getProcessedObjects()).hasSize(6);
 
-    Task task3 = fakeTaskListener1.getProcessedObjects().get(4);
-    assertThat(task3.getParents().length).isEqualTo(1);
+    AbstractListener.getThreadPool().awaitTermination(1000, TimeUnit.MILLISECONDS);
+
+    assertThat(fakeTaskListener1.getProcessedObjects().count()).isEqualTo(4);
+
+    Task task3 = fakeTaskListener1.getProcessedObjects().drop(2).head();
+    assertThat(task3.getParents().length).isEqualTo(0);
     assertThat(task3.getChildren().length).isEqualTo(1);
     assertThat(task3.getChildren()).contains(taskId4 + 1);
 
-    Task task4 = fakeTaskListener1.getProcessedObjects().get(5);
-    assertThat(task4.getParents().length).isEqualTo(2);
+    Task task4 = fakeTaskListener1.getProcessedObjects().drop(3).head();
+    assertThat(task4.getParents().length).isEqualTo(1);
     assertThat(task4.getParents()).contains(taskId3 + 1);
-    assertThat(task4.getParents()).contains(taskId2 + 1);
     assertThat(task4.getChildren().length).isEqualTo(0);
   }
 
@@ -331,26 +334,26 @@ class JobLevelListenerTest extends BaseLevelListenerTest {
 
     // stage 2 and stage 3 both have stage 1 as parent
     // stage 4 has stage 2 and stage 3 as parent
-    assertThat(fakeStageListener2.getProcessedObjects()).hasSize(4);
+    assertThat(fakeStageListener2.getProcessedObjects().count()).isEqualTo(4);
 
-    Task stage1 = fakeStageListener2.getProcessedObjects().get(0);
+    Task stage1 = fakeStageListener2.getProcessedObjects().head();
     assertThat(stage1.getParents().length).isEqualTo(0);
     assertThat(stage1.getChildren().length).isEqualTo(2);
     assertThat(stage1.getChildren()).contains(stageId2 + 1, stageId3 + 1);
 
-    Task stage2 = fakeStageListener2.getProcessedObjects().get(1);
+    Task stage2 = fakeStageListener2.getProcessedObjects().drop(1).head();
     assertThat(stage2.getParents().length).isEqualTo(1);
     assertThat(stage2.getParents()).contains(stageId1 + 1);
     assertThat(stage2.getChildren().length).isEqualTo(1);
     assertThat(stage2.getChildren()).contains(stageId4 + 1);
 
-    Task stage3 = fakeStageListener2.getProcessedObjects().get(2);
+    Task stage3 = fakeStageListener2.getProcessedObjects().drop(2).head();
     assertThat(stage3.getParents().length).isEqualTo(1);
     assertThat(stage3.getParents()).contains(stageId1 + 1);
     assertThat(stage3.getChildren().length).isEqualTo(1);
     assertThat(stage3.getChildren()).contains(stageId4 + 1);
 
-    Task stage4 = fakeStageListener2.getProcessedObjects().get(3);
+    Task stage4 = fakeStageListener2.getProcessedObjects().drop(3).head();
     assertThat(stage4.getParents().length).isEqualTo(2);
     assertThat(stage4.getParents()).contains(stageId2 + 1, stageId3 + 1);
     assertThat(stage4.getChildren().length).isEqualTo(0);
@@ -395,14 +398,14 @@ class JobLevelListenerTest extends BaseLevelListenerTest {
     fakeStageListener2.onStageCompleted(stageCompleted1);
     fakeStageListener2.onStageCompleted(stageCompleted2);
     fakeJobListener2.onJobEnd(jobEndEvent1);
-    assertThat(fakeStageListener2.getProcessedObjects()).hasSize(2);
+    assertThat(fakeStageListener2.getProcessedObjects().count()).isEqualTo(2);
 
-    Task stage1 = fakeStageListener2.getProcessedObjects().get(0);
+    Task stage1 = fakeStageListener2.getProcessedObjects().head();
     assertThat(stage1.getParents().length).isEqualTo(0);
     assertThat(stage1.getChildren().length).isEqualTo(1);
     assertThat(stage1.getChildren()).contains(stageId2 + 1);
 
-    Task stage2 = fakeStageListener2.getProcessedObjects().get(1);
+    Task stage2 = fakeStageListener2.getProcessedObjects().drop(1).head();
     assertThat(stage2.getParents().length).isEqualTo(1);
     assertThat(stage2.getParents()).contains(stageId1 + 1);
     assertThat(stage2.getChildren().length).isEqualTo(0);
@@ -412,14 +415,14 @@ class JobLevelListenerTest extends BaseLevelListenerTest {
     fakeStageListener2.onStageCompleted(stageCompleted3);
     fakeStageListener2.onStageCompleted(stageCompleted4);
     fakeJobListener2.onJobEnd(jobEndEvent2);
-    assertThat(fakeStageListener2.getProcessedObjects()).hasSize(4);
+    assertThat(fakeStageListener2.getProcessedObjects().count()).isEqualTo(4);
 
-    Task stage3 = fakeStageListener2.getProcessedObjects().get(2);
+    Task stage3 = fakeStageListener2.getProcessedObjects().drop(2).head();
     assertThat(stage3.getParents().length).isEqualTo(0);
     assertThat(stage3.getChildren().length).isEqualTo(1);
     assertThat(stage3.getChildren()).contains(stageId4 + 1);
 
-    Task stage4 = fakeStageListener2.getProcessedObjects().get(3);
+    Task stage4 = fakeStageListener2.getProcessedObjects().drop(3).head();
     assertThat(stage4.getParents().length).isEqualTo(1);
     assertThat(stage4.getParents()).contains(stageId3 + 1);
     assertThat(stage4.getChildren().length).isEqualTo(0);

@@ -1,4 +1,4 @@
-package com.asml.apa.wta.core.model.enums;
+package com.asml.apa.wta.core.model;
 
 import com.google.gson.annotations.SerializedName;
 

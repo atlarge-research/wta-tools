@@ -224,4 +224,90 @@ public class StreamIntegrationTest {
     Stream.deleteAllSerializedFiles();
     assertThat(Files.exists(serializationDirectory)).isFalse();
   }
+
+  @Test
+  void streamSerializationWithClone() {
+    Stream<Integer> originalStream = createSerializingStreamOfNaturalNumbers(10, defaultSerTrigger);
+    for (int i = 1; i <= 9; i++) {
+      originalStream.addToStream(i);
+    }
+    originalStream.addToStream(10);
+    originalStream.addToStream(5);
+    Stream<Integer> clone = originalStream.copy();
+    for (Stream<Integer> stream : List.of(originalStream, clone)) {
+      assertThat(stream.head()).isEqualTo(0);
+      assertThat(stream.head()).isEqualTo(1);
+      assertThat(stream.head()).isEqualTo(2);
+      assertThat(stream.head()).isEqualTo(3);
+      assertThat(stream.head()).isEqualTo(4);
+      assertThat(stream.head()).isEqualTo(5);
+      assertThat(stream.head()).isEqualTo(6);
+      assertThat(stream.head()).isEqualTo(7);
+      assertThat(stream.head()).isEqualTo(8);
+      assertThat(stream.head()).isEqualTo(9);
+      assertThat(stream.head()).isEqualTo(10);
+      assertThat(stream.head()).isEqualTo(1);
+      assertThat(stream.head()).isEqualTo(2);
+      assertThat(stream.head()).isEqualTo(3);
+      assertThat(stream.head()).isEqualTo(4);
+      assertThat(stream.head()).isEqualTo(5);
+      assertThat(stream.head()).isEqualTo(6);
+      assertThat(stream.head()).isEqualTo(7);
+      assertThat(stream.head()).isEqualTo(8);
+      assertThat(stream.head()).isEqualTo(9);
+      assertThat(stream.head()).isEqualTo(10);
+      assertThat(stream.head()).isEqualTo(5);
+      assertThat(stream.isEmpty()).isTrue();
+    }
+  }
+
+  @Test
+  void streamSerializationWithPartiallyConsumedClone() {
+    Stream<Integer> originalStream = createSerializingStreamOfNaturalNumbers(10, defaultSerTrigger);
+    for (int i = 1; i <= 9; i++) {
+      originalStream.addToStream(i);
+    }
+    originalStream.addToStream(10);
+    originalStream.addToStream(5);
+    int head = originalStream.head();
+    assertThat(head).isEqualTo(0);
+    for (int i = 1; i <= 10; i++) {
+      originalStream.addToStream(i);
+    }
+    Stream<Integer> clone = originalStream.copy();
+    for (Stream<Integer> stream : List.of(originalStream, clone)) {
+      assertThat(stream.head()).isEqualTo(1);
+      assertThat(stream.head()).isEqualTo(2);
+      assertThat(stream.head()).isEqualTo(3);
+      assertThat(stream.head()).isEqualTo(4);
+      assertThat(stream.head()).isEqualTo(5);
+      assertThat(stream.head()).isEqualTo(6);
+      assertThat(stream.head()).isEqualTo(7);
+      assertThat(stream.head()).isEqualTo(8);
+      assertThat(stream.head()).isEqualTo(9);
+      assertThat(stream.head()).isEqualTo(10);
+      assertThat(stream.head()).isEqualTo(1);
+      assertThat(stream.head()).isEqualTo(2);
+      assertThat(stream.head()).isEqualTo(3);
+      assertThat(stream.head()).isEqualTo(4);
+      assertThat(stream.head()).isEqualTo(5);
+      assertThat(stream.head()).isEqualTo(6);
+      assertThat(stream.head()).isEqualTo(7);
+      assertThat(stream.head()).isEqualTo(8);
+      assertThat(stream.head()).isEqualTo(9);
+      assertThat(stream.head()).isEqualTo(10);
+      assertThat(stream.head()).isEqualTo(5);
+      assertThat(stream.head()).isEqualTo(1);
+      assertThat(stream.head()).isEqualTo(2);
+      assertThat(stream.head()).isEqualTo(3);
+      assertThat(stream.head()).isEqualTo(4);
+      assertThat(stream.head()).isEqualTo(5);
+      assertThat(stream.head()).isEqualTo(6);
+      assertThat(stream.head()).isEqualTo(7);
+      assertThat(stream.head()).isEqualTo(8);
+      assertThat(stream.head()).isEqualTo(9);
+      assertThat(stream.head()).isEqualTo(10);
+      assertThat(stream.isEmpty()).isTrue();
+    }
+  }
 }

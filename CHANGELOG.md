@@ -102,7 +102,8 @@ For the most part, since we are pre-release this will serve no real purpose, oth
 - Fixed dstat command bug [@lyadalachanchu](https://gitlab.ewi.tudelft.nl/lyadalachanchu)
 - Fixed serialization bug in the new supplier POJOs [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 - Fixed Parquet schema generation static field edge cases [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
-- Fixed shellUtils execution bug [@lyadalachanchu](https://gitlab.ewi.tudelft.nl/lyadalachanchu)
+- Fixed ShellUtils execution bug [@lyadalachanchu](https://gitlab.ewi.tudelft.nl/lyadalachanchu)
+- Fixed some of the OOM issues by replacing Lists with Streams [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 
 ### Deprecated
 

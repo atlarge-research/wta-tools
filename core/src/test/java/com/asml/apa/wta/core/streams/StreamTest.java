@@ -3,7 +3,11 @@ package com.asml.apa.wta.core.streams;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
+import java.util.Queue;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -133,5 +137,216 @@ class StreamTest {
     Stream<Integer> stream = createStreamOfNaturalNumbers(10);
     stream.foldLeft(0, Integer::sum);
     assertThat(stream.isEmpty()).isTrue();
+  }
+
+  @Test
+  void clonePartiallyConsumedStream() {
+    Stream<Integer> stream = createStreamOfNaturalNumbers(10);
+    int one = stream.head();
+    stream.addToStream(1);
+    int two = stream.head();
+    stream.addToStream(2);
+    int sumClone = stream.copy().foldLeft(0, Integer::sum);
+    int sumOriginal = stream.foldLeft(0, Integer::sum);
+    assertThat(one).isEqualTo(1);
+    assertThat(two).isEqualTo(2);
+    assertThat(sumClone).isEqualTo(55);
+    assertThat(sumOriginal).isEqualTo(55);
+  }
+
+  @Test
+  void cloneStreamWithOneElement() {
+    Stream<Integer> stream = new Stream<>();
+    stream.addToStream(1);
+    Stream<Integer> clone = stream.copy();
+    assertThat(clone.head()).isEqualTo(1);
+    assertThat(stream.head()).isEqualTo(1);
+  }
+
+  @Test
+  void setUpStreamFromCollection() {
+    List<Boolean> list = List.of(true, false, true, false);
+    Stream<Boolean> stream = new Stream<>(list);
+    assertThat(stream.isEmpty()).isFalse();
+    assertThat(stream.head()).isEqualTo(true);
+    assertThat(stream.head()).isEqualTo(false);
+    assertThat(stream.head()).isEqualTo(true);
+    assertThat(stream.head()).isEqualTo(false);
+    assertThat(stream.isEmpty()).isTrue();
+  }
+
+  @Test
+  void setUpStreamFromEmptyCollection() {
+    Stream<Long> emptyStream = new Stream<>(List.of());
+    assertThat(emptyStream.isEmpty()).isTrue();
+  }
+
+  @Test
+  void setUpStreamFromNullCollection() {
+    Queue<Long> queue = null;
+    assertThatThrownBy(() -> new Stream<>(queue)).isInstanceOf(NullPointerException.class);
+  }
+
+  @Test
+  void findFirstOnEmptyStream() {
+    Stream<?> stream = new Stream<>();
+    assertThat(stream.isEmpty()).isTrue();
+    assertThat(stream.findFirst()).isEmpty();
+  }
+
+  @Test
+  void findFirstOnStreamWithOneElement() {
+    Stream<?> stream = new Stream<>(1);
+    assertThat(stream.isEmpty()).isFalse();
+    Optional<?> head = stream.findFirst();
+    assertThat(head).isPresent();
+    assertThat(head.get()).isEqualTo(1);
+  }
+
+  @Test
+  void findFirstOnStreamWithThreeElements() {
+    Stream<?> stream = new Stream<>(List.of(3, 2, 1));
+    assertThat(stream.isEmpty()).isFalse();
+    Optional<?> head = stream.findFirst();
+    assertThat(head).isPresent();
+    assertThat(head.get()).isEqualTo(3);
+  }
+
+  @Test
+  void dropZeroOnEmptyStream() {
+    Stream<?> stream = new Stream<>();
+    assertThat(stream.isEmpty()).isTrue();
+    assertThat(stream.drop(0)).isEqualTo(stream);
+    assertThat(stream.isEmpty()).isTrue();
+  }
+
+  @Test
+  void dropZeroOnStreamWithOneElement() {
+    Stream<?> stream = new Stream<>(1);
+    assertThat(stream.isEmpty()).isFalse();
+    assertThat(stream.drop(0)).isEqualTo(stream);
+    assertThat(stream.isEmpty()).isFalse();
+    assertThat(stream.head()).isEqualTo(1);
+  }
+
+  @Test
+  void dropOneOnStreamWithOneElement() {
+    Stream<?> stream = new Stream<>(1);
+    assertThat(stream.isEmpty()).isFalse();
+    assertThat(stream.drop(1)).isEqualTo(stream);
+    assertThat(stream.findFirst()).isEmpty();
+  }
+
+  @Test
+  void dropThreeOnStreamWithOneElement() {
+    Stream<?> stream = new Stream<>(1);
+    assertThat(stream.isEmpty()).isFalse();
+    assertThat(stream.drop(3)).isEqualTo(stream);
+    assertThat(stream.findFirst()).isEmpty();
+  }
+
+  @Test
+  void dropTwoOnStreamWithThreeElements() {
+    Stream<?> stream = new Stream<>(List.of(1, 2, 3));
+    assertThat(stream.isEmpty()).isFalse();
+    assertThat(stream.drop(2)).isEqualTo(stream);
+    assertThat(stream.head()).isEqualTo(3);
+  }
+
+  @Test
+  void reduceEmptyStream() {
+    Stream<Integer> stream = new Stream<>();
+    assertThat(stream.reduce(Integer::sum)).isEmpty();
+    assertThat(stream.isEmpty()).isTrue();
+  }
+
+  @Test
+  void reduceStreamWithOneElement() {
+    Stream<Integer> stream = new Stream<>(3);
+    assertThat(stream.isEmpty()).isFalse();
+    assertThat(stream.reduce(Integer::sum).get()).isEqualTo(3);
+    assertThat(stream.isEmpty()).isTrue();
+  }
+
+  @Test
+  void reduceStreamWithMultipleElements() {
+    Stream<Integer> stream = new Stream<>(List.of(1, 2, 3, 4, 5));
+    assertThat(stream.isEmpty()).isFalse();
+    assertThat(stream.reduce(Integer::sum).get()).isEqualTo(15);
+    assertThat(stream.isEmpty()).isTrue();
+  }
+
+  @Test
+  void forEachEmptyStream() {
+    Stream<Double> stream = new Stream<>();
+    List<Double> doubleList = new ArrayList<>();
+    assertThat(stream.isEmpty()).isTrue();
+    stream.forEach(doubleList::add);
+    assertThat(doubleList).isEmpty();
+    assertThat(stream.isEmpty()).isTrue();
+  }
+
+  @Test
+  void forEachEmptyStreamAddToNonEmptyList() {
+    Stream<Double> stream = new Stream<>();
+    List<Double> doubleList = new ArrayList<>();
+    doubleList.add(1.0);
+    assertThat(stream.isEmpty()).isTrue();
+    stream.forEach(doubleList::add);
+    assertThat(doubleList).isNotEmpty();
+    assertThat(doubleList.get(0)).isEqualTo(1.0);
+    assertThat(doubleList.size()).isEqualTo(1);
+    assertThat(stream.isEmpty()).isTrue();
+  }
+
+  @Test
+  void forEachStream() {
+    Stream<Double> stream = new Stream<>(List.of(1.0, 2.0, 3.0, 4.0));
+    List<Double> doubleList = new ArrayList<>();
+    assertThat(stream.isEmpty()).isFalse();
+    stream.forEach(doubleList::add);
+    assertThat(doubleList).isNotEmpty();
+    assertThat(doubleList).hasSize(4);
+    assertThat(stream.isEmpty()).isTrue();
+  }
+
+  @Test
+  void countEmptyStream() {
+    Stream<Double> stream = new Stream<>();
+    assertThat(stream.isEmpty()).isTrue();
+    assertThat(stream.count()).isEqualTo(0);
+  }
+
+  @Test
+  void countStreamWithOneElement() {
+    Stream<Integer> stream = new Stream<>(List.of(1));
+    assertThat(stream.isEmpty()).isFalse();
+    assertThat(stream.count()).isEqualTo(1);
+    assertThat(stream.isEmpty()).isTrue();
+  }
+
+  @Test
+  void countStreamWithFiveElementsWithDuplicates() {
+    Stream<Integer> stream = new Stream<>(List.of(1, 2, 2, 3, 1));
+    assertThat(stream.isEmpty()).isFalse();
+    assertThat(stream.count()).isEqualTo(5);
+    assertThat(stream.isEmpty()).isTrue();
+  }
+
+  @Test
+  void emptyStreamToArray() {
+    Stream<Double> stream = new Stream<>();
+    assertThat(stream.toArray(Double[]::new)).isEmpty();
+  }
+
+  @Test
+  void streamToArray() {
+    Stream<Character> stream = new Stream<>(List.of('a', 'b'));
+    Character[] arr = stream.toArray(Character[]::new);
+    assertThat(stream.isEmpty()).isTrue();
+    assertThat(arr).isNotEmpty();
+    assertThat(arr[0]).isEqualTo('a');
+    assertThat(arr[1]).isEqualTo('b');
+    assertThat(arr).hasSize(2);
   }
 }

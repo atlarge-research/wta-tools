@@ -147,7 +147,6 @@ public class EndToEnd {
         .set("spark.plugins", "com.asml.apa.wta.spark.WtaPlugin")
         .set("spark.executor.instances", "2")
         .set("spark.executor.cores", "2")
-        .set("spark.logConf", "true")
         .set("spark.driver.extraJavaOptions", "-DconfigFile=" + args[0]);
     //        .set("spark.driver.extraJavaOptions", "-DconfigFile=" +
     // "adapter/spark/src/test/resources/config.json");

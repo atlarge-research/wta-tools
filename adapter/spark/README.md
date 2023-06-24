@@ -232,6 +232,12 @@ Aggregation of all the resource utilisation metrics are done at the driver's end
   - This can also cause issues when trying to send task-level metrics from the executor to the driver. For example, if the Spark Plugin API is called before the SparkListenerInterface, then the executor will not have the task-level metrics to send.
 - Certain lifecycle callbacks in the SparkListenerInterface do **NOT** suppress exceptions, whilst the Spark Plugin API does.
 
+#### Memory
+- As we gather an enormous amount of data to create the traces, we write a lot of data to disk. This is done to avoid everything from piling up in memory and causing `OutOfMemoryExceptions`. This constant writing to and reading from disk causes some overhead.
+  - As we perform these operations in the listeners, this could theoretically cause Spark's listener queue to fill up on very intensive jobs which produce a lot of small tasks. To avoid issues with this, it is recommended to increase the queue size for such very intensive workloads.
+  - Decreasing the size of the queue is warned against as it can cause such issues to come up where they are not expected to.
+  - All this serialisation also means that you will need a disk that is able to store sizeable amounts of data and handle a large number of reads and writes.
+
 ## Metric Calculation Clarification
 For some metrics, it is not immediately clear how they are calculated. This section aims to clarify this.
 

@@ -7,7 +7,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 import lombok.Getter;
 import org.apache.spark.SparkContext;
 import org.apache.spark.executor.TaskMetrics;
@@ -90,8 +89,8 @@ public class TaskLevelListener extends TaskStageBaseListener {
     final String type = taskEnd.taskType();
     final long tsSubmit = curTaskInfo.launchTime();
     final long runtime = curTaskMetrics.executorRunTime();
-    final int userId = sparkContext.sparkUser().hashCode();
-    final long workflowId = stageToJob.get(taskEnd.stageId() + 1L);
+    final int userId = Math.abs(getSparkContext().sparkUser().hashCode());
+    final long workflowId = getStageToJob().get(stageId);
     final double diskSpaceRequested = (double) curTaskMetrics.diskBytesSpilled()
         + curTaskMetrics.shuffleWriteMetrics().bytesWritten();
     final long resourceUsed = Math.abs(curTaskInfo.executorId().hashCode());
@@ -134,7 +133,9 @@ public class TaskLevelListener extends TaskStageBaseListener {
         .energyConsumption(energyConsumption)
         .resourceUsed(resourceUsed)
         .build();
-    this.getProcessedObjects().add(task);
+
+    addTaskToWorkflow(workflowId, task);
+    getThreadPool().execute(() -> addProcessedObject(task));
     fillInParentChildMaps(taskId, stageId, task);
   }
 
@@ -150,17 +151,15 @@ public class TaskLevelListener extends TaskStageBaseListener {
    * @since 1.0.0
    */
   public void setTasks(StageLevelListener stageLevelListener, long jobId) {
-    final List<Task> filteredTasks = this.getProcessedObjects().stream()
-        .filter(t -> t.getWorkflowId() == jobId)
-        .collect(Collectors.toList());
+    final List<Task> filteredTasks = getWorkflowsToTasks().onKey(jobId).toList();
     for (Task task : filteredTasks) {
       // set parent field: all Tasks in are guaranteed to be in taskToStage
-      final long stageId = this.getTaskToStage().get(task.getId());
+      final long stageId = getTaskToStage().get(task.getId());
       final Long[] parentStages = stageLevelListener.getStageToParents().get(stageId);
       if (parentStages != null) {
         final long[] parents = Arrays.stream(parentStages)
-            .flatMap(parentStageId -> Arrays.stream(
-                this.getStageToTasks().getOrDefault(parentStageId, new ArrayList<>()).stream()
+            .flatMap(parentStageId ->
+                Arrays.stream(getStageToTasks().getOrDefault(parentStageId, new ArrayList<>()).stream()
                     .map(Task::getId)
                     .toArray(Long[]::new)))
             .mapToLong(Long::longValue)
@@ -174,7 +173,7 @@ public class TaskLevelListener extends TaskStageBaseListener {
       if (childrenStages != null) {
         List<Task> children = new ArrayList<>();
         childrenStages.forEach(
-            childrenStage -> children.addAll(this.getStageToTasks().get(childrenStage)));
+            childrenStage -> children.addAll(getStageToTasks().get(childrenStage)));
         long[] childrenTaskIds = children.stream()
             .map(Task::getId)
             .mapToLong(Long::longValue)
@@ -186,7 +185,7 @@ public class TaskLevelListener extends TaskStageBaseListener {
       final int resourceProfileId =
           stageLevelListener.getStageToResource().getOrDefault(stageId, -1);
       final ResourceProfile resourceProfile =
-          sparkContext.resourceProfileManager().resourceProfileFromId(resourceProfileId);
+          getSparkContext().resourceProfileManager().resourceProfileFromId(resourceProfileId);
       final List<TaskResourceRequest> resources = JavaConverters.seqAsJavaList(
           resourceProfile.taskResources().values().toList());
       if (resources.size() > 0) {

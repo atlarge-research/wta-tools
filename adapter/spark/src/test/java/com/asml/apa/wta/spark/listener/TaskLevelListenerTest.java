@@ -9,6 +9,7 @@ import com.asml.apa.wta.core.model.Task;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import org.apache.spark.executor.ExecutorMetrics;
 import org.apache.spark.executor.ShuffleWriteMetrics;
@@ -105,20 +106,23 @@ class TaskLevelListenerTest extends BaseLevelListenerTest {
   }
 
   @Test
-  void testTaskEndMetricExtraction() {
+  void testTaskEndMetricExtraction() throws InterruptedException {
     ListBuffer<StageInfo> stageBuffer = new ListBuffer<>();
     stageBuffer.$plus$eq(testStageInfo);
 
     fakeTaskListener1.onJobStart(new SparkListenerJobStart(0, 2L, stageBuffer.toList(), new Properties()));
     fakeTaskListener1.onTaskEnd(taskEndEvent);
-    assertEquals(1, fakeTaskListener1.getProcessedObjects().size());
-    Task curTask = fakeTaskListener1.getProcessedObjects().get(0);
+
+    AbstractListener.getThreadPool().awaitTermination(1000, TimeUnit.MILLISECONDS);
+
+    assertEquals(1, fakeTaskListener1.getProcessedObjects().count());
+    Task curTask = fakeTaskListener1.getProcessedObjects().head();
     assertEquals(1, curTask.getId());
     assertEquals("testTaskType", curTask.getType());
     assertEquals(50L, curTask.getTsSubmit());
     assertEquals(100L, curTask.getRuntime());
     assertEquals(1L, curTask.getWorkflowId());
-    assertEquals("testUser".hashCode(), curTask.getUserId());
+    assertEquals(Math.abs("testUser".hashCode()), curTask.getUserId());
     assertEquals(-1, curTask.getSubmissionSite());
     assertEquals("N/A", curTask.getResourceType());
     assertEquals(-1.0, curTask.getResourceAmountRequested());

@@ -20,5 +20,7 @@ import lombok.experimental.SuperBuilder;
 @EqualsAndHashCode(callSuper = true)
 public class SparkBaseSupplierWrapperDto extends BaseSupplierDto {
 
+  private static final long serialVersionUID = -7992568771408736130L;
+
   private String executorId;
 }

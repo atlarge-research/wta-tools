@@ -1,16 +1,21 @@
 package com.asml.apa.wta.spark.listener;
 
+import com.asml.apa.wta.core.WtaWriter;
 import com.asml.apa.wta.core.config.RuntimeConfig;
+import com.asml.apa.wta.core.model.Domain;
+import com.asml.apa.wta.core.model.Resource;
+import com.asml.apa.wta.core.model.ResourceState;
 import com.asml.apa.wta.core.model.Task;
 import com.asml.apa.wta.core.model.Workflow;
 import com.asml.apa.wta.core.model.Workload;
 import com.asml.apa.wta.core.model.Workload.WorkloadBuilder;
-import com.asml.apa.wta.core.model.enums.Domain;
-import java.util.Arrays;
+import com.asml.apa.wta.core.streams.Stream;
+import com.asml.apa.wta.spark.datasource.SparkDataSource;
+import com.asml.apa.wta.spark.dto.ResourceAndStateWrapper;
+import com.asml.apa.wta.spark.streams.MetricStreamingEngine;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.spark.SparkContext;
@@ -32,33 +37,53 @@ import org.apache.spark.scheduler.SparkListenerApplicationStart;
 @Slf4j
 public class ApplicationLevelListener extends AbstractListener<Workload> {
 
+  private static final int awaitInSeconds = 5;
+
+  private final MetricStreamingEngine metricStreamingEngine;
+
+  private final SparkDataSource sparkDataSource;
+
+  private final WtaWriter wtaWriter;
+
   private final TaskStageBaseListener wtaTaskListener;
 
   private final StageLevelListener stageLevelListener;
 
   private final JobLevelListener jobLevelListener;
 
+  @Getter
+  private Workload workload;
+
   /**
    * Constructor for the application-level listener.
    *
    * @param sparkContext The current spark context
    * @param config Additional config specified by the user for the plugin
-   * @param wtaTaskListener The task-level listener to be used by this listener
-   * @param stageLevelListener The stage-level listener to be used by this listener
-   * @param jobLevelListener The job-level listener to be used by this listener
+   * @param wtaTaskLevelListener The task-level listener to be used by this listener
+   * @param wtaStageLevelListener The stage-level listener to be used by this listener
+   * @param wtaJobLevelListener The job-level listener to be used by this listener
+   * @param dataSource the {@link SparkDataSource} to inject
+   * @param streamingEngine the driver's {@link MetricStreamingEngine} to use
+   * @param traceWriter the {@link WtaWriter} to write the traces with
    * @author Henry Page
    * @since 1.0.0
    */
   public ApplicationLevelListener(
       SparkContext sparkContext,
       RuntimeConfig config,
-      TaskStageBaseListener wtaTaskListener,
-      StageLevelListener stageLevelListener,
-      JobLevelListener jobLevelListener) {
+      TaskStageBaseListener wtaTaskLevelListener,
+      StageLevelListener wtaStageLevelListener,
+      JobLevelListener wtaJobLevelListener,
+      SparkDataSource dataSource,
+      MetricStreamingEngine streamingEngine,
+      WtaWriter traceWriter) {
     super(sparkContext, config);
-    this.wtaTaskListener = wtaTaskListener;
-    this.stageLevelListener = stageLevelListener;
-    this.jobLevelListener = jobLevelListener;
+    wtaTaskListener = wtaTaskLevelListener;
+    stageLevelListener = wtaStageLevelListener;
+    jobLevelListener = wtaJobLevelListener;
+    sparkDataSource = dataSource;
+    metricStreamingEngine = streamingEngine;
+    wtaWriter = traceWriter;
   }
 
   /**
@@ -66,20 +91,58 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
    *
    * @param sparkContext The current spark context
    * @param config Additional config specified by the user for the plugin
-   * @param stageLevelListener The stage-level listener to be used by this listener
-   * @param jobLevelListener The job-level listener to be used by this listener
+   * @param wtaStageLevelListener The stage-level listener to be used by this listener
+   * @param wtaJobLevelListener The job-level listener to be used by this listener
+   * @param dataSource the {@link SparkDataSource} to inject
+   * @param streamingEngine the driver's {@link MetricStreamingEngine} to use
+   * @param traceWriter the {@link WtaWriter} to write the traces with
    * @author Tianchen Qu
    * @since 1.0.0
    */
   public ApplicationLevelListener(
       SparkContext sparkContext,
       RuntimeConfig config,
-      StageLevelListener stageLevelListener,
-      JobLevelListener jobLevelListener) {
+      StageLevelListener wtaStageLevelListener,
+      JobLevelListener wtaJobLevelListener,
+      SparkDataSource dataSource,
+      MetricStreamingEngine streamingEngine,
+      WtaWriter traceWriter) {
     super(sparkContext, config);
-    this.wtaTaskListener = stageLevelListener;
-    this.stageLevelListener = stageLevelListener;
-    this.jobLevelListener = jobLevelListener;
+    wtaTaskListener = wtaStageLevelListener;
+    stageLevelListener = wtaStageLevelListener;
+    jobLevelListener = wtaJobLevelListener;
+    sparkDataSource = dataSource;
+    metricStreamingEngine = streamingEngine;
+    wtaWriter = traceWriter;
+  }
+
+  /**
+   * Writes the trace to file.
+   *
+   * @author Atour Mousavi Gourabi
+   * @since 1.0.0
+   */
+  public void writeTrace() {
+    List<ResourceAndStateWrapper> resourceAndStateWrappers = metricStreamingEngine.collectResourceInformation();
+    Stream<Resource> resources = new Stream<>();
+    resourceAndStateWrappers.stream()
+        .map(ResourceAndStateWrapper::getResource)
+        .forEach(resources::addToStream);
+    Stream<ResourceState> resourceStates = new Stream<>();
+    resourceAndStateWrappers.forEach(rs -> rs.getStates().forEach(resourceStates::addToStream));
+    Stream<Task> tasks = sparkDataSource.getRuntimeConfig().isStageLevel()
+        ? sparkDataSource.getStageLevelListener().getProcessedObjects()
+        : sparkDataSource.getTaskLevelListener().getProcessedObjects();
+
+    sparkDataSource.awaitAndShutdownThreadPool(awaitInSeconds);
+
+    wtaWriter.write(Task.class, tasks);
+    wtaWriter.write(Resource.class, resources);
+    wtaWriter.write(Workflow.class, sparkDataSource.getJobLevelListener().getProcessedObjects());
+    wtaWriter.write(ResourceState.class, resourceStates);
+    wtaWriter.write(workload);
+
+    Stream.deleteAllSerializedFiles();
   }
 
   /**
@@ -91,10 +154,10 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
    * @since 1.0.0
    */
   private void setGeneralFields(long dateEnd, WorkloadBuilder builder) {
-    final Domain domain = config.getDomain();
-    final long dateStart = sparkContext.startTime();
-    final String[] authors = config.getAuthors();
-    final String workloadDescription = config.getDescription();
+    final Domain domain = getConfig().getDomain();
+    final long dateStart = getSparkContext().startTime();
+    final String[] authors = getConfig().getAuthors();
+    final String workloadDescription = getConfig().getDescription();
     builder.authors(authors)
         .workloadDescription(workloadDescription)
         .domain(domain)
@@ -110,24 +173,25 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
    * @author Pil Kyu Cho
    * @since 1.0.0
    */
-  private void setCountFields(List<Task> tasks, WorkloadBuilder builder) {
-    final Workflow[] workflows = jobLevelListener.getProcessedObjects().toArray(new Workflow[0]);
-    final int totalWorkflows = workflows.length;
-    final int totalTasks =
-        Arrays.stream(workflows).mapToInt(Workflow::getTaskCount).sum();
-    final long numSites =
-        tasks.stream().filter(task -> task.getSubmissionSite() != -1).count();
-    final long numResources = tasks.stream()
+  private void setCountFields(Stream<Task> tasks, WorkloadBuilder builder) {
+    final Stream<Workflow> workflows = jobLevelListener.getProcessedObjects();
+    final long totalWorkflows = workflows.copy().count();
+    final long totalTasks =
+        workflows.map(Workflow::getTaskCount).reduce(Long::sum).orElse(0L);
+    long numSites =
+        tasks.copy().filter(task -> task.getSubmissionSite() >= 0).count();
+    numSites = numSites < 1 ? -1 : numSites;
+    final long numResources = tasks.copy()
         .map(Task::getResourceAmountRequested)
         .filter(task -> task >= 0.0)
         .reduce(Double::sum)
         .orElse(-1.0)
         .longValue();
-    final long numUsers =
-        tasks.stream().filter(task -> task.getUserId() != -1).count();
-    final long numGroups =
-        tasks.stream().filter(task -> task.getGroupId() != -1).count();
-    final double totalResourceSeconds = tasks.stream()
+    long numUsers = tasks.copy().filter(task -> task.getUserId() >= 0).count();
+    numUsers = numUsers < 1 ? -1 : numUsers;
+    long numGroups = tasks.copy().filter(task -> task.getGroupId() >= 0).count();
+    numGroups = numGroups < 1 ? -1 : numGroups;
+    final double totalResourceSeconds = tasks.copy()
         .filter(task -> task.getRuntime() >= 0 && task.getResourceAmountRequested() >= 0.0)
         .map(task -> task.getResourceAmountRequested() * task.getRuntime())
         .reduce(Double::sum)
@@ -148,38 +212,37 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
    * @since 1.0.0
    */
   private enum ResourceType {
-    RESOURCE(),
-    MEMORY(),
-    DISK(),
-    NETWORK(),
-    ENERGY();
-
-    ResourceType() {}
+    RESOURCE,
+    MEMORY,
+    DISK,
+    NETWORK,
+    ENERGY
   }
 
   /**
    * Setters for the statistical resource fields of the Workload.
    *
-   * @param tasks           List of WTA Task objects
-   * @param function        Function to be applied to the tasks to get the resource field
+   * @param metrics         {@link List} of WTA Task objects
    * @param resourceType    Type of resource to be set
    * @param builder         WorkloadBuilder to be used to build the Workload
    * @author Pil Kyu Cho
    * @since 1.0.0
    */
   @SuppressWarnings("CyclomaticComplexity")
-  private void setResourceStatisticsFields(
-      List<Task> tasks, Function<Task, Double> function, ResourceType resourceType, WorkloadBuilder builder) {
+  private void setResourceStatisticsFields(List<Double> metrics, ResourceType resourceType, WorkloadBuilder builder) {
     List<Double> sortedPositiveList =
-        tasks.stream().map(function).filter(x -> x >= 0.0).sorted().collect(Collectors.toList());
-    final double meanField = computeMean(tasks.stream().map(function), sortedPositiveList.size());
-    final double stdField =
-        computeStd(tasks.stream().map(function).filter(x -> x >= 0.0), meanField, sortedPositiveList.size());
+        metrics.stream().filter(x -> x >= 0.0).sorted().collect(Collectors.toList());
+    Stream<Double> metricsStream = new Stream<>(metrics);
+    final double meanField = computeMean(metricsStream.copy(), sortedPositiveList.size());
+    final double stdField = computeStd(
+        new Stream<>(metrics.stream().filter(x -> x >= 0.0).collect(Collectors.toList())),
+        meanField,
+        sortedPositiveList.size());
 
     switch (resourceType) {
       case RESOURCE:
-        builder.minResourceTask(computeMin(tasks.stream().map(function)))
-            .maxResourceTask(computeMax(tasks.stream().map(function)))
+        builder.minResourceTask(computeMin(metricsStream.copy()))
+            .maxResourceTask(computeMax(metricsStream.copy()))
             .meanResourceTask(meanField)
             .stdResourceTask(stdField)
             .covResourceTask(computeCov(meanField, stdField))
@@ -190,8 +253,8 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
                 sortedPositiveList.isEmpty() ? -1.0 : computeThirdQuantile(sortedPositiveList));
         break;
       case MEMORY:
-        builder.minMemory(computeMin(tasks.stream().map(function)))
-            .maxMemory(computeMax(tasks.stream().map(function)))
+        builder.minMemory(computeMin(metricsStream.copy()))
+            .maxMemory(computeMax(metricsStream.copy()))
             .meanMemory(meanField)
             .stdMemory(stdField)
             .covMemory(computeCov(meanField, stdField))
@@ -202,8 +265,8 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
                 sortedPositiveList.isEmpty() ? -1.0 : computeThirdQuantile(sortedPositiveList));
         break;
       case NETWORK:
-        builder.minNetworkUsage((long) computeMin(tasks.stream().map(function)))
-            .maxNetworkUsage((long) computeMax(tasks.stream().map(function)))
+        builder.minNetworkUsage((long) computeMin(metricsStream.copy()))
+            .maxNetworkUsage((long) computeMax(metricsStream.copy()))
             .meanNetworkUsage(meanField)
             .stdNetworkUsage(stdField)
             .covNetworkUsage(computeCov(meanField, stdField))
@@ -215,8 +278,8 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
                 sortedPositiveList.isEmpty() ? -1L : (long) computeThirdQuantile(sortedPositiveList));
         break;
       case DISK:
-        builder.minDiskSpaceUsage(computeMin(tasks.stream().map(function)))
-            .maxDiskSpaceUsage(computeMax(tasks.stream().map(function)))
+        builder.minDiskSpaceUsage(computeMin(metricsStream.copy()))
+            .maxDiskSpaceUsage(computeMax(metricsStream.copy()))
             .meanDiskSpaceUsage(meanField)
             .stdDiskSpaceUsage(stdField)
             .covDiskSpaceUsage(computeCov(meanField, stdField))
@@ -227,8 +290,8 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
                 sortedPositiveList.isEmpty() ? -1.0 : computeThirdQuantile(sortedPositiveList));
         break;
       case ENERGY:
-        builder.minEnergy(computeMin(tasks.stream().map(function)))
-            .maxEnergy(computeMax(tasks.stream().map(function)))
+        builder.minEnergy(computeMin(metricsStream.copy()))
+            .maxEnergy(computeMax(metricsStream.copy()))
             .meanEnergy(meanField)
             .stdEnergy(stdField)
             .covEnergy(computeCov(meanField, stdField))
@@ -251,26 +314,34 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
    * @since 1.0.0
    */
   public void onApplicationEnd(SparkListenerApplicationEnd applicationEnd) {
-    // we should never enter this branch, this is a guard since an application only terminates once.
-    if (!this.getProcessedObjects().isEmpty()) {
-      log.debug("Application end called twice, this should never happen");
+    if (containsProcessedObjects()) {
+      log.debug("Application end called twice, this should never happen.");
       return;
     }
-    jobLevelListener.setWorkflows();
 
     WorkloadBuilder workloadBuilder = Workload.builder();
-    final List<Task> tasks = wtaTaskListener.getProcessedObjects();
+    final Stream<Task> tasks = wtaTaskListener.getProcessedObjects();
     Function<Task, Long> networkFunction = Task::getNetworkIoTime;
 
     setGeneralFields(applicationEnd.time(), workloadBuilder);
-    setCountFields(tasks, workloadBuilder);
-    setResourceStatisticsFields(tasks, Task::getResourceAmountRequested, ResourceType.RESOURCE, workloadBuilder);
-    setResourceStatisticsFields(tasks, Task::getMemoryRequested, ResourceType.MEMORY, workloadBuilder);
+    setCountFields(tasks.copy(), workloadBuilder);
     setResourceStatisticsFields(
-        tasks, networkFunction.andThen(Long::doubleValue), ResourceType.NETWORK, workloadBuilder);
-    setResourceStatisticsFields(tasks, Task::getDiskSpaceRequested, ResourceType.DISK, workloadBuilder);
-    setResourceStatisticsFields(tasks, Task::getEnergyConsumption, ResourceType.ENERGY, workloadBuilder);
-    this.getProcessedObjects().add(workloadBuilder.build());
+        tasks.copy().map(Task::getResourceAmountRequested).toList(), ResourceType.RESOURCE, workloadBuilder);
+    setResourceStatisticsFields(
+        tasks.copy().map(Task::getMemoryRequested).toList(), ResourceType.MEMORY, workloadBuilder);
+    setResourceStatisticsFields(
+        tasks.copy().map(networkFunction.andThen(Long::doubleValue)).toList(),
+        ResourceType.NETWORK,
+        workloadBuilder);
+    setResourceStatisticsFields(
+        tasks.copy().map(Task::getDiskSpaceRequested).toList(), ResourceType.DISK, workloadBuilder);
+    setResourceStatisticsFields(
+        tasks.copy().map(Task::getEnergyConsumption).toList(), ResourceType.ENERGY, workloadBuilder);
+
+    sparkDataSource.removeListeners();
+
+    workload = workloadBuilder.build();
+    writeTrace();
   }
 
   /**

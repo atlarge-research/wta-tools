@@ -6,7 +6,7 @@ import com.asml.apa.wta.core.model.Resource;
 import com.asml.apa.wta.core.model.ResourceState;
 import com.asml.apa.wta.core.model.Task;
 import com.asml.apa.wta.core.model.Workflow;
-import java.util.List;
+import com.asml.apa.wta.core.streams.Stream;
 import org.junit.jupiter.api.Test;
 
 class ParquetSchemaTest {
@@ -15,7 +15,7 @@ class ParquetSchemaTest {
   public void generateSchemaAndConvertTasks() {
     Task task = Task.builder().id(1).build();
 
-    ParquetSchema parquetSchema = new ParquetSchema(Task.class, List.of(task), "tasks");
+    ParquetSchema parquetSchema = new ParquetSchema(Task.class, new Stream<>(task), "tasks");
 
     assertDoesNotThrow(() -> task.convertToRecord(parquetSchema));
   }
@@ -24,7 +24,7 @@ class ParquetSchemaTest {
   public void generateSchemaAndConvertResources() {
     Resource resource = Resource.builder().id(1).build();
 
-    ParquetSchema parquetSchema = new ParquetSchema(Resource.class, List.of(resource), "resources");
+    ParquetSchema parquetSchema = new ParquetSchema(Resource.class, new Stream<>(resource), "resources");
 
     assertDoesNotThrow(() -> resource.convertToRecord(parquetSchema));
   }
@@ -33,7 +33,7 @@ class ParquetSchemaTest {
   public void generateSchemaAndConvertWorkflows() {
     Workflow workflow = Workflow.builder().id(1).build();
 
-    ParquetSchema parquetSchema = new ParquetSchema(Workflow.class, List.of(workflow), "workflows");
+    ParquetSchema parquetSchema = new ParquetSchema(Workflow.class, new Stream<>(workflow), "workflows");
 
     assertDoesNotThrow(() -> workflow.convertToRecord(parquetSchema));
   }
@@ -42,7 +42,8 @@ class ParquetSchemaTest {
   public void generateSchemaAndConvertResourceStates() {
     ResourceState resourceState = ResourceState.builder().build();
 
-    ParquetSchema parquetSchema = new ParquetSchema(ResourceState.class, List.of(resourceState), "resource_states");
+    ParquetSchema parquetSchema =
+        new ParquetSchema(ResourceState.class, new Stream<>(resourceState), "resource_states");
 
     assertDoesNotThrow(() -> resourceState.convertToRecord(parquetSchema));
   }

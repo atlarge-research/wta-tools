@@ -1,6 +1,9 @@
 package com.asml.apa.wta.core.streams;
 
 import com.asml.apa.wta.core.exceptions.FailedToDeserializeStreamException;
+import com.asml.apa.wta.core.exceptions.FailedToSerializeStreamException;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -13,12 +16,19 @@ import java.nio.file.Path;
 import java.time.Instant;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.Queue;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.function.BiFunction;
+import java.util.function.BinaryOperator;
+import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.IntFunction;
+import java.util.function.Predicate;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -32,17 +42,16 @@ import lombok.extern.slf4j.Slf4j;
  * @since 1.0.0
  */
 @Slf4j
-public class Stream<V extends Serializable> {
+public class Stream<V extends Serializable> implements Cloneable {
 
   /**
    * Internal node of the {@link com.asml.apa.wta.core.streams.Stream}.
    *
-   * @param <V> the metrics class to hold, to extend {@link java.io.Serializable}
    * @author Atour Mousavi Gourabi
    * @since 1.0.0
    */
   @Getter
-  private static class StreamNode<V extends Serializable> implements Serializable {
+  private static class StreamNode<V> implements Serializable {
 
     private static final long serialVersionUID = -1846183914651125999L;
 
@@ -63,13 +72,13 @@ public class Stream<V extends Serializable> {
     }
   }
 
-  private final UUID id;
+  private static final String TEMP_SERIALIZATION_DIRECTORY = "tmp/wta/streams/serialization/";
 
-  private final Queue<String> diskLocations;
+  private UUID id;
+
+  private Queue<String> diskLocations;
   private int additionsSinceLastWriteToDisk;
   private final int serializationTrigger;
-
-  private static final String TEMP_SERIALIZATION_DIRECTORY = "tmp/wta/streams/serialization/";
 
   private StreamNode<V> deserializationStart;
   private StreamNode<V> deserializationEnd;
@@ -90,7 +99,7 @@ public class Stream<V extends Serializable> {
     new File(Stream.TEMP_SERIALIZATION_DIRECTORY).mkdirs();
     head = new StreamNode<>(content);
     tail = head;
-    diskLocations = new ArrayDeque<>();
+    diskLocations = new ConcurrentLinkedDeque<>();
     deserializationStart = head;
     deserializationEnd = head;
     id = UUID.randomUUID();
@@ -121,10 +130,24 @@ public class Stream<V extends Serializable> {
     deserializationEnd = null;
     head = null;
     tail = null;
-    diskLocations = new ArrayDeque<>();
+    diskLocations = new ConcurrentLinkedDeque<>();
     id = UUID.randomUUID();
     additionsSinceLastWriteToDisk = 0;
     serializationTrigger = 1800;
+  }
+
+  /**
+   * Constructs a {@link Stream} out of a {@link Collection}.
+   *
+   * @param content the {@link Collection} to construct the {@link Stream} from
+   * @author Atour Mousavi Gourabi
+   * @since 1.0.0
+   */
+  public Stream(@NonNull Collection<V> content) {
+    this();
+    for (V elem : content) {
+      addToStream(elem);
+    }
   }
 
   /**
@@ -136,11 +159,7 @@ public class Stream<V extends Serializable> {
   private synchronized void serializeInternals() {
     log.trace("Serializing stream {}.", id);
     StreamNode<V> current;
-    if (head == deserializationEnd) {
-      current = head.getNext();
-    } else {
-      current = deserializationEnd;
-    }
+    current = deserializationEnd;
     String filePath = Stream.TEMP_SERIALIZATION_DIRECTORY + id + "-" + System.currentTimeMillis() + "-"
         + Instant.now().getNano() + ".ser";
     List<StreamNode<V>> toSerialize = new ArrayList<>();
@@ -148,14 +167,15 @@ public class Stream<V extends Serializable> {
       toSerialize.add(current);
       current = current.getNext();
     }
-    try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream(filePath))) {
+    try (ObjectOutputStream objectOutputStream =
+        new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(filePath)))) {
       objectOutputStream.writeObject(toSerialize);
     } catch (IOException e) {
       log.error("Failed to serialize stream internals to {}.", filePath);
       return;
     }
-    deserializationEnd.setNext(null);
-    deserializationEnd = tail;
+    deserializationStart.setNext(current);
+    deserializationEnd = current;
     diskLocations.add(filePath);
     additionsSinceLastWriteToDisk = 0;
   }
@@ -164,16 +184,16 @@ public class Stream<V extends Serializable> {
    * Deserializes the internals of the stream on demand.
    *
    * @param filePath the chunk of internals to deserialize, to not be {@code null}
-   * @return the amount of {@link com.asml.apa.wta.core.streams.Stream.StreamNode} objects deserialized
    * @throws FailedToDeserializeStreamException if an exception occurred when deserializing this batch of the stream
    * @author Atour Mousavi Gourabi
    * @since 1.0.0
    */
-  private synchronized int deserializeInternals(@NonNull String filePath) {
+  private synchronized void deserializeInternals(String filePath) {
     log.trace("Deserializing stream internals from {}.", filePath);
-    int amountOfNodes;
-    try (ObjectInputStream objectInputStream = new ObjectInputStream(new FileInputStream(filePath))) {
+    try (ObjectInputStream objectInputStream =
+        new ObjectInputStream(new BufferedInputStream(new FileInputStream(filePath)))) {
       List<StreamNode<V>> nodes = (ArrayList<StreamNode<V>>) objectInputStream.readObject();
+      head = deserializationStart;
       StreamNode<V> previous = null;
       for (StreamNode<V> node : nodes) {
         if (previous != null) {
@@ -185,16 +205,32 @@ public class Stream<V extends Serializable> {
       }
       if (previous != null) {
         deserializationStart = previous;
-        previous.setNext(deserializationEnd);
+        deserializationStart.setNext(deserializationEnd);
       }
-      amountOfNodes = nodes.size();
     } catch (IOException | ClassNotFoundException | ClassCastException e) {
       log.error("Failed to deserialize stream internals from {}.", filePath);
       throw new FailedToDeserializeStreamException();
-    } finally {
-      new File(filePath).delete();
     }
-    return amountOfNodes;
+  }
+
+  /**
+   * Clones the {@link Stream}. Creates a shallow copy, so it points to the same elements.
+   *
+   * @return a shallow copy of the current {@link Stream}
+   * @author Atour Mousavi Gourabi
+   * @since 1.0.0
+   */
+  public synchronized Stream<V> copy() {
+    try {
+      Stream<V> clone = (Stream<V>) super.clone();
+      clone.id = UUID.randomUUID();
+      clone.diskLocations = new ArrayDeque<>();
+      clone.diskLocations.addAll(diskLocations);
+      return clone;
+    } catch (CloneNotSupportedException e) {
+      log.error("Could not clone Stream because {}.", e.getMessage());
+      throw new FailedToSerializeStreamException();
+    }
   }
 
   /**
@@ -207,6 +243,21 @@ public class Stream<V extends Serializable> {
   public boolean isEmpty() {
     log.trace("Checking whether stream {} is empty.", id);
     return head == null;
+  }
+
+  /**
+   * Gets an {@link Optional} containing the head of the {@link Stream} if present.
+   * If not, it returns an empty {@link Optional}. Consumes the element it returns.
+   *
+   * @return the head of the {@link Stream} wrapped in an {@link Optional} if present
+   * @author Atour Mousavi Gourabi
+   * @since 1.0.0
+   */
+  public synchronized Optional<V> findFirst() {
+    if (head == null) {
+      return Optional.empty();
+    }
+    return Optional.of(head());
   }
 
   /**
@@ -230,7 +281,7 @@ public class Stream<V extends Serializable> {
       if (diskLocations.isEmpty()) {
         deserializationStart = head.getNext();
       } else {
-        additionsSinceLastWriteToDisk += deserializeInternals(diskLocations.poll());
+        deserializeInternals(diskLocations.poll());
       }
     }
     V ret = head.getContent();
@@ -239,6 +290,36 @@ public class Stream<V extends Serializable> {
       tail = null;
     }
     return ret;
+  }
+
+  /**
+   * Drops the specified amount of elements from the head of the {@link Stream}.
+   * If the specified amount of elements is larger than the size of the {@link Stream},
+   * the {@link Stream} will be fully emptied. Consumes the {@link Stream}.
+   *
+   * @param amount the amount of elements to drop from the {@link Stream}
+   * @return the {@link Stream} after the elements were dropped
+   * @author Atour Mousavi Gourabi
+   * @since 1.0.0
+   */
+  public synchronized Stream<V> drop(long amount) {
+    for (int i = 0; i < amount; i++) {
+      if (head == null) {
+        tail = null;
+        log.error("Stream#drop called for {} elements, but only able to drop {}.", amount, i);
+        break;
+      }
+      additionsSinceLastWriteToDisk--;
+      if (head == deserializationStart) {
+        if (diskLocations.isEmpty()) {
+          deserializationStart = head.getNext();
+        } else {
+          deserializeInternals(diskLocations.poll());
+        }
+      }
+      head = head.getNext();
+    }
+    return this;
   }
 
   /**
@@ -272,6 +353,10 @@ public class Stream<V extends Serializable> {
       tail = head;
       deserializationStart = head;
       deserializationEnd = head;
+    } else if (head == tail) {
+      tail = new StreamNode<>(content);
+      deserializationEnd = tail;
+      head.setNext(tail);
     } else {
       tail.setNext(new StreamNode<>(content));
       tail = tail.getNext();
@@ -302,6 +387,10 @@ public class Stream<V extends Serializable> {
     StreamNode<V> next = head;
     Stream<R> ret = new Stream<>();
     while (next != null) {
+      if (next.getNext() == null) {
+        deserializationStart = next;
+        deserializationEnd = null;
+      }
       if (next == deserializationStart && !diskLocations.isEmpty()) {
         head = next;
         deserializeInternals(diskLocations.poll());
@@ -325,16 +414,20 @@ public class Stream<V extends Serializable> {
    * @author Atour Mousavi Gourabi
    * @since 1.0.0
    */
-  public synchronized Stream<V> filter(@NonNull Function<V, Boolean> predicate) {
+  public synchronized Stream<V> filter(@NonNull Predicate<V> predicate) {
     log.trace("Consuming and applying filter on stream {}", this.id);
     StreamNode<V> next = head;
     Stream<V> ret = new Stream<>();
     while (next != null) {
+      if (next.getNext() == null) {
+        deserializationStart = next;
+        deserializationEnd = null;
+      }
       if (next == deserializationStart && !diskLocations.isEmpty()) {
         head = next;
         deserializeInternals(diskLocations.poll());
       }
-      if (predicate.apply(next.getContent())) {
+      if (predicate.test(next.getContent())) {
         ret.addToStream(next.getContent());
       }
       next = next.getNext();
@@ -362,6 +455,10 @@ public class Stream<V extends Serializable> {
     R acc = init;
     StreamNode<V> next = head;
     while (next != null) {
+      if (next.getNext() == null) {
+        deserializationStart = next;
+        deserializationEnd = null;
+      }
       if (next == deserializationStart && !diskLocations.isEmpty()) {
         head = next;
         deserializeInternals(diskLocations.poll());
@@ -375,19 +472,123 @@ public class Stream<V extends Serializable> {
   }
 
   /**
-   * Converts the stream to a list, and consumes the stream.
+   * Reduces the {@link Stream} with the given accumulator. Consumes the stream.
    *
-   * @return A list with the stream elements
+   * @param accumulator the {@link BinaryOperator} to reduce the stream over
+   * @return the result of the reduction, an empty {@link Optional} if the {@link Stream} was empty
+   * @author Atour Mousavi Gourabi
+   */
+  public synchronized Optional<V> reduce(@NonNull BinaryOperator<V> accumulator) {
+    if (head == null) {
+      return Optional.empty();
+    }
+    additionsSinceLastWriteToDisk--;
+    if (head == deserializationStart) {
+      if (diskLocations.isEmpty()) {
+        deserializationStart = head.getNext();
+      } else {
+        deserializeInternals(diskLocations.poll());
+      }
+    }
+    V ret = head.getContent();
+    head = head.getNext();
+    if (head == null) {
+      tail = null;
+    }
+    return Optional.of(foldLeft(ret, accumulator));
+  }
+
+  /**
+   * Converts the {@link Stream} to a {@link List}, and consumes the {@link Stream}.
+   *
+   * @return a {@link List} with the {@link Stream}s elements
+   * @author Atour Mousavi Gourabi
    * @author Henry Page
    * @since 1.0.0
    */
   public synchronized List<V> toList() {
     log.trace("Consuming stream {} to list", this.id);
+    StreamNode<V> next = head;
     List<V> ret = new ArrayList<>();
-    while (!isEmpty()) {
-      ret.add(head());
+    while (next != null) {
+      if (next.getNext() == null) {
+        deserializationStart = next;
+        deserializationEnd = null;
+      }
+      if (next == deserializationStart && !diskLocations.isEmpty()) {
+        head = next;
+        deserializeInternals(diskLocations.poll());
+      }
+      ret.add(next.getContent());
+      next = next.getNext();
     }
+    head = null;
+    tail = null;
     return ret;
+  }
+
+  /**
+   * Performs the action for each element in the {@link Stream}. Consumes the {@link Stream}.
+   *
+   * @param action the action to perform for all elements of the {@link Stream}
+   * @author Atour Mousavi Gourabi
+   * @since 1.0.0
+   */
+  public synchronized void forEach(Consumer<? super V> action) {
+    StreamNode<V> next = head;
+    while (next != null) {
+      if (next.getNext() == null) {
+        deserializationStart = next;
+        deserializationEnd = null;
+      }
+      if (next == deserializationStart && !diskLocations.isEmpty()) {
+        head = next;
+        deserializeInternals(diskLocations.poll());
+      }
+      action.accept(next.getContent());
+      next = next.getNext();
+    }
+    head = null;
+    tail = null;
+  }
+
+  /**
+   * Counts the number of elements in the {@link Stream}. Consumes the {@link Stream}.
+   *
+   * @return the size of the {@link Stream}
+   * @author Atour Mousavi Gourabi
+   * @since 1.0.0
+   */
+  public synchronized long count() {
+    StreamNode<V> next = head;
+    long count = 0;
+    while (next != null) {
+      if (next.getNext() == null) {
+        deserializationStart = next;
+        deserializationEnd = null;
+      }
+      if (next == deserializationStart && !diskLocations.isEmpty()) {
+        head = next;
+        deserializeInternals(diskLocations.poll());
+      }
+      ++count;
+      next = next.getNext();
+    }
+    head = null;
+    tail = null;
+    return count;
+  }
+
+  /**
+   * Converts the {@link Stream} to an array, and consumes the {@link Stream}.
+   *
+   * @param generator the generator of the array
+   * @return an array with the {@link Stream}s elements
+   * @author Atour Mousavi Gourabi
+   * @since 1.0.0
+   */
+  public synchronized V[] toArray(IntFunction<V[]> generator) {
+    return toList().toArray(generator);
   }
 
   /**

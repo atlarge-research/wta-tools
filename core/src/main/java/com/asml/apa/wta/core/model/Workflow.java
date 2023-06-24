@@ -1,7 +1,6 @@
 package com.asml.apa.wta.core.model;
 
 import com.asml.apa.wta.core.io.ParquetSchema;
-import com.asml.apa.wta.core.model.enums.Domain;
 import lombok.Builder;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -24,13 +23,13 @@ public class Workflow implements BaseTraceObject {
 
   private final long tsSubmit;
 
-  private final Task[] tasks;
+  private final Long[] taskIds;
 
-  private final int taskCount;
+  private final long taskCount;
 
   private long criticalPathLength;
 
-  private int criticalPathTaskCount;
+  private final long criticalPathTaskCount;
 
   private final int maxConcurrentTasks;
 

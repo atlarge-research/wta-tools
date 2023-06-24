@@ -98,12 +98,13 @@ public class DiskOutputFile implements OutputFile {
    * @since 1.0.0
    */
   @Override
-  public void clearDirectory() throws IOException {
+  public OutputFile clearDirectory() throws IOException {
     Files.createDirectories(outputFile);
     try (Stream<Path> paths = Files.walk(outputFile)) {
       paths.sorted(Comparator.reverseOrder()).forEach(this::deleteFile);
     }
     log.debug("Cleared the directory at {}.", outputFile);
+    return this;
   }
 
   /**

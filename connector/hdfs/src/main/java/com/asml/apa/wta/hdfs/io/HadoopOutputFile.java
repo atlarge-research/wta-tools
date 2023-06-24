@@ -108,9 +108,10 @@ public class HadoopOutputFile implements OutputFile {
    * @since 1.0.0
    */
   @Override
-  public void clearDirectory() throws IOException {
+  public OutputFile clearDirectory() throws IOException {
     fs.delete(outputFile, true);
     fs.mkdirs(outputFile);
+    return this;
   }
 
   /**

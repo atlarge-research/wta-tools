@@ -2,7 +2,7 @@ package com.asml.apa.wta.spark.dto;
 
 import com.asml.apa.wta.core.model.Resource;
 import com.asml.apa.wta.core.model.ResourceState;
-import java.util.List;
+import com.asml.apa.wta.core.streams.Stream;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -20,5 +20,5 @@ public class ResourceAndStateWrapper {
 
   private Resource resource;
 
-  private List<ResourceState> states;
+  private Stream<ResourceState> states;
 }

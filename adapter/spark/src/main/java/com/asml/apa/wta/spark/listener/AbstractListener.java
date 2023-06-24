@@ -2,10 +2,9 @@ package com.asml.apa.wta.spark.listener;
 
 import com.asml.apa.wta.core.config.RuntimeConfig;
 import com.asml.apa.wta.core.model.BaseTraceObject;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
+import com.asml.apa.wta.core.streams.Stream;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.apache.spark.SparkContext;
@@ -25,29 +24,57 @@ public abstract class AbstractListener<T extends BaseTraceObject> extends SparkL
   /**
    * The current spark context.
    */
-  protected final SparkContext sparkContext;
+  @Getter
+  private final SparkContext sparkContext;
 
   /**
    * The current runtime config.
    */
-  protected final RuntimeConfig config;
+  @Getter
+  private final RuntimeConfig config;
 
   /**
    * A list of processed domain objects.
    */
-  @Getter
-  private final List<T> processedObjects = new ArrayList<>();
+  private final Stream<T> processedObjects = new Stream<>();
 
   /**
-   * Filters the list of processed objects by the given condition.
+   * The thread pool.
+   */
+  @Getter
+  private static final ExecutorService threadPool = Executors.newSingleThreadExecutor();
+
+  /**
+   * Returns a clone of the processed objects {@link Stream}.
    *
-   * @param filterCondition A predicate that filtered objects have to fulfill
-   * @return A list containing objects that match that condition
-   * @author Henry Page
+   * @return a clone of the processed objects
+   * @author Atour Mousavi Gourabi
    * @since 1.0.0
    */
-  protected List<T> getWithCondition(Predicate<T> filterCondition) {
-    return processedObjects.stream().filter(filterCondition).collect(Collectors.toList());
+  public Stream<T> getProcessedObjects() {
+    return processedObjects.copy();
+  }
+
+  /**
+   * Adds a processed object to the {@link Stream} maintained by the listener.
+   *
+   * @param object the processed object to add
+   * @author Atour Mousavi Gourabi
+   * @since 1.0.0
+   */
+  public void addProcessedObject(T object) {
+    processedObjects.addToStream(object);
+  }
+
+  /**
+   * Checks whether the listener contains processed objects.
+   *
+   * @return a {@code boolean} indicating whether the listener contains processed objects
+   * @author Atour Mousavi Gourabi
+   * @since 1.0.0
+   */
+  public boolean containsProcessedObjects() {
+    return !processedObjects.isEmpty();
   }
 
   /**

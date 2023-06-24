@@ -7,7 +7,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 import lombok.Getter;
 import org.apache.spark.SparkContext;
 import org.apache.spark.executor.TaskMetrics;
@@ -63,7 +62,7 @@ public class StageLevelListener extends TaskStageBaseListener {
         .mapToLong(parentId -> (Integer) parentId + 1)
         .toArray();
     task.setParents(parentStageIds);
-    if (!config.isStageLevel()) {
+    if (!getConfig().isStageLevel()) {
       stageToParents.put(stageId, Arrays.stream(parentStageIds).boxed().toArray(Long[]::new));
     }
 
@@ -106,12 +105,12 @@ public class StageLevelListener extends TaskStageBaseListener {
     final long stageId = curStageInfo.stageId() + 1;
     stageToResource.put(stageId, curStageInfo.resourceProfileId());
 
-    final Long tsSubmit = curStageInfo.submissionTime().getOrElse(() -> -1L);
+    final long tsSubmit = curStageInfo.submissionTime().getOrElse(() -> -1L);
     final long runtime = curStageInfo.taskMetrics().executorRunTime();
     final long[] parents = new long[0];
     final long[] children = new long[0];
-    final int userId = Math.abs(sparkContext.sparkUser().hashCode());
-    final long workflowId = stageToJob.get(stageId);
+    final int userId = Math.abs(getSparkContext().sparkUser().hashCode());
+    final long workflowId = getStageToJob().get(stageId);
     final double diskSpaceRequested = (double) curStageMetrics.diskBytesSpilled()
         + curStageMetrics.shuffleWriteMetrics().bytesWritten();
     final double memoryRequested = -1.0;
@@ -153,7 +152,9 @@ public class StageLevelListener extends TaskStageBaseListener {
         .resourceUsed(resourceUsed)
         .build();
     fillInParentChildMaps(stageId, task, curStageInfo);
-    this.getProcessedObjects().add(task);
+
+    addTaskToWorkflow(workflowId, task);
+    getThreadPool().execute(() -> addProcessedObject(task));
   }
 
   /**
@@ -167,9 +168,7 @@ public class StageLevelListener extends TaskStageBaseListener {
    * @since 1.0.0
    */
   public void setStages(long jobId) {
-    final List<Task> filteredStages = this.getProcessedObjects().stream()
-        .filter(task -> task.getWorkflowId() == jobId)
-        .collect(Collectors.toList());
+    final List<Task> filteredStages = getWorkflowsToTasks().onKey(jobId).toList();
     filteredStages.forEach(stage -> stage.setChildren(
         this.getParentStageToChildrenStages().getOrDefault(stage.getId(), new ArrayList<>()).stream()
             .mapToLong(Long::longValue)
