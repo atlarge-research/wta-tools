@@ -6,7 +6,6 @@ import com.asml.apa.wta.core.model.Workflow;
 import com.asml.apa.wta.spark.BaseSparkJobIntegrationTest;
 import java.util.Comparator;
 import java.util.concurrent.TimeUnit;
-
 import org.junit.jupiter.api.Test;
 
 class JobLevelListenerIntegrationTest extends BaseSparkJobIntegrationTest {
@@ -24,8 +23,7 @@ class JobLevelListenerIntegrationTest extends BaseSparkJobIntegrationTest {
     assertThat(sut1.getJobLevelListener().getJobSubmitTimes()).isEmpty();
     assertThat(sut1.getJobLevelListener().getProcessedObjects().isEmpty()).isFalse();
 
-    Workflow workflow =
-        sut1.getJobLevelListener().getProcessedObjects().head();
+    Workflow workflow = sut1.getJobLevelListener().getProcessedObjects().head();
     assertThat(workflow.getId()).isGreaterThan(0L);
     assertThat(workflow.getTsSubmit()).isGreaterThan(0L);
     assertThat(workflow.getApplicationName())
@@ -105,7 +103,8 @@ class JobLevelListenerIntegrationTest extends BaseSparkJobIntegrationTest {
   }
 
   @Test
-  void endOfJobShouldClearTheMapOfEntriesAfterJobIsDoneButNotProcessedObjectsStageLevel() throws InterruptedException {
+  void endOfJobShouldClearTheMapOfEntriesAfterJobIsDoneButNotProcessedObjectsStageLevel()
+      throws InterruptedException {
     sut2.registerStageListener();
     sut2.registerJobListener();
     invokeJob();

@@ -72,6 +72,5 @@ public abstract class TaskStageBaseListener extends AbstractListener<Task> {
    */
   public void addTaskToWorkflow(long workflowId, Task task) {
     workflowsToTasks.addToStream(workflowId, task);
-    addProcessedObject(task);
   }
 }
