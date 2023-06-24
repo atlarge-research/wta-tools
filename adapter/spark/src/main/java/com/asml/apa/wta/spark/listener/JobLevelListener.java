@@ -95,7 +95,7 @@ public class JobLevelListener extends AbstractListener<Workflow> {
   public void onJobEnd(SparkListenerJobEnd jobEnd) {
     final long jobId = jobEnd.jobId() + 1L;
     final long tsSubmit = jobSubmitTimes.get(jobId);
-    final Stream<Task> tasks = wtaTaskListener.getProcessedObjects().filter(task -> task.getWorkflowId() == jobId);
+    final Stream<Task> tasks = wtaTaskListener.getWorkflowsToTasks().onKey(jobId);
     final long criticalPathLength = -1L;
     final int criticalPathTaskCount = criticalPathTasks.get(jobId);
     final int maxNumberOfConcurrentTasks = -1;
@@ -115,6 +115,8 @@ public class JobLevelListener extends AbstractListener<Workflow> {
         .filter(resourceAmount -> resourceAmount >= 0.0)
         .reduce(Double::sum)
         .orElse(-1.0);
+
+    wtaTaskListener.removesWorkflowAssociations(jobId);
 
     getThreadPool()
         .execute(() -> addProcessedObject(Workflow.builder()

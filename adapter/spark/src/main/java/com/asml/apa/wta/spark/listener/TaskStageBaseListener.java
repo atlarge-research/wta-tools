@@ -2,6 +2,7 @@ package com.asml.apa.wta.spark.listener;
 
 import com.asml.apa.wta.core.config.RuntimeConfig;
 import com.asml.apa.wta.core.model.Task;
+import com.asml.apa.wta.core.streams.KeyedStream;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.Getter;
@@ -19,6 +20,9 @@ public abstract class TaskStageBaseListener extends AbstractListener<Task> {
 
   @Getter
   private final Map<Long, Long> stageToJob = new ConcurrentHashMap<>();
+
+  @Getter
+  private final KeyedStream<Long, Task> workflowsToTasks = new KeyedStream<>();
 
   /**
    * Constructor for the stage-level listener.
@@ -43,5 +47,31 @@ public abstract class TaskStageBaseListener extends AbstractListener<Task> {
   public void onJobStart(SparkListenerJobStart jobStart) {
     long jobId = jobStart.jobId() + 1;
     jobStart.stageInfos().foreach(stageInfo -> stageToJob.put((long) stageInfo.stageId() + 1, jobId));
+  }
+
+  /**
+   * Removes the {@link Task}s associated with the {@link com.asml.apa.wta.core.model.Workflow} from the
+   * {@link KeyedStream}.
+   *
+   * @param workflowId the id of the {@link com.asml.apa.wta.core.model.Workflow} to clear
+   * @author Atour Mousavi Gourabi
+   * @since 1.0.0
+   */
+  public void removesWorkflowAssociations(long workflowId) {
+    workflowsToTasks.dropKey(workflowId);
+  }
+
+  /**
+   * Associates a {@link Task} with a {@link com.asml.apa.wta.core.model.Workflow}.
+   * Also adds the {@link Task} to the processed objects {@link com.asml.apa.wta.core.streams.Stream}.
+   *
+   * @param workflowId the id of the {@link com.asml.apa.wta.core.model.Workflow} to add the {@link Task} to
+   * @param task the {@link Task} to add
+   * @author Atour Mousavi Gourabi
+   * @since 1.0.0
+   */
+  public void addTaskToWorkflow(long workflowId, Task task) {
+    workflowsToTasks.addToStream(workflowId, task);
+    addProcessedObject(task);
   }
 }

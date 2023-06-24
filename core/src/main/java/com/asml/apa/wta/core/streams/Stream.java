@@ -188,27 +188,27 @@ public class Stream<V extends Serializable> implements Cloneable {
    * @since 1.0.0
    */
   private synchronized void deserializeInternals(@NonNull String filePath) {
-      try (ObjectInputStream objectInputStream =
-          new ObjectInputStream(new BufferedInputStream(new FileInputStream(filePath)))) {
-        List<StreamNode<V>> nodes = (ArrayList<StreamNode<V>>) objectInputStream.readObject();
-        head = deserializationStart;
-        StreamNode<V> previous = null;
-        for (StreamNode<V> node : nodes) {
-          if (previous != null) {
-            previous.setNext(node);
-          } else {
-            deserializationStart.setNext(node);
-          }
-          previous = node;
-        }
+    try (ObjectInputStream objectInputStream =
+        new ObjectInputStream(new BufferedInputStream(new FileInputStream(filePath)))) {
+      List<StreamNode<V>> nodes = (ArrayList<StreamNode<V>>) objectInputStream.readObject();
+      head = deserializationStart;
+      StreamNode<V> previous = null;
+      for (StreamNode<V> node : nodes) {
         if (previous != null) {
-          deserializationStart = previous;
-          deserializationStart.setNext(deserializationEnd);
+          previous.setNext(node);
+        } else {
+          deserializationStart.setNext(node);
         }
-      } catch (IOException | ClassNotFoundException | ClassCastException e) {
-        log.error("Failed to deserialize stream internals from {}.", filePath);
-        throw new FailedToDeserializeStreamException();
+        previous = node;
       }
+      if (previous != null) {
+        deserializationStart = previous;
+        deserializationStart.setNext(deserializationEnd);
+      }
+    } catch (IOException | ClassNotFoundException | ClassCastException e) {
+      log.error("Failed to deserialize stream internals from {}.", filePath);
+      throw new FailedToDeserializeStreamException();
+    }
   }
 
   /**

@@ -39,6 +39,17 @@ public class KeyedStream<K, V extends Serializable> {
   }
 
   /**
+   * Drops the elements associated to the given key from the {@link KeyedStream}.
+   *
+   * @param key the key to remove the elements from
+   * @author Atour Mousavi Gourabi
+   * @since 1.0.0
+   */
+  public void dropKey(K key) {
+    streams.remove(key);
+  }
+
+  /**
    * Performs the mapping operation over the {@link KeyedStream} per key.
    * Consumes the {@link KeyedStream}.
    *

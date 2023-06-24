@@ -154,7 +154,7 @@ public class StageLevelListener extends TaskStageBaseListener {
         .build();
     fillInParentChildMaps(stageId, task, curStageInfo);
 
-    getThreadPool().execute(() -> addProcessedObject(task));
+    getThreadPool().execute(() -> addTaskToWorkflow(workflowId, task));
   }
 
   /**
@@ -168,9 +168,7 @@ public class StageLevelListener extends TaskStageBaseListener {
    * @since 1.0.0
    */
   public void setStages(long jobId) {
-    final List<Task> filteredStages = this.getProcessedObjects()
-        .filter(task -> task.getWorkflowId() == jobId)
-        .toList();
+    final List<Task> filteredStages = getWorkflowsToTasks().onKey(jobId).toList();
     filteredStages.forEach(stage -> stage.setChildren(
         this.getParentStageToChildrenStages().getOrDefault(stage.getId(), new ArrayList<>()).stream()
             .mapToLong(Long::longValue)

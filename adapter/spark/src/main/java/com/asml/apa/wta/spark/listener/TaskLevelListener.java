@@ -134,7 +134,7 @@ public class TaskLevelListener extends TaskStageBaseListener {
         .resourceUsed(resourceUsed)
         .build();
 
-    getThreadPool().execute(() -> addProcessedObject(task));
+    getThreadPool().execute(() -> addTaskToWorkflow(workflowId, task));
     fillInParentChildMaps(taskId, stageId, task);
   }
 
@@ -150,9 +150,7 @@ public class TaskLevelListener extends TaskStageBaseListener {
    * @since 1.0.0
    */
   public void setTasks(StageLevelListener stageLevelListener, long jobId) {
-    final List<Task> filteredTasks = this.getProcessedObjects()
-        .filter(t -> t.getWorkflowId() == jobId)
-        .toList();
+    final List<Task> filteredTasks = getWorkflowsToTasks().onKey(jobId).toList();
     for (Task task : filteredTasks) {
       // set parent field: all Tasks in are guaranteed to be in taskToStage
       final Long stageId = this.getTaskToStage().get(task.getId());
