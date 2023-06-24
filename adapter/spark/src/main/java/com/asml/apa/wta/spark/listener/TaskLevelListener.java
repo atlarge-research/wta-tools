@@ -174,7 +174,7 @@ public class TaskLevelListener extends TaskStageBaseListener {
       if (childrenStages != null) {
         List<Task> children = new ArrayList<>();
         childrenStages.forEach(
-            childrenStage -> children.addAll(this.getStageToTasks().get(childrenStage)));
+            childrenStage -> children.addAll(getStageToTasks().get(childrenStage)));
         long[] childrenTaskIds = children.stream()
             .map(Task::getId)
             .mapToLong(Long::longValue)

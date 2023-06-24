@@ -189,7 +189,6 @@ public class Stream<V extends Serializable> implements Cloneable {
    * @since 1.0.0
    */
   private synchronized void deserializeInternals(@NonNull String filePath) {
-    Thread thread = new Thread(() -> {
       try (ObjectInputStream objectInputStream =
           new ObjectInputStream(new BufferedInputStream(new FileInputStream(filePath)))) {
         List<StreamNode<V>> nodes = (ArrayList<StreamNode<V>>) objectInputStream.readObject();
@@ -213,13 +212,6 @@ public class Stream<V extends Serializable> implements Cloneable {
       } finally {
         new File(filePath).delete();
       }
-    });
-    thread.start();
-    try {
-      thread.join();
-    } catch (InterruptedException e) {
-      log.error("Failed to deserialize stream internals from {} because of {}.", filePath, e.getMessage());
-    }
   }
 
   /**
