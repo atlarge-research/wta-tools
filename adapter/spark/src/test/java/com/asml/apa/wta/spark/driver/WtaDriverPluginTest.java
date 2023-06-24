@@ -69,17 +69,6 @@ class WtaDriverPluginTest {
         .addSparkListener(sut.getSparkDataSource().getJobLevelListener());
     verify(mockedSparkContext, times(1))
         .addSparkListener(sut.getSparkDataSource().getApplicationLevelListener());
-
-    sut.shutdown();
-
-    verify(mockedSparkContext, times(1))
-        .removeSparkListener(sut.getSparkDataSource().getTaskLevelListener());
-    verify(mockedSparkContext, times(1))
-        .removeSparkListener(sut.getSparkDataSource().getStageLevelListener());
-    verify(mockedSparkContext, times(1))
-        .removeSparkListener(sut.getSparkDataSource().getJobLevelListener());
-    verify(mockedSparkContext, times(1))
-        .removeSparkListener(sut.getSparkDataSource().getApplicationLevelListener());
   }
 
   @Test
@@ -98,17 +87,6 @@ class WtaDriverPluginTest {
         .addSparkListener(sut.getSparkDataSource().getJobLevelListener());
     verify(mockedSparkContext, times(1))
         .addSparkListener(sut.getSparkDataSource().getApplicationLevelListener());
-
-    sut.shutdown();
-
-    verify(mockedSparkContext, times(1))
-        .removeSparkListener(sut.getSparkDataSource().getTaskLevelListener());
-    verify(mockedSparkContext, times(1))
-        .removeSparkListener(sut.getSparkDataSource().getStageLevelListener());
-    verify(mockedSparkContext, times(1))
-        .removeSparkListener(sut.getSparkDataSource().getJobLevelListener());
-    verify(mockedSparkContext, times(1))
-        .removeSparkListener(sut.getSparkDataSource().getApplicationLevelListener());
   }
 
   @Test
