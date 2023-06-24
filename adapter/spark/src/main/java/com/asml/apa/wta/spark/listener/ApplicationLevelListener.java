@@ -311,7 +311,6 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
    * @since 1.0.0
    */
   public void onApplicationEnd(SparkListenerApplicationEnd applicationEnd) {
-    // we should never enter this branch, this is a guard since an application only terminates once.
     if (containsProcessedObjects()) {
       log.debug("Application end called twice, this should never happen.");
       return;

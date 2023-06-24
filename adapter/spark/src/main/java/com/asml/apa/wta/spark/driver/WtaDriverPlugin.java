@@ -111,6 +111,7 @@ public class WtaDriverPlugin implements DriverPlugin {
     if (error) {
       log.error("Plugin shutting down without generating files.");
     }
+    sparkDataSource.removeListeners();
   }
 
   /**

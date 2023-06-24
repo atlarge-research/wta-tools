@@ -69,10 +69,8 @@ class WtaDriverPluginTest {
         .addSparkListener(sut.getSparkDataSource().getJobLevelListener());
     verify(mockedSparkContext, times(1))
         .addSparkListener(sut.getSparkDataSource().getApplicationLevelListener());
-    try {
-      sut.shutdown();
-    } catch (Exception ignored) {
-    }
+
+    sut.shutdown();
 
     verify(mockedSparkContext, times(1))
         .removeSparkListener(sut.getSparkDataSource().getTaskLevelListener());
@@ -100,10 +98,8 @@ class WtaDriverPluginTest {
         .addSparkListener(sut.getSparkDataSource().getJobLevelListener());
     verify(mockedSparkContext, times(1))
         .addSparkListener(sut.getSparkDataSource().getApplicationLevelListener());
-    try {
-      sut.shutdown();
-    } catch (Exception ignored) {
-    }
+
+    sut.shutdown();
 
     verify(mockedSparkContext, times(1))
         .removeSparkListener(sut.getSparkDataSource().getTaskLevelListener());
