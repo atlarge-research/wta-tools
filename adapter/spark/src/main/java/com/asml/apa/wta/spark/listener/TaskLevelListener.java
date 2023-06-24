@@ -134,7 +134,7 @@ public class TaskLevelListener extends TaskStageBaseListener {
         .resourceUsed(resourceUsed)
         .build();
 
-    addTaskToWorkflow(workflowId, task);
+    getTaskStageThreadPool().execute(() -> addTaskToWorkflow(workflowId, task));
     getThreadPool().execute(() -> addProcessedObject(task));
     fillInParentChildMaps(taskId, stageId, task);
   }

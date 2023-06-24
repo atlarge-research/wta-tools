@@ -5,7 +5,10 @@ import com.asml.apa.wta.core.model.Task;
 import com.asml.apa.wta.core.streams.KeyedStream;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.spark.SparkContext;
 import org.apache.spark.scheduler.SparkListenerJobStart;
 
@@ -15,6 +18,7 @@ import org.apache.spark.scheduler.SparkListenerJobStart;
  * @author Lohithsai Yadala Chanchu
  * @since 1.0.0
  */
+@Slf4j
 @SuppressWarnings("VisibilityModifier")
 public abstract class TaskStageBaseListener extends AbstractListener<Task> {
 
@@ -23,6 +27,12 @@ public abstract class TaskStageBaseListener extends AbstractListener<Task> {
 
   @Getter
   private final KeyedStream<Long, Task> workflowsToTasks = new KeyedStream<>();
+
+  /**
+   * Dedicated {@link ExecutorService} for task and stage specific tasks that are bound to a job.
+   */
+  @Getter
+  private final ExecutorService taskStageThreadPool = Executors.newSingleThreadExecutor();
 
   /**
    * Constructor for the stage-level listener.
@@ -72,5 +82,15 @@ public abstract class TaskStageBaseListener extends AbstractListener<Task> {
    */
   public void addTaskToWorkflow(long workflowId, Task task) {
     workflowsToTasks.addToStream(workflowId, task);
+  }
+
+  /**
+   * Shuts down the thread pool.
+   *
+   * @author Atour Mousavi Gourabi
+   * @since 1.0.0
+   */
+  public void shutdownThreadPool() {
+    taskStageThreadPool.shutdown();
   }
 }

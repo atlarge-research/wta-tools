@@ -3,7 +3,6 @@ package com.asml.apa.wta.spark.listener;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.asml.apa.wta.spark.BaseSparkJobIntegrationTest;
-import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.Test;
 
 public class StageLevelListenerIntegrationTest extends BaseSparkJobIntegrationTest {
