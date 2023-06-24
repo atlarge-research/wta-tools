@@ -4,8 +4,6 @@ import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Comparator;
-import java.util.stream.Stream;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -90,20 +88,17 @@ public class DiskOutputFile implements OutputFile {
   }
 
   /**
-   * Clear the current directory if this {@link OutputFile} points to a folder.
    * If the location this points to does not exist yet, the directory is created.
    *
+   * @return the {@link OutputFile} pointing to the cleared directory
    * @throws IOException when something goes wrong during I/O
    * @author Atour Mousavi Gourabi
    * @since 1.0.0
    */
   @Override
-  public OutputFile clearDirectory() throws IOException {
+  public OutputFile createDirectories() throws IOException {
     Files.createDirectories(outputFile);
-    try (Stream<Path> paths = Files.walk(outputFile)) {
-      paths.sorted(Comparator.reverseOrder()).forEach(this::deleteFile);
-    }
-    log.debug("Cleared the directory at {}.", outputFile);
+    log.debug("Created the directory at {}.", outputFile.toString());
     return this;
   }
 

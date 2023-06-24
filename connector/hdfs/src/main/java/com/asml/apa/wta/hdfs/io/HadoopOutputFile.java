@@ -100,16 +100,15 @@ public class HadoopOutputFile implements OutputFile {
   }
 
   /**
-   * Clear the current directory if this {@link OutputFile} points to a folder.
    * If the location this points to does not exist yet, the directory is created.
    *
+   * @return the {@link OutputFile} pointing to the cleared directory
    * @throws IOException when something goes wrong during I/O
    * @author Atour Mousavi Gourabi
    * @since 1.0.0
    */
   @Override
-  public OutputFile clearDirectory() throws IOException {
-    fs.delete(outputFile, true);
+  public OutputFile createDirectories() throws IOException {
     fs.mkdirs(outputFile);
     return this;
   }

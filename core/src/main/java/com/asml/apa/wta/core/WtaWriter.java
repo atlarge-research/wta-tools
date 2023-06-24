@@ -80,7 +80,7 @@ public class WtaWriter {
       OutputFile path = file.resolve(label)
           .resolve(schemaVersion)
           .resolve(label + ".parquet")
-          .clearDirectory();
+          .createDirectories();
       try (ParquetWriter<T> wtaParquetWriter = new ParquetWriter<>(path, schema)) {
         while (!wtaObjects.isEmpty()) {
           wtaParquetWriter.write(wtaObjects.head());
@@ -102,7 +102,7 @@ public class WtaWriter {
     OutputFile path = file.resolve("workload")
         .resolve(schemaVersion)
         .resolve("generic_information.json")
-        .clearDirectory();
+        .createDirectories();
     return new JsonWriter<>(path);
   }
 }

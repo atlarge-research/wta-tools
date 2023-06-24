@@ -48,7 +48,7 @@ class DiskOutputFileTest {
     DiskOutputFile outputFile = new DiskOutputFile(tempDirectory);
 
     try {
-      outputFile.clearDirectory();
+      outputFile.createDirectories();
       System.out.println("Directory cleared successfully.");
       assertTrue(Files.list(tempDirectory).count() == 0, "Directory is not empty");
 
