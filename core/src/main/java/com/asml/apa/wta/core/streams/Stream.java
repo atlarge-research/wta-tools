@@ -188,7 +188,7 @@ public class Stream<V extends Serializable> implements Cloneable {
    * @author Atour Mousavi Gourabi
    * @since 1.0.0
    */
-  private synchronized void deserializeInternals(@NonNull String filePath) {
+  private synchronized void deserializeInternals(String filePath) {
     log.trace("Deserializing stream internals from {}.", filePath);
     try (ObjectInputStream objectInputStream =
         new ObjectInputStream(new BufferedInputStream(new FileInputStream(filePath)))) {
