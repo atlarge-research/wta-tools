@@ -31,6 +31,8 @@ public class StageLevelListener extends TaskStageBaseListener {
 
   private final Map<Long, Integer> stageToResource = new ConcurrentHashMap<>();
 
+  private final Map<Long, List<Long>> jobToStages = new ConcurrentHashMap<>();
+
   /**
    * Constructor for the stage-level listener from Spark datasource class.
    *
@@ -59,9 +61,8 @@ public class StageLevelListener extends TaskStageBaseListener {
         .stream()
         .mapToLong(parentId -> (Integer) parentId + 1)
         .toArray();
-    if (getConfig().isStageLevel()) {
-      task.setParents(parentStageIds);
-    } else {
+    task.setParents(parentStageIds);
+    if (!config.isStageLevel()) {
       stageToParents.put(stageId, Arrays.stream(parentStageIds).boxed().toArray(Long[]::new));
     }
 
@@ -112,8 +113,7 @@ public class StageLevelListener extends TaskStageBaseListener {
     final long workflowId = getStageToJob().get(stageId);
     final double diskSpaceRequested = (double) curStageMetrics.diskBytesSpilled()
         + curStageMetrics.shuffleWriteMetrics().bytesWritten();
-    // final double memoryRequested = curTaskMetrics.peakExecutionMemory();
-
+    final double memoryRequested = -1.0;
     // dummy values
     final String type = "";
     final int submissionSite = -1;
@@ -123,7 +123,6 @@ public class StageLevelListener extends TaskStageBaseListener {
     final String nfrs = "";
     final long waitTime = -1L;
     final String params = "";
-    final double memoryRequested = -1.0;
     final long networkIoTime = -1L;
     final long diskIoTime = -1L;
     final double energyConsumption = -1L;

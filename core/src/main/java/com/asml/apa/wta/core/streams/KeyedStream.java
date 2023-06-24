@@ -8,6 +8,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Keyed stream.
@@ -18,6 +19,7 @@ import lombok.NonNull;
  * @author Henry Page
  * @since 1.0.0
  */
+@Slf4j
 public class KeyedStream<K, V extends Serializable> {
 
   private final Map<K, Stream<V>> streams = new ConcurrentHashMap<>();
@@ -31,6 +33,7 @@ public class KeyedStream<K, V extends Serializable> {
    * @since 1.0.0
    */
   public void addToStream(K key, @NonNull V record) {
+    log.trace("Adding object to stream");
     if (streams.containsKey(key)) {
       streams.get(key).addToStream(record);
     } else {
@@ -76,6 +79,7 @@ public class KeyedStream<K, V extends Serializable> {
    * @since 1.0.0
    */
   public Stream<V> onKey(K key) {
+    log.trace("Requested stream with key");
     streams.putIfAbsent(key, new Stream<>());
     return streams.get(key);
   }
@@ -88,6 +92,7 @@ public class KeyedStream<K, V extends Serializable> {
    * @since 1.0.0
    */
   public Map<K, List<V>> collectAll() {
+    log.trace("Collecting all streams");
     return streams.entrySet().stream()
         .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().toList()));
   }

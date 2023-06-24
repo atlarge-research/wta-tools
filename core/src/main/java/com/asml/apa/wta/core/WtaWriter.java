@@ -55,6 +55,7 @@ public class WtaWriter {
    * @since 1.0.0
    */
   public void write(Workload workload) {
+    log.debug("Writing workload to file.");
     try (JsonWriter<Workload> workloadWriter = createWorkloadWriter()) {
       workloadWriter.write(workload);
     } catch (IOException e) {
@@ -72,6 +73,7 @@ public class WtaWriter {
    * @since 1.0.0
    */
   public <T extends BaseTraceObject> void write(Class<T> clazz, Stream<T> wtaObjects) {
+    log.debug("Writing objects of type {} to file.", clazz.getSimpleName());
     String label = parquetLabels.get(clazz);
     ParquetSchema schema = new ParquetSchema(clazz, wtaObjects.copy(), label);
     try {

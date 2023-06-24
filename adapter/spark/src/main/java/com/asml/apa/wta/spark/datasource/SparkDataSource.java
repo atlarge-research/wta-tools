@@ -21,6 +21,7 @@ import org.apache.spark.SparkContext;
  */
 @Slf4j
 @Getter
+@Slf4j
 public class SparkDataSource {
 
   private final TaskLevelListener taskLevelListener;
@@ -52,6 +53,7 @@ public class SparkDataSource {
    * @param config Additional config specified by the user for the plugin
    * @param metricStreamingEngine the driver's {@link MetricStreamingEngine} to inject
    * @param wtaWriter the {@link WtaWriter} to write to
+   * @author Atour Mousavi Gourabi
    * @author Pil Kyu Cho
    * @author Henry Page
    * @author Tianchen Qu
@@ -63,13 +65,16 @@ public class SparkDataSource {
       RuntimeConfig config,
       MetricStreamingEngine metricStreamingEngine,
       WtaWriter wtaWriter) {
+    log.trace("Initialising Spark Data Source");
     taskLevelListener = new TaskLevelListener(sparkContext, config);
     stageLevelListener = new StageLevelListener(sparkContext, config);
     if (config.isStageLevel()) {
+      log.trace("Stage level listener is enabled.");
       jobLevelListener = new JobLevelListener(sparkContext, config, stageLevelListener);
       applicationLevelListener = new ApplicationLevelListener(
           sparkContext, config, stageLevelListener, jobLevelListener, this, metricStreamingEngine, wtaWriter);
     } else {
+      log.trace("Task level listener is enabled.");
       jobLevelListener = new JobLevelListener(sparkContext, config, taskLevelListener, stageLevelListener);
       applicationLevelListener = new ApplicationLevelListener(
           sparkContext,
@@ -92,6 +97,7 @@ public class SparkDataSource {
    * @since 1.0.0
    */
   public void registerTaskListener() {
+    log.trace("Registering task listener.");
     taskLevelListener.register();
   }
 
@@ -102,6 +108,7 @@ public class SparkDataSource {
    * @since 1.0.0
    */
   public void removeTaskListener() {
+    log.trace("Removing task listener.");
     taskLevelListener.remove();
   }
 
@@ -112,6 +119,7 @@ public class SparkDataSource {
    * @since 1.0.0
    */
   public void registerJobListener() {
+    log.trace("Registering job listener.");
     jobLevelListener.register();
   }
 
@@ -122,6 +130,7 @@ public class SparkDataSource {
    * @since 1.0.0
    */
   public void removeJobListener() {
+    log.trace("Removing job listener.");
     jobLevelListener.remove();
   }
 
@@ -132,6 +141,7 @@ public class SparkDataSource {
    * @since 1.0.0
    */
   public void registerApplicationListener() {
+    log.trace("Registering application listener.");
     applicationLevelListener.register();
   }
 
@@ -142,6 +152,7 @@ public class SparkDataSource {
    * @since 1.0.0
    */
   public void removeApplicationListener() {
+    log.trace("Removing application listener.");
     applicationLevelListener.remove();
   }
 
@@ -152,6 +163,7 @@ public class SparkDataSource {
    * @since 1.0.0
    */
   public void registerStageListener() {
+    log.trace("Registering stage level listener.");
     stageLevelListener.register();
   }
 
@@ -162,6 +174,7 @@ public class SparkDataSource {
    * @since 1.0.0
    */
   public void removeStageListener() {
+    log.trace("Removing stage level listener.");
     stageLevelListener.remove();
   }
 }

@@ -91,13 +91,13 @@ public class TaskLevelListener extends TaskStageBaseListener {
     final long runtime = curTaskMetrics.executorRunTime();
     final int userId = Math.abs(getSparkContext().sparkUser().hashCode());
     final long workflowId = getStageToJob().get(stageId);
-    final long diskIoTime = -1L;
     final double diskSpaceRequested = (double) curTaskMetrics.diskBytesSpilled()
         + curTaskMetrics.shuffleWriteMetrics().bytesWritten();
     final long resourceUsed = Math.abs(curTaskInfo.executorId().hashCode());
 
     // dummy values
     final double resourceAmountRequested = -1.0;
+    final long diskIoTime = -1L;
     final int submissionSite = -1;
     final String resourceType = "N/A";
     final long[] parents = new long[0];

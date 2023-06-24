@@ -11,7 +11,7 @@ import org.junit.jupiter.api.condition.OS;
 class OutputFileFactoryWithHdfsTest {
 
   @Test
-  @EnabledOnOs({OS.WINDOWS})
+  @EnabledOnOs(OS.WINDOWS)
   void createSimpleLocation() {
     OutputFileFactory factory = new OutputFileFactory();
     OutputFile file = factory.create("C:/path/to/output");

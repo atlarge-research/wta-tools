@@ -17,6 +17,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Used to extract resources from dependencies. Should be instantiated once per executor/node.
@@ -24,6 +25,7 @@ import lombok.Getter;
  * @author Henry Page
  * @since 1.0.0
  */
+@Slf4j
 public abstract class SupplierExtractionEngine<T extends BaseSupplierDto> {
 
   private final OperatingSystemSupplier operatingSystemSupplier;
@@ -108,6 +110,7 @@ public abstract class SupplierExtractionEngine<T extends BaseSupplierDto> {
    * @return A {@link CompletableFuture} representing the result of the ping operation
    */
   public CompletableFuture<Void> pingAndBuffer() {
+    log.trace("Pinging suppliers and buffering results.");
     return ping().thenAcceptAsync(buffer::add);
   }
 
@@ -118,6 +121,7 @@ public abstract class SupplierExtractionEngine<T extends BaseSupplierDto> {
    * @since 1.0.0
    */
   public void startPinging() {
+    log.trace("Starting to ping suppliers.");
     resourcePinger.scheduleAtFixedRate(this::pingAndBuffer, 0, resourcePingInterval, TimeUnit.MILLISECONDS);
   }
 
@@ -128,6 +132,7 @@ public abstract class SupplierExtractionEngine<T extends BaseSupplierDto> {
    * @since 1.0.0
    */
   public void stopPinging() {
+    log.trace("Stopping to ping suppliers.");
     resourcePinger.shutdown();
   }
 
@@ -150,6 +155,7 @@ public abstract class SupplierExtractionEngine<T extends BaseSupplierDto> {
    * @since 1.0.0
    */
   public List<T> getAndClear() {
+    log.trace("Getting and clearing buffer.");
     List<T> result = new ArrayList<>(buffer);
     buffer.clear();
     return result;

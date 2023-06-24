@@ -157,6 +157,7 @@ public class Stream<V extends Serializable> implements Cloneable {
    * @since 1.0.0
    */
   private synchronized void serializeInternals() {
+    log.trace("Serializing stream {}.", id);
     StreamNode<V> current;
     current = deserializationEnd;
     String filePath = Stream.TEMP_SERIALIZATION_DIRECTORY + id + "-" + System.currentTimeMillis() + "-"
@@ -170,7 +171,7 @@ public class Stream<V extends Serializable> implements Cloneable {
         new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(filePath)))) {
       objectOutputStream.writeObject(toSerialize);
     } catch (IOException e) {
-      log.error("Failed to serialize stream internals to {}", filePath);
+      log.error("Failed to serialize stream internals to {}.", filePath);
       return;
     }
     deserializationStart.setNext(current);
@@ -188,7 +189,8 @@ public class Stream<V extends Serializable> implements Cloneable {
    * @since 1.0.0
    */
   private synchronized void deserializeInternals(@NonNull String filePath) {
-    try (ObjectInputStream objectInputStream =
+    log.trace("Deserializing stream internals from {}.", filePath);
+    int amountOfNodes;
         new ObjectInputStream(new BufferedInputStream(new FileInputStream(filePath)))) {
       List<StreamNode<V>> nodes = (ArrayList<StreamNode<V>>) objectInputStream.readObject();
       head = deserializationStart;
@@ -239,6 +241,7 @@ public class Stream<V extends Serializable> implements Cloneable {
    * @since 1.0.0
    */
   public boolean isEmpty() {
+    log.trace("Checking whether stream {} is empty.", id);
     return head == null;
   }
 
@@ -268,8 +271,9 @@ public class Stream<V extends Serializable> implements Cloneable {
    * @since 1.0.0
    */
   public synchronized V head() {
+    log.trace("Head of stream {} was requested.", id);
     if (head == null) {
-      log.error("Stream#head() was called on an empty stream");
+      log.error("`Stream#head()` was called on an empty stream.");
       throw new NoSuchElementException();
     }
     additionsSinceLastWriteToDisk--;
@@ -327,8 +331,9 @@ public class Stream<V extends Serializable> implements Cloneable {
    * @since 1.0.0
    */
   public synchronized V peek() {
+    log.trace("Peeked at head of stream {}", this.id);
     if (head == null) {
-      log.error("Stream#peek() was called on an empty stream");
+      log.error("`Stream#peek()` was called on an empty stream.");
       throw new NoSuchElementException();
     }
     return head.getContent();
@@ -342,6 +347,7 @@ public class Stream<V extends Serializable> implements Cloneable {
    * @since 1.0.0
    */
   public synchronized void addToStream(V content) {
+    log.trace("Added content to stream {}", this.id);
     if (head == null) {
       head = new StreamNode<>(content);
       tail = head;
@@ -358,7 +364,7 @@ public class Stream<V extends Serializable> implements Cloneable {
     additionsSinceLastWriteToDisk++;
     if (additionsSinceLastWriteToDisk > serializationTrigger) {
       log.trace(
-          "Serializing stream internals after {} additions since last write to disk",
+          "Serializing stream internals after {} additions since last write to disk.",
           additionsSinceLastWriteToDisk);
       serializeInternals();
     }
@@ -377,6 +383,7 @@ public class Stream<V extends Serializable> implements Cloneable {
    * @since 1.0.0
    */
   public synchronized <R extends Serializable> Stream<R> map(@NonNull Function<V, R> op) {
+    log.trace("Consuming and applying map on stream {}", this.id);
     StreamNode<V> next = head;
     Stream<R> ret = new Stream<>();
     while (next != null) {
@@ -408,6 +415,7 @@ public class Stream<V extends Serializable> implements Cloneable {
    * @since 1.0.0
    */
   public synchronized Stream<V> filter(@NonNull Predicate<V> predicate) {
+    log.trace("Consuming and applying filter on stream {}", this.id);
     StreamNode<V> next = head;
     Stream<V> ret = new Stream<>();
     while (next != null) {
@@ -443,6 +451,7 @@ public class Stream<V extends Serializable> implements Cloneable {
    * @since 1.0.0
    */
   public synchronized <R> R foldLeft(R init, @NonNull BiFunction<R, V, R> op) {
+    log.trace("Consuming and applying left fold on stream {}", this.id);
     R acc = init;
     StreamNode<V> next = head;
     while (next != null) {
@@ -498,6 +507,7 @@ public class Stream<V extends Serializable> implements Cloneable {
    * @since 1.0.0
    */
   public synchronized List<V> toList() {
+    log.trace("Consuming stream {} to list", this.id);
     StreamNode<V> next = head;
     List<V> ret = new ArrayList<>();
     while (next != null) {

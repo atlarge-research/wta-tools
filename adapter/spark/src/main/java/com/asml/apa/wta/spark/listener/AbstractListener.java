@@ -36,6 +36,7 @@ public abstract class AbstractListener<T extends BaseTraceObject> extends SparkL
   /**
    * A list of processed domain objects.
    */
+  @Getter
   private final Stream<T> processedObjects = new Stream<>();
 
   /**

@@ -19,7 +19,6 @@ class JobLevelListenerIntegrationTest extends BaseSparkJobIntegrationTest {
     stopJob();
     AbstractListener.getThreadPool().shutdown();
     assertThat(sut1.getJobLevelListener().getJobSubmitTimes()).isEmpty();
-    assertThat(sut1.getJobLevelListener().getCriticalPathTasks()).isEmpty();
 
     Workflow workflow =
         sut1.getJobLevelListener().getProcessedObjects().drop(1).head();

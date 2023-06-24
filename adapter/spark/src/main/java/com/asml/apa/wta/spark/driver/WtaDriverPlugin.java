@@ -52,10 +52,13 @@ public class WtaDriverPlugin implements DriverPlugin {
    */
   @Override
   public Map<String, String> init(SparkContext sparkCtx, PluginContext pluginCtx) {
+    log.info("Initialising WTA driver plugin.");
     Map<String, String> executorVars = new HashMap<>();
     try {
-      String configFile =
-          sparkCtx.conf().get("spark.driver.extraJavaOptions").split("-DconfigFile=")[1];
+      String configFile = sparkCtx.conf()
+          .get("spark.driver.extraJavaOptions")
+          .split("-DconfigFile=")[1]
+          .split(" ")[0];
       RuntimeConfig runtimeConfig = RuntimeConfig.readConfig(configFile);
       metricStreamingEngine = new MetricStreamingEngine();
       OutputFile outputFile = new DiskOutputFile(Path.of(runtimeConfig.getOutputPath()));
@@ -84,6 +87,7 @@ public class WtaDriverPlugin implements DriverPlugin {
    */
   @Override
   public Object receive(Object message) {
+    log.trace("The driver received a message from an executor.");
     if (message instanceof ResourceCollectionDto) {
       ((ResourceCollectionDto) message)
           .getResourceCollection()
@@ -116,8 +120,12 @@ public class WtaDriverPlugin implements DriverPlugin {
    * @since 1.0.0
    */
   public void initListeners() {
+    log.trace("Initializing listeners.");
     if (!sparkDataSource.getRuntimeConfig().isStageLevel()) {
-      sparkDataSource.registerTaskListener();
+      this.sparkDataSource.registerTaskListener();
+      log.info("Task level metrics are enabled.");
+    } else {
+      log.info("Stage level metrics are enabled.");
     }
     sparkDataSource.registerStageListener();
     sparkDataSource.registerJobListener();
