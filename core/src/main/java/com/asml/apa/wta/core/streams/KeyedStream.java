@@ -81,7 +81,7 @@ public class KeyedStream<K, V extends Serializable> {
   public Stream<V> onKey(K key) {
     log.trace("Requested stream with key");
     streams.putIfAbsent(key, new Stream<>());
-    return streams.get(key);
+    return streams.get(key).copy();
   }
 
   /**
