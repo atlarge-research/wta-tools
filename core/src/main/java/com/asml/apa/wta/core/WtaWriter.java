@@ -45,7 +45,6 @@ public class WtaWriter {
   public WtaWriter(@NonNull OutputFile path, String version, String toolVersion) {
     file = path.resolve(toolVersion);
     schemaVersion = version;
-    setupDirectories(file, version);
   }
 
   /**
@@ -75,31 +74,18 @@ public class WtaWriter {
   public <T extends BaseTraceObject> void write(Class<T> clazz, Stream<T> wtaObjects) {
     String label = parquetLabels.get(clazz);
     ParquetSchema schema = new ParquetSchema(clazz, wtaObjects.copy(), label);
-    OutputFile path = file.resolve(label).resolve(schemaVersion).resolve(label + ".parquet");
-    try (ParquetWriter<T> wtaParquetWriter = new ParquetWriter<>(path, schema)) {
-      while (!wtaObjects.isEmpty()) {
-        wtaParquetWriter.write(wtaObjects.head());
+    try {
+      OutputFile path = file.resolve(label)
+          .resolve(schemaVersion)
+          .resolve(label + ".parquet")
+          .clearDirectory();
+      try (ParquetWriter<T> wtaParquetWriter = new ParquetWriter<>(path, schema)) {
+        while (!wtaObjects.isEmpty()) {
+          wtaParquetWriter.write(wtaObjects.head());
+        }
       }
     } catch (IOException e) {
       log.error("Could not write {} to file.", label);
-    }
-  }
-
-  /**
-   * Prepares the system for writing.
-   * Deletes old files in the output folder and initialises the directory structure.
-   *
-   * @author Atour Mousavi Gourabi
-   * @since 1.0.0
-   */
-  protected void setupDirectories(OutputFile path, String version) {
-    try {
-      path.resolve("workload").resolve(version).resolve(".temp").clearDirectory();
-      for (String directory : parquetLabels.values()) {
-        path.resolve(directory).resolve(version).resolve(".temp").clearDirectory();
-      }
-    } catch (IOException e) {
-      log.error("Could not create directory structure for the output.");
     }
   }
 
@@ -111,7 +97,10 @@ public class WtaWriter {
    * @since 1.0.0
    */
   protected JsonWriter<Workload> createWorkloadWriter() throws IOException {
-    OutputFile path = file.resolve("workload").resolve(schemaVersion).resolve("generic_information.json");
+    OutputFile path = file.resolve("workload")
+        .resolve(schemaVersion)
+        .resolve("generic_information.json")
+        .clearDirectory();
     return new JsonWriter<>(path);
   }
 }
