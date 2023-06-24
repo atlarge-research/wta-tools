@@ -21,7 +21,6 @@ import org.apache.spark.SparkContext;
  */
 @Slf4j
 @Getter
-@Slf4j
 public class SparkDataSource {
 
   private final TaskLevelListener taskLevelListener;

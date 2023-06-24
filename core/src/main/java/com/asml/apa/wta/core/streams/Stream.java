@@ -190,7 +190,7 @@ public class Stream<V extends Serializable> implements Cloneable {
    */
   private synchronized void deserializeInternals(@NonNull String filePath) {
     log.trace("Deserializing stream internals from {}.", filePath);
-    int amountOfNodes;
+    try (ObjectInputStream objectInputStream =
         new ObjectInputStream(new BufferedInputStream(new FileInputStream(filePath)))) {
       List<StreamNode<V>> nodes = (ArrayList<StreamNode<V>>) objectInputStream.readObject();
       head = deserializationStart;

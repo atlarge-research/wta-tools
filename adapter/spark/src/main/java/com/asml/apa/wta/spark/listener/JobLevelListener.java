@@ -5,14 +5,12 @@ import com.asml.apa.wta.core.model.Domain;
 import com.asml.apa.wta.core.model.Task;
 import com.asml.apa.wta.core.model.Workflow;
 import com.asml.apa.wta.core.streams.Stream;
-import com.asml.apa.wta.core.model.enums.Domain;
 import com.asml.apa.wta.spark.dagsolver.DagSolver;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Stream;
+import java.util.stream.Collectors;
 import lombok.Getter;
 import org.apache.spark.SparkContext;
 import org.apache.spark.scheduler.SparkListenerJobEnd;
@@ -115,8 +113,8 @@ public class JobLevelListener extends AbstractListener<Workflow> {
     final long jobId = jobEnd.jobId() + 1L;
     final long tsSubmit = jobSubmitTimes.get(jobId);
     final Stream<Task> tasks = wtaTaskListener.getWorkflowsToTasks().onKey(jobId);
-    final long criticalPathLength = -1L;
-    int criticalPathTaskCount = -1;
+    long criticalPathLength;
+    int criticalPathTaskCount;
     final int maxNumberOfConcurrentTasks = -1;
     final String nfrs = "";
 
@@ -135,15 +133,16 @@ public class JobLevelListener extends AbstractListener<Workflow> {
         .reduce(Double::sum)
         .orElse(-1.0);
 
-    if (config.isStageLevel()) {
+    if (getConfig().isStageLevel()) {
+      criticalPathLength = -1L;
+      criticalPathTaskCount = -1;
       stageLevelListener.setStages(jobId);
     } else {
       TaskLevelListener taskLevelListener = (TaskLevelListener) wtaTaskListener;
       taskLevelListener.setTasks(stageLevelListener, jobId);
 
-      List<Task> jobStages = stageLevelListener.getProcessedObjects().stream()
-          .filter(stage -> stage.getWorkflowId() == jobId)
-          .collect(Collectors.toList());
+      List<Task> jobStages =
+          stageLevelListener.getWorkflowsToTasks().onKey(jobId).toList();
       jobStages.addAll(jobToStages.get(jobId).stream()
           .filter(stage -> !jobStages.stream()
               .map(Task::getId)
@@ -249,25 +248,6 @@ public class JobLevelListener extends AbstractListener<Workflow> {
    */
   private double computeSum(Stream<Double> data) {
     return data.filter(task -> task >= 0.0).reduce(Double::sum).orElse(-1.0);
-  }
-
-  /**
-   * This is a method called on application end. it sets up the resources used in the spark workflow.
-   * It also calculated the critical path for the job.
-   *
-   * @author Tianchen Qu
-   * @author Pil Kyu Cho
-   * @since 1.0.0
-   */
-  public void setWorkflows() {
-    final List<Workflow> workflows = this.getProcessedObjects();
-    workflows.forEach(workflow -> {
-      workflow.setTotalResources(Arrays.stream(workflow.getTasks())
-          .map(Task::getResourceAmountRequested)
-          .filter(resourceAmount -> resourceAmount >= 0.0)
-          .reduce(Double::sum)
-          .orElse(-1.0));
-    });
   }
 
   /**
