@@ -245,7 +245,7 @@ class JobLevelListenerTest extends BaseLevelListenerTest {
   }
 
   @Test
-  void parentChildrenAggregationForTasksHoldsAcrossMultipleJobs() {
+  void parentChildrenAggregationForTasksHoldsAcrossMultipleJobs() throws InterruptedException {
     // task 1 and task 2 have parent child relation in job 1
     // task 3 and task 4 have parent child relation in job 1
     ListBuffer<StageInfo> stageBuffer1 = new ListBuffer<>();
@@ -276,6 +276,9 @@ class JobLevelListenerTest extends BaseLevelListenerTest {
     fakeTaskListener1.onTaskEnd(taskEndEvent2);
     fakeStageListener1.onStageCompleted(stageCompleted2);
     fakeJobListener1.onJobEnd(jobEndEvent1);
+
+    AbstractListener.getThreadPool().awaitTermination(1000, TimeUnit.MILLISECONDS);
+
     assertThat(fakeTaskListener1.getProcessedObjects().count()).isEqualTo(2);
 
     Task task1 = fakeTaskListener1.getProcessedObjects().head();
@@ -296,6 +299,9 @@ class JobLevelListenerTest extends BaseLevelListenerTest {
     fakeTaskListener1.onTaskEnd(taskEndEvent4);
     fakeStageListener1.onStageCompleted(stageCompleted4);
     fakeJobListener1.onJobEnd(jobEndEvent2);
+
+    AbstractListener.getThreadPool().awaitTermination(1000, TimeUnit.MILLISECONDS);
+
     assertThat(fakeTaskListener1.getProcessedObjects().count()).isEqualTo(4);
 
     Task task3 = fakeTaskListener1.getProcessedObjects().drop(2).head();
