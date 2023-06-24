@@ -12,7 +12,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.spark.SparkContext;
 import org.apache.spark.scheduler.SparkListenerJobEnd;
 import org.apache.spark.scheduler.SparkListenerJobStart;
@@ -25,7 +24,6 @@ import scala.collection.JavaConverters;
  * @since 1.0.0
  */
 @Getter
-@Slf4j
 public class JobLevelListener extends AbstractListener<Workflow> {
 
   private final TaskStageBaseListener wtaTaskListener;
@@ -111,9 +109,6 @@ public class JobLevelListener extends AbstractListener<Workflow> {
    */
   @Override
   public void onJobEnd(SparkListenerJobEnd jobEnd) {
-    stageLevelListener.shutdownThreadPool();
-    wtaTaskListener.shutdownThreadPool();
-
     final long jobId = jobEnd.jobId() + 1L;
     final long tsSubmit = jobSubmitTimes.get(jobId);
     final Stream<Task> tasks = wtaTaskListener.getWorkflowsToTasks().onKey(jobId);
