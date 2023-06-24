@@ -109,6 +109,8 @@ public class WtaDriverPlugin implements DriverPlugin {
   public void shutdown() {
     if (error) {
       log.error("Plugin shutting down without generating files.");
+    } else {
+      log.info("Plugin shutting down successfully.");
     }
   }
 

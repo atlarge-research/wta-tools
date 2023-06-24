@@ -48,7 +48,7 @@ class WtaWriterIntegrationTest {
   @Test
   void writeWorkflows() {
     Workflow workflow = Workflow.builder().build();
-    sut.write(Workflow.class, new com.asml.apa.wta.core.streams.Stream<>(workflow));
+    sut.write(Workflow.class, new Stream<>(workflow));
     assertThat(new File("wta-output/" + TOOL_VERSION + "/workflows/schema-1.0/workflows.parquet").exists())
         .isTrue();
   }

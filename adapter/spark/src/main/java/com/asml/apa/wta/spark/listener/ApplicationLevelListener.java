@@ -37,6 +37,8 @@ import org.apache.spark.scheduler.SparkListenerApplicationStart;
 @Slf4j
 public class ApplicationLevelListener extends AbstractListener<Workload> {
 
+  private static final int awaitInSeconds = 5;
+
   private final MetricStreamingEngine metricStreamingEngine;
 
   private final SparkDataSource sparkDataSource;
@@ -132,7 +134,7 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
         ? sparkDataSource.getStageLevelListener().getProcessedObjects()
         : sparkDataSource.getTaskLevelListener().getProcessedObjects();
 
-    sparkDataSource.awaitAndShutdownThreadPool(5);
+    sparkDataSource.awaitAndShutdownThreadPool(awaitInSeconds);
 
     wtaWriter.write(Task.class, tasks);
     wtaWriter.write(Resource.class, resources);
