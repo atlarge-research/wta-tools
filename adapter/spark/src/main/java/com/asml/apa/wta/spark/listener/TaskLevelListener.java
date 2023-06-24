@@ -154,12 +154,12 @@ public class TaskLevelListener extends TaskStageBaseListener {
     final List<Task> filteredTasks = getWorkflowsToTasks().onKey(jobId).toList();
     for (Task task : filteredTasks) {
       // set parent field: all Tasks in are guaranteed to be in taskToStage
-      final Long stageId = this.getTaskToStage().get(task.getId());
+      final long stageId = getTaskToStage().get(task.getId());
       final Long[] parentStages = stageLevelListener.getStageToParents().get(stageId);
       if (parentStages != null) {
         final long[] parents = Arrays.stream(parentStages)
-            .flatMap(parentStageId -> Arrays.stream(
-                this.getStageToTasks().getOrDefault(parentStageId, new ArrayList<>()).stream()
+            .flatMap(parentStageId ->
+                Arrays.stream(getStageToTasks().getOrDefault(parentStageId, new ArrayList<>()).stream()
                     .map(Task::getId)
                     .toArray(Long[]::new)))
             .mapToLong(Long::longValue)
