@@ -131,7 +131,9 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
     Stream<Task> tasks = sparkDataSource.getRuntimeConfig().isStageLevel()
         ? sparkDataSource.getStageLevelListener().getProcessedObjects()
         : sparkDataSource.getTaskLevelListener().getProcessedObjects();
-    joinThreadPool();
+
+    sparkDataSource.shutdownThreadPool();
+
     wtaWriter.write(Task.class, tasks);
     wtaWriter.write(Resource.class, resources);
     wtaWriter.write(Workflow.class, sparkDataSource.getJobLevelListener().getProcessedObjects());
@@ -139,34 +141,6 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
     wtaWriter.write(workload);
 
     Stream.deleteAllSerializedFiles();
-  }
-
-  /**
-   * Shuts down the thread pool and joins all of its threads.
-   *
-   * @author Atour Mousavi Gourabi
-   * @since 1.0.0
-   */
-  public void joinThreadPool() {
-    try {
-      sparkDataSource.join();
-    } catch (InterruptedException e) {
-      log.error("Could not join the threads because of {}.", e.getMessage());
-      throw new RuntimeException(e);
-    }
-  }
-
-  /**
-   * Removes the listeners from the Spark context on application end.
-   *
-   * @author Atour Mousavi Gourabi
-   * @since 1.0.0
-   */
-  public void removeListeners() {
-    sparkDataSource.removeTaskListener();
-    sparkDataSource.removeStageListener();
-    sparkDataSource.removeJobListener();
-    sparkDataSource.removeApplicationListener();
   }
 
   /**
@@ -362,7 +336,7 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
     setResourceStatisticsFields(
         tasks.copy().map(Task::getEnergyConsumption).toList(), ResourceType.ENERGY, workloadBuilder);
 
-    removeListeners();
+    sparkDataSource.removeListeners();
 
     workload = workloadBuilder.build();
     writeTrace();

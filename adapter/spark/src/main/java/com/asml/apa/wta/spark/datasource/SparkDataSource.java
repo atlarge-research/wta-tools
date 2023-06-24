@@ -34,13 +34,12 @@ public class SparkDataSource {
   private final RuntimeConfig runtimeConfig;
 
   /**
-   * Joins the thread pools.
+   * Shuts down the thread pools.
    *
-   * @throws InterruptedException when an {@link InterruptedException} occurs while joining the threads
    * @author Atour Mousavi Gourabi
    * @since 1.0.0
    */
-  public void join() throws InterruptedException {
+  public void shutdownThreadPool() {
     AbstractListener.getThreadPool().shutdown();
   }
 
@@ -101,17 +100,6 @@ public class SparkDataSource {
   }
 
   /**
-   * This method removes a task listener from the Spark context.
-   *
-   * @author Pil Kyu Cho
-   * @since 1.0.0
-   */
-  public void removeTaskListener() {
-    log.trace("Removing task listener.");
-    taskLevelListener.remove();
-  }
-
-  /**
    * Registers a job listener to the Spark context.
    *
    * @author Henry Page
@@ -120,17 +108,6 @@ public class SparkDataSource {
   public void registerJobListener() {
     log.trace("Registering job listener.");
     jobLevelListener.register();
-  }
-
-  /**
-   * Removes a job listener from the Spark context.
-   *
-   * @author Henry Page
-   * @since 1.0.0
-   */
-  public void removeJobListener() {
-    log.trace("Removing job listener.");
-    jobLevelListener.remove();
   }
 
   /**
@@ -145,17 +122,6 @@ public class SparkDataSource {
   }
 
   /**
-   * Removes an application listener from the Spark context.
-   *
-   * @author Henry Page
-   * @since 1.0.0
-   */
-  public void removeApplicationListener() {
-    log.trace("Removing application listener.");
-    applicationLevelListener.remove();
-  }
-
-  /**
    * This method registers a stage listener to the Spark context.
    *
    * @author Lohithsai Yadala Chanchu
@@ -167,13 +133,15 @@ public class SparkDataSource {
   }
 
   /**
-   * This method removes a stage listener from the Spark context.
+   * Removes the listeners from the Spark context.
    *
-   * @author Lohithsai Yadala Chanchu
+   * @author Atour Mousavi Gourabi
    * @since 1.0.0
    */
-  public void removeStageListener() {
-    log.trace("Removing stage level listener.");
+  public void removeListeners() {
+    taskLevelListener.remove();
     stageLevelListener.remove();
+    jobLevelListener.remove();
+    applicationLevelListener.remove();
   }
 }

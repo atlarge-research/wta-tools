@@ -42,7 +42,7 @@ class SparkDataSourceIntegrationTest extends BaseSparkJobIntegrationTest {
   @Test
   public void removedTaskListenerDoesNotCollect() {
     sut1.registerTaskListener();
-    sut1.removeTaskListener();
+    sut1.removeListeners();
     invokeJob();
     assertThat(sut1.getTaskLevelListener().getProcessedObjects().isEmpty()).isTrue();
   }
