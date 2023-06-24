@@ -140,7 +140,8 @@ public class JobLevelListener extends AbstractListener<Workflow> {
       TaskLevelListener taskLevelListener = (TaskLevelListener) wtaTaskListener;
       taskLevelListener.setTasks(stageLevelListener, jobId);
 
-      List<Task> jobStages = stageLevelListener.getWorkflowsToTasks().onKey(jobId).toList();
+      List<Task> jobStages =
+          stageLevelListener.getWorkflowsToTasks().onKey(jobId).toList();
       jobStages.addAll(jobToStages.get(jobId).stream()
           .filter(stage -> !jobStages.stream()
               .map(Task::getId)
@@ -216,11 +217,9 @@ public class JobLevelListener extends AbstractListener<Workflow> {
 
     Stream<Long> stageIds = new Stream<>();
 
-    for (Map.Entry<Long, Long> e : stageLevelListener.getStageToJob().entrySet()) {
-      if (e.getValue().equals(jobId)) {
-        stageIds.addToStream(e.getKey());
-      }
-    }
+    stageLevelListener.getStageToJob().entrySet().stream()
+        .filter((e) -> e.getValue().equals(jobId))
+        .forEach((e) -> stageIds.addToStream(e.getKey()));
 
     stageIds.forEach(stageId -> {
       stageLevelListener.getStageToJob().remove(stageId);
