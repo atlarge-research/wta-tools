@@ -56,25 +56,6 @@ public class DiskParquetInputFile implements InputFile {
       private final RandomAccessFile randomAccessFile = new RandomAccessFile(path.toFile(), "r");
 
       /**
-       * Reads the next byte of data from the input stream. The value byte is
-       * returned as an {@code int} in the range {@code 0} to
-       * {@code 255}. If no byte is available because the end of the stream
-       * has been reached, the value {@code -1} is returned. This method
-       * blocks until input data is available, the end of the stream is detected,
-       * or an exception is thrown.
-       *
-       * @return     the next byte of data, or {@code -1} if the end of the
-       *             stream is reached.
-       * @throws     IOException  if an I/O error occurs.
-       * @author Atour Mousavi Gourabi
-       * @since 1.0.0
-       */
-      @Override
-      public int read() throws IOException {
-        return randomAccessFile.read();
-      }
-
-      /**
        * Return the current position in the InputStream.
        *
        * @return current position in bytes from the start of the stream
@@ -97,6 +78,47 @@ public class DiskParquetInputFile implements InputFile {
       @Override
       public void seek(long newPos) throws IOException {
         randomAccessFile.seek(newPos);
+      }
+
+      /**
+       * Reads the next byte of data from the input stream. The value byte is
+       * returned as an {@code int} in the range {@code 0} to
+       * {@code 255}. If no byte is available because the end of the stream
+       * has been reached, the value {@code -1} is returned. This method
+       * blocks until input data is available, the end of the stream is detected,
+       * or an exception is thrown.
+       *
+       * @return     the next byte of data, or {@code -1} if the end of the
+       *             stream is reached.
+       * @throws     IOException  if an I/O error occurs.
+       * @author Atour Mousavi Gourabi
+       * @since 1.0.0
+       */
+      @Override
+      public int read() throws IOException {
+        return randomAccessFile.read();
+      }
+
+      /**
+       * Read {@code buf.remaining()} bytes of data into a {@link ByteBuffer}.
+       * <p>
+       * This method will copy available bytes into the buffer, reading at most
+       * {@code buf.remaining()} bytes. The number of bytes actually copied is
+       * returned by the method, or -1 is returned to signal that the end of the
+       * underlying stream has been reached.
+       *
+       * @param buf a byte buffer to fill with data from the stream
+       * @return the number of bytes read or -1 if the stream ended
+       * @throws IOException If the underlying stream throws IOException
+       * @author Atour Mousavi Gourabi
+       * @since 1.0.0
+       */
+      @Override
+      public int read(ByteBuffer buf) throws IOException {
+        byte[] buffer = new byte[buf.remaining()];
+        int code = read(buffer);
+        buf.put(buffer, buf.position() + buf.arrayOffset(), buf.remaining());
+        return code;
       }
 
       /**
@@ -138,28 +160,6 @@ public class DiskParquetInputFile implements InputFile {
       @Override
       public void readFully(byte[] bytes, int start, int len) throws IOException {
         randomAccessFile.readFully(bytes, start, len);
-      }
-
-      /**
-       * Read {@code buf.remaining()} bytes of data into a {@link ByteBuffer}.
-       * <p>
-       * This method will copy available bytes into the buffer, reading at most
-       * {@code buf.remaining()} bytes. The number of bytes actually copied is
-       * returned by the method, or -1 is returned to signal that the end of the
-       * underlying stream has been reached.
-       *
-       * @param buf a byte buffer to fill with data from the stream
-       * @return the number of bytes read or -1 if the stream ended
-       * @throws IOException If the underlying stream throws IOException
-       * @author Atour Mousavi Gourabi
-       * @since 1.0.0
-       */
-      @Override
-      public int read(ByteBuffer buf) throws IOException {
-        byte[] buffer = new byte[buf.remaining()];
-        int code = read(buffer);
-        buf.put(buffer, buf.position() + buf.arrayOffset(), buf.remaining());
-        return code;
       }
 
       /**

@@ -4,6 +4,7 @@ import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -68,7 +69,8 @@ public class DiskOutputFile implements OutputFile {
   @Override
   public BufferedOutputStream open() throws IOException {
     log.debug("Open stream at {}.", outputFile);
-    return new BufferedOutputStream(Files.newOutputStream(outputFile));
+    return new BufferedOutputStream(
+        Files.newOutputStream(outputFile, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING));
   }
 
   /**

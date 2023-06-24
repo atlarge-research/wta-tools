@@ -23,7 +23,7 @@ public class DiskParquetOutputFile implements OutputFile {
     private final BufferedOutputStream stream;
     private long pos = 0;
 
-    public LocalPositionOutputStream(int buffer, StandardOpenOption... openOption) throws IOException {
+    LocalPositionOutputStream(int buffer, StandardOpenOption... openOption) throws IOException {
       stream = new BufferedOutputStream(Files.newOutputStream(path, openOption), buffer);
     }
 
