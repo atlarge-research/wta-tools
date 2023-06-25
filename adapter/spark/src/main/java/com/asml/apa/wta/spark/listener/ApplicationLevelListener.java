@@ -33,8 +33,8 @@ import org.apache.spark.scheduler.SparkListenerApplicationStart;
  * @author Tianchen Qu
  * @since 1.0.0
  */
-@Getter
 @Slf4j
+@Getter
 public class ApplicationLevelListener extends AbstractListener<Workload> {
 
   private static final int awaitInSeconds = 5;

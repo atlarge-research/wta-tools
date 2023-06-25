@@ -84,7 +84,7 @@ public class DiskOutputFile implements OutputFile {
   @Override
   public OutputFile createDirectories() throws IOException {
     Files.createDirectories(outputFile);
-    Files.delete(outputFile);
+    Files.deleteIfExists(outputFile);
     log.debug("Created the directory at {}.", outputFile.toString());
     return this;
   }
