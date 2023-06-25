@@ -168,8 +168,6 @@ public class JobLevelListener extends AbstractListener<Workflow> {
           .orElse(-1L);
     }
 
-    wtaTaskListener.removesWorkflowAssociations(jobId);
-
     getThreadPool()
         .execute(() -> addProcessedObject(Workflow.builder()
             .id(jobId)
@@ -197,7 +195,7 @@ public class JobLevelListener extends AbstractListener<Workflow> {
       TaskLevelListener taskLevelListener = (TaskLevelListener) wtaTaskListener;
       taskLevelListener.setTasks(stageLevelListener, jobId);
     }
-    cleanUpContainers(jobEnd);
+    cleanUpContainers(jobId);
   }
 
   /**
@@ -211,9 +209,9 @@ public class JobLevelListener extends AbstractListener<Workflow> {
    * @author Pil Kyu Cho
    * @since 1.0.0
    */
-  private void cleanUpContainers(SparkListenerJobEnd jobEnd) {
-    long jobId = jobEnd.jobId() + 1;
+  private void cleanUpContainers(long jobId) {
     jobSubmitTimes.remove(jobId);
+    jobToStages.remove(jobId);
 
     Stream<Long> stageIds = new Stream<>();
 
@@ -226,6 +224,9 @@ public class JobLevelListener extends AbstractListener<Workflow> {
       stageLevelListener.getStageToParents().remove(stageId);
       stageLevelListener.getParentStageToChildrenStages().remove(stageId);
       stageLevelListener.getStageToResource().remove(stageId);
+      stageLevelListener.getWorkflowsToTasks().dropKey(jobId);
+      wtaTaskListener.getStageToJob().remove(stageId);
+      wtaTaskListener.getWorkflowsToTasks().dropKey(jobId);
       if (!getConfig().isStageLevel()) {
         // additional clean up for task-level plugin
         TaskLevelListener taskLevelListener = (TaskLevelListener) wtaTaskListener;

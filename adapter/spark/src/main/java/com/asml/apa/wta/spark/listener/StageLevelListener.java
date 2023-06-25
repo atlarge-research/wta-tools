@@ -31,8 +31,6 @@ public class StageLevelListener extends TaskStageBaseListener {
 
   private final Map<Long, Integer> stageToResource = new ConcurrentHashMap<>();
 
-  private final Map<Long, List<Long>> jobToStages = new ConcurrentHashMap<>();
-
   /**
    * Constructor for the stage-level listener from Spark datasource class.
    *

@@ -42,12 +42,12 @@ public class SparkDataSource {
    * @since 1.0.0
    */
   public void awaitAndShutdownThreadPool(int awaitSeconds) {
+    AbstractListener.getThreadPool().shutdown();
     try {
       AbstractListener.getThreadPool().awaitTermination(awaitSeconds, TimeUnit.SECONDS);
     } catch (InterruptedException e) {
       log.error("Could not await the thread pool because InterruptedException {}.", e.getMessage());
     }
-    AbstractListener.getThreadPool().shutdown();
   }
 
   /**

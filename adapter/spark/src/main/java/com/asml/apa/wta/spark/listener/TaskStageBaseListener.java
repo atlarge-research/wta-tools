@@ -50,18 +50,6 @@ public abstract class TaskStageBaseListener extends AbstractListener<Task> {
   }
 
   /**
-   * Removes the {@link Task}s associated with the {@link com.asml.apa.wta.core.model.Workflow} from the
-   * {@link KeyedStream}.
-   *
-   * @param workflowId the id of the {@link com.asml.apa.wta.core.model.Workflow} to clear
-   * @author Atour Mousavi Gourabi
-   * @since 1.0.0
-   */
-  public void removesWorkflowAssociations(long workflowId) {
-    workflowsToTasks.dropKey(workflowId);
-  }
-
-  /**
    * Associates a {@link Task} with a {@link com.asml.apa.wta.core.model.Workflow}.
    * Also adds the {@link Task} to the processed objects {@link com.asml.apa.wta.core.streams.Stream}.
    *
