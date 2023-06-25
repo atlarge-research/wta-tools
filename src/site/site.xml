@@ -6,8 +6,8 @@
     <version>2.0.0-M6</version>
   </skin>
   <body>
-    <menu ref="parent" />
-    <menu ref="reports" />
-    <menu ref="modules" />
+    <menu ref="parent" inherit="top" />
+    <menu ref="reports" inherit="top" />
+    <menu ref="modules" inherit="top" />
   </body>
 </project>
