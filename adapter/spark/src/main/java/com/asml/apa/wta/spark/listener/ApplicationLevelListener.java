@@ -37,7 +37,7 @@ import org.apache.spark.scheduler.SparkListenerApplicationStart;
 @Slf4j
 public class ApplicationLevelListener extends AbstractListener<Workload> {
 
-  private static final int awaitInSeconds = 5;
+  private static final int maxAwaitInSeconds = 600;
 
   private final MetricStreamingEngine metricStreamingEngine;
 
@@ -134,7 +134,7 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
         ? sparkDataSource.getStageLevelListener().getProcessedObjects()
         : sparkDataSource.getTaskLevelListener().getProcessedObjects();
 
-    sparkDataSource.awaitAndShutdownThreadPool(awaitInSeconds);
+    sparkDataSource.awaitAndShutdownThreadPool(maxAwaitInSeconds);
 
     wtaWriter.write(Task.class, tasks);
     wtaWriter.write(Resource.class, resources);
@@ -231,10 +231,11 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
   @SuppressWarnings("CyclomaticComplexity")
   private void setResourceStatisticsFields(
       Stream<Double> metrics, ResourceType resourceType, WorkloadBuilder builder) {
-    Stream<Double> positiveList = metrics.copy().filter(x -> x >= 0.0);
-    final double meanField = computeMean(metrics.copy(), positiveList.copy().count());
+    Stream<Double> positiveStream = metrics.copy().filter(x -> x >= 0.0);
+    final double meanField =
+        computeMean(metrics.copy(), positiveStream.copy().count());
     final double stdField = computeStd(
-        metrics.filter(x -> x >= 0.0), meanField, positiveList.copy().count());
+        metrics.filter(x -> x >= 0.0), meanField, positiveStream.copy().count());
 
     switch (resourceType) {
       case RESOURCE:
@@ -243,9 +244,11 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
             .meanResourceTask(meanField)
             .stdResourceTask(stdField)
             .covResourceTask(computeCov(meanField, stdField))
-            .medianResourceTask(positiveList.isEmpty() ? -1.0 : computeMedian(positiveList))
-            .firstQuartileResourceTask(positiveList.isEmpty() ? -1.0 : computeFirstQuantile(positiveList))
-            .thirdQuartileResourceTask(positiveList.isEmpty() ? -1.0 : computeThirdQuantile(positiveList));
+            .medianResourceTask(positiveStream.isEmpty() ? -1.0 : computeMedian(positiveStream))
+            .firstQuartileResourceTask(
+                positiveStream.isEmpty() ? -1.0 : computeFirstQuantile(positiveStream))
+            .thirdQuartileResourceTask(
+                positiveStream.isEmpty() ? -1.0 : computeThirdQuantile(positiveStream));
         break;
       case MEMORY:
         builder.minMemory(computeMin(metrics.copy()))
@@ -253,9 +256,9 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
             .meanMemory(meanField)
             .stdMemory(stdField)
             .covMemory(computeCov(meanField, stdField))
-            .medianMemory(positiveList.isEmpty() ? -1.0 : computeMedian(positiveList))
-            .firstQuartileMemory(positiveList.isEmpty() ? -1.0 : computeFirstQuantile(positiveList))
-            .thirdQuartileMemory(positiveList.isEmpty() ? -1.0 : computeThirdQuantile(positiveList));
+            .medianMemory(positiveStream.isEmpty() ? -1.0 : computeMedian(positiveStream))
+            .firstQuartileMemory(positiveStream.isEmpty() ? -1.0 : computeFirstQuantile(positiveStream))
+            .thirdQuartileMemory(positiveStream.isEmpty() ? -1.0 : computeThirdQuantile(positiveStream));
         break;
       case NETWORK:
         builder.minNetworkUsage((long) computeMin(metrics.copy()))
@@ -263,11 +266,11 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
             .meanNetworkUsage(meanField)
             .stdNetworkUsage(stdField)
             .covNetworkUsage(computeCov(meanField, stdField))
-            .medianNetworkUsage(positiveList.isEmpty() ? -1L : (long) computeMedian(positiveList))
+            .medianNetworkUsage(positiveStream.isEmpty() ? -1L : (long) computeMedian(positiveStream))
             .firstQuartileNetworkUsage(
-                positiveList.isEmpty() ? -1L : (long) computeFirstQuantile(positiveList))
+                positiveStream.isEmpty() ? -1L : (long) computeFirstQuantile(positiveStream))
             .thirdQuartileNetworkUsage(
-                positiveList.isEmpty() ? -1L : (long) computeThirdQuantile(positiveList));
+                positiveStream.isEmpty() ? -1L : (long) computeThirdQuantile(positiveStream));
         break;
       case DISK:
         builder.minDiskSpaceUsage(computeMin(metrics.copy()))
@@ -275,10 +278,11 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
             .meanDiskSpaceUsage(meanField)
             .stdDiskSpaceUsage(stdField)
             .covDiskSpaceUsage(computeCov(meanField, stdField))
-            .medianDiskSpaceUsage(positiveList.isEmpty() ? -1.0 : computeMedian(positiveList))
-            .firstQuartileDiskSpaceUsage(positiveList.isEmpty() ? -1.0 : computeFirstQuantile(positiveList))
+            .medianDiskSpaceUsage(positiveStream.isEmpty() ? -1.0 : computeMedian(positiveStream))
+            .firstQuartileDiskSpaceUsage(
+                positiveStream.isEmpty() ? -1.0 : computeFirstQuantile(positiveStream))
             .thirdQuartileDiskSpaceUsage(
-                positiveList.isEmpty() ? -1.0 : computeThirdQuantile(positiveList));
+                positiveStream.isEmpty() ? -1.0 : computeThirdQuantile(positiveStream));
         break;
       case ENERGY:
         builder.minEnergy(computeMin(metrics.copy()))
@@ -286,9 +290,9 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
             .meanEnergy(meanField)
             .stdEnergy(stdField)
             .covEnergy(computeCov(meanField, stdField))
-            .medianEnergy(positiveList.isEmpty() ? -1.0 : computeMedian(positiveList))
-            .firstQuartileEnergy(positiveList.isEmpty() ? -1.0 : computeFirstQuantile(positiveList))
-            .thirdQuartileEnergy(positiveList.isEmpty() ? -1.0 : computeThirdQuantile(positiveList));
+            .medianEnergy(positiveStream.isEmpty() ? -1.0 : computeMedian(positiveStream))
+            .firstQuartileEnergy(positiveStream.isEmpty() ? -1.0 : computeFirstQuantile(positiveStream))
+            .thirdQuartileEnergy(positiveStream.isEmpty() ? -1.0 : computeThirdQuantile(positiveStream));
     }
   }
 
