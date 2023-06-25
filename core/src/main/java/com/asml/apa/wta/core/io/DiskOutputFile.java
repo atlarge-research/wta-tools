@@ -74,22 +74,6 @@ public class DiskOutputFile implements OutputFile {
   }
 
   /**
-   * Helper to delete files.
-   *
-   * @param path a {@link Path} pointing to the file to delete
-   * @author Atour Mousavi Gourabi
-   * @since 1.0.0
-   */
-  private void deleteFile(Path path) {
-    try {
-      Files.delete(path);
-      log.debug("Deleted file at {}.", path);
-    } catch (IOException e) {
-      log.error("Could not delete file at {}.", path);
-    }
-  }
-
-  /**
    * If the location this points to does not exist yet, the directory is created.
    *
    * @return the {@link OutputFile} pointing to the cleared directory
@@ -100,6 +84,7 @@ public class DiskOutputFile implements OutputFile {
   @Override
   public OutputFile createDirectories() throws IOException {
     Files.createDirectories(outputFile);
+    Files.delete(outputFile);
     log.debug("Created the directory at {}.", outputFile.toString());
     return this;
   }
