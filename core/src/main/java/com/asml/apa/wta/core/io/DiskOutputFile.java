@@ -1,10 +1,13 @@
 package com.asml.apa.wta.core.io;
 
 import java.io.BufferedOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.util.Comparator;
+import java.util.stream.Stream;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -82,9 +85,14 @@ public class DiskOutputFile implements OutputFile {
    * @since 1.0.0
    */
   @Override
-  public OutputFile createDirectories() throws IOException {
+  public OutputFile clearDirectories() throws IOException {
     Files.createDirectories(outputFile);
-    Files.deleteIfExists(outputFile);
+    try (Stream<Path> stream = Files.walk(outputFile)) {
+      stream.sorted(Comparator.reverseOrder())
+          .map(Path::toFile)
+          .filter(file -> !outputFile.toFile().equals(file))
+          .forEach(File::delete);
+    }
     log.debug("Created the directory at {}.", outputFile.toString());
     return this;
   }

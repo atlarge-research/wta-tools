@@ -57,7 +57,7 @@ public interface OutputFile {
    * @author Atour Mousavi Gourabi
    * @since 1.0.0
    */
-  OutputFile createDirectories() throws IOException;
+  OutputFile clearDirectories() throws IOException;
 
   /**
    * Wraps this {@link OutputFile} into a Parquet {@link org.apache.parquet.io.OutputFile}.

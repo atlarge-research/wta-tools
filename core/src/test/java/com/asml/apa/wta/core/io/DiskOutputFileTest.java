@@ -1,7 +1,7 @@
 package com.asml.apa.wta.core.io;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -47,19 +47,14 @@ class DiskOutputFileTest {
 
     DiskOutputFile outputFile = new DiskOutputFile(tempDirectory);
 
-    try {
-      outputFile.createDirectories();
-      System.out.println("Directory cleared successfully.");
-      assertTrue(Files.list(tempDirectory).count() == 0, "Directory is not empty");
-
-    } catch (IOException e) {
-      System.err.println("Failed to clear directory: " + e.getMessage());
-    }
+    outputFile.clearDirectories();
+    assertEquals(0, Files.list(tempDirectory).count(), "Directory is not empty");
   }
 
   private void createFile(Path parentDirectory, String fileName) throws IOException {
     File file = parentDirectory.resolve(fileName).toFile();
-    try (BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(file))) {}
+    BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(file));
+    out.close();
   }
 
   private void createSubdirectory(Path parentDirectory, String subdirectoryName) throws IOException {
