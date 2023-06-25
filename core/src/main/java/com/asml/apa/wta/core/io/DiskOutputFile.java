@@ -93,7 +93,7 @@ public class DiskOutputFile implements OutputFile {
           .filter(file -> !outputFile.toFile().equals(file))
           .forEach(File::delete);
     }
-    log.debug("Created the directory at {}.", outputFile.toString());
+    log.debug("Created and cleared the directory at {}.", outputFile.toString());
     return this;
   }
 

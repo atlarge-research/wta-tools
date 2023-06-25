@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.parquet.io.OutputFile;
 import org.apache.parquet.io.PositionOutputStream;
@@ -16,6 +17,7 @@ import org.apache.parquet.io.PositionOutputStream;
  * @since 1.0.0
  */
 @Slf4j
+@RequiredArgsConstructor
 public class DiskParquetOutputFile implements OutputFile {
 
   private class LocalPositionOutputStream extends PositionOutputStream {
@@ -36,6 +38,7 @@ public class DiskParquetOutputFile implements OutputFile {
      */
     @Override
     public long getPos() {
+      log.trace("Position at {}.", pos);
       return pos;
     }
 
@@ -51,6 +54,7 @@ public class DiskParquetOutputFile implements OutputFile {
      */
     @Override
     public void write(int data) throws IOException {
+      log.trace("Write {} to Parquet.", data);
       pos++;
       stream.write(data);
     }
@@ -67,6 +71,7 @@ public class DiskParquetOutputFile implements OutputFile {
      */
     @Override
     public void write(byte[] data) throws IOException {
+      log.trace("Write {} to Parquet.", data);
       pos += data.length;
       stream.write(data);
     }
@@ -85,6 +90,7 @@ public class DiskParquetOutputFile implements OutputFile {
      */
     @Override
     public void write(byte[] data, int off, int len) throws IOException {
+      log.trace("Write {} to Parquet.", data);
       pos += len;
       stream.write(data, off, len);
     }
@@ -116,10 +122,6 @@ public class DiskParquetOutputFile implements OutputFile {
 
   private final Path path;
 
-  public DiskParquetOutputFile(Path file) {
-    path = file;
-  }
-
   /**
    * Creates a {@link PositionOutputStream} for the wrapped {@link Path}.
    *
@@ -131,6 +133,7 @@ public class DiskParquetOutputFile implements OutputFile {
    */
   @Override
   public PositionOutputStream create(long buffer) throws IOException {
+    log.debug("Create org.apache.parquet.io.PositionOutputStream with {} buffer.", buffer);
     return new LocalPositionOutputStream((int) buffer, StandardOpenOption.CREATE_NEW);
   }
 
