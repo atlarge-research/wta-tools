@@ -10,7 +10,7 @@ import com.asml.apa.wta.core.model.Workflow;
 import com.asml.apa.wta.core.model.Workload;
 import com.asml.apa.wta.core.model.Workload.WorkloadBuilder;
 import com.asml.apa.wta.core.streams.Stream;
-import com.asml.apa.wta.spark.dagsolver.KthLargest;
+import com.asml.apa.wta.core.utils.KthLargest;
 import com.asml.apa.wta.spark.datasource.SparkDataSource;
 import com.asml.apa.wta.spark.dto.ResourceAndStateWrapper;
 import com.asml.apa.wta.spark.streams.MetricStreamingEngine;

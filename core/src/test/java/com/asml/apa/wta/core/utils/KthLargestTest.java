@@ -1,4 +1,4 @@
-package com.asml.apa.wta.spark.dagsolver;
+package com.asml.apa.wta.core.utils;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
