@@ -13,7 +13,7 @@ public class DiskParquetOutputFileTest {
   @Test
   void testGetPos() throws IOException {
     DiskParquetOutputFile diskParquetOutputFile = new DiskParquetOutputFile(Path.of("test.parquet"));
-    PositionOutputStream sut = diskParquetOutputFile.create(1);
+    PositionOutputStream sut = diskParquetOutputFile.createOrOverwrite(1);
     sut.write(42);
     assertEquals(1, sut.getPos());
   }
@@ -27,7 +27,7 @@ public class DiskParquetOutputFileTest {
     DiskParquetOutputFile outputFile = new DiskParquetOutputFile(tempFile);
 
     // Create PositionOutputStream
-    PositionOutputStream outputStream = outputFile.create(1024);
+    PositionOutputStream outputStream = outputFile.createOrOverwrite(1024);
 
     // Verify initial position
     assertEquals(0, outputStream.getPos());

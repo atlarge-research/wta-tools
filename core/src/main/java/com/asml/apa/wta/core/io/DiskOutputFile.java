@@ -1,9 +1,11 @@
 package com.asml.apa.wta.core.io;
 
 import java.io.BufferedOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.util.Comparator;
 import java.util.stream.Stream;
 import lombok.AllArgsConstructor;
@@ -51,7 +53,6 @@ public class DiskOutputFile implements OutputFile {
    * Sets the path of the disk output file.
    *
    * @param path a {@link String} representation of the {@link Path} to point to
-   * @throws IOException when something goes wrong during I/O
    * @author Atour Mousavi Gourabi
    * @since 1.0.0
    */
@@ -61,6 +62,7 @@ public class DiskOutputFile implements OutputFile {
 
   /**
    * Open a writer resource for the {@link OutputFile}.
+   * Overwrites existing files when necessary.
    *
    * @return an opened {@link OutputFile} writer
    * @throws IOException when no writer can be opened for the location of this {@link OutputFile}
@@ -70,40 +72,28 @@ public class DiskOutputFile implements OutputFile {
   @Override
   public BufferedOutputStream open() throws IOException {
     log.debug("Open stream at {}.", outputFile);
-    return new BufferedOutputStream(Files.newOutputStream(outputFile));
+    return new BufferedOutputStream(
+        Files.newOutputStream(outputFile, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING));
   }
 
   /**
-   * Helper to delete files.
-   *
-   * @param path a {@link Path} pointing to the file to delete
-   * @author Atour Mousavi Gourabi
-   * @since 1.0.0
-   */
-  private void deleteFile(Path path) {
-    try {
-      Files.delete(path);
-      log.debug("Deleted file at {}.", path);
-    } catch (IOException e) {
-      log.error("Could not delete file at {}.", path);
-    }
-  }
-
-  /**
-   * Clear the current directory if this {@link OutputFile} points to a folder.
    * If the location this points to does not exist yet, the directory is created.
    *
+   * @return the {@link OutputFile} pointing to the cleared directory
    * @throws IOException when something goes wrong during I/O
    * @author Atour Mousavi Gourabi
    * @since 1.0.0
    */
   @Override
-  public OutputFile clearDirectory() throws IOException {
+  public OutputFile clearDirectories() throws IOException {
     Files.createDirectories(outputFile);
-    try (Stream<Path> paths = Files.walk(outputFile)) {
-      paths.sorted(Comparator.reverseOrder()).forEach(this::deleteFile);
+    try (Stream<Path> stream = Files.walk(outputFile)) {
+      stream.sorted(Comparator.reverseOrder())
+          .map(Path::toFile)
+          .filter(file -> !outputFile.toFile().equals(file))
+          .forEach(File::delete);
     }
-    log.debug("Cleared the directory at {}.", outputFile);
+    log.debug("Created and cleared the directory at {}.", outputFile.toString());
     return this;
   }
 

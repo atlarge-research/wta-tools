@@ -67,17 +67,6 @@ public abstract class AbstractListener<T extends BaseTraceObject> extends SparkL
   }
 
   /**
-   * Checks whether the listener contains processed objects.
-   *
-   * @return a {@code boolean} indicating whether the listener contains processed objects
-   * @author Atour Mousavi Gourabi
-   * @since 1.0.0
-   */
-  public boolean containsProcessedObjects() {
-    return !processedObjects.isEmpty();
-  }
-
-  /**
    * Registers the listener to the current spark context.
    *
    * @author Henry Page

@@ -79,8 +79,8 @@ public class WtaWriter {
     try {
       OutputFile path = file.resolve(label)
           .resolve(schemaVersion)
-          .resolve(label + ".parquet")
-          .clearDirectory();
+          .clearDirectories()
+          .resolve(label + ".parquet");
       try (ParquetWriter<T> wtaParquetWriter = new ParquetWriter<>(path, schema)) {
         while (!wtaObjects.isEmpty()) {
           wtaParquetWriter.write(wtaObjects.head());
@@ -101,8 +101,8 @@ public class WtaWriter {
   protected JsonWriter<Workload> createWorkloadWriter() throws IOException {
     OutputFile path = file.resolve("workload")
         .resolve(schemaVersion)
-        .resolve("generic_information.json")
-        .clearDirectory();
+        .clearDirectories()
+        .resolve("generic_information.json");
     return new JsonWriter<>(path);
   }
 }

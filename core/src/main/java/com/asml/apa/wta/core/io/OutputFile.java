@@ -50,7 +50,6 @@ public interface OutputFile {
   BufferedOutputStream open() throws IOException;
 
   /**
-   * Clear the current directory if this {@link OutputFile} points to a folder.
    * If the location this points to does not exist yet, the directory is created.
    *
    * @return the {@link OutputFile} pointing to the cleared directory
@@ -58,7 +57,7 @@ public interface OutputFile {
    * @author Atour Mousavi Gourabi
    * @since 1.0.0
    */
-  OutputFile clearDirectory() throws IOException;
+  OutputFile clearDirectories() throws IOException;
 
   /**
    * Wraps this {@link OutputFile} into a Parquet {@link org.apache.parquet.io.OutputFile}.

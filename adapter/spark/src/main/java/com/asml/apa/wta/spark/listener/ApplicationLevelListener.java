@@ -33,8 +33,8 @@ import org.apache.spark.scheduler.SparkListenerApplicationStart;
  * @author Tianchen Qu
  * @since 1.0.0
  */
-@Getter
 @Slf4j
+@Getter
 public class ApplicationLevelListener extends AbstractListener<Workload> {
 
   private static final int maxAwaitInSeconds = 600;
@@ -307,7 +307,7 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
    * @since 1.0.0
    */
   public void onApplicationEnd(SparkListenerApplicationEnd applicationEnd) {
-    if (containsProcessedObjects()) {
+    if (workload != null) {
       log.debug("Application end called twice, this should never happen.");
       return;
     }
