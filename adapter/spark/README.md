@@ -25,9 +25,11 @@ These metrics are then transmitted periodically to the driver using the Spark Pl
 To address the limitation of excessive memory consumption, it is impractical to store all this information solely in the driver's memory.
 As a solution, serialization and deserialization techniques are applied.
 The rate of serialization is configurable by the user.
-Upon completion of the application, all of the data is ultimately outputted to Parquet format.
+Upon completion of the application, all the data is ultimately outputted to Parquet format.
 
-
+This `README` goes over a number of things necessary to use our plugin, including its configuration.
+For any explicit guidance on running and configuring a Spark application, we would like to direct you to
+[Apache Spark's documentation](https://spark.apache.org/docs/latest/) instead.
 
 
 ## Installation and Usage
@@ -94,14 +96,14 @@ For the second approach, create a JAR file of the plugin and run it alongside th
 **spark-submit**. Here is an example of how to run the plugin alongside the main Spark application:
 
 - Run `mvn -pl core clean install && mvn -pl adapter/spark clean package` in the source root.
-- Copy the resulting jar file from `adapter/spark/target`.
-- Execute the following command in the directory where the jar file is located:
+- Copy the resulting JAR file from `adapter/spark/target`.
+- Execute the following command in the directory where the JAR file is located:
 
 ```shell
 spark-submit --class <main class path to spark application> --master local \
 --conf spark.plugins=com.asml.apa.wta.spark.WtaPlugin \
 --conf spark.driver.extraJavaOptions=-DconfigFile=<config.json_location> \
---jars <plugin_jar_location> <Spark_jar_location> \
+--jars <plugin_JAR_location> <Spark_JAR_location> \
 <optional arguments for spark application>
 ```
 - The Parquet files should now be located in the `outputPath` as specified in the config file.
@@ -146,22 +148,24 @@ Note that in the Python script, `sc.stop()` must also be specified at the end to
 Now execute the following command and submit the Python script along with the JAR file of the plugin to **spark-submit**.
 
 ```shell
-spark-submit --jars <path-to-plugin-jar> <path-to-python-script>
+spark-submit --jars <path-to-plugin-JAR> <path-to-python-script>
 ```
 
 Another way to specify the plugin config is to use the `--conf` flag in the command line directly:
 
 ```shell
-spark-submit --conf spark.plugins=com.asml.apa.wta.spark.WtaPlugin --conf spark.driver.extraJavaOptions=-DconfigFile=<path-to-config-file> --jars <path-to-plugin-jar> <path-to-python-script>
+spark-submit --conf spark.plugins=com.asml.apa.wta.spark.WtaPlugin --conf spark.driver.extraJavaOptions=-DconfigFile=<path-to-config-file> --jars <path-to-plugin-JAR> <path-to-python-script>
 ```
 
 ## Configuration
 General configuration instructions are located [here](/../../README.md#configuration). See above for [instructions](#installation-and-usage) on how to provide the configuration to the plugin.
 
 
-## Description
+## General Remarks
 This plugin will **not** block the main Spark application. Even if the plugin fails to initialise, the main Spark
 application will still run.
+
+> :warning: The plugin deletes the contents of the output directory before writing the resulting trace.
 
 The Spark Adapter consists of two main parts that allows the application to collect metrics.
 - SparkListenerInterface
@@ -196,7 +200,7 @@ for each executor, and it's lifecycle is equivalent to that of an executor. This
 Our main use case for the plugin API is to pass messages between the executor and the driver. We use different libraries such as `iostat` to collect resource
 utilisation metrics on the executor side. These metrics are then passed to the driver using the plugin API. Namely, we use `ask()`,`send(Object message)` and `receive(Object message)`.
 
-Aggregation of all the resource utilisation metrics are done at the driver's end.
+Aggregation of all the resource utilisation metrics are done on the driver end.
 
 ## Developer Guidelines
 
@@ -274,8 +278,10 @@ This snippet can be found [here](src/main/java/com/asml/apa/wta/spark/streams/Me
 It is important to note that the benchmarking module is not part of the plugin itself but a separate tool.
 
 ## Logging
-The plugin uses the [SLF4J](http://www.slf4j.org/) logging API. This allows the end-user to choose the desired logging frameworks (e.g. java.util.logging, logback, log4j) . The plugin itself does not depend on any logging implementation.
-The plugin log level corresponds to the Spark log level. This means that the plugin log level can be configured using the Spark configuration through the following:
+Just like Spark, this plugin uses the [SLF4J](http://www.slf4j.org/) logging API. This allows the end-user to choose
+the desired logging frameworks (e.g. `java.util.logging`, logback, log4j). The plugin itself does not depend on any
+logging implementation. The plugin log level corresponds to the Spark log level. This means that the plugin log level
+can be configured using the Spark configuration through the following:
 ```java
 sc.setLogLevel("INFO");
 ```

@@ -786,6 +786,7 @@
             <reports>
               <report>report</report>
               <report>report-integration</report>
+              <report>report-aggregation</report>
             </reports>
           </reportSet>
         </reportSets>
@@ -957,7 +958,7 @@
             <executions>
               <execution>
                 <id>enforce-site-plus-no-checks</id>
-                <phase>pre-site</phase>
+                <phase>validate</phase>
                 <goals>
                   <goal>enforce</goal>
                 </goals>

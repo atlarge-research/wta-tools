@@ -45,12 +45,11 @@ An example of a valid configuration can be seen here:
   "authors": ["John Doe", "Jane Doe"],
   "domain": "Scientific",
   "description": "Processing data for scientific research purposes",
-  "logLevel": "INFO",
+  "isStageLevel": false,
   "outputPath": "wta-output",
   "resourcePingInterval": 500,
   "executorSynchronizationInterval": -1
 }
-
 ```
 
 ### Configuration Description
@@ -61,7 +60,7 @@ Below is an explanation of each field and their expected types. The default valu
 | authors                         |                                                                                                                                                                                                                                                                                                                                                                      The author(s) of the trace. Even if there is 1 author, they must still be specified in an array. | `ARRAY[STRING]` | :heavy_check_mark: |
 | domain                          |                                                                                                                                                                                                                                                                                                                The domain that the job corresponds to. This must be either 'Biomedical', 'Engineering', 'Industrial' or 'Scientific'. This is a case-sensitive field. |    `STRING`     | :heavy_check_mark: |
 | description                     |                                                                                                                                                                                                                                                                                                                                                                                                                                           The description of the job. |    `STRING`     |                    |
-| logLevel                        |                                                                                                                                                                                                                                                                                                The granularity of which the events/errors should be logged. This is one of `OFF`,`ALL`,`TRACE`,`DEBUG`,`FATAL`,`WARN`,`INFO` or`ERROR`. This field is case-sensitive. |    `STRING`     |                    |
+| isStageLevel                    |                                                                                                                                                                                                                                                                                                                                                                                              Whether to use stage instead of task level metrics, defaults to `false`. |     `BOOL`      |                    |
 | outputPath                      |                                                                                                                                                                                                                                                                                                                                                                                                                               The output path of the generated trace. |    `STRING`     | :heavy_check_mark: |
 | resourcePingInterval            |                                                       How often the resources are pinged for metrics in milliseconds. By default this is set to 500 and it is encouraged that the user does not modify this unless they know exactly what they are doing, as modifying this in a naive manner can introduce unforeseen effects. If this parameter is too large, metrics will not be captured for executors that have a lifespan shorter than the respective interval. |     `INT32`     |                    |
 | executorSynchronizationInterval | How often executors/slaves send their captured resource metrics to the driver/master in milliseconds. By default this is set to -1.  If the resources are pinged and the executor subsequently ends before a buffer synchronization tick, the respective resources will not be included in the aggregated metrics on the driver side. If this value is non-positive, resource information will be sent immediately after it is collected and it will not be buffered. |     `INT32`     |                    |
@@ -104,11 +103,17 @@ Additional modules can be found in the submodules directory. Currently, they inc
   - Instructions to use validation scripts. More information can be found in [here](./submodules/wta-tools/README.md).
 
 #### Maven Verification and Deployment
-To run the linters and other verification goals on the code, you need to run `mvn clean verify`.
-In order to generate the site, you need to run `mvn site`. If you want the site to contain information
-on testing, such as code coverage, you need to have JaCoCo reports present on your machine. A simple way
-to ensure that this works is by running `mvn clean verify site -Psite,no-checks`. The site will be located
-in the `target/site` directory in every module by default.
+To run the linters and other verification goals on the code, you need to run `mvn clean verify`. This will run
+all tests in the project, unit, integration, and mutation, while also applying all linters. We also include a
+coverage check goal to ensure that mutation test coverage does not drop below 60%, while ensuring that for unit
+and integration tests coverage does not drop below 80%. This limit is set for both branch and line coverage. To only
+execute the unit tests, you can run the `mvn test` goal.
+
+In order to generate the site, you need to run `mvn site -Psite,no-checks`. This comes as we enforce these profiles
+are available when running the `mvn site` lifecycle phase. If you want the site to contain  information on testing,
+such as code coverage, you need to have JaCoCo reports present on your machine. A simple way to ensure that this
+works is by running `mvn clean verify site -Psite,no-checks`. The site will be located in the `target/site` directory
+in every module by default.
 
 It is also possible to run `mvn site -Psite,no-checks` without running the `mvn verify` phase. This will, however,
 make the site less informative as there would be no information on tests run or code coverage from these tests.
@@ -120,6 +125,19 @@ into one, you need to run `mvn site:stage` after running the site phase. This wi
 `target/staging` directory in the top level project. You can put this all together into one big command, to generate
 the final site. This final site can be generated in one go by running the
 `mvn clean verify site site:stage -Psite,no-checks` command.
+
+###### Profiles
+We have set up multiple profiles in Maven, all of which serve a distinct purpose and need. Firstly, we have the
+`end-to-end` profile. This makes sure `mvn package` generates a JAR containing the `EndToEnd` class. We use this
+class to run end-to-end testing on the application to ensure no critical bugs get introduced. To use this goal
+you need to simply make use of Maven's default way of enabling profiles. To generate a JAR containing the `EndToEnd`
+class, you would thus need to run `mvn package -Pend-to-end`. As the `end-to-end` profile is intended to be part of
+a highly parallelised pipeline, it does not run the tests.
+Secondly, we include the `no-checks` and `no-tests` profiles. These profiles are pretty straight forward. The
+`no-checks` profile disables linters and coverage checks, while `no-tests` disables running tests.
+Finally, the Maven includes the `site` profile. This was included to avoid running unnecessary tasks when
+generating the site. It enforces the presence of the `no-checks profile` while ignoring any failures when running
+the tests. It also skips the mutation tests and delomboks the code to allow the generation of Javadoc for the code.
 
 
 ## Authors and Acknowledgement
