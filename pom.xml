@@ -786,7 +786,7 @@
             <reports>
               <report>report</report>
               <report>report-integration</report>
-              <report>report-aggregation</report>
+              <report>report-aggregate</report>
             </reports>
           </reportSet>
         </reportSets>
