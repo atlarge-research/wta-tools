@@ -10,12 +10,12 @@ import com.asml.apa.wta.core.model.Workflow;
 import com.asml.apa.wta.core.model.Workload;
 import com.asml.apa.wta.core.model.Workload.WorkloadBuilder;
 import com.asml.apa.wta.core.streams.Stream;
+import com.asml.apa.wta.spark.dagsolver.KthLargest;
 import com.asml.apa.wta.spark.datasource.SparkDataSource;
 import com.asml.apa.wta.spark.dto.ResourceAndStateWrapper;
 import com.asml.apa.wta.spark.streams.MetricStreamingEngine;
 import java.util.List;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.spark.SparkContext;
@@ -229,77 +229,66 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
    * @since 1.0.0
    */
   @SuppressWarnings("CyclomaticComplexity")
-  private void setResourceStatisticsFields(List<Double> metrics, ResourceType resourceType, WorkloadBuilder builder) {
-    List<Double> sortedPositiveList =
-        metrics.stream().filter(x -> x >= 0.0).sorted().collect(Collectors.toList());
-    Stream<Double> metricsStream = new Stream<>(metrics);
-    final double meanField = computeMean(metricsStream.copy(), sortedPositiveList.size());
+  private void setResourceStatisticsFields(
+      Stream<Double> metrics, ResourceType resourceType, WorkloadBuilder builder) {
+    Stream<Double> positiveList = metrics.copy().filter(x -> x >= 0.0);
+    final double meanField = computeMean(metrics.copy(), positiveList.copy().count());
     final double stdField = computeStd(
-        new Stream<>(metrics.stream().filter(x -> x >= 0.0).collect(Collectors.toList())),
-        meanField,
-        sortedPositiveList.size());
+        metrics.filter(x -> x >= 0.0), meanField, positiveList.copy().count());
 
     switch (resourceType) {
       case RESOURCE:
-        builder.minResourceTask(computeMin(metricsStream.copy()))
-            .maxResourceTask(computeMax(metricsStream.copy()))
+        builder.minResourceTask(computeMin(metrics.copy()))
+            .maxResourceTask(computeMax(metrics.copy()))
             .meanResourceTask(meanField)
             .stdResourceTask(stdField)
             .covResourceTask(computeCov(meanField, stdField))
-            .medianResourceTask(sortedPositiveList.isEmpty() ? -1.0 : computeMedian(sortedPositiveList))
-            .firstQuartileResourceTask(
-                sortedPositiveList.isEmpty() ? -1.0 : computeFirstQuantile(sortedPositiveList))
-            .thirdQuartileResourceTask(
-                sortedPositiveList.isEmpty() ? -1.0 : computeThirdQuantile(sortedPositiveList));
+            .medianResourceTask(positiveList.isEmpty() ? -1.0 : computeMedian(positiveList))
+            .firstQuartileResourceTask(positiveList.isEmpty() ? -1.0 : computeFirstQuantile(positiveList))
+            .thirdQuartileResourceTask(positiveList.isEmpty() ? -1.0 : computeThirdQuantile(positiveList));
         break;
       case MEMORY:
-        builder.minMemory(computeMin(metricsStream.copy()))
-            .maxMemory(computeMax(metricsStream.copy()))
+        builder.minMemory(computeMin(metrics.copy()))
+            .maxMemory(computeMax(metrics.copy()))
             .meanMemory(meanField)
             .stdMemory(stdField)
             .covMemory(computeCov(meanField, stdField))
-            .medianMemory(sortedPositiveList.isEmpty() ? -1.0 : computeMedian(sortedPositiveList))
-            .firstQuartileMemory(
-                sortedPositiveList.isEmpty() ? -1.0 : computeFirstQuantile(sortedPositiveList))
-            .thirdQuartileMemory(
-                sortedPositiveList.isEmpty() ? -1.0 : computeThirdQuantile(sortedPositiveList));
+            .medianMemory(positiveList.isEmpty() ? -1.0 : computeMedian(positiveList))
+            .firstQuartileMemory(positiveList.isEmpty() ? -1.0 : computeFirstQuantile(positiveList))
+            .thirdQuartileMemory(positiveList.isEmpty() ? -1.0 : computeThirdQuantile(positiveList));
         break;
       case NETWORK:
-        builder.minNetworkUsage((long) computeMin(metricsStream.copy()))
-            .maxNetworkUsage((long) computeMax(metricsStream.copy()))
+        builder.minNetworkUsage((long) computeMin(metrics.copy()))
+            .maxNetworkUsage((long) computeMax(metrics.copy()))
             .meanNetworkUsage(meanField)
             .stdNetworkUsage(stdField)
             .covNetworkUsage(computeCov(meanField, stdField))
-            .medianNetworkUsage(
-                sortedPositiveList.isEmpty() ? -1L : (long) computeMedian(sortedPositiveList))
+            .medianNetworkUsage(positiveList.isEmpty() ? -1L : (long) computeMedian(positiveList))
             .firstQuartileNetworkUsage(
-                sortedPositiveList.isEmpty() ? -1L : (long) computeFirstQuantile(sortedPositiveList))
+                positiveList.isEmpty() ? -1L : (long) computeFirstQuantile(positiveList))
             .thirdQuartileNetworkUsage(
-                sortedPositiveList.isEmpty() ? -1L : (long) computeThirdQuantile(sortedPositiveList));
+                positiveList.isEmpty() ? -1L : (long) computeThirdQuantile(positiveList));
         break;
       case DISK:
-        builder.minDiskSpaceUsage(computeMin(metricsStream.copy()))
-            .maxDiskSpaceUsage(computeMax(metricsStream.copy()))
+        builder.minDiskSpaceUsage(computeMin(metrics.copy()))
+            .maxDiskSpaceUsage(computeMax(metrics.copy()))
             .meanDiskSpaceUsage(meanField)
             .stdDiskSpaceUsage(stdField)
             .covDiskSpaceUsage(computeCov(meanField, stdField))
-            .medianDiskSpaceUsage(sortedPositiveList.isEmpty() ? -1.0 : computeMedian(sortedPositiveList))
-            .firstQuartileDiskSpaceUsage(
-                sortedPositiveList.isEmpty() ? -1.0 : computeFirstQuantile(sortedPositiveList))
+            .medianDiskSpaceUsage(positiveList.isEmpty() ? -1.0 : computeMedian(positiveList))
+            .firstQuartileDiskSpaceUsage(positiveList.isEmpty() ? -1.0 : computeFirstQuantile(positiveList))
             .thirdQuartileDiskSpaceUsage(
-                sortedPositiveList.isEmpty() ? -1.0 : computeThirdQuantile(sortedPositiveList));
+                positiveList.isEmpty() ? -1.0 : computeThirdQuantile(positiveList));
         break;
       case ENERGY:
-        builder.minEnergy(computeMin(metricsStream.copy()))
-            .maxEnergy(computeMax(metricsStream.copy()))
+        builder.minEnergy(computeMin(metrics.copy()))
+            .maxEnergy(computeMax(metrics.copy()))
             .meanEnergy(meanField)
             .stdEnergy(stdField)
             .covEnergy(computeCov(meanField, stdField))
-            .medianEnergy(sortedPositiveList.isEmpty() ? -1.0 : computeMedian(sortedPositiveList))
-            .firstQuartileEnergy(
-                sortedPositiveList.isEmpty() ? -1.0 : computeFirstQuantile(sortedPositiveList))
-            .thirdQuartileEnergy(
-                sortedPositiveList.isEmpty() ? -1.0 : computeThirdQuantile(sortedPositiveList));
+            .medianEnergy(positiveList.isEmpty() ? -1.0 : computeMedian(positiveList))
+            .firstQuartileEnergy(positiveList.isEmpty() ? -1.0 : computeFirstQuantile(positiveList))
+            .thirdQuartileEnergy(positiveList.isEmpty() ? -1.0 : computeThirdQuantile(positiveList));
     }
   }
 
@@ -326,17 +315,12 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
     setGeneralFields(applicationEnd.time(), workloadBuilder);
     setCountFields(tasks.copy(), workloadBuilder);
     setResourceStatisticsFields(
-        tasks.copy().map(Task::getResourceAmountRequested).toList(), ResourceType.RESOURCE, workloadBuilder);
+        tasks.copy().map(Task::getResourceAmountRequested), ResourceType.RESOURCE, workloadBuilder);
+    setResourceStatisticsFields(tasks.copy().map(Task::getMemoryRequested), ResourceType.MEMORY, workloadBuilder);
     setResourceStatisticsFields(
-        tasks.copy().map(Task::getMemoryRequested).toList(), ResourceType.MEMORY, workloadBuilder);
-    setResourceStatisticsFields(
-        tasks.copy().map(networkFunction.andThen(Long::doubleValue)).toList(),
-        ResourceType.NETWORK,
-        workloadBuilder);
-    setResourceStatisticsFields(
-        tasks.copy().map(Task::getDiskSpaceRequested).toList(), ResourceType.DISK, workloadBuilder);
-    setResourceStatisticsFields(
-        tasks.copy().map(Task::getEnergyConsumption).toList(), ResourceType.ENERGY, workloadBuilder);
+        tasks.copy().map(networkFunction.andThen(Long::doubleValue)), ResourceType.NETWORK, workloadBuilder);
+    setResourceStatisticsFields(tasks.copy().map(Task::getDiskSpaceRequested), ResourceType.DISK, workloadBuilder);
+    setResourceStatisticsFields(tasks.copy().map(Task::getEnergyConsumption), ResourceType.ENERGY, workloadBuilder);
 
     sparkDataSource.removeListeners();
 
@@ -430,39 +414,37 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
   /**
    * Median value for data stream. Assumes that data is not empty, sorted, and positive elements only.
    *
-   * @param data            stream of data
-   * return                 median value of the data
-   * @author Tianchen Qu
-   * @author Pil Kyu Cho
+   * @param data {@link Stream} of data
+   * @return the median value of the data
+   * @author Atour Mousavi Gourabi
    * @since 1.0.0
    */
-  private double computeMedian(List<Double> data) {
-    return data.get(data.size() / 2);
+  private double computeMedian(Stream<Double> data) {
+    return new KthLargest().findKthSmallest(data.copy(), data.copy().count() / 2);
   }
 
   /**
    * First quantile value for data stream. Assumes that data is not empty, sorted, and positive elements only.
    *
-   * @param data            stream of data
-   * return                 first quantile value of the data
-   * @author Tianchen Qu
-   * @author Pil Kyu Cho
+   * @param data {@link Stream} of data
+   * @return the first quantile value of the data
+   * @author Atour Mousavi Gourabi
    * @since 1.0.0
    */
-  private double computeFirstQuantile(List<Double> data) {
-    return data.get(data.size() / 4);
+  private double computeFirstQuantile(Stream<Double> data) {
+    return new KthLargest().findKthSmallest(data.copy(), data.copy().count() / 4);
   }
 
   /**
    * Third quantile value for data stream. Assumes that data is not empty, sorted, and positive elements only.
    *
-   * @param data            stream of data
-   * return                 third quantile value of the data
+   * @param data {@link Stream} of data
+   * @return third quantile value of the data
    * @author Tianchen Qu
    * @author Pil Kyu Cho
    * @since 1.0.0
    */
-  private double computeThirdQuantile(List<Double> data) {
-    return data.get(data.size() * 3 / 4);
+  private double computeThirdQuantile(Stream<Double> data) {
+    return new KthLargest().findKthSmallest(data.copy(), data.copy().count() * 3 / 4);
   }
 }
