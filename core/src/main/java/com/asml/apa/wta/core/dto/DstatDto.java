@@ -18,17 +18,17 @@ import lombok.NoArgsConstructor;
 public class DstatDto implements SupplierDto {
   private static final long serialVersionUID = 4386177879327585527L;
 
-  private int totalUsageUsr;
-  private int totalUsageSys;
-  private int totalUsageIdl;
-  private int totalUsageWai;
-  private int totalUsageStl;
-  private int dskRead;
-  private int dskWrite;
-  private int netRecv;
-  private int netSend;
-  private int pagingIn;
-  private int pagingOut;
-  private int systemInt;
-  private int systemCsw;
+  private long totalUsageUsr;
+  private long totalUsageSys;
+  private long totalUsageIdl;
+  private long totalUsageWai;
+  private long totalUsageStl;
+  private long dskRead;
+  private long dskWrite;
+  private long netRecv;
+  private long netSend;
+  private long pagingIn;
+  private long pagingOut;
+  private long systemInt;
+  private long systemCsw;
 }

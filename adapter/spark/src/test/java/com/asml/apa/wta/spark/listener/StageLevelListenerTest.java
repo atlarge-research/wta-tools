@@ -10,7 +10,9 @@ import com.asml.apa.wta.core.model.Task;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+import org.apache.spark.executor.ShuffleWriteMetrics;
 import org.apache.spark.executor.TaskMetrics;
 import org.apache.spark.scheduler.SparkListenerJobStart;
 import org.apache.spark.scheduler.SparkListenerStageCompleted;
@@ -33,13 +35,18 @@ class StageLevelListenerTest extends BaseLevelListenerTest {
   void setup() {
     TaskMetrics mockedMetrics = mock(TaskMetrics.class);
     when(mockedMetrics.executorRunTime()).thenReturn(100L);
-
+    ShuffleWriteMetrics mockedShuffleMetrics = mock(ShuffleWriteMetrics.class);
+    when(mockedMetrics.executorRunTime()).thenReturn(100L);
+    when(mockedMetrics.peakExecutionMemory()).thenReturn(100L);
+    when(mockedMetrics.diskBytesSpilled()).thenReturn(100L);
+    when(mockedMetrics.shuffleWriteMetrics()).thenReturn(mockedShuffleMetrics);
+    when(mockedShuffleMetrics.bytesWritten()).thenReturn(100L);
     ListBuffer<Integer> parents = new ListBuffer<>();
     parents.$plus$eq(1);
     parents.$plus$eq(2);
 
     testStageInfo = new StageInfo(
-        3,
+        0,
         0,
         "test",
         50,
@@ -61,32 +68,35 @@ class StageLevelListenerTest extends BaseLevelListenerTest {
   }
 
   @Test
-  void testStageEndMetricExtraction() {
+  void testStageEndMetricExtraction() throws InterruptedException {
     ListBuffer<StageInfo> stageBuffer = new ListBuffer<>();
     stageBuffer.$plus$eq(spyStageInfo);
 
-    fakeStageListener.onJobStart(new SparkListenerJobStart(1, 2L, stageBuffer.toList(), new Properties()));
-    fakeStageListener.onStageCompleted(stageEndEvent);
-    assertEquals(1, fakeStageListener.getProcessedObjects().size());
-    Task curStage = fakeStageListener.getProcessedObjects().get(0);
-    assertEquals(3, curStage.getId());
+    fakeStageListener1.onJobStart(new SparkListenerJobStart(0, 2L, stageBuffer.toList(), new Properties()));
+    fakeStageListener1.onStageCompleted(stageEndEvent);
+
+    AbstractListener.getThreadPool().awaitTermination(1, TimeUnit.SECONDS);
+
+    assertEquals(1, fakeStageListener1.getProcessedObjects().count());
+    Task curStage = fakeStageListener1.getProcessedObjects().head();
+    assertEquals(1, curStage.getId());
     assertEquals("", curStage.getType());
     assertEquals(10L, curStage.getTsSubmit());
     assertEquals(100L, curStage.getRuntime());
-    assertEquals(2L, curStage.getWorkflowId());
+    assertEquals(1L, curStage.getWorkflowId());
     assertEquals(Math.abs("testUser".hashCode()), curStage.getUserId());
     assertEquals(-1, curStage.getSubmissionSite());
     assertEquals("N/A", curStage.getResourceType());
     assertEquals(-1.0, curStage.getResourceAmountRequested());
     assertEquals(-1.0, curStage.getMemoryRequested());
-    assertEquals(-1.0, curStage.getDiskSpaceRequested());
+    assertEquals(200.0, curStage.getDiskSpaceRequested());
     assertEquals(-1L, curStage.getEnergyConsumption());
     assertEquals(-1L, curStage.getNetworkIoTime());
     assertEquals(-1L, curStage.getDiskIoTime());
     assertEquals(-1, curStage.getGroupId());
     assertEquals("", curStage.getNfrs());
     assertEquals("", curStage.getParams());
-    assertEquals(0, curStage.getParents().length);
+    assertEquals(2, curStage.getParents().length);
     assertEquals(0, curStage.getChildren().length);
   }
 
@@ -95,14 +105,14 @@ class StageLevelListenerTest extends BaseLevelListenerTest {
     ListBuffer<StageInfo> stageBuffer = new ListBuffer<>();
     stageBuffer.$plus$eq(spyStageInfo);
 
-    fakeStageListener.onJobStart(new SparkListenerJobStart(1, 2L, stageBuffer.toList(), new Properties()));
-    fakeStageListener.onStageCompleted(stageEndEvent);
-    assertThat(fakeStageListener.getStageToParents()).containsEntry(3, new Integer[] {1, 2});
-    assertThat(fakeStageListener.getStageToParents().size()).isEqualTo(1);
-    List<Integer> temp = new ArrayList<>();
-    temp.add(3);
-    assertThat(fakeStageListener.getParentToChildren()).containsEntry(1, temp);
-    assertThat(fakeStageListener.getParentToChildren()).containsEntry(2, temp);
-    assertThat(fakeStageListener.getParentToChildren().size()).isEqualTo(2);
+    fakeStageListener1.onJobStart(new SparkListenerJobStart(0, 2L, stageBuffer.toList(), new Properties()));
+    fakeStageListener1.onStageCompleted(stageEndEvent);
+    assertThat(fakeStageListener1.getStageToParents()).containsEntry(1L, new Long[] {2L, 3L});
+    assertThat(fakeStageListener1.getStageToParents().size()).isEqualTo(1);
+    List<Long> childrenStages = new ArrayList<>();
+    childrenStages.add(1L);
+    assertThat(fakeStageListener1.getParentStageToChildrenStages()).containsEntry(2L, childrenStages);
+    assertThat(fakeStageListener1.getParentStageToChildrenStages()).containsEntry(3L, childrenStages);
+    assertThat(fakeStageListener1.getParentStageToChildrenStages().size()).isEqualTo(2);
   }
 }

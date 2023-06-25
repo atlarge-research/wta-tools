@@ -31,12 +31,12 @@ Ensure that you have the following tools installed and environment path variable
 This module contains the code for running TPC-DS benchmarks on Spark. To run TPC-DS benchmarks on Spark, we only need the **tpcds-spark** submodule within **zoo-tutorials**, but it is necessary to clone the entire repo in order to properly package it using sbt.
 
 Download the repository:
-```bash
+```shell
 git clone https://github.com/intel-analytics/zoo-tutorials.git
 ```
 
 Clone submodule spark-sql-perf into directory:
-```bash
+```shell
 cd /path/to/zoo-tutorials
 git submodule update --init
 ```
@@ -44,7 +44,7 @@ git submodule update --init
 Currently, this module supports Spark 3.0.0. To run with other Spark versions, please modify `build.sbt` in **zoo-tutorials/tpcds-spark**  with the required version (e.g. Spark 3.2.4)
 
 Enter the following command to compile **tpcds-spark** and package it:
-```bash
+```shell
 cd zoo-tutorials/tpcds-spark
 sbt package
 ```
@@ -53,25 +53,25 @@ sbt package
 **tpcds-toolkit** is only available on Ubuntu or CentOS. For other distributions, please use a virtual machine.
 
 For Ubuntu:
-```bash
-`sudo apt-get install gcc-9 g++-9 make flex bison byacc git`
+```shell
+`sudo apt-get install gcc make flex bison byacc git`
 ```
 
 For CentOS:
-```bash
-`sudo yum install gcc-9 g++-9 make flex bison byacc git`
+```shell
+`sudo yum install gcc make flex bison byacc git`
 ```
 
 Download and compile **tpcds-toolkit**:
-```bash
+```shell
 git clone https://github.com/databricks/tpcds-kit.git
 cd tpcds-kit/tools
-make CC=gcc-9 OS=LINUX
+make OS=LINUX
 ```
 
 ### Generate test data ##
 Now that every thing is installed, generate TPC-DS data:
-```bash
+```shell
 cd zoo-tutorials/tpcds-spark/spark-sql-perf
 sbt "test:runMain com.databricks.spark.sql.perf.tpcds.GenTPCDSData -d <dsdgenDir> -s <scaleFactor> -l <dataDir> -f parquet"
 ```
@@ -80,7 +80,7 @@ sbt "test:runMain com.databricks.spark.sql.perf.tpcds.GenTPCDSData -d <dsdgenDir
 ### Create external tables ###
 Create tables in the **tpcds-spark** using `spark-submit`:
 
-```bash
+```shell
 spark-submit \
 --class "createTables" \
 --master <spark-master> \
@@ -97,7 +97,7 @@ target/scala-2.12/tpcds-benchmark_2.12-0.1.jar <dataDir> <dsdgenDir> <scaleFacto
 ### Execute TPC-DS queries ###
 Execute the following queries to run TPC-DS benchmark:
 
-```bash
+```shell
 spark-submit \
 --class "TPCDSBenchmark" \
 --master <spark-master> \

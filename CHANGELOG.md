@@ -53,6 +53,18 @@ For the most part, since we are pre-release this will serve no real purpose, oth
 - Add aggregation for resource related metrics [@hpage](https://gitlab.ewi.tudelft.nl/hpage)
 - Added shading for plugin dependencies [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 - Added Parquet reader [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
+- Brought mutation testing coverage up to 80% and add mutation testing coverage to pipeline [@lyadalachanchu](https://gitlab.ewi.tudelft.nl/lyadalachanchu)
+- Enhanced documentation relating to Spark [@hpage](https://gitlab.ewi.tudelft.nl/hpage)
+- Added Spark aggregations [@tqu](https://gitlab.ewi.tudelft.nl/tqu)
+- Set up SPI for the connector output file implementations [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
+- Added enhanced trace level logs [@hpage](https://gitlab.ewi.tudelft.nl/hpage)
+- Added parent-child functionality to Spark stage listeners as well [@pcho](https://gitlab.ewi.tudelft.nl/pcho)
+- Filter the ConcurrentHashMap containers and remove processed entries on job end [@pcho](https://gitlab.ewi.tudelft.nl/pcho)
+- Added coherent Maven lifecycle bindings [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
+- Added Maven site generation [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
+- Added documentation on how to integrate the plugin JAR with PySpark [@pcho](https://gitlab.ewi.tudelft.nl/pcho)
+- Implemented critical path fields [@tqu](https://gitlab.ewi.tudelft.nl/tqu)
+- Adds Stream based metric aggregation in Workload [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 
 ### Changed
 - Refactored listeners into a generic interface to reduce code duplication and increase cc [@hpage](https://gitlab.ewi.tudelft.nl/hpage)
@@ -71,6 +83,11 @@ For the most part, since we are pre-release this will serve no real purpose, oth
 - Restructured the benchmarking directory into a submodule directory [@pcho](https://gitlab.ewi.tudelft.nl/pcho)
 - Updated the Spark method in EndToEnd class to cover more broad shuffling operations [@pcho](https://gitlab.ewi.tudelft.nl/pcho)
 - Added Dockerfiles for the user to deploy more easily for containerized environments [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
+- Changed the pipeline to enforce code coverage [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
+- Expanded the Parquet schema generator to privates and maps [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
+- Refactored the Spark listeners to improve readability and maintainability [@pcho](https://gitlab.ewi.tudelft.nl/pcho)
+- AbstractListener made to be actually abstract. [@hpage](https://gitlab.ewi.tudelft.nl/hpage)
+- Updated the READMEs [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 
 ### Fixed
 - Fixed the slf4j logging module to allow use in testing and `adapter/spark` [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
@@ -80,6 +97,16 @@ For the most part, since we are pre-release this will serve no real purpose, oth
 - Fixed the type inconsistency in the field types of the WTA Objects [@tqu](https://gitlab.ewi.tudelft.nl/tqu)
 - Fixed iostat partition bug and added support for comma decimal separator [@lyadalachanchu](https://gitlab.ewi.tudelft.nl/lyadalachanchu)
 - Fixed the bug that caused the plugin to crash if given invalid configs [@pcho](https://gitlab.ewi.tudelft.nl/pcho)
+- Fixed the Maven configuration by binding failsafe to the integration-test goals [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
+- Delete the serialized files left behind by unconsumed streams on application end [@lyadalachanchu](https://gitlab.ewi.tudelft.nl/lyadalachanchu)
+- Fixed the shading to be more specific in the shaded locations to avoid dependency hell for users [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
+- Fixed the stage id bug in stage listener [@pcho](https://gitlab.ewi.tudelft.nl/pcho)
+- Fixed dstat command bug [@lyadalachanchu](https://gitlab.ewi.tudelft.nl/lyadalachanchu)
+- Fixed serialization bug in the new supplier POJOs [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
+- Fixed Parquet schema generation static field edge cases [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
+- Fixed ShellUtils execution bug [@lyadalachanchu](https://gitlab.ewi.tudelft.nl/lyadalachanchu)
+- Fixed some of the OOM issues by replacing Lists with Streams [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
+- Fixed the WTA writer to remove pre-existing files to write traces [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 
 ### Deprecated
 
@@ -91,3 +118,4 @@ For the most part, since we are pre-release this will serve no real purpose, oth
 - Removed WtaUtils [@hpage](https://gitlab.ewi.tudelft.nl/hpage)
 - Removed the outdated spark-benchmarking module [@pcho](https://gitlab.ewi.tudelft.nl/pcho)
 - Removed custom Log4j2 configuration [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
+- Removed PITest from the pipeline again [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)

@@ -10,8 +10,8 @@ import com.asml.apa.wta.core.model.ResourceState;
 import com.asml.apa.wta.core.model.Task;
 import com.asml.apa.wta.core.model.Workflow;
 import com.asml.apa.wta.core.model.Workload;
+import com.asml.apa.wta.core.streams.Stream;
 import java.io.IOException;
-import java.util.List;
 import java.util.Map;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -38,13 +38,13 @@ public class WtaWriter {
    *
    * @param path the output path to write to
    * @param version the version of files to write
+   * @param toolVersion the version of the tool that writes to file
    * @author Atour Mousavi Gourabi
    * @since 1.0.0
    */
-  public WtaWriter(@NonNull OutputFile path, String version) {
-    file = path;
+  public WtaWriter(@NonNull OutputFile path, String version, String toolVersion) {
+    file = path.resolve(toolVersion);
     schemaVersion = version;
-    setupDirectories(path, version);
   }
 
   /**
@@ -55,8 +55,8 @@ public class WtaWriter {
    * @since 1.0.0
    */
   public void write(Workload workload) {
-    OutputFile path = file.resolve("workload").resolve(schemaVersion).resolve("generic_information.json");
-    try (JsonWriter<Workload> workloadWriter = new JsonWriter<>(path)) {
+    log.debug("Writing workload to file.");
+    try (JsonWriter<Workload> workloadWriter = createWorkloadWriter()) {
       workloadWriter.write(workload);
     } catch (IOException e) {
       log.error("Could not write workload to file.");
@@ -64,7 +64,7 @@ public class WtaWriter {
   }
 
   /**
-   * Writes a {@link List} of WTA objects to their corresponding Parquet file.
+   * Writes a {@link Stream} of WTA objects to their corresponding Parquet file.
    *
    * @param clazz the class of WTA objects to write
    * @param wtaObjects the WTA objects to write
@@ -72,13 +72,19 @@ public class WtaWriter {
    * @author Atour Mousavi Gourabi
    * @since 1.0.0
    */
-  public <T extends BaseTraceObject> void write(Class<T> clazz, List<T> wtaObjects) {
+  public <T extends BaseTraceObject> void write(Class<T> clazz, Stream<T> wtaObjects) {
+    log.debug("Writing objects of type {} to file.", clazz.getSimpleName());
     String label = parquetLabels.get(clazz);
-    ParquetSchema schema = new ParquetSchema(clazz, wtaObjects, label);
-    OutputFile path = file.resolve(label).resolve(schemaVersion).resolve(label + ".parquet");
-    try (ParquetWriter<T> wtaParquetWriter = new ParquetWriter<>(path, schema)) {
-      for (T wtaObject : wtaObjects) {
-        wtaParquetWriter.write(wtaObject);
+    ParquetSchema schema = new ParquetSchema(clazz, wtaObjects.copy(), label);
+    try {
+      OutputFile path = file.resolve(label)
+          .resolve(schemaVersion)
+          .clearDirectories()
+          .resolve(label + ".parquet");
+      try (ParquetWriter<T> wtaParquetWriter = new ParquetWriter<>(path, schema)) {
+        while (!wtaObjects.isEmpty()) {
+          wtaParquetWriter.write(wtaObjects.head());
+        }
       }
     } catch (IOException e) {
       log.error("Could not write {} to file.", label);
@@ -86,20 +92,17 @@ public class WtaWriter {
   }
 
   /**
-   * Prepares the system for writing.
-   * Deletes old files in the output folder and initialises the directory structure.
+   * Creates a Workload json writer.
    *
-   * @author Atour Mousavi Gourabi
+   * @return JsonWriter a json writer that writes the workload json file
+   * @author Lohithsai Yadala Chanchu
    * @since 1.0.0
    */
-  private void setupDirectories(OutputFile path, String version) {
-    try {
-      path.resolve("workload").resolve(version).resolve(".temp").clearDirectory();
-      for (String directory : parquetLabels.values()) {
-        path.resolve(directory).resolve(version).resolve(".temp").clearDirectory();
-      }
-    } catch (IOException e) {
-      log.error("Could not create directory structure for the output.");
-    }
+  protected JsonWriter<Workload> createWorkloadWriter() throws IOException {
+    OutputFile path = file.resolve("workload")
+        .resolve(schemaVersion)
+        .clearDirectories()
+        .resolve("generic_information.json");
+    return new JsonWriter<>(path);
   }
 }

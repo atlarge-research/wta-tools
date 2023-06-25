@@ -1,12 +1,17 @@
 package com.asml.apa.wta.core.io;
 
 import com.asml.apa.wta.core.model.BaseTraceObject;
-import com.asml.apa.wta.core.model.enums.Domain;
+import com.asml.apa.wta.core.model.Domain;
+import com.asml.apa.wta.core.streams.Stream;
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.VarHandle;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -31,17 +36,17 @@ public class ParquetSchema {
   private final Map<String, String> fieldsToSchema = new HashMap<>();
 
   /**
-   * Create a dense {@link ParquetSchema} for the given {@link Collection} of objects.
+   * Create a dense {@link ParquetSchema} for the given {@link Stream} of objects.
    *
    * @param clazz the {@link Class} of objects to create the schema for
-   * @param objects the {@link Collection} of objects to create the schema for
+   * @param objects the {@link Stream} of objects to create the schema for
    * @param name the name of the schema
-   * @param <T> the type parameter for the {@link Class} and {@link Collection}
+   * @param <T> the type parameter for the {@link Class} and {@link Stream}
    * @author Atour Mousavi Gourabi
    * @since 1.0.0
    */
   @SuppressWarnings("CyclomaticComplexity")
-  public <T> ParquetSchema(Class<T> clazz, Collection<T> objects, String name) {
+  public <T extends BaseTraceObject> ParquetSchema(Class<T> clazz, Stream<T> objects, String name) {
     String followedByCapitalized = "([a-z0-9])([A-Z]+)";
     String followedByDigit = "([a-zA-Z])([0-9]+)";
     String replacement = "$1_$2";
@@ -50,47 +55,68 @@ public class ParquetSchema {
         .namespace("com.asml.apa.wta.core.model")
         .fields();
     try {
+      List<Field> nonStaticValidFields = new ArrayList<>();
+      Map<Field, MethodHandle> fieldHandles = new HashMap<>();
+      MethodHandles.Lookup lookup = MethodHandles.privateLookupIn(clazz, MethodHandles.lookup());
       for (Field field : fields) {
-        boolean sparseField = false;
-        for (T o : objects) {
-          if (!Modifier.isPublic(field.getModifiers()) || field.get(o) == null) {
-            sparseField = true;
-            break;
+        if (!Modifier.isStatic(field.getModifiers())) {
+          nonStaticValidFields.add(field);
+        }
+        fieldHandles.put(field, lookup.unreflectGetter(field));
+      }
+      while (!objects.isEmpty()) {
+        T object = objects.head();
+        List<Field> toRemove = new ArrayList<>();
+        for (Field field : nonStaticValidFields) {
+          if (fieldHandles.get(field).invoke(object) == null) {
+            toRemove.add(field);
           }
         }
-        if (!sparseField) {
-          Class<?> fieldType = field.getType();
-          String fieldName = field.getName()
-              .replaceAll(followedByCapitalized, replacement)
-              .replaceAll(followedByDigit, replacement)
-              .toLowerCase();
-          if (String.class.isAssignableFrom(fieldType) || Domain.class.isAssignableFrom(fieldType)) {
-            schemaBuilder = schemaBuilder.requiredString(fieldName);
-          } else if (long.class.isAssignableFrom(fieldType)
-              || BaseTraceObject.class.isAssignableFrom(fieldType)) {
-            schemaBuilder = schemaBuilder.requiredLong(fieldName);
-          } else if (int.class.isAssignableFrom(fieldType)) {
-            schemaBuilder = schemaBuilder.requiredInt(fieldName);
-          } else if (double.class.isAssignableFrom(fieldType)) {
-            schemaBuilder = schemaBuilder.requiredDouble(fieldName);
-          } else if (long[].class.isAssignableFrom(fieldType)
-              || BaseTraceObject[].class.isAssignableFrom(fieldType)) {
-            schemaBuilder = schemaBuilder
-                .name(fieldName)
-                .type()
-                .array()
-                .items()
-                .longType()
-                .noDefault();
-          } else {
-            log.error("Could not create a valid encoding for {}.", fieldType);
-            throw new IllegalAccessException(fieldType.toString());
-          }
-          fieldsToSchema.put(field.getName(), fieldName);
+        nonStaticValidFields.removeAll(toRemove);
+      }
+      for (Field field : nonStaticValidFields) {
+        VarHandle typeInfoHandle = lookup.unreflectVarHandle(field);
+        Class<?> fieldType = typeInfoHandle.varType();
+        String fieldName = lookup.revealDirect(fieldHandles.get(field))
+            .getName()
+            .replaceAll(followedByCapitalized, replacement)
+            .replaceAll(followedByDigit, replacement)
+            .toLowerCase();
+        if (String.class.isAssignableFrom(fieldType) || Domain.class.isAssignableFrom(fieldType)) {
+          schemaBuilder = schemaBuilder.requiredString(fieldName);
+        } else if (long.class.isAssignableFrom(fieldType)
+            || BaseTraceObject.class.isAssignableFrom(fieldType)) {
+          schemaBuilder = schemaBuilder.requiredLong(fieldName);
+        } else if (int.class.isAssignableFrom(fieldType)) {
+          schemaBuilder = schemaBuilder.requiredInt(fieldName);
+        } else if (double.class.isAssignableFrom(fieldType)) {
+          schemaBuilder = schemaBuilder.requiredDouble(fieldName);
+        } else if (long[].class.isAssignableFrom(fieldType)
+            || Long[].class.isAssignableFrom(fieldType)
+            || BaseTraceObject[].class.isAssignableFrom(fieldType)) {
+          schemaBuilder = schemaBuilder
+              .name(fieldName)
+              .type()
+              .array()
+              .items()
+              .longType()
+              .noDefault();
+        } else if (Map.class.isAssignableFrom(fieldType)) {
+          schemaBuilder = schemaBuilder
+              .name(fieldName)
+              .type()
+              .map()
+              .values()
+              .stringType()
+              .noDefault();
+        } else {
+          log.error("Could not create a valid encoding for {}.", fieldType);
+          throw new IllegalAccessException(fieldType.toString());
         }
+        fieldsToSchema.put(lookup.revealDirect(fieldHandles.get(field)).getName(), fieldName);
       }
       avroSchema = schemaBuilder.endRecord();
-    } catch (IllegalAccessException e) {
+    } catch (Throwable e) {
       log.error("Could not create a valid schema for {} in {}.", e.getMessage(), clazz);
       throw new RuntimeException("Could not create a valid schema for " + clazz, e);
     }
@@ -111,8 +137,12 @@ public class ParquetSchema {
     GenericData.Record record = new GenericData.Record(avroSchema);
     try {
       for (Field field : fields) {
-        if (Modifier.isPublic(field.getModifiers()) && fieldsToSchema.containsKey(field.getName())) {
-          Object object = field.get(pojo);
+        MethodHandles.Lookup lookup = MethodHandles.privateLookupIn(clazz, MethodHandles.lookup());
+        MethodHandle handle = lookup.unreflectGetter(field);
+        if (!Modifier.isStatic(field.getModifiers())
+            && fieldsToSchema.containsKey(
+                lookup.revealDirect(handle).getName())) {
+          Object object = handle.invoke(pojo);
           if (object instanceof BaseTraceObject[]) {
             object = Arrays.stream((BaseTraceObject[]) object)
                 .map(BaseTraceObject::getId)
@@ -134,17 +164,20 @@ public class ParquetSchema {
                 break;
               default:
                 object = "";
-                log.error("Failed to properly serialise {} for value {}.", field.getName(), domain);
+                log.error(
+                    "Failed to properly serialise {} for value {}.",
+                    lookup.revealDirect(handle).getName(),
+                    domain);
                 break;
             }
           } else if (object instanceof BaseTraceObject) {
             BaseTraceObject traceObject = (BaseTraceObject) object;
             object = traceObject.getId();
           }
-          record.put(fieldsToSchema.get(field.getName()), object);
+          record.put(fieldsToSchema.get(lookup.revealDirect(handle).getName()), object);
         }
       }
-    } catch (IllegalAccessException e) {
+    } catch (Throwable e) {
       log.error("Could not convert to Avro record {}.", e.getMessage());
     }
     log.debug("Converted record {}.", record);

@@ -1,135 +1,454 @@
 package com.asml.apa.wta.spark.listener;
 
+import com.asml.apa.wta.core.WtaWriter;
 import com.asml.apa.wta.core.config.RuntimeConfig;
+import com.asml.apa.wta.core.model.Domain;
+import com.asml.apa.wta.core.model.Resource;
+import com.asml.apa.wta.core.model.ResourceState;
 import com.asml.apa.wta.core.model.Task;
 import com.asml.apa.wta.core.model.Workflow;
 import com.asml.apa.wta.core.model.Workload;
-import com.asml.apa.wta.core.model.enums.Domain;
-import java.util.ArrayList;
-import java.util.Arrays;
+import com.asml.apa.wta.core.model.Workload.WorkloadBuilder;
+import com.asml.apa.wta.core.streams.Stream;
+import com.asml.apa.wta.core.utils.KthLargest;
+import com.asml.apa.wta.spark.datasource.SparkDataSource;
+import com.asml.apa.wta.spark.dto.ResourceAndStateWrapper;
+import com.asml.apa.wta.spark.streams.MetricStreamingEngine;
 import java.util.List;
+import java.util.function.Function;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.spark.SparkContext;
 import org.apache.spark.scheduler.SparkListenerApplicationEnd;
 import org.apache.spark.scheduler.SparkListenerApplicationStart;
 
 /**
  * This class is an application-level listener for the Spark data source.
- * It's important that one does not override {@link org.apache.spark.scheduler.SparkListenerInterface#onApplicationStart(SparkListenerApplicationStart)} here, as the event is already sent
- * before the listener is registered unless the listener is explicitly registered in the Spark configuration as per <a href="https://stackoverflow.com/questions/36401238/spark-onapplicationstart-is-never-gets-called">SO</a>
+ * It's important that one does not override {@link org.apache.spark.scheduler.SparkListenerInterface#onApplicationStart(SparkListenerApplicationStart)}
+ * here, as the event is already sent before the listener is registered unless the listener is explicitly registered in
+ * the Spark configuration as per <a href="https://stackoverflow.com/questions/36401238/spark-onapplicationstart-is-never-gets-called">SO</a>
  *
  * @author Pil Kyu Cho
  * @author Henry Page
  * @author Tianchen Qu
  * @since 1.0.0
  */
-@Getter
 @Slf4j
+@Getter
 public class ApplicationLevelListener extends AbstractListener<Workload> {
+
+  private static final int maxAwaitInSeconds = 600;
+
+  private final MetricStreamingEngine metricStreamingEngine;
+
+  private final SparkDataSource sparkDataSource;
+
+  private final WtaWriter wtaWriter;
+
+  private final TaskStageBaseListener wtaTaskListener;
+
+  private final StageLevelListener stageLevelListener;
 
   private final JobLevelListener jobLevelListener;
 
-  private final TaskLevelListener taskLevelListener;
-
-  private final StageLevelListener stageLevelListener;
+  @Getter
+  private Workload workload;
 
   /**
    * Constructor for the application-level listener.
    *
    * @param sparkContext The current spark context
    * @param config Additional config specified by the user for the plugin
-   * @param jobLevelListener The job-level listener to be used by this listener
-   * @param taskLevelListener The task-level listener to be used by this listener
-   * @param stageLevelListener The stage-level listener to be used by this listener
+   * @param wtaTaskLevelListener The task-level listener to be used by this listener
+   * @param wtaStageLevelListener The stage-level listener to be used by this listener
+   * @param wtaJobLevelListener The job-level listener to be used by this listener
+   * @param dataSource the {@link SparkDataSource} to inject
+   * @param streamingEngine the driver's {@link MetricStreamingEngine} to use
+   * @param traceWriter the {@link WtaWriter} to write the traces with
    * @author Henry Page
    * @since 1.0.0
    */
   public ApplicationLevelListener(
       SparkContext sparkContext,
       RuntimeConfig config,
-      JobLevelListener jobLevelListener,
-      TaskLevelListener taskLevelListener,
-      StageLevelListener stageLevelListener) {
+      TaskStageBaseListener wtaTaskLevelListener,
+      StageLevelListener wtaStageLevelListener,
+      JobLevelListener wtaJobLevelListener,
+      SparkDataSource dataSource,
+      MetricStreamingEngine streamingEngine,
+      WtaWriter traceWriter) {
     super(sparkContext, config);
-    this.jobLevelListener = jobLevelListener;
-    this.taskLevelListener = taskLevelListener;
-    this.stageLevelListener = stageLevelListener;
+    wtaTaskListener = wtaTaskLevelListener;
+    stageLevelListener = wtaStageLevelListener;
+    jobLevelListener = wtaJobLevelListener;
+    sparkDataSource = dataSource;
+    metricStreamingEngine = streamingEngine;
+    wtaWriter = traceWriter;
+  }
+
+  /**
+   * Constructor for the application-level listener at stage level.
+   *
+   * @param sparkContext The current spark context
+   * @param config Additional config specified by the user for the plugin
+   * @param wtaStageLevelListener The stage-level listener to be used by this listener
+   * @param wtaJobLevelListener The job-level listener to be used by this listener
+   * @param dataSource the {@link SparkDataSource} to inject
+   * @param streamingEngine the driver's {@link MetricStreamingEngine} to use
+   * @param traceWriter the {@link WtaWriter} to write the traces with
+   * @author Tianchen Qu
+   * @since 1.0.0
+   */
+  public ApplicationLevelListener(
+      SparkContext sparkContext,
+      RuntimeConfig config,
+      StageLevelListener wtaStageLevelListener,
+      JobLevelListener wtaJobLevelListener,
+      SparkDataSource dataSource,
+      MetricStreamingEngine streamingEngine,
+      WtaWriter traceWriter) {
+    super(sparkContext, config);
+    wtaTaskListener = wtaStageLevelListener;
+    stageLevelListener = wtaStageLevelListener;
+    jobLevelListener = wtaJobLevelListener;
+    sparkDataSource = dataSource;
+    metricStreamingEngine = streamingEngine;
+    wtaWriter = traceWriter;
+  }
+
+  /**
+   * Writes the trace to file.
+   *
+   * @author Atour Mousavi Gourabi
+   * @since 1.0.0
+   */
+  public void writeTrace() {
+    List<ResourceAndStateWrapper> resourceAndStateWrappers = metricStreamingEngine.collectResourceInformation();
+    Stream<Resource> resources = new Stream<>();
+    resourceAndStateWrappers.stream()
+        .map(ResourceAndStateWrapper::getResource)
+        .forEach(resources::addToStream);
+    Stream<ResourceState> resourceStates = new Stream<>();
+    resourceAndStateWrappers.forEach(rs -> rs.getStates().forEach(resourceStates::addToStream));
+    Stream<Task> tasks = sparkDataSource.getRuntimeConfig().isStageLevel()
+        ? sparkDataSource.getStageLevelListener().getProcessedObjects()
+        : sparkDataSource.getTaskLevelListener().getProcessedObjects();
+
+    sparkDataSource.awaitAndShutdownThreadPool(maxAwaitInSeconds);
+
+    wtaWriter.write(Task.class, tasks);
+    wtaWriter.write(Resource.class, resources);
+    wtaWriter.write(Workflow.class, sparkDataSource.getJobLevelListener().getProcessedObjects());
+    wtaWriter.write(ResourceState.class, resourceStates);
+    wtaWriter.write(workload);
+
+    Stream.deleteAllSerializedFiles();
+  }
+
+  /**
+   * Setters for the general fields of the Workload.
+   *
+   * @param dateEnd     End date of the application
+   * @param builder     WorkloadBuilder to be used to build the Workload
+   * @author Pil Kyu Cho
+   * @since 1.0.0
+   */
+  private void setGeneralFields(long dateEnd, WorkloadBuilder builder) {
+    final Domain domain = getConfig().getDomain();
+    final long dateStart = getSparkContext().startTime();
+    final String[] authors = getConfig().getAuthors();
+    final String workloadDescription = getConfig().getDescription();
+    builder.authors(authors)
+        .workloadDescription(workloadDescription)
+        .domain(domain)
+        .dateStart(dateStart)
+        .dateEnd(dateEnd);
+  }
+
+  /**
+   * Setters for the count fields of the Workload.
+   *
+   * @param tasks       List of WTA Task objects
+   * @param builder     WorkloadBuilder to be used to build the Workload
+   * @author Pil Kyu Cho
+   * @since 1.0.0
+   */
+  private void setCountFields(Stream<Task> tasks, WorkloadBuilder builder) {
+    final Stream<Workflow> workflows = jobLevelListener.getProcessedObjects();
+    final long totalWorkflows = workflows.copy().count();
+    final long totalTasks =
+        workflows.map(Workflow::getTaskCount).reduce(Long::sum).orElse(0L);
+    long numSites =
+        tasks.copy().filter(task -> task.getSubmissionSite() >= 0).count();
+    numSites = numSites < 1 ? -1 : numSites;
+    final long numResources = tasks.copy()
+        .map(Task::getResourceAmountRequested)
+        .filter(task -> task >= 0.0)
+        .reduce(Double::sum)
+        .orElse(-1.0)
+        .longValue();
+    long numUsers = tasks.copy().filter(task -> task.getUserId() >= 0).count();
+    numUsers = numUsers < 1 ? -1 : numUsers;
+    long numGroups = tasks.copy().filter(task -> task.getGroupId() >= 0).count();
+    numGroups = numGroups < 1 ? -1 : numGroups;
+    final double totalResourceSeconds = tasks.copy()
+        .filter(task -> task.getRuntime() >= 0 && task.getResourceAmountRequested() >= 0.0)
+        .map(task -> task.getResourceAmountRequested() * task.getRuntime())
+        .reduce(Double::sum)
+        .orElse(-1.0);
+    builder.totalWorkflows(totalWorkflows)
+        .totalTasks(totalTasks)
+        .numSites(numSites)
+        .numResources(numResources)
+        .numUsers(numUsers)
+        .numGroups(numGroups)
+        .totalResourceSeconds(totalResourceSeconds);
+  }
+
+  /**
+   * Private enum to represent the different types of resources for resource fields.
+   *
+   * @author Pil Kyu Cho
+   * @since 1.0.0
+   */
+  private enum ResourceType {
+    RESOURCE,
+    MEMORY,
+    DISK,
+    NETWORK,
+    ENERGY
+  }
+
+  /**
+   * Setters for the statistical resource fields of the Workload.
+   *
+   * @param metrics         {@link List} of WTA Task objects
+   * @param resourceType    Type of resource to be set
+   * @param builder         WorkloadBuilder to be used to build the Workload
+   * @author Pil Kyu Cho
+   * @since 1.0.0
+   */
+  @SuppressWarnings("CyclomaticComplexity")
+  private void setResourceStatisticsFields(
+      Stream<Double> metrics, ResourceType resourceType, WorkloadBuilder builder) {
+    Stream<Double> positiveStream = metrics.copy().filter(x -> x >= 0.0);
+    final double meanField =
+        computeMean(metrics.copy(), positiveStream.copy().count());
+    final double stdField = computeStd(
+        metrics.filter(x -> x >= 0.0), meanField, positiveStream.copy().count());
+
+    switch (resourceType) {
+      case RESOURCE:
+        builder.minResourceTask(computeMin(metrics.copy()))
+            .maxResourceTask(computeMax(metrics.copy()))
+            .meanResourceTask(meanField)
+            .stdResourceTask(stdField)
+            .covResourceTask(computeCov(meanField, stdField))
+            .medianResourceTask(positiveStream.isEmpty() ? -1.0 : computeMedian(positiveStream))
+            .firstQuartileResourceTask(
+                positiveStream.isEmpty() ? -1.0 : computeFirstQuantile(positiveStream))
+            .thirdQuartileResourceTask(
+                positiveStream.isEmpty() ? -1.0 : computeThirdQuantile(positiveStream));
+        break;
+      case MEMORY:
+        builder.minMemory(computeMin(metrics.copy()))
+            .maxMemory(computeMax(metrics.copy()))
+            .meanMemory(meanField)
+            .stdMemory(stdField)
+            .covMemory(computeCov(meanField, stdField))
+            .medianMemory(positiveStream.isEmpty() ? -1.0 : computeMedian(positiveStream))
+            .firstQuartileMemory(positiveStream.isEmpty() ? -1.0 : computeFirstQuantile(positiveStream))
+            .thirdQuartileMemory(positiveStream.isEmpty() ? -1.0 : computeThirdQuantile(positiveStream));
+        break;
+      case NETWORK:
+        builder.minNetworkUsage((long) computeMin(metrics.copy()))
+            .maxNetworkUsage((long) computeMax(metrics.copy()))
+            .meanNetworkUsage(meanField)
+            .stdNetworkUsage(stdField)
+            .covNetworkUsage(computeCov(meanField, stdField))
+            .medianNetworkUsage(positiveStream.isEmpty() ? -1L : (long) computeMedian(positiveStream))
+            .firstQuartileNetworkUsage(
+                positiveStream.isEmpty() ? -1L : (long) computeFirstQuantile(positiveStream))
+            .thirdQuartileNetworkUsage(
+                positiveStream.isEmpty() ? -1L : (long) computeThirdQuantile(positiveStream));
+        break;
+      case DISK:
+        builder.minDiskSpaceUsage(computeMin(metrics.copy()))
+            .maxDiskSpaceUsage(computeMax(metrics.copy()))
+            .meanDiskSpaceUsage(meanField)
+            .stdDiskSpaceUsage(stdField)
+            .covDiskSpaceUsage(computeCov(meanField, stdField))
+            .medianDiskSpaceUsage(positiveStream.isEmpty() ? -1.0 : computeMedian(positiveStream))
+            .firstQuartileDiskSpaceUsage(
+                positiveStream.isEmpty() ? -1.0 : computeFirstQuantile(positiveStream))
+            .thirdQuartileDiskSpaceUsage(
+                positiveStream.isEmpty() ? -1.0 : computeThirdQuantile(positiveStream));
+        break;
+      case ENERGY:
+        builder.minEnergy(computeMin(metrics.copy()))
+            .maxEnergy(computeMax(metrics.copy()))
+            .meanEnergy(meanField)
+            .stdEnergy(stdField)
+            .covEnergy(computeCov(meanField, stdField))
+            .medianEnergy(positiveStream.isEmpty() ? -1.0 : computeMedian(positiveStream))
+            .firstQuartileEnergy(positiveStream.isEmpty() ? -1.0 : computeFirstQuantile(positiveStream))
+            .thirdQuartileEnergy(positiveStream.isEmpty() ? -1.0 : computeThirdQuantile(positiveStream));
+    }
   }
 
   /**
    * Callback function that is called right at the end of the application. Further experimentation
    * is needed to determine if applicationEnd is called first or shutdown.
    *
-   * @param applicationEnd The event corresponding to the end of the application
+   * @param applicationEnd    The event corresponding to the end of the application
    * @author Henry Page
    * @author Tianchen Qu
+   * @author Pil Kyu Cho
    * @since 1.0.0
    */
   public void onApplicationEnd(SparkListenerApplicationEnd applicationEnd) {
-    // we should never enter this branch, this is a guard since an application only terminates once.
-    List<Workload> processedObjects = this.getProcessedObjects();
-    if (!processedObjects.isEmpty()) {
-      log.debug("Application end called twice, this should never happen");
+    if (workload != null) {
+      log.debug("Application end called twice, this should never happen.");
       return;
     }
 
-    final Workflow[] workflows = jobLevelListener.getProcessedObjects().toArray(new Workflow[0]);
-    final int numWorkflows = workflows.length;
-    final int totalTasks =
-        Arrays.stream(workflows).mapToInt(Workflow::getTaskCount).sum();
-    final Domain domain = config.getDomain();
-    final long startDate = sparkContext.startTime();
-    final long endDate = applicationEnd.time();
-    final String[] authors = config.getAuthors();
-    final String workloadDescription = config.getDescription();
-    for (Task task : taskLevelListener.getProcessedObjects()) {
-      final int stageId = taskLevelListener.getTaskToStage().get(task.getId());
-      final Integer[] parentStages =
-          stageLevelListener.getStageToParents().get(stageId);
-      if (parentStages != null) {
-        final Long[] parents = Arrays.stream(parentStages)
-            .flatMap(parentId -> Arrays.stream(taskLevelListener
-                .getStageToTasks()
-                .getOrDefault(parentId, new ArrayList<>())
-                .toArray(new Long[0])))
-            .toArray(Long[]::new);
-        task.setParents(ArrayUtils.toPrimitive(parents));
-      }
+    WorkloadBuilder workloadBuilder = Workload.builder();
+    final Stream<Task> tasks = wtaTaskListener.getProcessedObjects();
+    Function<Task, Long> networkFunction = Task::getNetworkIoTime;
 
-      List<Integer> childrenStages =
-          stageLevelListener.getParentToChildren().get(stageId);
-      if (childrenStages != null) {
-        List<Long> children = new ArrayList<>();
-        childrenStages.forEach(childStage ->
-            children.addAll(taskLevelListener.getStageToTasks().get(childStage)));
-        Long[] temp = children.toArray(new Long[0]);
-        task.setChildren(ArrayUtils.toPrimitive(temp));
-      }
+    setGeneralFields(applicationEnd.time(), workloadBuilder);
+    setCountFields(tasks.copy(), workloadBuilder);
+    setResourceStatisticsFields(
+        tasks.copy().map(Task::getResourceAmountRequested), ResourceType.RESOURCE, workloadBuilder);
+    setResourceStatisticsFields(tasks.copy().map(Task::getMemoryRequested), ResourceType.MEMORY, workloadBuilder);
+    setResourceStatisticsFields(
+        tasks.copy().map(networkFunction.andThen(Long::doubleValue)), ResourceType.NETWORK, workloadBuilder);
+    setResourceStatisticsFields(tasks.copy().map(Task::getDiskSpaceRequested), ResourceType.DISK, workloadBuilder);
+    setResourceStatisticsFields(tasks.copy().map(Task::getEnergyConsumption), ResourceType.ENERGY, workloadBuilder);
+
+    sparkDataSource.removeListeners();
+
+    workload = workloadBuilder.build();
+    writeTrace();
+  }
+
+  /**
+   * Finds the maximum element inside the double valued stream.
+   *
+   * @param data              stream of data
+   * @return                  double maximum value from data
+   * @author Tianchen Qu
+   * @author Pil Kyu Cho
+   * @since 1.0.0
+   */
+  private double computeMax(Stream<Double> data) {
+    return data.reduce(Double::max).orElse(-1.0);
+  }
+
+  /**
+   * Finds the minimum element of the double valued stream.
+   *
+   * @param data              stream of data
+   * @return                  double minimum value from data
+   * @author Tianchen Qu
+   * @author Pil Kyu Cho
+   * @since 1.0.0
+   */
+  private double computeMin(Stream<Double> data) {
+    return data.filter(x -> x >= 0.0).reduce(Double::min).orElse(-1.0);
+  }
+
+  /**
+   * Mean value for the double type data stream with invalid stream handling.
+   *
+   * @param data              stream of data
+   * @param size              size of the stream
+   * @return                  mean value from data or -1.0
+   * @author Tianchen Qu
+   * @author Pil Kyu Cho
+   * @since 1.0.0
+   */
+  private double computeMean(Stream<Double> data, long size) {
+    if (size == 0) {
+      return -1.0;
     }
+    return data.filter(x -> x >= 0.0).reduce(Double::sum).orElse((double) -size) / size;
+  }
 
-    // unknown
-    final long numSites = -1L;
-    final long numResources = -1L;
-    final long numUsers = -1L;
-    final long numGroups = -1L;
-    final double totalResourceSeconds = -1.0;
-    // all statistics (stdev, mean, etc.) are unknown
+  /**
+   * Standard deviation value for data stream with invalid stream handling. Assumes the data has
+   * positive elements only.
+   *
+   * @param data              stream of data
+   * @param mean              mean value from {@link #computeMean(Stream, long)}
+   * @param size              size from data
+   * @return                  standard deviation value from data or -1.0
+   * @author Tianchen Qu
+   * @author Pil Kyu Cho
+   * @since 1.0.0
+   */
+  private double computeStd(Stream<Double> data, double mean, long size) {
+    if (size == 0 || mean == -1.0) {
+      return -1.0;
+    }
+    double numerator = data.map(x -> x * x).reduce(Double::sum).orElse(-1.0);
+    if (numerator == -1.0) {
+      return -1.0;
+    }
+    return Math.pow(numerator / size - mean * mean, 0.5);
+  }
 
-    processedObjects.add(Workload.builder()
-        .totalWorkflows(numWorkflows)
-        .totalTasks(totalTasks)
-        .domain(domain)
-        .dateStart(startDate)
-        .dateEnd(endDate)
-        .authors(authors)
-        .workloadDescription(workloadDescription)
-        .numSites(numSites)
-        .numResources(numResources)
-        .numUsers(numUsers)
-        .numGroups(numGroups)
-        .totalResourceSeconds(totalResourceSeconds)
-        .build());
+  /**
+   * Normalized deviation value for data stream with invalid stream handling.
+   *
+   * @param mean              mean value from {@link #computeMean(Stream, long)}
+   * @param std               standard deviation from {@link #computeStd(Stream, double, long)}
+   * @return                  normalized standard deviation value from data or -1.0
+   * @author Tianchen Qu
+   * @author Pil Kyu Cho
+   * @since 1.0.0
+   */
+  private double computeCov(double mean, double std) {
+    if (mean == 0.0 || mean == -1.0 || std == -1.0) {
+      return -1.0;
+    }
+    return std / mean;
+  }
+
+  /**
+   * Median value for data stream. Assumes that data is not empty, sorted, and positive elements only.
+   *
+   * @param data {@link Stream} of data
+   * @return the median value of the data
+   * @author Atour Mousavi Gourabi
+   * @since 1.0.0
+   */
+  private double computeMedian(Stream<Double> data) {
+    return new KthLargest().findKthSmallest(data.copy(), data.copy().count() / 2);
+  }
+
+  /**
+   * First quantile value for data stream. Assumes that data is not empty, sorted, and positive elements only.
+   *
+   * @param data {@link Stream} of data
+   * @return the first quantile value of the data
+   * @author Atour Mousavi Gourabi
+   * @since 1.0.0
+   */
+  private double computeFirstQuantile(Stream<Double> data) {
+    return new KthLargest().findKthSmallest(data.copy(), data.copy().count() / 4);
+  }
+
+  /**
+   * Third quantile value for data stream. Assumes that data is not empty, sorted, and positive elements only.
+   *
+   * @param data {@link Stream} of data
+   * @return third quantile value of the data
+   * @author Tianchen Qu
+   * @author Pil Kyu Cho
+   * @since 1.0.0
+   */
+  private double computeThirdQuantile(Stream<Double> data) {
+    return new KthLargest().findKthSmallest(data.copy(), data.copy().count() * 3 / 4);
   }
 }

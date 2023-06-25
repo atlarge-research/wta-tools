@@ -54,6 +54,7 @@ public class SparkSupplierExtractionEngine extends SupplierExtractionEngine<Spar
    */
   @Override
   public CompletableFuture<Void> pingAndBuffer() {
+    log.trace(pluginContext.executorID() + " is pinging suppliers.");
     return ping().thenAcceptAsync(result -> {
       if (this.executorSynchronizationInterval <= 0) {
         sendBuffer(List.of(result));
@@ -74,9 +75,11 @@ public class SparkSupplierExtractionEngine extends SupplierExtractionEngine<Spar
   private void sendBuffer(List<SparkBaseSupplierWrapperDto> snapshots) {
     ResourceCollectionDto bufferSnapshot = new ResourceCollectionDto(snapshots);
     if (bufferSnapshot.getResourceCollection().isEmpty()) {
+      log.trace(pluginContext.executorID() + " has no buffer to send. Aborting send.");
       return;
     }
     try {
+      log.trace(pluginContext.executorID() + " is sending buffer {}.", bufferSnapshot);
       this.pluginContext.send(bufferSnapshot);
     } catch (IOException e) {
       log.error("Failed to send buffer: {}.", bufferSnapshot, e);
@@ -102,6 +105,7 @@ public class SparkSupplierExtractionEngine extends SupplierExtractionEngine<Spar
    */
   public void startSynchonizing() {
     if (this.executorSynchronizationInterval > 0) {
+      log.trace(pluginContext.executorID() + " is starting to synchronize.");
       this.bufferSynchronizer.scheduleAtFixedRate(
           this::sendBuffer, 0, executorSynchronizationInterval, TimeUnit.MILLISECONDS);
     }
@@ -114,6 +118,7 @@ public class SparkSupplierExtractionEngine extends SupplierExtractionEngine<Spar
    * @since 1.0.0
    */
   public void stopSynchronizing() {
+    log.trace(pluginContext.executorID() + " is stopping to synchronize.");
     this.bufferSynchronizer.shutdown();
   }
 

@@ -3,6 +3,7 @@ package com.asml.apa.wta.core.model;
 import com.asml.apa.wta.core.io.ParquetSchema;
 import lombok.Builder;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.avro.generic.GenericRecord;
 
 /**
@@ -13,52 +14,52 @@ import org.apache.avro.generic.GenericRecord;
  */
 @Data
 @Builder
-@SuppressWarnings("VisibilityModifier")
+@Slf4j
 public class Task implements BaseTraceObject {
 
   private static final long serialVersionUID = -1372345471722101373L;
 
-  public final long id;
+  private final long id;
 
-  public final String type;
+  private final String type;
 
-  public final long tsSubmit;
+  private final long tsSubmit;
 
-  public final int submissionSite;
+  private final int submissionSite;
 
-  public final long runtime;
+  private final long runtime;
 
-  public final String resourceType;
+  private String resourceType;
 
-  public final double resourceAmountRequested;
+  private double resourceAmountRequested;
 
-  public long[] parents;
+  private long[] parents;
 
-  public long[] children;
+  private long[] children;
 
-  public final int userId;
+  private final int userId;
 
-  public final int groupId;
+  private final int groupId;
 
-  public final String nfrs;
+  private final String nfrs;
 
-  public final long workflowId;
+  private final long workflowId;
 
-  public final long waitTime;
+  private final long waitTime;
 
-  public final String params;
+  private final String params;
 
-  public final double memoryRequested;
+  private final double memoryRequested;
 
-  public final long diskIoTime;
+  private final long diskIoTime;
 
-  public final double diskSpaceRequested;
+  private final double diskSpaceRequested;
 
-  public final double energyConsumption;
+  private final double energyConsumption;
 
-  public final long networkIoTime;
+  private final long networkIoTime;
 
-  public final long resourceUsed;
+  private final long resourceUsed;
 
   /**
    * Converts the POJO object into record object, enabling it to be written by Avro.
@@ -71,6 +72,7 @@ public class Task implements BaseTraceObject {
    */
   @Override
   public GenericRecord convertToRecord(ParquetSchema schema) {
+    log.trace("Converting Task with id {} to record", this.id);
     return schema.convertFromPojo(this, Task.class);
   }
 }

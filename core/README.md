@@ -7,11 +7,19 @@ This module consists of:
  - Model objects (e.g., Resource, Task, Workflow, Workload)
  - Stream Infrastructure for the smart serialisation/deserialisation of objects to prevent the driver from running out of memory.
  - Functionality for serialising into Parquet
+ - Logic to collect resource utilization metrics.
 
 ## Streaming infrastructure
 The general streaming infrastructure is used to store intermediate metrics before aggregation.
 
-The Stream is a singly linked list storing streams of metric data. It will serialise the data to disk (using the `.ser` format) automatically after receiving a certain number of metrics (by default this is set to 1800). It will automatically deserialise the data once the data is required (e.g., when `poll()` is called).
+The Stream is a singly linked list storing streams of data. It will serialise the data to disk (using the `.ser` format) automatically after receiving a certain number of metrics (by default this is set to 1800). It will automatically deserialise the data once the data is required (e.g., when `Stream#head()` is called).
+
+The Stream gets consumed after most operations we perform. This means that we mutate the underlying state when some operations are called.
+An example of this would be `Stream#head()`. This operation returns the head of the stream and causes the stream to decrease in size by one.
+Another example would be `Stream#filter(Predicate)`. This operation returns the filtered stream, while the original stream we filtered on is now empty.
+If you want to perform multiple operations on one Stream, the easiest way to do so is by using the `Stream#copy()` method.
+This method makes a shallow copy of the Stream which can be independently used and consumed from the original.
+
 
 ## I/O Utilities
 To read the config JSON file, we use the ObjectMapper from the Jackson library to parse it and create RuntimeConfig objects within the application. The resulting data will be written into a Parquet file for the Resource, Task, and Workflow information, while the Workload information will be written into a JSON file. Our approach involves the use of Jackson, Apache Avro, and Apache Hadoop.
@@ -26,6 +34,16 @@ It is important that when using the `core` module to build adapter layers, `Log4
 is invoked early to set the user-defined part of the logging configuration.
 As of now, the user can define one part of the logging configuration using `core` logging, the log level. This
 is set to `ERROR` by default, but the user can exert full control over this using the `config.json` file.
+
+### SupplierExtractionEngine - Resource Utilization Metrics
+The SupplierExtractionEngine is a class that is used to extract data from some suppliers. A `supplier` is an object that collects resource-utilization information
+from a given source, such as the JVM or the command line.
+
+#### Resource Utilization Metrics
+- Create a new supplier class that implements the `InformationSupplier` interface. You can add logic to collect information from a new source.
+- Add the supplier as a new dependency in `SupplierExtractionEngine`, if it is application specific, you may have to add the dependency in the application specific extraction engine, such as `SparkSupplierExtractionEngine`.
+- Modify the `ping()` and `transform()` method in `SupplierExtractionEngine` to include information from the new supplier.
+- Modify any relevant DTOs as necessary.
 
 ### Hadoop Dependency on Windows
 Avro uses Hadoop internally. If you want to run the plugin in Windows, you need

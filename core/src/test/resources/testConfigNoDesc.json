@@ -1,7 +1,6 @@
 {
   "authors": ["Test Name"],
   "domain": "Engineering",
-  "logLevel": "INFO",
   "outputPath": "/home/user/WTA",
   "isStageLevel": "true"
 }

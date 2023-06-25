@@ -1,12 +1,14 @@
 package com.asml.apa.wta.core.io;
 
 import java.io.BufferedOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.util.Comparator;
 import java.util.stream.Stream;
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -16,10 +18,10 @@ import lombok.extern.slf4j.Slf4j;
  * @since 1.0.0
  */
 @Slf4j
-@RequiredArgsConstructor
+@AllArgsConstructor
 public class DiskOutputFile implements OutputFile {
 
-  private final Path file;
+  private Path outputFile;
 
   /**
    * Resolves a path in the current location.
@@ -31,13 +33,36 @@ public class DiskOutputFile implements OutputFile {
    */
   @Override
   public OutputFile resolve(String path) {
-    Path resolved = file.resolve(path);
+    Path resolved = outputFile.resolve(path);
     log.debug("Resolves {} and {} to {}.", this, path, resolved);
-    return new DiskOutputFile(file.resolve(path));
+    return new DiskOutputFile(outputFile.resolve(path));
+  }
+
+  /**
+   * Signals whether this implementation can output to the specified location.
+   *
+   * @param path a {@link String} representation of the location to point to
+   * @return a {@code boolean} indicating whether the implementation can handle the given location
+   */
+  @Override
+  public boolean acceptsLocation(String path) {
+    return true;
+  }
+
+  /**
+   * Sets the path of the disk output file.
+   *
+   * @param path a {@link String} representation of the {@link Path} to point to
+   * @author Atour Mousavi Gourabi
+   * @since 1.0.0
+   */
+  public void setPath(String path) {
+    outputFile = Path.of(path);
   }
 
   /**
    * Open a writer resource for the {@link OutputFile}.
+   * Overwrites existing files when necessary.
    *
    * @return an opened {@link OutputFile} writer
    * @throws IOException when no writer can be opened for the location of this {@link OutputFile}
@@ -46,41 +71,30 @@ public class DiskOutputFile implements OutputFile {
    */
   @Override
   public BufferedOutputStream open() throws IOException {
-    log.debug("Open stream at {}.", file);
-    return new BufferedOutputStream(Files.newOutputStream(file));
+    log.debug("Open stream at {}.", outputFile);
+    return new BufferedOutputStream(
+        Files.newOutputStream(outputFile, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING));
   }
 
   /**
-   * Helper to delete files.
-   *
-   * @param path a {@link Path} pointing to the file to delete
-   * @author Atour Mousavi Gourabi
-   * @since 1.0.0
-   */
-  private void deleteFile(Path path) {
-    try {
-      Files.delete(path);
-      log.debug("Deleted file at {}.", path);
-    } catch (IOException e) {
-      log.error("Could not delete file at {}.", path);
-    }
-  }
-
-  /**
-   * Clear the current directory if this {@link OutputFile} points to a folder.
    * If the location this points to does not exist yet, the directory is created.
    *
+   * @return the {@link OutputFile} pointing to the cleared directory
    * @throws IOException when something goes wrong during I/O
    * @author Atour Mousavi Gourabi
    * @since 1.0.0
    */
   @Override
-  public void clearDirectory() throws IOException {
-    Files.createDirectories(file);
-    try (Stream<Path> paths = Files.walk(file)) {
-      paths.sorted(Comparator.reverseOrder()).forEach(this::deleteFile);
+  public OutputFile clearDirectories() throws IOException {
+    Files.createDirectories(outputFile);
+    try (Stream<Path> stream = Files.walk(outputFile)) {
+      stream.sorted(Comparator.reverseOrder())
+          .map(Path::toFile)
+          .filter(file -> !outputFile.toFile().equals(file))
+          .forEach(File::delete);
     }
-    log.debug("Cleared the directory at {}.", file);
+    log.debug("Created and cleared the directory at {}.", outputFile.toString());
+    return this;
   }
 
   /**
@@ -93,7 +107,7 @@ public class DiskOutputFile implements OutputFile {
   @Override
   public org.apache.parquet.io.OutputFile wrap() {
     log.debug("Wrapping {} with org.apache.parquet.io.OutputFile.", this);
-    return new DiskParquetOutputFile(file);
+    return new DiskParquetOutputFile(outputFile);
   }
 
   /**
@@ -105,6 +119,6 @@ public class DiskOutputFile implements OutputFile {
    */
   @Override
   public String toString() {
-    return file.toString();
+    return outputFile.toString();
   }
 }

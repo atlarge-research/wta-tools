@@ -68,6 +68,7 @@ line-coverage-spark-adapter:
     when: always
     paths:
       - adapter/spark/reports/jacoco/
+      - adapter/spark/target/jacoco.exec
   cache:
     - key:
         prefix: maven
@@ -86,6 +87,25 @@ branch-coverage-spark-adapter:
     - echo "Started generating Spark adapter branch coverage"
     - "cat adapter/spark/reports/jacoco/index.html | grep -Po '%.*?of.*?([0-9]{1,3})%' || echo '0%'"
   coverage: /([0-9]{1,3})%/
+
+
+enforce-coverage-spark-adapter:
+  stage: test-spark-adapter
+  needs: [line-coverage-spark-adapter, build-spark-adapter]
+  dependencies:
+    - line-coverage-spark-adapter
+    - build-spark-adapter
+  script:
+    - echo "Started enforcing Spark adapter test coverage"
+    - "mvn -pl adapter/spark jacoco:check"
+  cache:
+    - key:
+        prefix: maven
+        files:
+          - pom.xml
+          - core/pom.xml
+      paths:
+        - .m2/repository
 
 
 e2e-spark-adapter_2.12:

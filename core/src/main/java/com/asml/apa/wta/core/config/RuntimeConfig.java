@@ -1,6 +1,6 @@
 package com.asml.apa.wta.core.config;
 
-import com.asml.apa.wta.core.model.enums.Domain;
+import com.asml.apa.wta.core.model.Domain;
 import com.google.gson.Gson;
 import com.google.gson.JsonParseException;
 import java.io.FileNotFoundException;
@@ -38,29 +38,27 @@ public class RuntimeConfig {
   private String description = "";
 
   @Builder.Default
-  private String logLevel = "ERROR";
-
-  @Builder.Default
   private boolean isStageLevel = false;
 
   @Builder.Default
-  private int resourcePingInterval = 1000;
+  private int resourcePingInterval = 500;
 
   @Builder.Default
-  private int executorSynchronizationInterval = 2000;
+  private int executorSynchronizationInterval = -1;
 
   private String outputPath;
 
   /**
    * Reads the config file and creates the associated config object.
    *
-   * @param configDir The directory where the config is located.
+   * @param configFile The filepath to the config file
    * @return The associated config object
    * @author Atour Mousavi Gourabi
    */
   @SuppressWarnings("CyclomaticComplexity")
-  public static RuntimeConfig readConfig(String configDir) {
-    try (FileReader reader = new FileReader(configDir)) {
+  public static RuntimeConfig readConfig(String configFile) {
+    log.trace("Reading config file from {}.", configFile);
+    try (FileReader reader = new FileReader(configFile)) {
       Gson gson = new Gson();
       RuntimeConfig config = gson.fromJson(reader, RuntimeConfig.class);
       if (config.getAuthors() == null || config.getAuthors().length < 1) {
@@ -72,39 +70,29 @@ public class RuntimeConfig {
         throw new IllegalArgumentException("The config file does not specify a domain");
       } else if (config.getDescription() == null
           || config.getDescription().isBlank()) {
-        log.info("The config file does not include a description, this field is highly recommended.");
+        log.warn("The config file does not include a description, this field is highly recommended.");
       } else if (config.getOutputPath() == null) {
         log.error("The config file does not specify an output path, this field is mandatory.");
         throw new IllegalArgumentException("The config file does not specify the output path");
       } else if (config.getResourcePingInterval() <= 0) {
-        log.error("Resource ping interval must be greater than 0");
+        log.error("Resource ping interval must be greater than 0.");
         throw new IllegalArgumentException("Resource ping interval must be greater than 0");
       }
+      log.trace("Successfully read config file from {}.", configFile);
       return config;
     } catch (JsonParseException e) {
-      log.error("The config file has invalid fields");
+      log.error("The config file has invalid fields.");
       throw new IllegalArgumentException("The config file has invalid fields");
     } catch (FileNotFoundException e) {
-      log.error("No config file was found at {}", configDir);
-      throw new IllegalArgumentException("No config file was found at " + configDir);
+      log.error("No config file was found at {}.", configFile);
+      throw new IllegalArgumentException("No config file was found at " + configFile);
     } catch (IOException e) {
-      log.error("Something went wrong while reading {}", configDir);
-      throw new IllegalArgumentException("Something went wrong while reading " + configDir);
+      log.error("Something went wrong while reading {}.", configFile);
+      throw new IllegalArgumentException("Something went wrong while reading " + configFile);
     } catch (Exception e) {
-      log.error("\"configFile\" was not set in the command line arguments or system property");
+      log.error("\"configFile\" was not set in the command line arguments or system property.");
       throw new IllegalArgumentException(
           "\"configFile\" was not set in the command line arguments or system property");
     }
-  }
-
-  /**
-   * Reads the config file specified at the path of the system property "configFile".
-   *
-   * @return The config file object representing the user config
-   * @author Henry Page
-   * @since 1.0.0
-   */
-  public static RuntimeConfig readConfig() {
-    return readConfig(System.getProperty("configFile"));
   }
 }

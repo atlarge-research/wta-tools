@@ -20,6 +20,7 @@ import org.apache.parquet.io.SeekableInputStream;
 public class DiskParquetInputFile implements InputFile {
 
   private final Path path;
+  private long length = -1;
 
   /**
    * Returns the total length of the file.
@@ -31,9 +32,11 @@ public class DiskParquetInputFile implements InputFile {
    */
   @Override
   public long getLength() throws IOException {
-    RandomAccessFile file = new RandomAccessFile(path.toFile(), "r");
-    long length = file.length();
-    file.close();
+    if (length == -1) {
+      try (RandomAccessFile file = new RandomAccessFile(path.toFile(), "r")) {
+        length = file.length();
+      }
+    }
     return length;
   }
 

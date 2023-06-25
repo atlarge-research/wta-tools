@@ -1,9 +1,9 @@
 package com.asml.apa.wta.core.model;
 
 import com.asml.apa.wta.core.io.ParquetSchema;
-import com.asml.apa.wta.core.model.enums.Domain;
 import lombok.Builder;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.avro.generic.GenericRecord;
 
 /**
@@ -14,44 +14,44 @@ import org.apache.avro.generic.GenericRecord;
  */
 @Data
 @Builder
-@SuppressWarnings("VisibilityModifier")
+@Slf4j
 public class Workflow implements BaseTraceObject {
 
   private static final long serialVersionUID = 9065743819019553490L;
 
-  public final long id;
+  private final long id;
 
-  public final long tsSubmit;
+  private final long tsSubmit;
 
-  public final Task[] tasks;
+  private final Long[] taskIds;
 
-  public final int taskCount;
+  private final long taskCount;
 
-  public final long criticalPathLength;
+  private long criticalPathLength;
 
-  public final int criticalPathTaskCount;
+  private final long criticalPathTaskCount;
 
-  public final int maxConcurrentTasks;
+  private final int maxConcurrentTasks;
 
-  public final String nfrs;
+  private final String nfrs;
 
-  public final String scheduler;
+  private final String scheduler;
 
-  public final Domain domain;
+  private final Domain domain;
 
-  public final String applicationName;
+  private final String applicationName;
 
-  public final String applicationField;
+  private final String applicationField;
 
-  public final double totalResources;
+  private double totalResources;
 
-  public final double totalMemoryUsage;
+  private final double totalMemoryUsage;
 
-  public final long totalNetworkUsage;
+  private final long totalNetworkUsage;
 
-  public final double totalDiskSpaceUsage;
+  private final double totalDiskSpaceUsage;
 
-  public final double totalEnergyConsumption;
+  private final double totalEnergyConsumption;
 
   /**
    * Converts the POJO object into record object, enabling it to be written by Avro.
@@ -64,6 +64,7 @@ public class Workflow implements BaseTraceObject {
    */
   @Override
   public GenericRecord convertToRecord(ParquetSchema schema) {
+    log.trace("Converting Workflow with id {} to record", this.id);
     return schema.convertFromPojo(this, Workflow.class);
   }
 }

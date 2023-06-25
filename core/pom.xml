@@ -14,9 +14,10 @@
   <artifactId>core</artifactId>
   <packaging>jar</packaging>
 
+  <description>Extensible module to facilitate the creation of WTA trace generators for big data frameworks.</description>
+
   <properties>
     <gson.version>2.10.1</gson.version>
-    <parquet.version>1.12.2</parquet.version>
     <avro.version>1.10.2</avro.version>
     <hadoop.version>3.3.5</hadoop.version>
   </properties>
