@@ -165,6 +165,8 @@ General configuration instructions are located [here](/../../README.md#configura
 This plugin will **not** block the main Spark application. Even if the plugin fails to initialise, the main Spark
 application will still run.
 
+The plugin deletes the contents of the output directory before writing the resulting trace.
+
 The Spark Adapter consists of two main parts that allows the application to collect metrics.
 - SparkListenerInterface
 - SparkPlugin API
