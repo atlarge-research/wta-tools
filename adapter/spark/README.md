@@ -25,9 +25,11 @@ These metrics are then transmitted periodically to the driver using the Spark Pl
 To address the limitation of excessive memory consumption, it is impractical to store all this information solely in the driver's memory.
 As a solution, serialization and deserialization techniques are applied.
 The rate of serialization is configurable by the user.
-Upon completion of the application, all of the data is ultimately outputted to Parquet format.
+Upon completion of the application, all the data is ultimately outputted to Parquet format.
 
-
+This `README` goes over a number of things necessary to use our plugin, including its configuration.
+For any explicit guidance on running and configuring a Spark application, we would like to direct you to
+[Apache Spark's documentation](https://spark.apache.org/docs/latest/) instead.
 
 
 ## Installation and Usage
@@ -196,7 +198,7 @@ for each executor, and it's lifecycle is equivalent to that of an executor. This
 Our main use case for the plugin API is to pass messages between the executor and the driver. We use different libraries such as `iostat` to collect resource
 utilisation metrics on the executor side. These metrics are then passed to the driver using the plugin API. Namely, we use `ask()`,`send(Object message)` and `receive(Object message)`.
 
-Aggregation of all the resource utilisation metrics are done at the driver's end.
+Aggregation of all the resource utilisation metrics are done on the driver end.
 
 ## Developer Guidelines
 
@@ -274,7 +276,7 @@ This snippet can be found [here](src/main/java/com/asml/apa/wta/spark/streams/Me
 It is important to note that the benchmarking module is not part of the plugin itself but a separate tool.
 
 ## Logging
-The plugin uses the [SLF4J](http://www.slf4j.org/) logging API. This allows the end-user to choose the desired logging frameworks (e.g. java.util.logging, logback, log4j) . The plugin itself does not depend on any logging implementation.
+The plugin uses the [SLF4J](http://www.slf4j.org/) logging API. This allows the end-user to choose the desired logging frameworks (e.g. `java.util.logging`, logback, log4j). The plugin itself does not depend on any logging implementation.
 The plugin log level corresponds to the Spark log level. This means that the plugin log level can be configured using the Spark configuration through the following:
 ```java
 sc.setLogLevel("INFO");
