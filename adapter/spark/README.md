@@ -96,14 +96,14 @@ For the second approach, create a JAR file of the plugin and run it alongside th
 **spark-submit**. Here is an example of how to run the plugin alongside the main Spark application:
 
 - Run `mvn -pl core clean install && mvn -pl adapter/spark clean package` in the source root.
-- Copy the resulting jar file from `adapter/spark/target`.
-- Execute the following command in the directory where the jar file is located:
+- Copy the resulting JAR file from `adapter/spark/target`.
+- Execute the following command in the directory where the JAR file is located:
 
 ```shell
 spark-submit --class <main class path to spark application> --master local \
 --conf spark.plugins=com.asml.apa.wta.spark.WtaPlugin \
 --conf spark.driver.extraJavaOptions=-DconfigFile=<config.json_location> \
---jars <plugin_jar_location> <Spark_jar_location> \
+--jars <plugin_JAR_location> <Spark_JAR_location> \
 <optional arguments for spark application>
 ```
 - The Parquet files should now be located in the `outputPath` as specified in the config file.
@@ -148,13 +148,13 @@ Note that in the Python script, `sc.stop()` must also be specified at the end to
 Now execute the following command and submit the Python script along with the JAR file of the plugin to **spark-submit**.
 
 ```shell
-spark-submit --jars <path-to-plugin-jar> <path-to-python-script>
+spark-submit --jars <path-to-plugin-JAR> <path-to-python-script>
 ```
 
 Another way to specify the plugin config is to use the `--conf` flag in the command line directly:
 
 ```shell
-spark-submit --conf spark.plugins=com.asml.apa.wta.spark.WtaPlugin --conf spark.driver.extraJavaOptions=-DconfigFile=<path-to-config-file> --jars <path-to-plugin-jar> <path-to-python-script>
+spark-submit --conf spark.plugins=com.asml.apa.wta.spark.WtaPlugin --conf spark.driver.extraJavaOptions=-DconfigFile=<path-to-config-file> --jars <path-to-plugin-JAR> <path-to-python-script>
 ```
 
 ## Configuration
@@ -276,8 +276,10 @@ This snippet can be found [here](src/main/java/com/asml/apa/wta/spark/streams/Me
 It is important to note that the benchmarking module is not part of the plugin itself but a separate tool.
 
 ## Logging
-The plugin uses the [SLF4J](http://www.slf4j.org/) logging API. This allows the end-user to choose the desired logging frameworks (e.g. `java.util.logging`, logback, log4j). The plugin itself does not depend on any logging implementation.
-The plugin log level corresponds to the Spark log level. This means that the plugin log level can be configured using the Spark configuration through the following:
+Just like Spark, this plugin uses the [SLF4J](http://www.slf4j.org/) logging API. This allows the end-user to choose
+the desired logging frameworks (e.g. `java.util.logging`, logback, log4j). The plugin itself does not depend on any
+logging implementation. The plugin log level corresponds to the Spark log level. This means that the plugin log level
+can be configured using the Spark configuration through the following:
 ```java
 sc.setLogLevel("INFO");
 ```
