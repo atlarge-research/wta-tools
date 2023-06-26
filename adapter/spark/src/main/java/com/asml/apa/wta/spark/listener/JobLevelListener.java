@@ -228,11 +228,8 @@ public class JobLevelListener extends AbstractListener<Workflow> {
       wtaTaskListener.getStageToJob().remove(stageId);
       wtaTaskListener.getWorkflowsToTasks().dropKey(jobId);
       if (!getConfig().isStageLevel()) {
-        // additional clean up for task-level plugin
         TaskLevelListener taskLevelListener = (TaskLevelListener) wtaTaskListener;
         taskLevelListener.getStageToTasks().remove(stageId);
-        taskLevelListener.getTaskToStage().entrySet().removeIf(entry -> entry.getValue()
-            .equals(stageId));
       }
     });
   }
