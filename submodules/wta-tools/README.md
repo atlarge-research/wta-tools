@@ -16,21 +16,22 @@ Furthermore, you need to have the WTA trace Parquet files as the following direc
 
 ```
 <dir_name>
-    workload
-        schema-1.0
-            generic_information.json
-    workflows
-        schema-1.0
-            workflows.parquet
-    tasks
-        schema-1.0
-            tasks.parquet
-    resources
-        schema-1.0
-            resources.parquet    
-    resource_states
-        schema-1.0 
-            resource_states.parquet
+    <plugin_version>
+        workload
+            schema-1.0
+                generic_information.json
+        workflows
+            schema-1.0
+                workflows.parquet
+        tasks
+            schema-1.0
+                tasks.parquet
+        resources
+            schema-1.0
+                resources.parquet    
+        resource_states
+            schema-1.0 
+                resource_states.parquet
 ```
 ### Download script
 Download the script from the github repo:
@@ -78,7 +79,7 @@ Once all the dependencies are installed, you can run the script with the followi
 
 ```shell
 cd wta-tools
-python parse_scripts/validate_parquet_files.py <dir_name>
+python parse_scripts/validate_parquet_files.py <dir_name>/<plugin_version>
 ```
 
-<dir_name> is the directory of the WTA trace Parquet files.
+<dir_name> is the directory of the WTA trace Parquet files. <plugin_version> is the directory one level down.

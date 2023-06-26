@@ -257,7 +257,7 @@ public class ProcSupplier implements InformationSupplier<ProcDto> {
         "grep -m 1 \"model name\" /proc/cpuinfo | awk -F: '{print $2}' | sed 's/^[ \\t]*//'", false);
     return cpuMetrics.thenApply(result -> {
       if (result != null && !result.isEmpty() && !fileNotFound(result)) {
-        return Optional.of(result);
+        return Optional.of(result.replace("\n", ""));
       }
       return Optional.empty();
     });
