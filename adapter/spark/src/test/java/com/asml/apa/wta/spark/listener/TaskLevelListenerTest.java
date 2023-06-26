@@ -1,15 +1,14 @@
 package com.asml.apa.wta.spark.listener;
 
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.awaitility.Awaitility.await;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.asml.apa.wta.core.model.Task;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Properties;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import org.apache.spark.executor.ExecutorMetrics;
 import org.apache.spark.executor.ShuffleWriteMetrics;
@@ -88,15 +87,12 @@ class TaskLevelListenerTest extends BaseLevelListenerTest {
     fakeTaskListener1.onJobStart(new SparkListenerJobStart(0, 2L, stageBuffer.toList(), new Properties()));
     fakeTaskListener1.onTaskEnd(taskEndEvent);
     assertThat(fakeTaskListener1.getStageToTasks().size()).isEqualTo(1);
-    List<Task> list = new ArrayList<>();
-    list.add(Task.builder().id(1L).build());
     assertThat(fakeTaskListener1.getStageToTasks().get(3L).size()).isEqualTo(1);
     assertThat(fakeTaskListener1.getStageToTasks().get(3L).get(0).getId()).isEqualTo(1);
     assertThat(fakeTaskListener1.getTaskToStage().size()).isEqualTo(1);
     assertThat(fakeTaskListener1.getTaskToStage()).containsEntry(1L, 3L);
     fakeTaskListener1.onTaskEnd(taskEndEvent2);
     assertThat(fakeTaskListener1.getStageToTasks().size()).isEqualTo(1);
-    list.add(Task.builder().id(2L).build());
     assertThat(fakeTaskListener1.getStageToTasks().get(3L).size()).isEqualTo(2);
     assertThat(fakeTaskListener1.getStageToTasks().get(3L).get(0).getId()).isEqualTo(1);
     assertThat(fakeTaskListener1.getStageToTasks().get(3L).get(1).getId()).isEqualTo(2);
@@ -106,16 +102,16 @@ class TaskLevelListenerTest extends BaseLevelListenerTest {
   }
 
   @Test
-  void testTaskEndMetricExtraction() throws InterruptedException {
+  void testTaskEndMetricExtraction() {
     ListBuffer<StageInfo> stageBuffer = new ListBuffer<>();
     stageBuffer.$plus$eq(testStageInfo);
 
     fakeTaskListener1.onJobStart(new SparkListenerJobStart(0, 2L, stageBuffer.toList(), new Properties()));
     fakeTaskListener1.onTaskEnd(taskEndEvent);
 
-    AbstractListener.getThreadPool().awaitTermination(1000, TimeUnit.MILLISECONDS);
+    await().atMost(20, SECONDS)
+        .until(() -> fakeTaskListener1.getProcessedObjects().count() == 1);
 
-    assertEquals(1, fakeTaskListener1.getProcessedObjects().count());
     Task curTask = fakeTaskListener1.getProcessedObjects().head();
     assertEquals(1, curTask.getId());
     assertEquals("testTaskType", curTask.getType());

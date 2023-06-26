@@ -1,13 +1,14 @@
 package com.asml.apa.wta.spark.listener;
 
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.awaitility.Awaitility.await;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.asml.apa.wta.core.model.Task;
 import com.asml.apa.wta.core.model.Workflow;
 import java.util.Properties;
-import java.util.concurrent.TimeUnit;
 import org.apache.spark.executor.ExecutorMetrics;
 import org.apache.spark.executor.ShuffleWriteMetrics;
 import org.apache.spark.executor.TaskMetrics;
@@ -182,15 +183,15 @@ class JobLevelListenerTest extends BaseLevelListenerTest {
   }
 
   @Test
-  void jobStartAndEndStateIsCorrect() throws InterruptedException {
+  void jobStartAndEndStateIsCorrect() {
     fakeJobListener1.onJobStart(
         new SparkListenerJobStart(jobId1, 40L, new ListBuffer<StageInfo>().toList(), new Properties()));
     fakeJobListener1.onJobEnd(jobEndEvent1);
 
-    AbstractListener.getThreadPool().awaitTermination(1000, TimeUnit.MILLISECONDS);
+    await().atMost(20, SECONDS)
+        .until(() -> fakeJobListener1.getProcessedObjects().count() == 1);
 
     assertThat(fakeJobListener1.getJobSubmitTimes()).isEmpty();
-    assertThat(fakeJobListener1.getProcessedObjects().count()).isEqualTo(1);
 
     Workflow fakeJobListenerWorkflow =
         fakeJobListener1.getProcessedObjects().head();
@@ -245,7 +246,7 @@ class JobLevelListenerTest extends BaseLevelListenerTest {
   }
 
   @Test
-  void parentChildrenAggregationForTasksHoldsAcrossMultipleJobs() throws InterruptedException {
+  void parentChildrenAggregationForTasksHoldsAcrossMultipleJobs() {
     // task 1 and task 2 have parent child relation in job 1
     // task 3 and task 4 have parent child relation in job 1
     ListBuffer<StageInfo> stageBuffer1 = new ListBuffer<>();
@@ -277,9 +278,8 @@ class JobLevelListenerTest extends BaseLevelListenerTest {
     fakeStageListener1.onStageCompleted(stageCompleted2);
     fakeJobListener1.onJobEnd(jobEndEvent1);
 
-    AbstractListener.getThreadPool().awaitTermination(1000, TimeUnit.MILLISECONDS);
-
-    assertThat(fakeTaskListener1.getProcessedObjects().count()).isEqualTo(2);
+    await().atMost(20, SECONDS)
+        .until(() -> fakeTaskListener1.getProcessedObjects().count() == 2);
 
     Task task1 = fakeTaskListener1.getProcessedObjects().head();
     assertThat(task1.getParents().length).isEqualTo(0);
@@ -300,9 +300,8 @@ class JobLevelListenerTest extends BaseLevelListenerTest {
     fakeStageListener1.onStageCompleted(stageCompleted4);
     fakeJobListener1.onJobEnd(jobEndEvent2);
 
-    AbstractListener.getThreadPool().awaitTermination(1000, TimeUnit.MILLISECONDS);
-
-    assertThat(fakeTaskListener1.getProcessedObjects().count()).isEqualTo(4);
+    await().atMost(20, SECONDS)
+        .until(() -> fakeTaskListener1.getProcessedObjects().count() == 4);
 
     Task task3 = fakeTaskListener1.getProcessedObjects().drop(2).head();
     assertThat(task3.getParents().length).isEqualTo(0);
