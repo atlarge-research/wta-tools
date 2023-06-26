@@ -150,9 +150,8 @@ public class JobLevelListener extends AbstractListener<Workflow> {
           .collect(Collectors.toList()));
 
       final List<Task> criticalPath = solveCriticalPath(jobStages);
-      TaskLevelListener listener = (TaskLevelListener) wtaTaskListener;
 
-      final Map<Long, List<Task>> stageToTasks = listener.getStageToTasks();
+      final Map<Long, List<Task>> stageToTasks = taskLevelListener.getStageToTasks();
       criticalPathTaskCount = criticalPath.stream()
           .map(stage -> stageToTasks
               .getOrDefault(stage.getId(), new ArrayList<>())
@@ -189,12 +188,6 @@ public class JobLevelListener extends AbstractListener<Workflow> {
             .totalEnergyConsumption(totalEnergyConsumption)
             .build()));
 
-    if (getConfig().isStageLevel()) {
-      stageLevelListener.setStages(jobId);
-    } else {
-      TaskLevelListener taskLevelListener = (TaskLevelListener) wtaTaskListener;
-      taskLevelListener.setTasks(stageLevelListener, jobId);
-    }
     cleanUpContainers(jobId);
   }
 
