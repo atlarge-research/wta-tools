@@ -149,6 +149,7 @@ public class StageLevelListener extends TaskStageBaseListener {
         .energyConsumption(energyConsumption)
         .resourceUsed(resourceUsed)
         .build();
+
     fillInParentChildMaps(stageId, task, curStageInfo);
 
     addTaskToWorkflow(workflowId, task);

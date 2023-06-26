@@ -212,14 +212,15 @@ public class JobLevelListener extends AbstractListener<Workflow> {
         .filter((e) -> e.getValue().equals(jobId))
         .forEach((e) -> stageIds.addToStream(e.getKey()));
 
+    stageLevelListener.getWorkflowsToTasks().dropKey(jobId);
+    wtaTaskListener.getWorkflowsToTasks().dropKey(jobId);
+
     stageIds.forEach(stageId -> {
       stageLevelListener.getStageToJob().remove(stageId);
       stageLevelListener.getStageToParents().remove(stageId);
       stageLevelListener.getParentStageToChildrenStages().remove(stageId);
       stageLevelListener.getStageToResource().remove(stageId);
-      stageLevelListener.getWorkflowsToTasks().dropKey(jobId);
       wtaTaskListener.getStageToJob().remove(stageId);
-      wtaTaskListener.getWorkflowsToTasks().dropKey(jobId);
       if (!getConfig().isStageLevel()) {
         TaskLevelListener taskLevelListener = (TaskLevelListener) wtaTaskListener;
         taskLevelListener.getStageToTasks().remove(stageId);
