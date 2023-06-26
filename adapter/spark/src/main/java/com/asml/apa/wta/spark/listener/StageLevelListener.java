@@ -96,49 +96,18 @@ public class StageLevelListener extends TaskStageBaseListener {
 
     final long tsSubmit = curStageInfo.submissionTime().getOrElse(() -> -1L);
     final long runtime = curStageInfo.taskMetrics().executorRunTime();
-    final long[] parents = new long[0];
-    final long[] children = new long[0];
     final int userId = Math.abs(getSparkContext().sparkUser().hashCode());
     final long workflowId = getStageToJob().get(stageId);
     final double diskSpaceRequested = (double) curStageMetrics.diskBytesSpilled()
         + curStageMetrics.shuffleWriteMetrics().bytesWritten();
-    final double memoryRequested = -1.0;
-    // dummy values
-    final String type = "";
-    final int submissionSite = -1;
-    final String resourceType = "N/A";
-    final double resourceAmountRequested = -1.0;
-    final int groupId = -1;
-    final String nfrs = "";
-    final long waitTime = -1L;
-    final String params = "";
-    final long networkIoTime = -1L;
-    final long diskIoTime = -1L;
-    final double energyConsumption = -1L;
-    final long resourceUsed = -1L;
 
     Task task = Task.builder()
         .id(stageId)
-        .type(type)
-        .submissionSite(submissionSite)
         .tsSubmit(tsSubmit)
         .runtime(runtime)
-        .resourceType(resourceType)
-        .resourceAmountRequested(resourceAmountRequested)
-        .parents(parents)
-        .children(children)
         .userId(userId)
-        .groupId(groupId)
-        .nfrs(nfrs)
         .workflowId(workflowId)
-        .waitTime(waitTime)
-        .params(params)
-        .memoryRequested(memoryRequested)
-        .networkIoTime(networkIoTime)
-        .diskIoTime(diskIoTime)
         .diskSpaceRequested(diskSpaceRequested)
-        .energyConsumption(energyConsumption)
-        .resourceUsed(resourceUsed)
         .build();
 
     fillInParentChildMaps(stageId, task, curStageInfo);

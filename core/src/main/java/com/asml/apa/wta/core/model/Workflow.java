@@ -31,9 +31,11 @@ public class Workflow implements BaseTraceObject {
 
   private final long criticalPathTaskCount;
 
-  private final int maxConcurrentTasks;
+  @Builder.Default
+  private final int maxConcurrentTasks = -1;
 
-  private final String nfrs;
+  @Builder.Default
+  private final String nfrs = "";
 
   private final String scheduler;
 
@@ -41,7 +43,8 @@ public class Workflow implements BaseTraceObject {
 
   private final String applicationName;
 
-  private final String applicationField;
+  @Builder.Default
+  private final String applicationField = "ETL";
 
   private double totalResources;
 

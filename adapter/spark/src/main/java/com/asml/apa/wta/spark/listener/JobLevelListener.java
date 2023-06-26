@@ -114,14 +114,11 @@ public class JobLevelListener extends AbstractListener<Workflow> {
     final Stream<Task> tasks = wtaTaskListener.getWorkflowsToTasks().onKey(jobId);
     long criticalPathLength;
     int criticalPathTaskCount;
-    final int maxNumberOfConcurrentTasks = -1;
-    final String nfrs = "";
 
     // we can also get the mode from the config, if that's what the user wants?
     final String scheduler = getSparkContext().getConf().get("spark.scheduler.mode", "FIFO");
     final Domain domain = getConfig().getDomain();
     final String appName = getSparkContext().appName();
-    final String applicationField = "ETL";
     final double totalMemoryUsage = computeSum(tasks.copy().map(Task::getMemoryRequested));
     final long totalNetworkUsage = (long) computeSum(tasks.copy().map(task -> (double) task.getNetworkIoTime()));
     final double totalDiskSpaceUsage = computeSum(tasks.copy().map(Task::getDiskSpaceRequested));
@@ -175,12 +172,9 @@ public class JobLevelListener extends AbstractListener<Workflow> {
             .taskCount(tasks.count())
             .criticalPathLength(criticalPathLength)
             .criticalPathTaskCount(criticalPathTaskCount)
-            .maxConcurrentTasks(maxNumberOfConcurrentTasks)
-            .nfrs(nfrs)
             .scheduler(scheduler)
             .domain(domain)
             .applicationName(appName)
-            .applicationField(applicationField)
             .totalResources(totalResources)
             .totalMemoryUsage(totalMemoryUsage)
             .totalNetworkUsage(totalNetworkUsage)

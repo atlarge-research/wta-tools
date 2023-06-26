@@ -86,42 +86,14 @@ public class TaskLevelListener extends TaskStageBaseListener {
         + curTaskMetrics.shuffleWriteMetrics().bytesWritten();
     final long resourceUsed = Math.abs(curTaskInfo.executorId().hashCode());
 
-    // dummy values
-    final double resourceAmountRequested = -1.0;
-    final long diskIoTime = -1L;
-    final int submissionSite = -1;
-    final String resourceType = "N/A";
-    final long[] parents = new long[0];
-    final long[] children = new long[0];
-    final int groupId = -1;
-    final String nfrs = "";
-    final long waitTime = -1L;
-    final String params = "";
-    final double memoryRequested = -1.0;
-    final long networkIoTime = -1L;
-    final double energyConsumption = -1L;
-
     Task task = Task.builder()
         .id(taskId)
         .type(type)
-        .submissionSite(submissionSite)
         .tsSubmit(tsSubmit)
         .runtime(runtime)
-        .resourceType(resourceType)
-        .resourceAmountRequested(resourceAmountRequested)
-        .parents(parents)
-        .children(children)
         .userId(userId)
-        .groupId(groupId)
-        .nfrs(nfrs)
         .workflowId(workflowId)
-        .waitTime(waitTime)
-        .params(params)
-        .memoryRequested(memoryRequested)
-        .networkIoTime(networkIoTime)
-        .diskIoTime(diskIoTime)
         .diskSpaceRequested(diskSpaceRequested)
-        .energyConsumption(energyConsumption)
         .resourceUsed(resourceUsed)
         .build();
 
