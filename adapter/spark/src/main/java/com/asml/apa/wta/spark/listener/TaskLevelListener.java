@@ -61,15 +61,6 @@ public class TaskLevelListener extends TaskStageBaseListener {
 
   /**
    * This method is called every time a task ends. Task-level metrics are collected, aggregated, and added here.
-   * <p>
-   * Note:
-   * peakExecutionMemory is the peak memory used by internal data structures created during shuffles, aggregations
-   * and joins. The value of this accumulator should be approximately the sum of the peak sizes across all such
-   * data structures created in this task. It is thus only an upper bound of the actual peak memory for the task.
-   * For SQL jobs, this only tracks all unsafe operators and ExternalSort
-   * <p>
-   * Alternative:
-   * final double memoryRequested = curTaskMetrics.peakExecutionMemory();
    *
    * @param taskEnd   SparkListenerTaskEnd object corresponding to information on task end
    * @author Henry Page
