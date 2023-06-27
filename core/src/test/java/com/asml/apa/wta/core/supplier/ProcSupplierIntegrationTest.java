@@ -4,10 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.asml.apa.wta.core.dto.ProcDto;
 import com.asml.apa.wta.core.util.ShellRunner;
-
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
 

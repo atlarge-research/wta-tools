@@ -2,7 +2,6 @@ package com.asml.apa.wta.core.supplier;
 
 import com.asml.apa.wta.core.dto.DstatDto;
 import com.asml.apa.wta.core.util.ShellRunner;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;

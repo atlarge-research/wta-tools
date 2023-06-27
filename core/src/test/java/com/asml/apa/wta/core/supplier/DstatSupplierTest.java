@@ -7,10 +7,8 @@ import static org.mockito.Mockito.when;
 
 import com.asml.apa.wta.core.dto.DstatDto;
 import com.asml.apa.wta.core.util.ShellRunner;
-
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;

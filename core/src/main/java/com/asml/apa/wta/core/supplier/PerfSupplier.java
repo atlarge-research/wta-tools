@@ -2,10 +2,8 @@ package com.asml.apa.wta.core.supplier;
 
 import com.asml.apa.wta.core.dto.PerfDto;
 import com.asml.apa.wta.core.util.ShellRunner;
-
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
-
 import lombok.extern.slf4j.Slf4j;
 
 /**

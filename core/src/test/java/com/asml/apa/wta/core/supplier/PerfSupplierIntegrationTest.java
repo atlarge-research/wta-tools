@@ -6,7 +6,6 @@ import static org.junit.jupiter.api.condition.OS.LINUX;
 
 import com.asml.apa.wta.core.dto.PerfDto;
 import com.asml.apa.wta.core.util.ShellRunner;
-
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledOnOs;

@@ -5,9 +5,7 @@ import static org.mockito.Mockito.doReturn;
 
 import com.asml.apa.wta.core.dto.ProcDto;
 import com.asml.apa.wta.core.util.ShellRunner;
-
 import java.util.concurrent.CompletableFuture;
-
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
@@ -107,7 +105,9 @@ public class ProcSupplierTest {
   @Test
   void testNoFilesInsideProc() {
     ShellRunner shellRunner = Mockito.mock(ShellRunner.class);
-    doReturn(CompletableFuture.completedFuture(null)).when(shellRunner).executeCommand("cat /proc/diskstats", false);
+    doReturn(CompletableFuture.completedFuture(null))
+        .when(shellRunner)
+        .executeCommand("cat /proc/diskstats", false);
     doReturn(CompletableFuture.completedFuture(null)).when(shellRunner).executeCommand("cat /proc/diskstats", true);
 
     doReturn(CompletableFuture.completedFuture(null)).when(shellRunner).executeCommand("cat /proc/meminfo", false);

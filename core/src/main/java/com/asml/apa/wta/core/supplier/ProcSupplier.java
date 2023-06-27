@@ -2,7 +2,6 @@ package com.asml.apa.wta.core.supplier;
 
 import com.asml.apa.wta.core.dto.ProcDto;
 import com.asml.apa.wta.core.util.ShellRunner;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
@@ -16,7 +15,6 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
-
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -47,7 +45,8 @@ public class ProcSupplier implements InformationSupplier<ProcDto> {
         this.shellRunner.executeCommand("cat /proc/diskstats", true).join() != null;
     this.isMemMetricsAvailable =
         this.shellRunner.executeCommand("cat /proc/meminfo", true).join() != null;
-    this.isCpuMetricsAvailable = this.shellRunner.executeCommand(
+    this.isCpuMetricsAvailable = this.shellRunner
+            .executeCommand(
                 "grep -m 1 \"model name\" /proc/cpuinfo | awk -F: '{print $2}' | sed 's/^[ \\t]*//'",
                 true)
             .join()

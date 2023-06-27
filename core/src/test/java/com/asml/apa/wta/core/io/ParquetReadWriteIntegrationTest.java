@@ -35,7 +35,7 @@ public class ParquetReadWriteIntegrationTest {
       assertThat(result.get("id")).isEqualTo(1L);
       assertThat(result.get("domain")).isEqualTo(new Utf8("Scientific"));
       assertThat(result.get("nfrs")).isEqualTo(new Utf8("Harry Porter"));
-      assertThat(result.get("critical_path_length")).isEqualTo(0L);
+      assertThat(result.get("critical_path_length")).isEqualTo(-1L);
     }
 
     assertThat(new File("test.parquet").exists()).isTrue();

@@ -8,7 +8,6 @@ import com.asml.apa.wta.core.dto.PerfDto;
 import com.asml.apa.wta.core.util.ShellRunner;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
-
 import org.junit.jupiter.api.Test;
 
 public class PerfSupplierTest {
@@ -43,7 +42,8 @@ public class PerfSupplierTest {
 
   @Test
   void perfEnergyDataSourceNoPowerPkg() {
-    when(shellRunner.executeCommand(isAvailableBashCommand, true)).thenReturn(CompletableFuture.completedFuture(""));
+    when(shellRunner.executeCommand(isAvailableBashCommand, true))
+        .thenReturn(CompletableFuture.completedFuture(""));
     assertThat(sut.isAvailable()).isFalse();
   }
 

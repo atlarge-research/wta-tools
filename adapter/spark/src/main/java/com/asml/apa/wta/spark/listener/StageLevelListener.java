@@ -130,9 +130,11 @@ public class StageLevelListener extends TaskStageBaseListener {
    * @since 1.0.0
    */
   public void setStages(long jobId) {
-    getWorkflowsToTasks().onKey(jobId).forEach(stage -> stage.setChildren(
-        this.getParentStageToChildrenStages().getOrDefault(stage.getId(), new ArrayList<>()).stream()
-            .mapToLong(Long::longValue)
-            .toArray()));
+    getWorkflowsToTasks()
+        .onKey(jobId)
+        .forEach(stage -> stage.setChildren(
+            this.getParentStageToChildrenStages().getOrDefault(stage.getId(), new ArrayList<>()).stream()
+                .mapToLong(Long::longValue)
+                .toArray()));
   }
 }

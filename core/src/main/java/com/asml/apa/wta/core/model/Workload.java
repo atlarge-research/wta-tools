@@ -174,7 +174,6 @@ public class Workload implements BaseTraceObject {
   @Builder.Default
   private final double covEnergy = -1.0;
 
-
   /**
    * This method should never be called as we do not need to output workloads in Parquet.
    *
