@@ -115,9 +115,7 @@ public class TaskLevelListener extends TaskStageBaseListener {
    * @since 1.0.0
    */
   public void setTasks(StageLevelListener stageLevelListener, long jobId) {
-    final List<Task> filteredTasks = getWorkflowsToTasks().onKey(jobId).toList();
-    for (Task task : filteredTasks) {
-      // set parent field: all Tasks in are guaranteed to be in taskToStage
+    getWorkflowsToTasks().onKey(jobId).forEach(task -> {
       final long stageId = getTaskToStage().remove(task.getId());
       final Long[] parentStages = stageLevelListener.getStageToParents().get(stageId);
       if (parentStages != null) {
@@ -131,7 +129,6 @@ public class TaskLevelListener extends TaskStageBaseListener {
         task.setParents(parents);
       }
 
-      // set children field
       List<Long> childrenStages =
           stageLevelListener.getParentStageToChildrenStages().get(stageId);
       if (childrenStages != null) {
@@ -145,7 +142,6 @@ public class TaskLevelListener extends TaskStageBaseListener {
         task.setChildren(childrenTaskIds);
       }
 
-      // set resource related fields
       final int resourceProfileId =
           stageLevelListener.getStageToResource().getOrDefault(stageId, -1);
       final ResourceProfile resourceProfile =
@@ -156,6 +152,6 @@ public class TaskLevelListener extends TaskStageBaseListener {
         task.setResourceType(resources.get(0).resourceName());
         task.setResourceAmountRequested(resources.get(0).amount());
       }
-    }
+    });
   }
 }

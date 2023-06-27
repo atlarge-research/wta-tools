@@ -127,8 +127,8 @@ public class JobLevelListener extends AbstractListener<Workflow> {
         .reduce(Double::sum)
         .orElse(-1.0);
 
-    long criticalPathLength;
-    int criticalPathTaskCount;
+    final long criticalPathLength;
+    final int criticalPathTaskCount;
     if (getConfig().isStageLevel()) {
       stageLevelListener.setStages(jobId);
       criticalPathLength = -1L;
