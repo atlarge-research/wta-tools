@@ -55,6 +55,7 @@ public class KthLargest {
         data = recursive;
       }
     }
+    return 0.0;
   }
 
   /**
@@ -82,5 +83,6 @@ public class KthLargest {
         kthSmallest -= smallerSize + equalSize;
       }
     }
+    return -1.0;
   }
 }
