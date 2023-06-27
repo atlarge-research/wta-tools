@@ -1,4 +1,4 @@
-package com.asml.apa.wta.spark.dagsolver;
+package com.asml.apa.wta.spark.util;
 
 import com.asml.apa.wta.core.model.Task;
 import com.asml.apa.wta.spark.listener.TaskLevelListener;

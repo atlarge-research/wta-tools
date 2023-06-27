@@ -34,7 +34,7 @@ Furthermore, you need to have the WTA trace Parquet files as the following direc
                 resource_states.parquet
 ```
 ### Download script
-Download the script from the github repo:
+Download the script from the GitHub repo:
 ```
 git clone https://github.com/atlarge-research/wta-tools
 ```

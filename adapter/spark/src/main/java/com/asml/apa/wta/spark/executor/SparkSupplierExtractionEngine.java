@@ -1,4 +1,4 @@
-package com.asml.apa.wta.spark.executor.engine;
+package com.asml.apa.wta.spark.executor;
 
 import com.asml.apa.wta.core.dto.BaseSupplierDto;
 import com.asml.apa.wta.core.supplier.SupplierExtractionEngine;

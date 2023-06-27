@@ -1,4 +1,4 @@
-package com.asml.apa.wta.spark.streams;
+package com.asml.apa.wta.spark.stream;
 
 import java.io.Serializable;
 import lombok.AllArgsConstructor;

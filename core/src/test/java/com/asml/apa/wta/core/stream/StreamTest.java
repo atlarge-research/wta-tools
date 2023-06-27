@@ -1,4 +1,4 @@
-package com.asml.apa.wta.core.streams;
+package com.asml.apa.wta.core.stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -11,7 +11,7 @@ import java.util.Queue;
 import org.junit.jupiter.api.Test;
 
 /**
- * Fixture for {@link com.asml.apa.wta.core.streams.Stream}.
+ * Fixture for {@link com.asml.apa.wta.core.stream.Stream}.
  */
 class StreamTest {
 

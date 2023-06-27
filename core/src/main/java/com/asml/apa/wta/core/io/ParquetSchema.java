@@ -2,7 +2,7 @@ package com.asml.apa.wta.core.io;
 
 import com.asml.apa.wta.core.model.BaseTraceObject;
 import com.asml.apa.wta.core.model.Domain;
-import com.asml.apa.wta.core.streams.Stream;
+import com.asml.apa.wta.core.stream.Stream;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.VarHandle;

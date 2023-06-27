@@ -1,4 +1,4 @@
-package com.asml.apa.wta.core.streams;
+package com.asml.apa.wta.core.stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -8,7 +8,7 @@ import java.util.Map;
 import org.junit.jupiter.api.Test;
 
 /**
- * Fixture for {@link com.asml.apa.wta.core.streams.KeyedStream}.
+ * Fixture for {@link com.asml.apa.wta.core.stream.KeyedStream}.
  */
 class KeyedStreamTest {
 

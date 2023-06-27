@@ -6,9 +6,11 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
 import com.asml.apa.wta.core.dto.DstatDto;
-import com.asml.apa.wta.core.utils.ShellUtils;
+import com.asml.apa.wta.core.util.ShellRunner;
+
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -17,21 +19,21 @@ import org.mockito.junit.jupiter.MockitoExtension;
 public class DstatSupplierTest {
   @Test
   void getSnapshotReturnsDstatDto() {
-    ShellUtils shellUtils = mock(ShellUtils.class);
+    ShellRunner shellRunner = mock(ShellRunner.class);
     if (System.getProperty("os.name").toLowerCase().contains("linux")) {
-      when(shellUtils.executeCommand("dstat -cdngy 1 1", false))
+      when(shellRunner.executeCommand("dstat -cdngy 1 1", false))
           .thenReturn(CompletableFuture.completedFuture(
               "----total-usage---- -dsk/total- -net/total- ---paging-- ---system--\n"
                   + "usr sys idl wai stl| read  writ| recv  send|  in   out | int   csw\n"
                   + "  0   1M  98k   0   0|   0     0 |   10B     0 |   0B     0B | 516G  2116"));
 
-      when(shellUtils.executeCommand("dstat -cdngy 1 1", true))
+      when(shellRunner.executeCommand("dstat -cdngy 1 1", true))
           .thenReturn(CompletableFuture.completedFuture(
               "----total-usage---- -dsk/total- -net/total- ---paging-- ---system--\n"
                   + "usr sys idl wai stl| read  writ| recv  send|  in   out | int   csw\n"
                   + "  0   1M  98k   0   0|   0     0 |   10B     0 |   0B     0B | 516G  2116"));
     }
-    DstatSupplier sut = spy(new DstatSupplier(shellUtils));
+    DstatSupplier sut = spy(new DstatSupplier(shellRunner));
 
     Optional<DstatDto> actual = sut.getSnapshot().join();
 
@@ -60,12 +62,12 @@ public class DstatSupplierTest {
 
   @Test
   void dstatNotAvailable() {
-    ShellUtils shellUtils = mock(ShellUtils.class);
+    ShellRunner shellRunner = mock(ShellRunner.class);
     if (System.getProperty("os.name").toLowerCase().contains("linux")) {
-      when(shellUtils.executeCommand("dstat -cdngy 1 1", true))
+      when(shellRunner.executeCommand("dstat -cdngy 1 1", true))
           .thenReturn(CompletableFuture.completedFuture(null));
     }
-    DstatSupplier sut = spy(new DstatSupplier(shellUtils));
+    DstatSupplier sut = spy(new DstatSupplier(shellRunner));
 
     Optional<DstatDto> actual = sut.getSnapshot().join();
 
@@ -74,21 +76,21 @@ public class DstatSupplierTest {
 
   @Test
   void getSnapshotWithDifferentOutputReturnsEmptyDstatDto() {
-    ShellUtils shellUtils = mock(ShellUtils.class);
+    ShellRunner shellRunner = mock(ShellRunner.class);
     if (System.getProperty("os.name").toLowerCase().contains("linux")) {
-      when(shellUtils.executeCommand("dstat -cdngy 1 1", false))
+      when(shellRunner.executeCommand("dstat -cdngy 1 1", false))
           .thenReturn(CompletableFuture.completedFuture(
               "----total-usage---- -dsk/total- -net/total- ---paging-- ---system--\n"
                   + "usr sys idl wai stl|  recv  send|  in   out | int   csw\n"
                   + "  0   1M  98k   0   0|  10B     0 |   0B     0B | 516G  2116"));
 
-      when(shellUtils.executeCommand("dstat -cdngy 1 1", true))
+      when(shellRunner.executeCommand("dstat -cdngy 1 1", true))
           .thenReturn(CompletableFuture.completedFuture(
               "----total-usage---- -dsk/total- -net/total- ---paging-- ---system--\n"
                   + "usr sys idl wai stl|  recv  send|  in   out | int   csw\n"
                   + "  0   1M  98k   0   0|  10B     0 |   0B     0B | 516G  2116"));
     }
-    DstatSupplier sut = spy(new DstatSupplier(shellUtils));
+    DstatSupplier sut = spy(new DstatSupplier(shellRunner));
 
     Optional<DstatDto> actual = sut.getSnapshot().join();
 

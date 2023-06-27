@@ -1,10 +1,16 @@
-package com.asml.apa.wta.core.utils;
+package com.asml.apa.wta.core.util;
 
-import com.asml.apa.wta.core.streams.Stream;
+import com.asml.apa.wta.core.stream.Stream;
 import java.util.ArrayList;
 import java.util.List;
 
-public class KthLargest {
+/**
+ * Util class to find the kth smallest number in a {@link Stream} of {@code doubles}.
+ *
+ * @author Atour Mousavi Gourabi
+ * @since 1.0.0
+ */
+public class KthSmallest {
 
   /**
    * Finds the median of a {@link List} of at most five {@link Double}s.
@@ -68,7 +74,7 @@ public class KthLargest {
    * @author Atour Mousavi Gourabi
    * @since 1.0.0
    */
-  public double findKthSmallest(Stream<Double> data, long kthSmallest) {
+  public double find(Stream<Double> data, long kthSmallest) {
     Stream<Double> stream = data;
     long kth = kthSmallest;
     while (!stream.isEmpty()) {

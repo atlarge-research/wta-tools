@@ -4,24 +4,26 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.doReturn;
 
 import com.asml.apa.wta.core.dto.IostatDto;
-import com.asml.apa.wta.core.utils.ShellUtils;
+import com.asml.apa.wta.core.util.ShellRunner;
+
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 public class IostatSupplierTest {
 
-  ShellUtils shellUtils;
+  ShellRunner shellRunner;
   IostatSupplier sut;
 
   @BeforeEach
   void setup() {
-    shellUtils = Mockito.mock(ShellUtils.class);
-    doReturn(CompletableFuture.completedFuture("str")).when(shellUtils).executeCommand("iostat", true);
+    shellRunner = Mockito.mock(ShellRunner.class);
+    doReturn(CompletableFuture.completedFuture("str")).when(shellRunner).executeCommand("iostat", true);
 
-    sut = Mockito.spy(new IostatSupplier(shellUtils));
+    sut = Mockito.spy(new IostatSupplier(shellRunner));
   }
 
   @Test
@@ -31,7 +33,7 @@ public class IostatSupplierTest {
                 "Device             tps    kB_read/s    kB_wrtn/s    kB_dscd/s    kB_read    kB_wrtn    kB_dscd\n"
                     + "sda               0,01         0.54         0.00         0.00      70941          0          0\n"
                     + "str               1.0          2.0          3.0          4.0       5.0        6.0        7.0"))
-        .when(shellUtils)
+        .when(shellRunner)
         .executeCommand("iostat -d", false);
 
     IostatDto expected = IostatDto.builder()
@@ -55,7 +57,7 @@ public class IostatSupplierTest {
 
   @Test
   public void aggregateIostatWorksCorrectlyWithZeroRows() {
-    doReturn(CompletableFuture.completedFuture("")).when(shellUtils).executeCommand("iostat -d", false);
+    doReturn(CompletableFuture.completedFuture("")).when(shellRunner).executeCommand("iostat -d", false);
 
     IostatDto expected = IostatDto.builder().build();
 
@@ -74,7 +76,7 @@ public class IostatSupplierTest {
             "Device             tps    kB_read/s    kB_wrtn/s    kB_dscd/s    kB_read    kB_wrtn\n"
                 + "sda               0,01         0.54         0.00         0.00      70941          0\n"
                 + "str               1.0          2.0          3.0          4.0       5.0        6.0"))
-        .when(shellUtils)
+        .when(shellRunner)
         .executeCommand("iostat -d", false);
 
     IostatDto expected = IostatDto.builder().build();
@@ -93,7 +95,7 @@ public class IostatSupplierTest {
             "Device           kB_read/s    kB_wrtn/s    kB_dscd/s    kB_read    kB_wrtn    kB_dscd\n"
                 + "sda                  0.54         0.00         0.00      70941          0          0\n"
                 + "str                  2.0          3.0          4.0       5.0        6.0        7.0"))
-        .when(shellUtils)
+        .when(shellRunner)
         .executeCommand("iostat -d", false);
 
     IostatDto expected = IostatDto.builder()

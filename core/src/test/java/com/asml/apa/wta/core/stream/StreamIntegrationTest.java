@@ -1,4 +1,4 @@
-package com.asml.apa.wta.core.streams;
+package com.asml.apa.wta.core.stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

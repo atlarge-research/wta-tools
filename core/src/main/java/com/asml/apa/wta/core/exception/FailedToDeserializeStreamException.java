@@ -1,9 +1,9 @@
-package com.asml.apa.wta.core.exceptions;
+package com.asml.apa.wta.core.exception;
 
 import lombok.NoArgsConstructor;
 
 /**
- * Exception that is thrown when a {@link com.asml.apa.wta.core.streams.Stream} fails serialization.
+ * Exception that is thrown when a {@link com.asml.apa.wta.core.stream.Stream} fails serialization.
  *
  * @author Atour Mousavi Gourabi
  * @since 1.0.0

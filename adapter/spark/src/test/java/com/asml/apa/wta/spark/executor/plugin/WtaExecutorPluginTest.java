@@ -7,6 +7,8 @@ import static org.mockito.Mockito.spy;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import com.asml.apa.wta.spark.executor.WtaExecutorPlugin;
 import org.apache.spark.api.plugin.PluginContext;
 import org.junit.jupiter.api.Test;
 

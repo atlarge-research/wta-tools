@@ -1,7 +1,7 @@
 package com.asml.apa.wta.core.supplier;
 
 import com.asml.apa.wta.core.dto.IostatDto;
-import com.asml.apa.wta.core.utils.ShellUtils;
+import com.asml.apa.wta.core.util.ShellRunner;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -10,6 +10,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -23,7 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class IostatSupplier implements InformationSupplier<IostatDto> {
 
-  private final ShellUtils shellUtils;
+  private final ShellRunner shellRunner;
 
   private boolean isAvailable;
 
@@ -32,12 +33,12 @@ public class IostatSupplier implements InformationSupplier<IostatDto> {
   /**
    * Constructs the supplier with a given instance of shell utils.
    *
-   * @param shellUtils the shell utils instance to use
+   * @param shellRunner the shell utils instance to use
    * @author Henry Page
    * @since 1.0.0
    */
-  public IostatSupplier(ShellUtils shellUtils) {
-    this.shellUtils = shellUtils;
+  public IostatSupplier(ShellRunner shellRunner) {
+    this.shellRunner = shellRunner;
     this.isAvailable = isAvailable();
   }
 
@@ -55,7 +56,7 @@ public class IostatSupplier implements InformationSupplier<IostatDto> {
       return false;
     }
     try {
-      if (shellUtils.executeCommand("iostat", true).get() != null) {
+      if (shellRunner.executeCommand("iostat", true).get() != null) {
         return true;
       }
       return false;
@@ -79,7 +80,7 @@ public class IostatSupplier implements InformationSupplier<IostatDto> {
       return notAvailableResult();
     }
 
-    CompletableFuture<String> allMetrics = shellUtils.executeCommand("iostat -d", false);
+    CompletableFuture<String> allMetrics = shellRunner.executeCommand("iostat -d", false);
 
     return allMetrics.thenApply(result -> {
       if (result != null) {

@@ -1,4 +1,4 @@
-package com.asml.apa.wta.spark.streams;
+package com.asml.apa.wta.spark.stream;
 
 import com.asml.apa.wta.core.dto.BaseSupplierDto;
 import com.asml.apa.wta.core.dto.IostatDto;
@@ -7,8 +7,8 @@ import com.asml.apa.wta.core.dto.OsInfoDto;
 import com.asml.apa.wta.core.dto.ProcDto;
 import com.asml.apa.wta.core.model.Resource;
 import com.asml.apa.wta.core.model.ResourceState;
-import com.asml.apa.wta.core.streams.KeyedStream;
-import com.asml.apa.wta.core.streams.Stream;
+import com.asml.apa.wta.core.stream.KeyedStream;
+import com.asml.apa.wta.core.stream.Stream;
 import com.asml.apa.wta.spark.dto.ResourceAndStateWrapper;
 import com.asml.apa.wta.spark.dto.SparkBaseSupplierWrapperDto;
 import java.io.Serializable;
@@ -62,7 +62,7 @@ public class MetricStreamingEngine {
   /**
    * Adds task metrics to the task stream.
    *
-   * @param task the {@link com.asml.apa.wta.spark.streams.TaskKey} of the task
+   * @param task the {@link com.asml.apa.wta.spark.stream.TaskKey} of the task
    * @param record the {@link TaskMetricsRecord} containing the metrics
    * @author Atour Mousavi Gourabi
    * @since 1.0.0

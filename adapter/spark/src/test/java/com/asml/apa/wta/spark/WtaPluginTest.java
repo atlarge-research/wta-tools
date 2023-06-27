@@ -3,7 +3,7 @@ package com.asml.apa.wta.spark;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.asml.apa.wta.spark.driver.WtaDriverPlugin;
-import com.asml.apa.wta.spark.executor.plugin.WtaExecutorPlugin;
+import com.asml.apa.wta.spark.executor.WtaExecutorPlugin;
 import org.junit.jupiter.api.Test;
 
 class WtaPluginTest {

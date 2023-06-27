@@ -1,4 +1,4 @@
-package com.asml.apa.wta.spark.streams;
+package com.asml.apa.wta.spark.stream;
 
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;

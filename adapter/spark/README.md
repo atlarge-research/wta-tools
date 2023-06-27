@@ -258,7 +258,7 @@ if (ping.getIostatDto().isPresent()) {
         + iostatDto.getKiloByteWrtnPerSec() / kBpsToGbpsDenom;
 }
 ```
-This snippet can be found [here](src/main/java/com/asml/apa/wta/spark/streams/MetricStreamingEngine.java)
+This snippet can be found [here](src/main/java/com/asml/apa/wta/spark/stream/MetricStreamingEngine.java)
 
 #### averageUtilizationXMinute
 - By using the information provided by `cat /proc/loadavg`, we can obtain the average utilization of the CPU over the last X minutes, as mentioned [here](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/4/html/reference_guide/s2-proc-loadavg).
@@ -270,7 +270,7 @@ final double averageUtilization1Minute = ping.getProcDto()
         .orElse(-1.0);
 ```
 
-This snippet can be found [here](src/main/java/com/asml/apa/wta/spark/streams/MetricStreamingEngine.java)
+This snippet can be found [here](src/main/java/com/asml/apa/wta/spark/stream/MetricStreamingEngine.java)
 
 ## Benchmarking
 [The benchmarking module](../../submodules/benchmarking/README.md) is used to benchmark the performance of the plugin. Any changes to the plugin should be benchmarked to ensure no significant performance degradation.

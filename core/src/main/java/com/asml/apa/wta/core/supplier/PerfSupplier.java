@@ -1,9 +1,11 @@
 package com.asml.apa.wta.core.supplier;
 
 import com.asml.apa.wta.core.dto.PerfDto;
-import com.asml.apa.wta.core.utils.ShellUtils;
+import com.asml.apa.wta.core.util.ShellRunner;
+
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -16,19 +18,19 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class PerfSupplier implements InformationSupplier<PerfDto> {
 
-  private final ShellUtils shellUtils;
+  private final ShellRunner shellRunner;
 
   private final boolean isAvailable;
 
   /**
    * Constructs a {@code perf} data source.
    *
-   * @param shellUtils the {@link ShellUtils} to inject.
+   * @param shellRunner the {@link ShellRunner} to inject.
    * @author Atour Mousavi Gourabi
    * @since 1.0.0
    */
-  public PerfSupplier(ShellUtils shellUtils) {
-    this.shellUtils = shellUtils;
+  public PerfSupplier(ShellRunner shellRunner) {
+    this.shellRunner = shellRunner;
     this.isAvailable = isAvailable();
   }
 
@@ -46,7 +48,7 @@ public class PerfSupplier implements InformationSupplier<PerfDto> {
       return false;
     }
     try {
-      if (shellUtils
+      if (shellRunner
           .executeCommand("perf list | grep -w 'power/energy-pkg/' | awk '{print $1}'", true)
           .get()
           .equals("power/energy-pkg/")) {
@@ -96,7 +98,7 @@ public class PerfSupplier implements InformationSupplier<PerfDto> {
    * @since 1.0.0
    */
   public CompletableFuture<String> gatherMetrics() {
-    return shellUtils.executeCommand(
+    return shellRunner.executeCommand(
         "perf stat -e power/energy-pkg/ -a sleep 1 2>&1 | "
             + "grep -oP '^\\s+\\K[0-9]+[,\\.][0-9]+(?=\\s+Joules)' | sed 's/,/./g'",
         false);

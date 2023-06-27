@@ -1,7 +1,7 @@
-package com.asml.apa.wta.core.streams;
+package com.asml.apa.wta.core.stream;
 
-import com.asml.apa.wta.core.exceptions.FailedToDeserializeStreamException;
-import com.asml.apa.wta.core.exceptions.FailedToSerializeStreamException;
+import com.asml.apa.wta.core.exception.FailedToDeserializeStreamException;
+import com.asml.apa.wta.core.exception.FailedToSerializeStreamException;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -45,7 +45,7 @@ import lombok.extern.slf4j.Slf4j;
 public class Stream<V extends Serializable> implements Cloneable {
 
   /**
-   * Internal node of the {@link com.asml.apa.wta.core.streams.Stream}.
+   * Internal node of the {@link com.asml.apa.wta.core.stream.Stream}.
    *
    * @author Atour Mousavi Gourabi
    * @since 1.0.0
@@ -63,7 +63,7 @@ public class Stream<V extends Serializable> implements Cloneable {
     /**
      * Constructs a node.
      *
-     * @param content the content of this {@link com.asml.apa.wta.core.streams.Stream.StreamNode}
+     * @param content the content of this {@link com.asml.apa.wta.core.stream.Stream.StreamNode}
      * @author Atour Mousavi Gourabi
      * @since 1.0.0
      */
@@ -89,8 +89,8 @@ public class Stream<V extends Serializable> implements Cloneable {
   /**
    * Constructs a stream with one element.
    *
-   * @param content the element to hold in the {@link com.asml.apa.wta.core.streams.Stream}
-   * @param serializationTrigger the amount of additions to the {@link com.asml.apa.wta.core.streams.Stream} after
+   * @param content the element to hold in the {@link com.asml.apa.wta.core.stream.Stream}
+   * @param serializationTrigger the amount of additions to the {@link com.asml.apa.wta.core.stream.Stream} after
    *                             which serialization is triggered.
    * @author Atour Mousavi Gourabi
    * @since 1.0.0
@@ -110,7 +110,7 @@ public class Stream<V extends Serializable> implements Cloneable {
   /**
    * Constructs a stream with one element.
    *
-   * @param content the element to hold in the {@link com.asml.apa.wta.core.streams.Stream}
+   * @param content the element to hold in the {@link com.asml.apa.wta.core.stream.Stream}
    * @author Atour Mousavi Gourabi
    * @since 1.0.0
    */
@@ -236,7 +236,7 @@ public class Stream<V extends Serializable> implements Cloneable {
   /**
    * Checks whether the stream is empty.
    *
-   * @return {@code true} when this {@link com.asml.apa.wta.core.streams.Stream} is empty, {@code false} when it is not
+   * @return {@code true} when this {@link com.asml.apa.wta.core.stream.Stream} is empty, {@code false} when it is not
    * @author Atour Mousavi Gourabi
    * @since 1.0.0
    */
@@ -263,10 +263,10 @@ public class Stream<V extends Serializable> implements Cloneable {
   /**
    * Retrieves the head of the stream, which is then removed.
    *
-   * @return the head of the {@link com.asml.apa.wta.core.streams.Stream}
+   * @return the head of the {@link com.asml.apa.wta.core.stream.Stream}
    * @throws FailedToDeserializeStreamException when some error occurred during routine deserialization of parts of
-   *                                            the {@link com.asml.apa.wta.core.streams.Stream}
-   * @throws NoSuchElementException when head is called on an empty {@link com.asml.apa.wta.core.streams.Stream}
+   *                                            the {@link com.asml.apa.wta.core.stream.Stream}
+   * @throws NoSuchElementException when head is called on an empty {@link com.asml.apa.wta.core.stream.Stream}
    * @author Atour Mousavi Gourabi
    * @since 1.0.0
    */
@@ -332,8 +332,8 @@ public class Stream<V extends Serializable> implements Cloneable {
   /**
    * Peeks at the head of the stream.
    *
-   * @return the head of the {@link com.asml.apa.wta.core.streams.Stream}
-   * @throws NoSuchElementException when peek is called on an empty {@link com.asml.apa.wta.core.streams.Stream}
+   * @return the head of the {@link com.asml.apa.wta.core.stream.Stream}
+   * @throws NoSuchElementException when peek is called on an empty {@link com.asml.apa.wta.core.stream.Stream}
    * @author Atour Mousavi Gourabi
    * @since 1.0.0
    */
@@ -352,7 +352,7 @@ public class Stream<V extends Serializable> implements Cloneable {
   /**
    * Adds content to the stream.
    *
-   * @param content the content to add to this {@link com.asml.apa.wta.core.streams.Stream}
+   * @param content the content to add to this {@link com.asml.apa.wta.core.stream.Stream}
    * @author Atour Mousavi Gourabi
    * @since 1.0.0
    */
@@ -384,11 +384,11 @@ public class Stream<V extends Serializable> implements Cloneable {
    * Returns a stream that maps all elements in this stream using the given function. Consumes the
    * stream.
    *
-   * @param op the operation to perform over the {@link com.asml.apa.wta.core.streams.Stream}
+   * @param op the operation to perform over the {@link com.asml.apa.wta.core.stream.Stream}
    * @param <R> generic return type of the mapping operation
    * @return the mapped stream
    * @throws FailedToDeserializeStreamException when some error occurred during routine deserialization of parts
-   *                                            of the {@link com.asml.apa.wta.core.streams.Stream}
+   *                                            of the {@link com.asml.apa.wta.core.stream.Stream}
    * @author Atour Mousavi Gourabi
    * @since 1.0.0
    */
@@ -420,9 +420,9 @@ public class Stream<V extends Serializable> implements Cloneable {
    * the stream.
    *
    * @param predicate the predicate used for filtering, elements that return false get filtered out
-   * @return the filtered {@link com.asml.apa.wta.core.streams.Stream}
+   * @return the filtered {@link com.asml.apa.wta.core.stream.Stream}
    * @throws FailedToDeserializeStreamException when some error occurred during routine deserialization of parts
-   *                                            of the {@link com.asml.apa.wta.core.streams.Stream}
+   *                                            of the {@link com.asml.apa.wta.core.stream.Stream}
    * @author Atour Mousavi Gourabi
    * @since 1.0.0
    */
@@ -456,11 +456,11 @@ public class Stream<V extends Serializable> implements Cloneable {
    * using a left fold. Consumes the stream.
    *
    * @param init the initial value
-   * @param op the fold operation to perform over the {@link com.asml.apa.wta.core.streams.Stream}
+   * @param op the fold operation to perform over the {@link com.asml.apa.wta.core.stream.Stream}
    * @param <R> generic return type of the fold operation
    * @return the resulting accumulator
    * @throws FailedToDeserializeStreamException when some error occurred during routine deserialization of parts of
-   *                                            the {@link com.asml.apa.wta.core.streams.Stream}
+   *                                            the {@link com.asml.apa.wta.core.stream.Stream}
    * @author Atour Mousavi Gourabi
    * @since 1.0.0
    */

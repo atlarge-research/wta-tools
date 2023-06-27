@@ -1,4 +1,4 @@
-package com.asml.apa.wta.core.utils;
+package com.asml.apa.wta.core.util;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -7,19 +7,19 @@ import java.util.concurrent.CompletableFuture;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class ShellUtils {
+public class ShellRunner {
 
   /**
    * Executes given shell command and returns the terminal output.
    *
    * @param command The shell command string that is run.
    * @param suppressErrors Decides if logs written on error
-   * @return CompletableFuture that returns the output of the command
+   * @return {@link CompletableFuture} that returns the output of the command
    * @author Lohithsai Yadala Chanchu
    * @since 1.0.0
    */
   public CompletableFuture<String> executeCommand(String command, boolean suppressErrors) {
-    log.trace("Executing shell command: {}", command);
+    log.trace("Executing shell command: {}.", command);
     return CompletableFuture.supplyAsync(() -> {
       try {
         String[] commands = {"sh", "-c", command};
@@ -29,7 +29,7 @@ public class ShellUtils {
         if (exitValue != 0) {
           if (!suppressErrors) {
             log.error(
-                "Shell command {} failed to execute correctly with exit code: {}", command, exitValue);
+                "Shell command {} failed to execute correctly with exit code: {}.", command, exitValue);
           }
           return null;
         }

@@ -1,8 +1,8 @@
-package com.asml.apa.wta.spark.executor.plugin;
+package com.asml.apa.wta.spark.executor;
 
 import com.asml.apa.wta.spark.WtaPlugin;
 import com.asml.apa.wta.spark.driver.WtaDriverPlugin;
-import com.asml.apa.wta.spark.executor.engine.SparkSupplierExtractionEngine;
+import com.asml.apa.wta.spark.executor.SparkSupplierExtractionEngine;
 import java.util.Map;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;

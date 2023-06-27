@@ -1,4 +1,4 @@
-package com.asml.apa.wta.core.streams;
+package com.asml.apa.wta.core.stream;
 
 import java.io.Serializable;
 import java.util.ArrayList;

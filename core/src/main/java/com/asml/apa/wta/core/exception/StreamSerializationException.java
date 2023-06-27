@@ -1,7 +1,7 @@
-package com.asml.apa.wta.core.exceptions;
+package com.asml.apa.wta.core.exception;
 
 /**
- * Exception that is thrown when a {@link com.asml.apa.wta.core.streams.Stream} fails (de)serialization.
+ * Exception that is thrown when a {@link com.asml.apa.wta.core.stream.Stream} fails (de)serialization.
  *
  * @author Atour Mousavi Gourabi
  * @since 1.0.0

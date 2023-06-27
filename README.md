@@ -98,7 +98,7 @@ More information can be found in the [adapter](./adapter/README.md) module.
 
 Additional modules can be found in the submodules directory. Currently, they include the following things
 - Benchmarking
-  - Contains scripts to benchmark the performance of the framework against the Distributed ASCI Supercomputer 5 (DAS-5). More information can be found in the [here](./submodules/benchmarking/README.md).
+  - Contains scripts to benchmark the performance of the framework against the Distributed ASCI Supercomputer 5 (DAS-5). More information can be found [here](./submodules/benchmarking/README.md).
 - wta-tools
   - Instructions to use validation scripts. More information can be found in [here](./submodules/wta-tools/README.md).
 
