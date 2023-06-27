@@ -23,9 +23,10 @@ public class Workload implements BaseTraceObject {
 
   private final String[] authors;
 
-  private final String workloadDescription;
-
   private final Domain domain;
+
+  @Builder.Default
+  private final String workloadDescription = "";
 
   @Builder.Default
   private final long totalWorkflows = -1L;
