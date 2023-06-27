@@ -52,8 +52,7 @@
         <version>${pitest.version}</version>
         <configuration>
           <excludedTestClasses>
-            <excludedTestClass>com.asml.apa.wta.spark.listener.ApplicationLevelListenerTest</excludedTestClass>
-            <excludedTestClass>com.asml.apa.wta.spark.datasource.SparkDataSourceIntegrationTest</excludedTestClass>
+            <excludedTestClass>com.asml.apa.wta.spark.driver.WtaDriverPluginIntegrationTest</excludedTestClass>
           </excludedTestClasses>
         </configuration>
       </plugin>
