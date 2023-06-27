@@ -15,14 +15,15 @@ class OutputFileFactoryWithHdfsTest {
   void createSimpleLocation() {
     OutputFileFactory factory = new OutputFileFactory();
     OutputFile file = factory.create("C:/path/to/output");
+    assertThat(file).isNotNull();
     assertThat(file).isExactlyInstanceOf(HadoopOutputFile.class);
   }
 
   @Test
-  @EnabledOnOs({OS.LINUX, OS.MAC})
-  void creatRelativeLocation() {
+  void createRelativeLocation() {
     OutputFileFactory factory = new OutputFileFactory();
     OutputFile file = factory.create("path/to/output");
+    assertThat(file).isNotNull();
     assertThat(file).isExactlyInstanceOf(HadoopOutputFile.class);
   }
 }
