@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiFunction;
-import java.util.stream.Collectors;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 
@@ -82,18 +81,5 @@ public class KeyedStream<K, V extends Serializable> {
     log.trace("Requested stream with key");
     streams.putIfAbsent(key, new Stream<>());
     return streams.get(key).copy();
-  }
-
-  /**
-   * Consumes all the streams and returns a map that maps keys to a list representation.
-   *
-   * @return a map that maps keys to a list representation of the stream
-   * @author Henry Page
-   * @since 1.0.0
-   */
-  public Map<K, List<V>> collectAll() {
-    log.trace("Collecting all streams");
-    return streams.entrySet().stream()
-        .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().toList()));
   }
 }
