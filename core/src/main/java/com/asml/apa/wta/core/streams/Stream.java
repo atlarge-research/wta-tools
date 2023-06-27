@@ -273,6 +273,9 @@ public class Stream<V extends Serializable> implements Cloneable {
   public synchronized V head() {
     log.trace("Head of stream {} was requested.", id);
     if (head == null) {
+      tail = null;
+      deserializationStart = null;
+      deserializationEnd = null;
       log.error("`Stream#head()` was called on an empty stream.");
       throw new NoSuchElementException();
     }
@@ -287,6 +290,8 @@ public class Stream<V extends Serializable> implements Cloneable {
     V ret = head.getContent();
     head = head.getNext();
     if (head == null) {
+      deserializationStart = null;
+      deserializationEnd = null;
       tail = null;
     }
     return ret;
@@ -306,6 +311,8 @@ public class Stream<V extends Serializable> implements Cloneable {
     for (int i = 0; i < amount; i++) {
       if (head == null) {
         tail = null;
+        deserializationStart = null;
+        deserializationEnd = null;
         log.error("Stream#drop called for {} elements, but only able to drop {}.", amount, i);
         break;
       }
@@ -333,6 +340,9 @@ public class Stream<V extends Serializable> implements Cloneable {
   public synchronized V peek() {
     log.trace("Peeked at head of stream {}", this.id);
     if (head == null) {
+      tail = null;
+      deserializationStart = null;
+      deserializationEnd = null;
       log.error("`Stream#peek()` was called on an empty stream.");
       throw new NoSuchElementException();
     }
@@ -400,6 +410,8 @@ public class Stream<V extends Serializable> implements Cloneable {
     }
     head = null;
     tail = null;
+    deserializationStart = null;
+    deserializationEnd = null;
     return ret;
   }
 
@@ -434,6 +446,8 @@ public class Stream<V extends Serializable> implements Cloneable {
     }
     head = null;
     tail = null;
+    deserializationStart = null;
+    deserializationEnd = null;
     return ret;
   }
 
@@ -468,6 +482,8 @@ public class Stream<V extends Serializable> implements Cloneable {
     }
     head = null;
     tail = null;
+    deserializationStart = null;
+    deserializationEnd = null;
     return acc;
   }
 
@@ -494,6 +510,8 @@ public class Stream<V extends Serializable> implements Cloneable {
     head = head.getNext();
     if (head == null) {
       tail = null;
+      deserializationStart = null;
+      deserializationEnd = null;
     }
     return Optional.of(foldLeft(ret, accumulator));
   }
@@ -524,6 +542,8 @@ public class Stream<V extends Serializable> implements Cloneable {
     }
     head = null;
     tail = null;
+    deserializationStart = null;
+    deserializationEnd = null;
     return ret;
   }
 
@@ -550,6 +570,8 @@ public class Stream<V extends Serializable> implements Cloneable {
     }
     head = null;
     tail = null;
+    deserializationStart = null;
+    deserializationEnd = null;
   }
 
   /**
@@ -576,6 +598,8 @@ public class Stream<V extends Serializable> implements Cloneable {
     }
     head = null;
     tail = null;
+    deserializationStart = null;
+    deserializationEnd = null;
     return count;
   }
 
