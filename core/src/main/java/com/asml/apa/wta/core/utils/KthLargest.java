@@ -36,22 +36,24 @@ public class KthLargest {
    * @since 1.0.0
    */
   private double medianOfMedians(Stream<Double> data) {
-    Stream<Double> recursive = new Stream<>();
-    long amount = 0;
-    while (!data.isEmpty()) {
-      List<Double> listOfFive = new ArrayList<>();
-      for (int i = 0; i < 5; i++) {
-        if (!data.isEmpty()) {
-          listOfFive.add(data.head());
+    while (true) {
+      Stream<Double> recursive = new Stream<>();
+      long amount = 0;
+      while (!data.isEmpty()) {
+        List<Double> listOfFive = new ArrayList<>();
+        for (int i = 0; i < 5; i++) {
+          if (!data.isEmpty()) {
+            listOfFive.add(data.head());
+          }
         }
+        amount++;
+        recursive.addToStream(findMedian(listOfFive));
       }
-      amount++;
-      recursive.addToStream(findMedian(listOfFive));
-    }
-    if (amount == 1) {
-      return recursive.head();
-    } else {
-      return medianOfMedians(recursive);
+      if (amount == 1) {
+        return recursive.head();
+      } else {
+        data = recursive;
+      }
     }
   }
 
@@ -65,18 +67,20 @@ public class KthLargest {
    * @since 1.0.0
    */
   public double findKthSmallest(Stream<Double> data, long kthSmallest) {
-    double medianOfMedians = medianOfMedians(data.copy());
-    Stream<Double> smaller = data.copy().filter(x -> x < medianOfMedians);
-    Stream<Double> larger = data.copy().filter(x -> x > medianOfMedians);
-    Stream<Double> equal = data.copy().filter(x -> x == medianOfMedians);
-    long smallerSize = smaller.copy().count();
-    long equalSize = equal.count();
-    if (kthSmallest < smallerSize) {
-      return findKthSmallest(smaller, kthSmallest);
-    } else if (kthSmallest < equalSize + smallerSize) {
-      return medianOfMedians;
-    } else {
-      return findKthSmallest(larger, kthSmallest - smallerSize - equalSize);
+    while (true) {
+      double medianOfMedians = medianOfMedians(data.copy());
+      Stream<Double> smaller = data.copy().filter(x -> x < medianOfMedians);
+      Stream<Double> larger = data.copy().filter(x -> x > medianOfMedians);
+      long equalSize = data.copy().filter(x -> x == medianOfMedians).count();
+      long smallerSize = smaller.copy().count();
+      if (kthSmallest < smallerSize) {
+        data = smaller;
+      } else if (kthSmallest < equalSize + smallerSize) {
+        return medianOfMedians;
+      } else {
+        data = larger;
+        kthSmallest -= smallerSize + equalSize;
+      }
     }
   }
 }
