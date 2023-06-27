@@ -1,6 +1,8 @@
 package com.asml.apa.wta.spark.listener;
 
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.awaitility.Awaitility.await;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -129,6 +131,7 @@ class ApplicationLevelListenerTest extends BaseLevelListenerTest {
   void workloadBuiltWithDefaultMetricValues() {
     assertThat(fakeApplicationListener1.getProcessedObjects().isEmpty()).isTrue();
     fakeApplicationListener1.onApplicationEnd(applicationEndObj);
+    await().atMost(20, SECONDS).until(() -> fakeApplicationListener1.getWorkload() != null);
     assertThat(fakeApplicationListener1.getProcessedObjects().count()).isEqualTo(0);
 
     Workload workload = fakeApplicationListener1.getWorkload();
@@ -155,6 +158,7 @@ class ApplicationLevelListenerTest extends BaseLevelListenerTest {
   void workloadGeneralMetricsCollected() {
     assertThat(fakeApplicationListener1.getProcessedObjects().isEmpty()).isTrue();
     fakeApplicationListener1.onApplicationEnd(applicationEndObj);
+    await().atMost(20, SECONDS).until(() -> fakeApplicationListener1.getWorkload() != null);
     assertThat(fakeApplicationListener1.getProcessedObjects().count()).isEqualTo(0);
 
     Workload workload = fakeApplicationListener1.getWorkload();
@@ -170,6 +174,7 @@ class ApplicationLevelListenerTest extends BaseLevelListenerTest {
   void workloadCountMetricsCollected() {
     assertThat(fakeApplicationListener1.getProcessedObjects().isEmpty()).isTrue();
     fakeApplicationListener1.onApplicationEnd(applicationEndObj);
+    await().atMost(20, SECONDS).until(() -> fakeApplicationListener1.getWorkload() != null);
     assertThat(fakeApplicationListener1.getProcessedObjects().count()).isEqualTo(0);
 
     Workload workload = fakeApplicationListener1.getWorkload();
@@ -199,6 +204,8 @@ class ApplicationLevelListenerTest extends BaseLevelListenerTest {
 
     assertThat(fakeApplicationListener1.getProcessedObjects().isEmpty()).isTrue();
     fakeApplicationListener1.onApplicationEnd(applicationEndObj);
+    await().atMost(20, SECONDS).until(() -> fakeApplicationListener1.getWorkload() != null);
+
     assertThat(fakeApplicationListener1.getProcessedObjects().count()).isEqualTo(0);
 
     Workload workload = fakeApplicationListener1.getWorkload();
@@ -221,6 +228,7 @@ class ApplicationLevelListenerTest extends BaseLevelListenerTest {
 
     assertThat(fakeApplicationListener1.getProcessedObjects().isEmpty()).isTrue();
     fakeApplicationListener1.onApplicationEnd(applicationEndObj);
+    await().atMost(20, SECONDS).until(() -> fakeApplicationListener1.getWorkload() != null);
     assertThat(fakeApplicationListener1.getProcessedObjects().count()).isEqualTo(0);
 
     Workload workload = fakeApplicationListener1.getWorkload();
@@ -257,7 +265,8 @@ class ApplicationLevelListenerTest extends BaseLevelListenerTest {
     fakeStageListener1.onStageCompleted(stageCompleted1);
     assertThat(fakeApplicationListener1.getProcessedObjects().isEmpty()).isTrue();
     fakeApplicationListener1.onApplicationEnd(applicationEndObj);
-    assertThat(fakeApplicationListener1.getProcessedObjects().count()).isEqualTo(0);
+    await().atMost(20, SECONDS)
+        .until(() -> fakeApplicationListener1.getProcessedObjects().count() == 0);
 
     fakeTaskListener1.onJobStart(jobStart2);
     fakeStageListener1.onJobStart(jobStart2);
