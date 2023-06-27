@@ -3,14 +3,22 @@ package com.asml.apa.wta.spark.listener;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.asml.apa.wta.core.WtaWriter;
 import com.asml.apa.wta.core.config.RuntimeConfig;
 import com.asml.apa.wta.core.model.Domain;
+import com.asml.apa.wta.core.model.Resource;
+import com.asml.apa.wta.core.model.ResourceState;
 import com.asml.apa.wta.core.model.Workload;
+import com.asml.apa.wta.core.stream.Stream;
 import com.asml.apa.wta.spark.datasource.SparkDataSource;
+import com.asml.apa.wta.spark.dto.ResourceAndStateWrapper;
 import com.asml.apa.wta.spark.stream.MetricStreamingEngine;
 import java.util.List;
 import java.util.Properties;
@@ -31,6 +39,8 @@ import org.apache.spark.scheduler.TaskInfo;
 import org.apache.spark.scheduler.TaskLocality;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.MockedStatic;
 import scala.Tuple2;
 import scala.collection.immutable.HashMap;
 import scala.collection.immutable.Map;
@@ -67,6 +77,8 @@ class ApplicationLevelListenerTest {
   protected StageLevelListener fakeStageListener2;
   protected JobLevelListener fakeJobListener2;
   protected ApplicationLevelListener fakeApplicationListener2;
+
+  private SparkDataSource sparkDataSource;
 
   SparkListenerApplicationEnd applicationEndObj;
 
@@ -144,7 +156,7 @@ class ApplicationLevelListenerTest {
 
     fakeJobListener1 = new JobLevelListener(mockedSparkContext, fakeConfig1, fakeTaskListener1, fakeStageListener1);
 
-    SparkDataSource sparkDataSource = mock(SparkDataSource.class);
+    sparkDataSource = mock(SparkDataSource.class);
     when(sparkDataSource.getRuntimeConfig()).thenReturn(mock(RuntimeConfig.class));
     when(sparkDataSource.getTaskLevelListener()).thenReturn(mock(TaskLevelListener.class));
     when(sparkDataSource.getStageLevelListener()).thenReturn(mock(StageLevelListener.class));
@@ -397,5 +409,32 @@ class ApplicationLevelListenerTest {
     assertThat(fakeApplicationListener1.getProcessedObjects().count()).isEqualTo(0);
     fakeApplicationListener1.onApplicationEnd(applicationEndObj);
     assertThat(fakeApplicationListener1.getProcessedObjects().count()).isEqualTo(0);
+  }
+
+  @Test
+  void writeTrace() {
+    WtaWriter writer = mock(WtaWriter.class);
+    MetricStreamingEngine streamingEngine = mock(MetricStreamingEngine.class);
+    ResourceState resourceState = mock(ResourceState.class);
+    Resource resource = Resource.builder().os("Hannah Montana Linux").build();
+    when(streamingEngine.collectResourceInformation())
+        .thenReturn(List.of(new ResourceAndStateWrapper(resource, new Stream<>(resourceState))));
+    ApplicationLevelListener listener = new ApplicationLevelListener(
+        mockedSparkContext2,
+        fakeConfig1,
+        fakeTaskListener1,
+        fakeStageListener1,
+        fakeJobListener1,
+        sparkDataSource,
+        streamingEngine,
+        writer);
+    try (MockedStatic<Stream> streamMock = mockStatic(Stream.class)) {
+      listener.writeTrace();
+      verify(sparkDataSource).awaitAndShutdownThreadPool(anyInt());
+      ArgumentCaptor<Stream<Resource>> resourceArgumentCaptor = ArgumentCaptor.forClass(Stream.class);
+      verify(writer).write(eq(Resource.class), resourceArgumentCaptor.capture());
+      assertThat(resourceArgumentCaptor.getValue().head().getOs()).isEqualTo("Hannah Montana Linux");
+      streamMock.verify(Stream::deleteAllSerializedFiles);
+    }
   }
 }
