@@ -116,7 +116,6 @@ class BaseLevelListenerTest {
         .isStageLevel(true)
         .description("Yer a wizard harry")
         .build();
-    fakeStageListener2 = new StageLevelListener(mockedSparkContext2, fakeConfig2);
 
     fakeTaskListener2 = new TaskLevelListener(mockedSparkContext2, fakeConfig2);
 

@@ -80,15 +80,6 @@ public class StageLevelListener extends TaskStageBaseListener {
   /**
    * This method is called every time a stage is completed. Stage-level metrics are collected, aggregated,
    * and added here.
-   * <p>
-   * Note: peakExecutionMemory is the peak memory used by internal data structures created during
-   * shuffles, aggregations and joins. The value of this accumulator should be approximately the sum of
-   * the peak sizes across all such data structures created in this task. It is thus only an upper
-   * bound of the actual peak memory for the task. For SQL jobs, this only tracks all unsafe operators
-   * and ExternalSort
-   * <p>
-   * Alternative:
-   * final double memoryRequested = curTaskMetrics.peakExecutionMemory();
    *
    * @param stageCompleted   SparkListenerStageCompleted The object corresponding to information on stage completion
    * @author Tianchen Qu
@@ -105,54 +96,27 @@ public class StageLevelListener extends TaskStageBaseListener {
 
     final long tsSubmit = curStageInfo.submissionTime().getOrElse(() -> -1L);
     final long runtime = curStageInfo.taskMetrics().executorRunTime();
-    final long[] parents = new long[0];
-    final long[] children = new long[0];
     final int userId = Math.abs(getSparkContext().sparkUser().hashCode());
     final long workflowId = getStageToJob().get(stageId);
     final double diskSpaceRequested = (double) curStageMetrics.diskBytesSpilled()
         + curStageMetrics.shuffleWriteMetrics().bytesWritten();
-    final double memoryRequested = -1.0;
-    // dummy values
-    final String type = "";
-    final int submissionSite = -1;
-    final String resourceType = "N/A";
-    final double resourceAmountRequested = -1.0;
-    final int groupId = -1;
-    final String nfrs = "";
-    final long waitTime = -1L;
-    final String params = "";
-    final long networkIoTime = -1L;
-    final long diskIoTime = -1L;
-    final double energyConsumption = -1L;
-    final long resourceUsed = -1L;
 
     Task task = Task.builder()
         .id(stageId)
-        .type(type)
-        .submissionSite(submissionSite)
         .tsSubmit(tsSubmit)
         .runtime(runtime)
-        .resourceType(resourceType)
-        .resourceAmountRequested(resourceAmountRequested)
-        .parents(parents)
-        .children(children)
         .userId(userId)
-        .groupId(groupId)
-        .nfrs(nfrs)
         .workflowId(workflowId)
-        .waitTime(waitTime)
-        .params(params)
-        .memoryRequested(memoryRequested)
-        .networkIoTime(networkIoTime)
-        .diskIoTime(diskIoTime)
         .diskSpaceRequested(diskSpaceRequested)
-        .energyConsumption(energyConsumption)
-        .resourceUsed(resourceUsed)
         .build();
+
     fillInParentChildMaps(stageId, task, curStageInfo);
 
     addTaskToWorkflow(workflowId, task);
-    getThreadPool().execute(() -> addProcessedObject(task));
+
+    if (getConfig().isStageLevel()) {
+      getThreadPool().execute(() -> addProcessedObject(task));
+    }
   }
 
   /**

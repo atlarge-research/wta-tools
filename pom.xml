@@ -64,7 +64,7 @@
     <lombok-plugin.version>1.18.20.0</lombok-plugin.version>
     <mockito.version>5.3.1</mockito.version>
     <parquet.version>1.12.2</parquet.version>
-    <pitest.version>1.14.1</pitest.version>
+    <pitest.version>1.14.2</pitest.version>
     <pitest-junit.version>1.2.0</pitest-junit.version>
     <pmd.version>3.20.0</pmd.version>
     <project-info-reports.version>3.4.5</project-info-reports.version>
@@ -574,9 +574,6 @@
             <targetClass>com.asml.apa.wta.core.*</targetClass>
             <targetClass>com.asml.apa.wta.spark.*</targetClass>
           </targetClasses>
-          <excludedTestClasses>
-            <param>com.asml.apa.wta.spark.MultithreadTest</param>
-          </excludedTestClasses>
           <mutationThreshold>60</mutationThreshold>
           <withHistory>true</withHistory>
         </configuration>

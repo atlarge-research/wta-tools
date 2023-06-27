@@ -107,6 +107,7 @@ For the most part, since we are pre-release this will serve no real purpose, oth
 - Fixed ShellUtils execution bug [@lyadalachanchu](https://gitlab.ewi.tudelft.nl/lyadalachanchu)
 - Fixed some of the OOM issues by replacing Lists with Streams [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 - Fixed the WTA writer to remove pre-existing files to write traces [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
+- Fixed inefficient map interactions [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 
 ### Deprecated
 
