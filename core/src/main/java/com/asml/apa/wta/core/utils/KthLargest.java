@@ -36,7 +36,7 @@ public class KthLargest {
    * @since 1.0.0
    */
   private double medianOfMedians(Stream<Double> data) {
-    while (true) {
+    while (!data.isEmpty()) {
       Stream<Double> recursive = new Stream<>();
       long amount = 0;
       while (!data.isEmpty()) {
@@ -67,7 +67,7 @@ public class KthLargest {
    * @since 1.0.0
    */
   public double findKthSmallest(Stream<Double> data, long kthSmallest) {
-    while (true) {
+    while (!data.isEmpty()) {
       double medianOfMedians = medianOfMedians(data.copy());
       Stream<Double> smaller = data.copy().filter(x -> x < medianOfMedians);
       Stream<Double> larger = data.copy().filter(x -> x > medianOfMedians);
