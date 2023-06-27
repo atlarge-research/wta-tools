@@ -30,9 +30,9 @@ public class DagSolver {
    * @author Tianchen Qu
    * @since 1.0.0
    */
-  class Node {
+  private static class Node {
 
-    private long id;
+    private final long id;
 
     private long distance;
 
@@ -59,13 +59,13 @@ public class DagSolver {
 
   private static final long sinkId = -1;
 
-  private Map<Long, Node> nodes = new ConcurrentHashMap<>();
+  private final Map<Long, Node> nodes = new ConcurrentHashMap<>();
 
-  private Map<Long, Map<Long, Long>> adjacencyMap = new ConcurrentHashMap<>();
+  private final Map<Long, Map<Long, Long>> adjacencyMap = new ConcurrentHashMap<>();
 
-  private Map<Long, Map<Long, Long>> adjacencyMapReversed = new ConcurrentHashMap<>();
+  private final Map<Long, Map<Long, Long>> adjacencyMapReversed = new ConcurrentHashMap<>();
 
-  private List<Task> stages;
+  private final List<Task> stages;
 
   public DagSolver(List<Task> stages, TaskLevelListener listener) {
     this.stages = stages;
@@ -89,11 +89,8 @@ public class DagSolver {
     Node node = new Node(stage);
     nodes.put(stage.getId(), node);
 
-    long runtime = 0L;
-    List<Task> tasks = listener.getStageToTasks().get(stage.getId());
-    if (tasks != null) {
-      runtime = tasks.stream().map(Task::getRuntime).reduce(Long::max).orElse(0L);
-    }
+    List<Task> tasks = listener.getStageToTasks().getOrDefault(stage.getId(), new ArrayList<>());
+    long runtime = tasks.stream().map(Task::getRuntime).reduce(Long::max).orElse(0L);
 
     if (stage.getParents().length > 0) {
       for (long id : stage.getParents()) {

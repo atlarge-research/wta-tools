@@ -113,7 +113,6 @@ public class JobLevelListener extends AbstractListener<Workflow> {
     final long tsSubmit = jobSubmitTimes.get(jobId);
     final Stream<Task> tasks = wtaTaskListener.getWorkflowsToTasks().onKey(jobId);
 
-    // we can also get the mode from the config, if that's what the user wants?
     final String scheduler = getSparkContext().getConf().get("spark.scheduler.mode", "FIFO");
     final Domain domain = getConfig().getDomain();
     final String appName = getSparkContext().appName();
