@@ -571,8 +571,7 @@
           </outputFormats>
           <failWhenNoMutations>false</failWhenNoMutations>
           <targetClasses>
-            <targetClass>com.asml.apa.wta.core.*</targetClass>
-            <targetClass>com.asml.apa.wta.spark.*</targetClass>
+            <targetClass>com.asml.apa.wta.*</targetClass>
           </targetClasses>
           <mutationThreshold>60</mutationThreshold>
           <withHistory>true</withHistory>
