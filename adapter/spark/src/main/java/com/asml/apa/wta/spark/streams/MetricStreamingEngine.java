@@ -97,12 +97,10 @@ public class MetricStreamingEngine {
    * @since 1.0.0
    */
   private Resource produceResourceFromExecutorInfo(long executorId, Stream<SparkBaseSupplierWrapperDto> pings) {
-
     Optional<OsInfoDto> sampleOsInfo = getFirstAvailable(pings.copy(), BaseSupplierDto::getOsInfoDto);
     Optional<JvmFileDto> sampleJvmInfo = getFirstAvailable(pings.copy(), BaseSupplierDto::getJvmFileDto);
     // do not sample proc info, later pings might actually have useful information
 
-    final String type = "cluster node";
     final String os = sampleOsInfo.map(OsInfoDto::getOs).orElse("unknown");
 
     StringBuilder processorInformation = new StringBuilder();
@@ -134,13 +132,11 @@ public class MetricStreamingEngine {
 
     return Resource.builder()
         .id(executorId)
-        .type(type)
         .numResources(numResources)
         .memory(memory)
         .diskSpace(diskSpace)
         .procModel(processorInformation.toString())
         .os(os)
-        .network(-1L)
         .build();
   }
 
@@ -158,7 +154,6 @@ public class MetricStreamingEngine {
     return pings.map(ping -> {
       final long timestamp = ping.getTimestamp();
       final String eventType = "resource active";
-      final long platformId = -1L;
       final double availableResources = Optional.ofNullable(ping.getOsInfoDto())
           .map(pg -> (double) pg.getAvailableProcessors())
           .orElse(-1.0);
@@ -169,15 +164,15 @@ public class MetricStreamingEngine {
           .map(pg -> (double) pg.getUsableSpace() / bytesToGbDenom)
           .orElse(-1.0);
 
-      double availableDiskIoBandwith = -1.0;
+      double availableDiskIoBandwidth;
 
       if (ping.getIostatDto() != null) {
         final IostatDto iostatDto = ping.getIostatDto();
-        availableDiskIoBandwith = iostatDto.getKiloByteReadPerSec() / kBpsToGbpsDenom
+        availableDiskIoBandwidth = iostatDto.getKiloByteReadPerSec() / kBpsToGbpsDenom
             + iostatDto.getKiloByteWrtnPerSec() / kBpsToGbpsDenom;
+      } else {
+        availableDiskIoBandwidth = -1.0;
       }
-
-      final double availableNetworkBandwidth = -1.0;
 
       final double numCores = Optional.ofNullable(ping.getOsInfoDto())
           .map(OsInfoDto::getAvailableProcessors)
@@ -205,12 +200,10 @@ public class MetricStreamingEngine {
           .resourceId(resourceId)
           .timestamp(timestamp)
           .eventType(eventType)
-          .platformId(platformId)
           .availableResources(availableResources)
           .availableDiskSpace(availableDiskSpace)
           .availableMemory(availableMemory)
-          .availableDiskIoBandwidth(availableDiskIoBandwith)
-          .availableNetworkBandwidth(availableNetworkBandwidth)
+          .availableDiskIoBandwidth(availableDiskIoBandwidth)
           .averageUtilization1Minute(averageUtilization1Minute)
           .averageUtilization5Minute(averageUtilization5Minute)
           .averageUtilization15Minute(averageUtilization15Minute)

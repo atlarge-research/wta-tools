@@ -112,8 +112,6 @@ public class JobLevelListener extends AbstractListener<Workflow> {
     final long jobId = jobEnd.jobId() + 1L;
     final long tsSubmit = jobSubmitTimes.get(jobId);
     final Stream<Task> tasks = wtaTaskListener.getWorkflowsToTasks().onKey(jobId);
-    long criticalPathLength;
-    int criticalPathTaskCount;
 
     // we can also get the mode from the config, if that's what the user wants?
     final String scheduler = getSparkContext().getConf().get("spark.scheduler.mode", "FIFO");
@@ -129,6 +127,8 @@ public class JobLevelListener extends AbstractListener<Workflow> {
         .reduce(Double::sum)
         .orElse(-1.0);
 
+    long criticalPathLength;
+    int criticalPathTaskCount;
     if (getConfig().isStageLevel()) {
       criticalPathLength = -1L;
       criticalPathTaskCount = -1;

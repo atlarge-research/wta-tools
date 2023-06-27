@@ -26,17 +26,23 @@ public class Resource implements BaseTraceObject {
   @Builder.Default
   private final String type = "cluster node";
 
-  private final double numResources;
+  @Builder.Default
+  private final double numResources = 1.0;
 
-  private final String procModel;
+  @Builder.Default
+  private final String procModel = "unknown";
 
-  private final long memory;
+  @Builder.Default
+  private final long memory = -1L;
 
-  private final long diskSpace;
+  @Builder.Default
+  private final long diskSpace = -1L;
 
-  private final long network;
+  @Builder.Default
+  private final long network = -1L;
 
-  private final String os;
+  @Builder.Default
+  private final String os = "unknown";
 
   @Builder.Default
   private final String details = "";
