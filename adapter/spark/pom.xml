@@ -53,10 +53,7 @@
         <configuration>
           <excludedTestClasses>
             <excludedTestClass>com.asml.apa.wta.spark.listener.ApplicationLevelListenerTest</excludedTestClass>
-            <excludedTestClass>com.asml.apa.wta.spark.listener.DagSolverTest</excludedTestClass>
             <excludedTestClass>com.asml.apa.wta.spark.datasource.SparkDataSourceIntegrationTest</excludedTestClass>
-            <excludedTestClass>com.asml.apa.wta.spark.driver.WtaDriverPluginIntegrationTest</excludedTestClass>
-            <excludedTestClass>com.asml.apa.wta.spark.MultithreadTest</excludedTestClass>
           </excludedTestClasses>
         </configuration>
       </plugin>
