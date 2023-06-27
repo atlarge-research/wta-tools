@@ -67,15 +67,16 @@ public class KthLargest {
   public double findKthSmallest(Stream<Double> data, long kthSmallest) {
     double medianOfMedians = medianOfMedians(data.copy());
     Stream<Double> smaller = data.copy().filter(x -> x < medianOfMedians);
-    Stream<Double> largerOrEqual = data.copy().filter(x -> x >= medianOfMedians);
+    Stream<Double> larger = data.copy().filter(x -> x > medianOfMedians);
     Stream<Double> equal = data.copy().filter(x -> x == medianOfMedians);
     long smallerSize = smaller.copy().count();
+    long equalSize = equal.count();
     if (kthSmallest < smallerSize) {
       return findKthSmallest(smaller, kthSmallest);
-    } else if (kthSmallest < equal.count() + smallerSize) {
+    } else if (kthSmallest < equalSize + smallerSize) {
       return medianOfMedians;
     } else {
-      return findKthSmallest(largerOrEqual, kthSmallest - smallerSize);
+      return findKthSmallest(larger, kthSmallest - smallerSize - equalSize);
     }
   }
 }

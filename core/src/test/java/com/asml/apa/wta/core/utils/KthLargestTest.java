@@ -36,4 +36,11 @@ class KthLargestTest {
     double median = kthLargest.findKthSmallest(new Stream<>(list), 6);
     assertThat(median).isEqualTo(7.0);
   }
+
+  @Test
+  void getKthOfUniform() {
+    List<Double> list = List.of(-1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0);
+    double median = kthLargest.findKthSmallest(new Stream<>(list), 5);
+    assertThat(median).isEqualTo(-1.0);
+  }
 }
