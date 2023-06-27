@@ -24,12 +24,17 @@ public class Task implements BaseTraceObject {
   @Builder.Default
   private final String type = "";
 
-  private final long tsSubmit;
+  @Builder.Default
+  private final long tsSubmit = -1L;
+
+  @Builder.Default
+  private final long workflowId = -1L;
 
   @Builder.Default
   private final int submissionSite = -1;
 
-  private final long runtime;
+  @Builder.Default
+  private final long runtime = -1L;
 
   @Builder.Default
   private String resourceType = "N/A";
@@ -43,15 +48,14 @@ public class Task implements BaseTraceObject {
   @Builder.Default
   private long[] children = new long[0];
 
-  private final int userId;
+  @Builder.Default
+  private final int userId = -1;
 
   @Builder.Default
   private final int groupId = -1;
 
   @Builder.Default
   private final String nfrs = "";
-
-  private final long workflowId;
 
   @Builder.Default
   private final long waitTime = -1L;
@@ -65,7 +69,8 @@ public class Task implements BaseTraceObject {
   @Builder.Default
   private final long diskIoTime = -1L;
 
-  private final double diskSpaceRequested;
+  @Builder.Default
+  private final double diskSpaceRequested = -1.0;
 
   @Builder.Default
   private final double energyConsumption = -1L;

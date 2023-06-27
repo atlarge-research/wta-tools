@@ -21,27 +21,38 @@ public class ResourceState implements BaseTraceObject {
 
   private final long resourceId;
 
-  private final long timestamp;
+  @Builder.Default
+  private final long timestamp = -1L;
 
-  private final String eventType;
+  @Builder.Default
+  private final String eventType = "";
 
-  private final long platformId;
+  @Builder.Default
+  private final long platformId = -1L;
 
-  private final double availableResources;
+  @Builder.Default
+  private final double availableResources = -1.0;
 
-  private final double availableMemory;
+  @Builder.Default
+  private final double availableMemory = -1.0;
 
-  private final double availableDiskSpace;
+  @Builder.Default
+  private final double availableDiskSpace = -1.0;
 
-  private final double availableDiskIoBandwidth;
+  @Builder.Default
+  private final double availableDiskIoBandwidth = -1.0;
 
-  private final double availableNetworkBandwidth;
+  @Builder.Default
+  private final double availableNetworkBandwidth = -1.0;
 
-  private final double averageUtilization1Minute;
+  @Builder.Default
+  private final double averageUtilization1Minute = -1.0;
 
-  private final double averageUtilization5Minute;
+  @Builder.Default
+  private final double averageUtilization5Minute = -1.0;
 
-  private final double averageUtilization15Minute;
+  @Builder.Default
+  private final double averageUtilization15Minute = -1.0;
 
   /**
    * This method should never be called as we do not need to ever fetch its ID.

@@ -21,27 +21,38 @@ public class Workload implements BaseTraceObject {
 
   private static final long serialVersionUID = -4547341610378381743L;
 
-  private final long totalWorkflows;
+  private final String[] authors;
 
-  private final long totalTasks;
+  private final String workloadDescription;
 
   private final Domain domain;
 
-  private final long dateStart;
+  @Builder.Default
+  private final long totalWorkflows = -1L;
 
-  private final long dateEnd;
+  @Builder.Default
+  private final long totalTasks = -1L;
 
-  private final long numSites;
+  @Builder.Default
+  private final long dateStart = -1L;
 
-  private final long numResources;
+  @Builder.Default
+  private final long dateEnd = -1L;
 
-  private final long numUsers;
+  @Builder.Default
+  private final long numSites = -1L;
 
-  private final long numGroups;
+  @Builder.Default
+  private final long numResources = -1L;
 
-  private final double totalResourceSeconds;
+  @Builder.Default
+  private final long numUsers = -1L;
 
-  private final String[] authors;
+  @Builder.Default
+  private final long numGroups = -1L;
+
+  @Builder.Default
+  private final double totalResourceSeconds = -1.0;
 
   @Builder.Default
   private final double minResourceTask = -1.0;
@@ -163,7 +174,6 @@ public class Workload implements BaseTraceObject {
   @Builder.Default
   private final double covEnergy = -1.0;
 
-  private final String workloadDescription;
 
   /**
    * This method should never be called as we do not need to output workloads in Parquet.

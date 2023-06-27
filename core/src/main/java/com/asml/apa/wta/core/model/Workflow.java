@@ -21,15 +21,22 @@ public class Workflow implements BaseTraceObject {
 
   private final long id;
 
-  private final long tsSubmit;
+  private final Domain domain;
 
-  private final Long[] taskIds;
+  @Builder.Default
+  private final long tsSubmit = -1L;
 
-  private final long taskCount;
+  @Builder.Default
+  private final Long[] taskIds = new Long[0];
 
-  private long criticalPathLength;
+  @Builder.Default
+  private final long taskCount = -1L;
 
-  private final long criticalPathTaskCount;
+  @Builder.Default
+  private long criticalPathLength = -1L;
+
+  @Builder.Default
+  private final long criticalPathTaskCount = -1L;
 
   @Builder.Default
   private final int maxConcurrentTasks = -1;
@@ -37,24 +44,29 @@ public class Workflow implements BaseTraceObject {
   @Builder.Default
   private final String nfrs = "";
 
-  private final String scheduler;
+  @Builder.Default
+  private final String scheduler = "";
 
-  private final Domain domain;
-
-  private final String applicationName;
+  @Builder.Default
+  private final String applicationName = "";
 
   @Builder.Default
   private final String applicationField = "ETL";
 
-  private double totalResources;
+  @Builder.Default
+  private double totalResources = -1.0;
 
-  private final double totalMemoryUsage;
+  @Builder.Default
+  private final double totalMemoryUsage = -1.0;
 
-  private final long totalNetworkUsage;
+  @Builder.Default
+  private final long totalNetworkUsage = -1L;
 
-  private final double totalDiskSpaceUsage;
+  @Builder.Default
+  private final double totalDiskSpaceUsage = -1.0;
 
-  private final double totalEnergyConsumption;
+  @Builder.Default
+  private final double totalEnergyConsumption = -1.0;
 
   /**
    * Converts the POJO object into record object, enabling it to be written by Avro.
