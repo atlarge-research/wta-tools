@@ -130,9 +130,9 @@ public class JobLevelListener extends AbstractListener<Workflow> {
     long criticalPathLength;
     int criticalPathTaskCount;
     if (getConfig().isStageLevel()) {
+      stageLevelListener.setStages(jobId);
       criticalPathLength = -1L;
       criticalPathTaskCount = -1;
-      stageLevelListener.setStages(jobId);
     } else {
       TaskLevelListener taskLevelListener = (TaskLevelListener) wtaTaskListener;
       taskLevelListener.setTasks(stageLevelListener, jobId);
@@ -147,7 +147,6 @@ public class JobLevelListener extends AbstractListener<Workflow> {
           .collect(Collectors.toList()));
 
       final List<Task> criticalPath = solveCriticalPath(jobStages);
-
       final Map<Long, List<Task>> stageToTasks = taskLevelListener.getStageToTasks();
       criticalPathTaskCount = criticalPath.stream()
           .map(stage -> stageToTasks
@@ -201,7 +200,6 @@ public class JobLevelListener extends AbstractListener<Workflow> {
     jobToStages.remove(jobId);
 
     Stream<Long> stageIds = new Stream<>();
-
     stageLevelListener.getStageToJob().entrySet().stream()
         .filter((e) -> e.getValue().equals(jobId))
         .forEach((e) -> stageIds.addToStream(e.getKey()));
@@ -216,8 +214,7 @@ public class JobLevelListener extends AbstractListener<Workflow> {
       stageLevelListener.getStageToResource().remove(stageId);
       wtaTaskListener.getStageToJob().remove(stageId);
       if (!getConfig().isStageLevel()) {
-        TaskLevelListener taskLevelListener = (TaskLevelListener) wtaTaskListener;
-        taskLevelListener.getStageToTasks().remove(stageId);
+        ((TaskLevelListener) wtaTaskListener).getStageToTasks().remove(stageId);
       }
     });
   }
