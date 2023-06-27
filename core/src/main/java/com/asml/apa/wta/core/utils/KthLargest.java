@@ -36,14 +36,15 @@ public class KthLargest {
    * @since 1.0.0
    */
   private double medianOfMedians(Stream<Double> data) {
-    while (!data.isEmpty()) {
+    Stream<Double> stream = data;
+    while (!stream.isEmpty()) {
       Stream<Double> recursive = new Stream<>();
       long amount = 0;
-      while (!data.isEmpty()) {
+      while (!stream.isEmpty()) {
         List<Double> listOfFive = new ArrayList<>();
         for (int i = 0; i < 5; i++) {
-          if (!data.isEmpty()) {
-            listOfFive.add(data.head());
+          if (!stream.isEmpty()) {
+            listOfFive.add(stream.head());
           }
         }
         amount++;
@@ -52,7 +53,7 @@ public class KthLargest {
       if (amount == 1) {
         return recursive.head();
       } else {
-        data = recursive;
+        stream = recursive;
       }
     }
     return 0.0;
@@ -68,19 +69,21 @@ public class KthLargest {
    * @since 1.0.0
    */
   public double findKthSmallest(Stream<Double> data, long kthSmallest) {
-    while (!data.isEmpty()) {
-      double medianOfMedians = medianOfMedians(data.copy());
-      Stream<Double> smaller = data.copy().filter(x -> x < medianOfMedians);
-      Stream<Double> larger = data.copy().filter(x -> x > medianOfMedians);
-      long equalSize = data.copy().filter(x -> x == medianOfMedians).count();
+    Stream<Double> stream = data;
+    long kth = kthSmallest;
+    while (!stream.isEmpty()) {
+      double medianOfMedians = medianOfMedians(stream.copy());
+      Stream<Double> smaller = stream.copy().filter(x -> x < medianOfMedians);
+      Stream<Double> larger = stream.copy().filter(x -> x > medianOfMedians);
+      long equalSize = stream.copy().filter(x -> x == medianOfMedians).count();
       long smallerSize = smaller.copy().count();
-      if (kthSmallest < smallerSize) {
-        data = smaller;
-      } else if (kthSmallest < equalSize + smallerSize) {
+      if (kth < smallerSize) {
+        stream = smaller;
+      } else if (kth < equalSize + smallerSize) {
         return medianOfMedians;
       } else {
-        data = larger;
-        kthSmallest -= smallerSize + equalSize;
+        stream = larger;
+        kth -= smallerSize + equalSize;
       }
     }
     return -1.0;
