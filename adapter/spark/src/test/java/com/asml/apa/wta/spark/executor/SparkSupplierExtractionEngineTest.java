@@ -1,4 +1,4 @@
-package com.asml.apa.wta.spark.executor.engine;
+package com.asml.apa.wta.spark.executor;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;

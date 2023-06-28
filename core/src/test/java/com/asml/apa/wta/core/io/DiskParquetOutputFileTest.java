@@ -11,12 +11,14 @@ import org.apache.parquet.io.PositionOutputStream;
 import org.junit.jupiter.api.Test;
 
 public class DiskParquetOutputFileTest {
+
   @Test
   void testGetPos() throws IOException {
     DiskParquetOutputFile diskParquetOutputFile = new DiskParquetOutputFile(Path.of("test.parquet"));
-    PositionOutputStream sut = diskParquetOutputFile.createOrOverwrite(1);
-    sut.write(42);
-    assertEquals(1, sut.getPos());
+    try (PositionOutputStream sut = diskParquetOutputFile.createOrOverwrite(1)) {
+      sut.write(42);
+      assertEquals(1, sut.getPos());
+    }
     new File("test.parquet").delete();
   }
 

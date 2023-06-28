@@ -30,11 +30,9 @@ public class MetricStreamingEngine {
 
   private final KeyedStream<String, SparkBaseSupplierWrapperDto> executorResourceStream;
 
-  private final KeyedStream<TaskKey, TaskMetricsRecord> taskStream;
+  private static final long bytesToGb = 1073741824;
 
-  private static final long bytesToGbDenom = 1073741824;
-
-  private static final long kBpsToGbpsDenom = 125000;
+  private static final long kBpsToGbps = 125000;
 
   /**
    * Initializes the streams.
@@ -44,7 +42,6 @@ public class MetricStreamingEngine {
    */
   public MetricStreamingEngine() {
     executorResourceStream = new KeyedStream<>();
-    taskStream = new KeyedStream<>();
   }
 
   /**
@@ -57,18 +54,6 @@ public class MetricStreamingEngine {
    */
   public void addToResourceStream(String resourceKey, SparkBaseSupplierWrapperDto record) {
     executorResourceStream.addToStream(resourceKey, record);
-  }
-
-  /**
-   * Adds task metrics to the task stream.
-   *
-   * @param task the {@link com.asml.apa.wta.spark.stream.TaskKey} of the task
-   * @param record the {@link TaskMetricsRecord} containing the metrics
-   * @author Atour Mousavi Gourabi
-   * @since 1.0.0
-   */
-  public void addToTaskStream(TaskKey task, TaskMetricsRecord record) {
-    taskStream.addToStream(task, record);
   }
 
   /**
@@ -99,7 +84,6 @@ public class MetricStreamingEngine {
   private Resource produceResourceFromExecutorInfo(long executorId, Stream<SparkBaseSupplierWrapperDto> pings) {
     Optional<OsInfoDto> sampleOsInfo = getFirstAvailable(pings.copy(), BaseSupplierDto::getOsInfoDto);
     Optional<JvmFileDto> sampleJvmInfo = getFirstAvailable(pings.copy(), BaseSupplierDto::getJvmFileDto);
-    // do not sample proc info, later pings might actually have useful information
 
     final String os = sampleOsInfo.map(OsInfoDto::getOs).orElse("unknown");
 
@@ -123,11 +107,11 @@ public class MetricStreamingEngine {
     final double numResources =
         sampleOsInfo.map(OsInfoDto::getAvailableProcessors).orElse(-1);
     final long memory = sampleOsInfo
-        .map(pg -> pg.getTotalPhysicalMemorySize() / bytesToGbDenom)
+        .map(pg -> pg.getTotalPhysicalMemorySize() / bytesToGb)
         .orElse(-1L);
 
     final long diskSpace = sampleJvmInfo
-        .map(jvmDto -> jvmDto.getTotalSpace() / bytesToGbDenom)
+        .map(jvmDto -> jvmDto.getTotalSpace() / bytesToGb)
         .orElse(-1L);
 
     return Resource.builder()
@@ -158,18 +142,18 @@ public class MetricStreamingEngine {
           .map(pg -> (double) pg.getAvailableProcessors())
           .orElse(-1.0);
       final double availableMemory = Optional.ofNullable(ping.getOsInfoDto())
-          .map(pg -> (double) pg.getFreePhysicalMemorySize() / bytesToGbDenom)
+          .map(pg -> (double) pg.getFreePhysicalMemorySize() / bytesToGb)
           .orElse(-1.0);
       final double availableDiskSpace = Optional.ofNullable(ping.getJvmFileDto())
-          .map(pg -> (double) pg.getUsableSpace() / bytesToGbDenom)
+          .map(pg -> (double) pg.getUsableSpace() / bytesToGb)
           .orElse(-1.0);
 
       double availableDiskIoBandwidth;
 
       if (ping.getIostatDto() != null) {
         final IostatDto iostatDto = ping.getIostatDto();
-        availableDiskIoBandwidth = iostatDto.getKiloByteReadPerSec() / kBpsToGbpsDenom
-            + iostatDto.getKiloByteWrtnPerSec() / kBpsToGbpsDenom;
+        availableDiskIoBandwidth = iostatDto.getKiloByteReadPerSec() / kBpsToGbps
+            + iostatDto.getKiloByteWrtnPerSec() / kBpsToGbps;
       } else {
         availableDiskIoBandwidth = -1.0;
       }
