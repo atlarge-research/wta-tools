@@ -110,9 +110,8 @@ public class MetricStreamingEngine {
         .map(pg -> pg.getTotalPhysicalMemorySize() / bytesToGb)
         .orElse(-1L);
 
-    final long diskSpace = sampleJvmInfo
-        .map(jvmDto -> jvmDto.getTotalSpace() / bytesToGb)
-        .orElse(-1L);
+    final long diskSpace =
+        sampleJvmInfo.map(jvmDto -> jvmDto.getTotalSpace() / bytesToGb).orElse(-1L);
 
     return Resource.builder()
         .id(executorId)
@@ -152,8 +151,8 @@ public class MetricStreamingEngine {
 
       if (ping.getIostatDto() != null) {
         final IostatDto iostatDto = ping.getIostatDto();
-        availableDiskIoBandwidth = iostatDto.getKiloByteReadPerSec() / kBpsToGbps
-            + iostatDto.getKiloByteWrtnPerSec() / kBpsToGbps;
+        availableDiskIoBandwidth =
+            iostatDto.getKiloByteReadPerSec() / kBpsToGbps + iostatDto.getKiloByteWrtnPerSec() / kBpsToGbps;
       } else {
         availableDiskIoBandwidth = -1.0;
       }
