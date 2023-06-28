@@ -154,8 +154,8 @@ public class EndToEnd {
     SparkContext sc = spark.sparkContext();
     sc.setLogLevel("INFO");
     sparkOperation(JavaSparkContext.fromSparkContext(sc).textFile(args[1]));
-    // sparkOperation(
-    //    JavaSparkContext.fromSparkContext(sc).textFile("adapter/spark/src/test/resources/e2e-input.txt"));
+    //    sparkOperation(
+    //            JavaSparkContext.fromSparkContext(sc).textFile("adapter/spark/src/test/resources/e2e-input.txt"));
     sc.stop();
   }
 }

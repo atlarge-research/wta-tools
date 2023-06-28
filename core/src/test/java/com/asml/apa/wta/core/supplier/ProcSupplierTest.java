@@ -4,7 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.doReturn;
 
 import com.asml.apa.wta.core.dto.ProcDto;
-import com.asml.apa.wta.core.utils.ShellUtils;
+import com.asml.apa.wta.core.util.ShellRunner;
 import java.util.concurrent.CompletableFuture;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -12,45 +12,45 @@ import org.mockito.Mockito;
 public class ProcSupplierTest {
   @Test
   void getSnapshotReturnsProcDto() {
-    ShellUtils shellUtils = Mockito.mock(ShellUtils.class);
+    ShellRunner shellRunner = Mockito.mock(ShellRunner.class);
     doReturn(CompletableFuture.completedFuture("8       0 sda 1114 437 141266 153\n"
             + "8      16 sdb 103 0 4712 174\n" + "8      32 sdc 77636 10312 5307586 5345"))
-        .when(shellUtils)
+        .when(shellRunner)
         .executeCommand("cat /proc/diskstats", false);
     doReturn(CompletableFuture.completedFuture("8       0 sda 1114 437 141266 153\n"
             + "8      16 sdb 103 0 4712 174\n" + "8      32 sdc 77636 10312 5307586 5345"))
-        .when(shellUtils)
+        .when(shellRunner)
         .executeCommand("cat /proc/diskstats", true);
 
     doReturn(CompletableFuture.completedFuture("MemTotal:       10118252 kB\n" + "MemFree:         1921196 kB\n"
             + "MemAvailable:    5470300 kB\n"
             + "Buffers:          239068 kB\n"))
-        .when(shellUtils)
+        .when(shellRunner)
         .executeCommand("cat /proc/meminfo", false);
 
     doReturn(CompletableFuture.completedFuture("MemTotal:       10118252 kB\n" + "MemFree:         1921196 kB\n"
             + "MemAvailable:    5470300 kB\n"
             + "Buffers:          239068 kB\n"))
-        .when(shellUtils)
+        .when(shellRunner)
         .executeCommand("cat /proc/meminfo", true);
 
     doReturn(CompletableFuture.completedFuture("Intel(R) Core(TM) i7-10750H CPU @ 2.60GHz"))
-        .when(shellUtils)
+        .when(shellRunner)
         .executeCommand(
             "grep -m 1 \"model name\" /proc/cpuinfo | awk -F: '{print $2}' | sed 's/^[ \\t]*//'", false);
 
     doReturn(CompletableFuture.completedFuture("Intel(R) Core(TM) i7-10750H CPU @ 2.60GHz"))
-        .when(shellUtils)
+        .when(shellRunner)
         .executeCommand(
             "grep -m 1 \"model name\" /proc/cpuinfo | awk -F: '{print $2}' | sed 's/^[ \\t]*//'", true);
 
     doReturn(CompletableFuture.completedFuture("0,62 1.23 1.02 1/479 278339"))
-        .when(shellUtils)
+        .when(shellRunner)
         .executeCommand("cat /proc/loadavg", false);
     doReturn(CompletableFuture.completedFuture("0,62 1.23 1.02 1/479 278339"))
-        .when(shellUtils)
+        .when(shellRunner)
         .executeCommand("cat /proc/loadavg", true);
-    ProcSupplier sut = new ProcSupplier(shellUtils);
+    ProcSupplier sut = new ProcSupplier(shellRunner);
     sut.setProcAvailable(true);
 
     ProcDto expected = ProcDto.builder()
@@ -76,25 +76,25 @@ public class ProcSupplierTest {
 
   @Test
   void emptyOutputReturnEmptyProcDto() {
-    ShellUtils shellUtils = Mockito.mock(ShellUtils.class);
-    doReturn(CompletableFuture.completedFuture("")).when(shellUtils).executeCommand("cat /proc/diskstats", false);
-    doReturn(CompletableFuture.completedFuture("")).when(shellUtils).executeCommand("cat /proc/diskstats", true);
+    ShellRunner shellRunner = Mockito.mock(ShellRunner.class);
+    doReturn(CompletableFuture.completedFuture("")).when(shellRunner).executeCommand("cat /proc/diskstats", false);
+    doReturn(CompletableFuture.completedFuture("")).when(shellRunner).executeCommand("cat /proc/diskstats", true);
 
-    doReturn(CompletableFuture.completedFuture("")).when(shellUtils).executeCommand("cat /proc/meminfo", false);
-    doReturn(CompletableFuture.completedFuture("")).when(shellUtils).executeCommand("cat /proc/meminfo", true);
+    doReturn(CompletableFuture.completedFuture("")).when(shellRunner).executeCommand("cat /proc/meminfo", false);
+    doReturn(CompletableFuture.completedFuture("")).when(shellRunner).executeCommand("cat /proc/meminfo", true);
 
     doReturn(CompletableFuture.completedFuture(""))
-        .when(shellUtils)
+        .when(shellRunner)
         .executeCommand(
             "grep -m 1 \"model name\" /proc/cpuinfo | awk -F: '{print $2}' | sed 's/^[ \\t]*//'", false);
     doReturn(CompletableFuture.completedFuture(""))
-        .when(shellUtils)
+        .when(shellRunner)
         .executeCommand(
             "grep -m 1 \"model name\" /proc/cpuinfo | awk -F: '{print $2}' | sed 's/^[ \\t]*//'", true);
 
-    doReturn(CompletableFuture.completedFuture("")).when(shellUtils).executeCommand("cat /proc/loadavg", false);
-    doReturn(CompletableFuture.completedFuture("")).when(shellUtils).executeCommand("cat /proc/loadavg", true);
-    ProcSupplier sut = new ProcSupplier(shellUtils);
+    doReturn(CompletableFuture.completedFuture("")).when(shellRunner).executeCommand("cat /proc/loadavg", false);
+    doReturn(CompletableFuture.completedFuture("")).when(shellRunner).executeCommand("cat /proc/loadavg", true);
+    ProcSupplier sut = new ProcSupplier(shellRunner);
     sut.setProcAvailable(true);
 
     ProcDto expected = ProcDto.builder().build();
@@ -104,25 +104,27 @@ public class ProcSupplierTest {
 
   @Test
   void testNoFilesInsideProc() {
-    ShellUtils shellUtils = Mockito.mock(ShellUtils.class);
-    doReturn(CompletableFuture.completedFuture(null)).when(shellUtils).executeCommand("cat /proc/diskstats", false);
-    doReturn(CompletableFuture.completedFuture(null)).when(shellUtils).executeCommand("cat /proc/diskstats", true);
+    ShellRunner shellRunner = Mockito.mock(ShellRunner.class);
+    doReturn(CompletableFuture.completedFuture(null))
+        .when(shellRunner)
+        .executeCommand("cat /proc/diskstats", false);
+    doReturn(CompletableFuture.completedFuture(null)).when(shellRunner).executeCommand("cat /proc/diskstats", true);
 
-    doReturn(CompletableFuture.completedFuture(null)).when(shellUtils).executeCommand("cat /proc/meminfo", false);
-    doReturn(CompletableFuture.completedFuture(null)).when(shellUtils).executeCommand("cat /proc/meminfo", true);
+    doReturn(CompletableFuture.completedFuture(null)).when(shellRunner).executeCommand("cat /proc/meminfo", false);
+    doReturn(CompletableFuture.completedFuture(null)).when(shellRunner).executeCommand("cat /proc/meminfo", true);
 
     doReturn(CompletableFuture.completedFuture(null))
-        .when(shellUtils)
+        .when(shellRunner)
         .executeCommand(
             "grep -m 1 \"model name\" /proc/cpuinfo | awk -F: '{print $2}' | sed 's/^[ \\t]*//'", false);
     doReturn(CompletableFuture.completedFuture(null))
-        .when(shellUtils)
+        .when(shellRunner)
         .executeCommand(
             "grep -m 1 \"model name\" /proc/cpuinfo | awk -F: '{print $2}' | sed 's/^[ \\t]*//'", true);
 
-    doReturn(CompletableFuture.completedFuture(null)).when(shellUtils).executeCommand("cat /proc/loadavg", false);
-    doReturn(CompletableFuture.completedFuture(null)).when(shellUtils).executeCommand("cat /proc/loadavg", true);
-    ProcSupplier sut = new ProcSupplier(shellUtils);
+    doReturn(CompletableFuture.completedFuture(null)).when(shellRunner).executeCommand("cat /proc/loadavg", false);
+    doReturn(CompletableFuture.completedFuture(null)).when(shellRunner).executeCommand("cat /proc/loadavg", true);
+    ProcSupplier sut = new ProcSupplier(shellRunner);
     sut.setProcAvailable(true);
 
     ProcDto expected = ProcDto.builder().build();

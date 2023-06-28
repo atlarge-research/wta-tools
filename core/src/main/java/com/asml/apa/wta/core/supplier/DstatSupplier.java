@@ -1,7 +1,7 @@
 package com.asml.apa.wta.core.supplier;
 
 import com.asml.apa.wta.core.dto.DstatDto;
-import com.asml.apa.wta.core.utils.ShellUtils;
+import com.asml.apa.wta.core.util.ShellRunner;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -19,11 +19,11 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 public class DstatSupplier implements InformationSupplier<DstatDto> {
-  private final ShellUtils shellUtils;
+  private final ShellRunner shellRunner;
   private final boolean isDstatAvailable;
 
-  public DstatSupplier(ShellUtils shellUtils) {
-    this.shellUtils = shellUtils;
+  public DstatSupplier(ShellRunner shellRunner) {
+    this.shellRunner = shellRunner;
     this.isDstatAvailable = isAvailable();
   }
 
@@ -40,7 +40,7 @@ public class DstatSupplier implements InformationSupplier<DstatDto> {
       return notAvailableResult();
     }
 
-    CompletableFuture<String> allMetrics = shellUtils.executeCommand("dstat -cdngy 1 1", false);
+    CompletableFuture<String> allMetrics = shellRunner.executeCommand("dstat -cdngy 1 1", false);
 
     return allMetrics.thenApply(result -> {
       if (result != null) {
@@ -123,7 +123,7 @@ public class DstatSupplier implements InformationSupplier<DstatDto> {
       return false;
     }
     try {
-      if (shellUtils.executeCommand("dstat -cdngy 1 1", true).get() != null) {
+      if (shellRunner.executeCommand("dstat -cdngy 1 1", true).get() != null) {
         return true;
       }
       return false;

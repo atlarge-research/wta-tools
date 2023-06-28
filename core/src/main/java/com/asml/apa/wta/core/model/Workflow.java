@@ -21,37 +21,52 @@ public class Workflow implements BaseTraceObject {
 
   private final long id;
 
-  private final long tsSubmit;
-
-  private final Long[] taskIds;
-
-  private final long taskCount;
-
-  private long criticalPathLength;
-
-  private final long criticalPathTaskCount;
-
-  private final int maxConcurrentTasks;
-
-  private final String nfrs;
-
-  private final String scheduler;
-
   private final Domain domain;
 
-  private final String applicationName;
+  @Builder.Default
+  private final long tsSubmit = -1L;
 
-  private final String applicationField;
+  @Builder.Default
+  private final Long[] taskIds = new Long[0];
 
-  private double totalResources;
+  @Builder.Default
+  private final long taskCount = -1L;
 
-  private final double totalMemoryUsage;
+  @Builder.Default
+  private long criticalPathLength = -1L;
 
-  private final long totalNetworkUsage;
+  @Builder.Default
+  private final long criticalPathTaskCount = -1L;
 
-  private final double totalDiskSpaceUsage;
+  @Builder.Default
+  private final int maxConcurrentTasks = -1;
 
-  private final double totalEnergyConsumption;
+  @Builder.Default
+  private final String nfrs = "";
+
+  @Builder.Default
+  private final String scheduler = "";
+
+  @Builder.Default
+  private final String applicationName = "";
+
+  @Builder.Default
+  private final String applicationField = "ETL";
+
+  @Builder.Default
+  private double totalResources = -1.0;
+
+  @Builder.Default
+  private final double totalMemoryUsage = -1.0;
+
+  @Builder.Default
+  private final long totalNetworkUsage = -1L;
+
+  @Builder.Default
+  private final double totalDiskSpaceUsage = -1.0;
+
+  @Builder.Default
+  private final double totalEnergyConsumption = -1.0;
 
   /**
    * Converts the POJO object into record object, enabling it to be written by Avro.

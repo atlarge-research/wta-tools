@@ -21,45 +21,65 @@ public class Task implements BaseTraceObject {
 
   private final long id;
 
-  private final String type;
+  @Builder.Default
+  private final String type = "";
 
-  private final long tsSubmit;
+  @Builder.Default
+  private final long tsSubmit = -1L;
 
-  private final int submissionSite;
+  @Builder.Default
+  private final long workflowId = -1L;
 
-  private final long runtime;
+  @Builder.Default
+  private final int submissionSite = -1;
 
-  private String resourceType;
+  @Builder.Default
+  private final long runtime = -1L;
 
-  private double resourceAmountRequested;
+  @Builder.Default
+  private String resourceType = "N/A";
 
-  private long[] parents;
+  @Builder.Default
+  private double resourceAmountRequested = -1.0;
 
-  private long[] children;
+  @Builder.Default
+  private long[] parents = new long[0];
 
-  private final int userId;
+  @Builder.Default
+  private long[] children = new long[0];
 
-  private final int groupId;
+  @Builder.Default
+  private final int userId = -1;
 
-  private final String nfrs;
+  @Builder.Default
+  private final int groupId = -1;
 
-  private final long workflowId;
+  @Builder.Default
+  private final String nfrs = "";
 
-  private final long waitTime;
+  @Builder.Default
+  private final long waitTime = -1L;
 
-  private final String params;
+  @Builder.Default
+  private final String params = "";
 
-  private final double memoryRequested;
+  @Builder.Default
+  private final double memoryRequested = -1.0;
 
-  private final long diskIoTime;
+  @Builder.Default
+  private final long diskIoTime = -1L;
 
-  private final double diskSpaceRequested;
+  @Builder.Default
+  private final double diskSpaceRequested = -1.0;
 
-  private final double energyConsumption;
+  @Builder.Default
+  private final double energyConsumption = -1L;
 
-  private final long networkIoTime;
+  @Builder.Default
+  private final long networkIoTime = -1L;
 
-  private final long resourceUsed;
+  @Builder.Default
+  private final long resourceUsed = -1L;
 
   /**
    * Converts the POJO object into record object, enabling it to be written by Avro.

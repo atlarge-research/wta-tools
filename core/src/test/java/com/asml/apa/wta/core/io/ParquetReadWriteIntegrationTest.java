@@ -4,7 +4,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 import com.asml.apa.wta.core.model.Domain;
 import com.asml.apa.wta.core.model.Workflow;
-import com.asml.apa.wta.core.streams.Stream;
+import com.asml.apa.wta.core.stream.Stream;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -35,7 +35,7 @@ public class ParquetReadWriteIntegrationTest {
       assertThat(result.get("id")).isEqualTo(1L);
       assertThat(result.get("domain")).isEqualTo(new Utf8("Scientific"));
       assertThat(result.get("nfrs")).isEqualTo(new Utf8("Harry Porter"));
-      assertThat(result.get("critical_path_length")).isEqualTo(0L);
+      assertThat(result.get("critical_path_length")).isEqualTo(-1L);
     }
 
     assertThat(new File("test.parquet").exists()).isTrue();

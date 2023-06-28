@@ -50,6 +50,7 @@
     <awaitility.version>4.2.0</awaitility.version>
     <build-helper.version>3.4.0</build-helper.version>
     <checkstyle.version>3.3.0</checkstyle.version>
+    <clean-plugin.version>3.3.1</clean-plugin.version>
     <compiler-plugin.version>3.11.0</compiler-plugin.version>
     <dependency-plugin.version>3.6.0</dependency-plugin.version>
     <doxia-markdown.version>2.0.0-M6</doxia-markdown.version>
@@ -64,7 +65,7 @@
     <lombok-plugin.version>1.18.20.0</lombok-plugin.version>
     <mockito.version>5.3.1</mockito.version>
     <parquet.version>1.12.2</parquet.version>
-    <pitest.version>1.14.1</pitest.version>
+    <pitest.version>1.14.2</pitest.version>
     <pitest-junit.version>1.2.0</pitest-junit.version>
     <pmd.version>3.20.0</pmd.version>
     <project-info-reports.version>3.4.5</project-info-reports.version>
@@ -571,12 +572,8 @@
           </outputFormats>
           <failWhenNoMutations>false</failWhenNoMutations>
           <targetClasses>
-            <targetClass>com.asml.apa.wta.core.*</targetClass>
-            <targetClass>com.asml.apa.wta.spark.*</targetClass>
+            <targetClass>com.asml.apa.wta.*</targetClass>
           </targetClasses>
-          <excludedTestClasses>
-            <param>com.asml.apa.wta.spark.MultithreadTest</param>
-          </excludedTestClasses>
           <mutationThreshold>60</mutationThreshold>
           <withHistory>true</withHistory>
         </configuration>
@@ -597,6 +594,35 @@
             <version>${pitest-junit.version}</version>
           </dependency>
         </dependencies>
+      </plugin>
+      <!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-clean-plugin -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-clean-plugin</artifactId>
+        <version>${clean-plugin.version}</version>
+        <configuration>
+          <filesets>
+            <fileset>
+              <directory>${basedir}</directory>
+              <includes>
+                <include>dependency-reduced-pom.xml</include>
+                <include>reports/**</include>
+                <include>tmp/**</include>
+                <include>wta-output/**</include>
+              </includes>
+              <followSymlinks>false</followSymlinks>
+            </fileset>
+          </filesets>
+        </configuration>
+        <executions>
+          <execution>
+            <id>clean-directories</id>
+            <phase>none</phase>
+            <goals>
+              <goal>clean</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
     <pluginManagement>
@@ -1030,6 +1056,16 @@
               <execution>
                 <id>delombok-sources</id>
                 <phase>generate-sources</phase>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-clean-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>clean-directories</id>
+                <phase>initialize</phase>
               </execution>
             </executions>
           </plugin>

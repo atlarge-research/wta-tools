@@ -2,7 +2,7 @@ package com.asml.apa.wta.spark.listener;
 
 import com.asml.apa.wta.core.config.RuntimeConfig;
 import com.asml.apa.wta.core.model.BaseTraceObject;
-import com.asml.apa.wta.core.streams.Stream;
+import com.asml.apa.wta.core.stream.Stream;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import lombok.Getter;

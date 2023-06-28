@@ -98,7 +98,7 @@ More information can be found in the [adapter](./adapter/README.md) module.
 
 Additional modules can be found in the submodules directory. Currently, they include the following things
 - Benchmarking
-  - Contains scripts to benchmark the performance of the framework against the Distributed ASCI Supercomputer 5 (DAS-5). More information can be found in the [here](./submodules/benchmarking/README.md).
+  - Contains scripts to benchmark the performance of the framework against the Distributed ASCI Supercomputer 5 (DAS-5). More information can be found [here](./submodules/benchmarking/README.md).
 - wta-tools
   - Instructions to use validation scripts. More information can be found in [here](./submodules/wta-tools/README.md).
 
@@ -109,11 +109,11 @@ coverage check goal to ensure that mutation test coverage does not drop below 60
 and integration tests coverage does not drop below 80%. This limit is set for both branch and line coverage. To only
 execute the unit tests, you can run the `mvn test` goal.
 
-In order to generate the site, you need to run `mvn site -Psite,no-checks`. This comes as we enforce these profiles
-are available when running the `mvn site` lifecycle phase. If you want the site to contain  information on testing,
-such as code coverage, you need to have JaCoCo reports present on your machine. A simple way to ensure that this
-works is by running `mvn clean verify site -Psite,no-checks`. The site will be located in the `target/site` directory
-in every module by default.
+In order to generate the site, you need to run `mvn site:attach-descriptor site -Psite,no-checks`. This comes as we
+enforce these profiles are available when running the `mvn site` lifecycle phase. If you want the site to contain
+information on testing, such as code coverage, you need to have JaCoCo reports present on your machine. A simple way
+to ensure that this works is by running `mvn clean verify site:attach-descriptor site -Psite,no-checks`. The site
+will be located in the `target/site` directory in every module by default.
 
 It is also possible to run `mvn site -Psite,no-checks` without running the `mvn verify` phase. This will, however,
 make the site less informative as there would be no information on tests run or code coverage from these tests.

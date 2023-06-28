@@ -1,5 +1,5 @@
 ## This script (The DAS configuration script) is based on the work of Tim Hegeman, Chris Lemaire, and Laurens Versluis 
-## The github repo for the original script: https://github.com/lfdversluis/das-bigdata-deployment
+## The GitHub repo for the original script: https://github.com/lfdversluis/das-bigdata-deployment
 
 # Deployment scripts for big data frameworks on DAS-5
 Scripts to download configure, and deploy several big data frameworks (YARN/MapReduce, Spark) and related systems (HDFS, ZooKeeper).
@@ -82,7 +82,7 @@ cd das-bigdata-deployment
 deployer deploy --preserve-id $RESERVATION_ID -s env/das5-hadoop.settings hadoop 3.2.4
 ```
 
-If you do not need HDFS or YARN append the `hdfs_enable=false` or `yarn_enable=false` options, respectively, to the above comand.
+If you do not need HDFS or YARN append the `hdfs_enable=false` or `yarn_enable=false` options, respectively, to the above command.
 
 ### Deploying Spark
 To deploy Spark with sensible defaults, run the following command (substituting your reservation ID):

@@ -4,8 +4,8 @@ import com.asml.apa.wta.core.config.RuntimeConfig;
 import com.asml.apa.wta.core.model.Domain;
 import com.asml.apa.wta.core.model.Task;
 import com.asml.apa.wta.core.model.Workflow;
-import com.asml.apa.wta.core.streams.Stream;
-import com.asml.apa.wta.spark.dagsolver.DagSolver;
+import com.asml.apa.wta.core.stream.Stream;
+import com.asml.apa.wta.spark.util.DagSolver;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -112,16 +112,10 @@ public class JobLevelListener extends AbstractListener<Workflow> {
     final long jobId = jobEnd.jobId() + 1L;
     final long tsSubmit = jobSubmitTimes.get(jobId);
     final Stream<Task> tasks = wtaTaskListener.getWorkflowsToTasks().onKey(jobId);
-    long criticalPathLength;
-    int criticalPathTaskCount;
-    final int maxNumberOfConcurrentTasks = -1;
-    final String nfrs = "";
 
-    // we can also get the mode from the config, if that's what the user wants?
     final String scheduler = getSparkContext().getConf().get("spark.scheduler.mode", "FIFO");
     final Domain domain = getConfig().getDomain();
     final String appName = getSparkContext().appName();
-    final String applicationField = "ETL";
     final double totalMemoryUsage = computeSum(tasks.copy().map(Task::getMemoryRequested));
     final long totalNetworkUsage = (long) computeSum(tasks.copy().map(task -> (double) task.getNetworkIoTime()));
     final double totalDiskSpaceUsage = computeSum(tasks.copy().map(Task::getDiskSpaceRequested));
@@ -132,10 +126,12 @@ public class JobLevelListener extends AbstractListener<Workflow> {
         .reduce(Double::sum)
         .orElse(-1.0);
 
+    final long criticalPathLength;
+    final long criticalPathTaskCount;
     if (getConfig().isStageLevel()) {
+      stageLevelListener.setStages(jobId);
       criticalPathLength = -1L;
       criticalPathTaskCount = -1;
-      stageLevelListener.setStages(jobId);
     } else {
       TaskLevelListener taskLevelListener = (TaskLevelListener) wtaTaskListener;
       taskLevelListener.setTasks(stageLevelListener, jobId);
@@ -150,15 +146,8 @@ public class JobLevelListener extends AbstractListener<Workflow> {
           .collect(Collectors.toList()));
 
       final List<Task> criticalPath = solveCriticalPath(jobStages);
-      TaskLevelListener listener = (TaskLevelListener) wtaTaskListener;
-
-      final Map<Long, List<Task>> stageToTasks = listener.getStageToTasks();
-      criticalPathTaskCount = criticalPath.stream()
-          .map(stage -> stageToTasks
-              .getOrDefault(stage.getId(), new ArrayList<>())
-              .size())
-          .reduce(Integer::sum)
-          .orElse(-1);
+      final Map<Long, List<Task>> stageToTasks = taskLevelListener.getStageToTasks();
+      criticalPathTaskCount = criticalPath.isEmpty() ? -1L : criticalPath.size();
       criticalPathLength = criticalPath.stream()
           .map(stage -> stageToTasks.getOrDefault(stage.getId(), new ArrayList<>()).stream()
               .map(Task::getRuntime)
@@ -176,12 +165,9 @@ public class JobLevelListener extends AbstractListener<Workflow> {
             .taskCount(tasks.count())
             .criticalPathLength(criticalPathLength)
             .criticalPathTaskCount(criticalPathTaskCount)
-            .maxConcurrentTasks(maxNumberOfConcurrentTasks)
-            .nfrs(nfrs)
             .scheduler(scheduler)
             .domain(domain)
             .applicationName(appName)
-            .applicationField(applicationField)
             .totalResources(totalResources)
             .totalMemoryUsage(totalMemoryUsage)
             .totalNetworkUsage(totalNetworkUsage)
@@ -189,12 +175,6 @@ public class JobLevelListener extends AbstractListener<Workflow> {
             .totalEnergyConsumption(totalEnergyConsumption)
             .build()));
 
-    if (getConfig().isStageLevel()) {
-      stageLevelListener.setStages(jobId);
-    } else {
-      TaskLevelListener taskLevelListener = (TaskLevelListener) wtaTaskListener;
-      taskLevelListener.setTasks(stageLevelListener, jobId);
-    }
     cleanUpContainers(jobId);
   }
 
@@ -214,25 +194,22 @@ public class JobLevelListener extends AbstractListener<Workflow> {
     jobToStages.remove(jobId);
 
     Stream<Long> stageIds = new Stream<>();
-
     stageLevelListener.getStageToJob().entrySet().stream()
         .filter((e) -> e.getValue().equals(jobId))
         .forEach((e) -> stageIds.addToStream(e.getKey()));
+
+    stageLevelListener.getWorkflowsToTasks().dropKey(jobId);
+    wtaTaskListener.getWorkflowsToTasks().dropKey(jobId);
 
     stageIds.forEach(stageId -> {
       stageLevelListener.getStageToJob().remove(stageId);
       stageLevelListener.getStageToParents().remove(stageId);
       stageLevelListener.getParentStageToChildrenStages().remove(stageId);
       stageLevelListener.getStageToResource().remove(stageId);
-      stageLevelListener.getWorkflowsToTasks().dropKey(jobId);
       wtaTaskListener.getStageToJob().remove(stageId);
-      wtaTaskListener.getWorkflowsToTasks().dropKey(jobId);
       if (!getConfig().isStageLevel()) {
-        // additional clean up for task-level plugin
         TaskLevelListener taskLevelListener = (TaskLevelListener) wtaTaskListener;
         taskLevelListener.getStageToTasks().remove(stageId);
-        taskLevelListener.getTaskToStage().entrySet().removeIf(entry -> entry.getValue()
-            .equals(stageId));
       }
     });
   }

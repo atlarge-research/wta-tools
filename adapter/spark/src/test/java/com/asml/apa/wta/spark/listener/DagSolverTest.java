@@ -4,16 +4,57 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.asml.apa.wta.core.WtaWriter;
+import com.asml.apa.wta.core.config.RuntimeConfig;
+import com.asml.apa.wta.core.model.Domain;
 import com.asml.apa.wta.core.model.Task;
+import com.asml.apa.wta.spark.datasource.SparkDataSource;
+import com.asml.apa.wta.spark.stream.MetricStreamingEngine;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import org.apache.spark.SparkConf;
+import org.apache.spark.SparkContext;
+import org.apache.spark.resource.ResourceProfile;
+import org.apache.spark.resource.ResourceProfileManager;
+import org.apache.spark.resource.TaskResourceRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import scala.Tuple2;
 
-class DagSolverTest extends BaseLevelListenerTest {
+class DagSolverTest {
+
+  protected SparkContext mockedSparkContext;
+
+  protected ResourceProfileManager mockedResourceProfileManager;
+
+  protected ResourceProfile mockedResource;
+
+  protected scala.collection.immutable.Map<String, TaskResourceRequest> mapResource;
+
+  protected SparkContext mockedSparkContext2;
+
+  protected ResourceProfileManager mockedResourceProfileManager2;
+
+  protected ResourceProfile mockedResource2;
+
+  protected scala.collection.immutable.Map<String, TaskResourceRequest> mapResource2;
+
+  protected RuntimeConfig fakeConfig1;
+
+  protected RuntimeConfig fakeConfig2;
+
+  protected TaskLevelListener fakeTaskListener1;
+  protected StageLevelListener fakeStageListener1;
+  protected JobLevelListener fakeJobListener1;
+  protected ApplicationLevelListener fakeApplicationListener1;
+
+  protected TaskLevelListener fakeTaskListener2;
+  protected StageLevelListener fakeStageListener2;
+  protected JobLevelListener fakeJobListener2;
+  protected ApplicationLevelListener fakeApplicationListener2;
 
   TaskLevelListener mockedListener1;
 
@@ -25,6 +66,85 @@ class DagSolverTest extends BaseLevelListenerTest {
 
   @BeforeEach
   void init() {
+    mockedSparkContext = mock(SparkContext.class);
+    mockedResourceProfileManager = mock(ResourceProfileManager.class);
+    mockedResource = mock(ResourceProfile.class);
+    mapResource = new scala.collection.immutable.HashMap<String, TaskResourceRequest>()
+        .$plus(new Tuple2<>("this", new TaskResourceRequest("this", 20)));
+    SparkConf conf = new SparkConf().set("spark.app.name", "testApp");
+    when(mockedSparkContext.sparkUser()).thenReturn("testUser");
+    when(mockedSparkContext.getConf()).thenReturn(conf);
+    when(mockedSparkContext.appName()).thenReturn("testApp");
+    when(mockedSparkContext.startTime()).thenReturn(5000L);
+    when(mockedSparkContext.resourceProfileManager()).thenReturn(mockedResourceProfileManager);
+    when(mockedResourceProfileManager.resourceProfileFromId(100)).thenReturn(mockedResource);
+    when(mockedResource.taskResources()).thenReturn(mapResource);
+
+    mockedSparkContext2 = mock(SparkContext.class);
+    mockedResourceProfileManager2 = mock(ResourceProfileManager.class);
+    mockedResource2 = mock(ResourceProfile.class);
+    mapResource2 = new scala.collection.immutable.HashMap<>();
+    when(mockedSparkContext2.sparkUser()).thenReturn("testUser");
+    when(mockedSparkContext2.getConf()).thenReturn(conf);
+    when(mockedSparkContext2.appName()).thenReturn("testApp");
+    when(mockedSparkContext2.startTime()).thenReturn(5000L);
+    when(mockedSparkContext2.resourceProfileManager()).thenReturn(mockedResourceProfileManager2);
+    when(mockedResourceProfileManager2.resourceProfileFromId(100)).thenReturn(mockedResource2);
+    when(mockedResource2.taskResources()).thenReturn(mapResource2);
+
+    fakeConfig1 = RuntimeConfig.builder()
+        .authors(new String[] {"Harry Potter"})
+        .domain(Domain.SCIENTIFIC)
+        .isStageLevel(false)
+        .description("Yer a wizard harry")
+        .build();
+    fakeStageListener1 = new StageLevelListener(mockedSparkContext, fakeConfig1);
+
+    fakeTaskListener1 = new TaskLevelListener(mockedSparkContext, fakeConfig1);
+
+    fakeStageListener1 = new StageLevelListener(mockedSparkContext, fakeConfig1);
+
+    fakeJobListener1 = new JobLevelListener(mockedSparkContext, fakeConfig1, fakeTaskListener1, fakeStageListener1);
+
+    SparkDataSource sparkDataSource = mock(SparkDataSource.class);
+    when(sparkDataSource.getRuntimeConfig()).thenReturn(mock(RuntimeConfig.class));
+    when(sparkDataSource.getTaskLevelListener()).thenReturn(mock(TaskLevelListener.class));
+    when(sparkDataSource.getStageLevelListener()).thenReturn(mock(StageLevelListener.class));
+    when(sparkDataSource.getJobLevelListener()).thenReturn(mock(JobLevelListener.class));
+
+    fakeApplicationListener1 = new ApplicationLevelListener(
+        mockedSparkContext,
+        fakeConfig1,
+        fakeTaskListener1,
+        fakeStageListener1,
+        fakeJobListener1,
+        sparkDataSource,
+        mock(MetricStreamingEngine.class),
+        mock(WtaWriter.class));
+
+    fakeConfig2 = RuntimeConfig.builder()
+        .authors(new String[] {"Harry Potter"})
+        .domain(Domain.SCIENTIFIC)
+        .isStageLevel(true)
+        .description("Yer a wizard harry")
+        .build();
+
+    fakeTaskListener2 = new TaskLevelListener(mockedSparkContext2, fakeConfig2);
+
+    fakeStageListener2 = new StageLevelListener(mockedSparkContext2, fakeConfig2);
+
+    fakeJobListener2 =
+        new JobLevelListener(mockedSparkContext2, fakeConfig2, fakeTaskListener2, fakeStageListener2);
+
+    fakeApplicationListener2 = new ApplicationLevelListener(
+        mockedSparkContext2,
+        fakeConfig2,
+        fakeTaskListener2,
+        fakeStageListener2,
+        fakeJobListener2,
+        sparkDataSource,
+        mock(MetricStreamingEngine.class),
+        mock(WtaWriter.class));
     Task mockedTask1 = mock(Task.class);
     when(mockedTask1.getRuntime()).thenReturn(1L);
     Task mockedTask2 = mock(Task.class);
@@ -113,5 +233,17 @@ class DagSolverTest extends BaseLevelListenerTest {
     assertThat(cp.contains(2L)).isTrue();
     assertThat(cp.contains(5L)).isTrue();
     assertThat(cp.contains(7L)).isTrue();
+  }
+
+  @Test
+  void criticalPathTaskCountTest() {
+    Map<Long, List<Task>> stageToTasks = mock(Map.class);
+    Task mockedTask = mock(Task.class);
+    when(stageToTasks.get(2L)).thenReturn(List.of(mockedTask, mockedTask));
+    when(stageToTasks.get(5L)).thenReturn(List.of(mockedTask, mockedTask));
+    when(stageToTasks.get(7L)).thenReturn(List.of(mockedTask, mockedTask));
+    List<Task> criticalPath = fakeJobListener1.solveCriticalPath(stages2);
+    long criticalPathTaskCount = criticalPath.isEmpty() ? -1L : criticalPath.size();
+    assertThat(criticalPathTaskCount).isEqualTo(3);
   }
 }

@@ -20,7 +20,5 @@ public enum Domain {
   INDUSTRIAL,
 
   @SerializedName("Scientific")
-  SCIENTIFIC;
-
-  public static final String[] STRINGS = {"Biomedical", "Engineering", "Industrial", "Scientific"};
+  SCIENTIFIC
 }

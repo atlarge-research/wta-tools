@@ -9,11 +9,11 @@ import com.asml.apa.wta.core.model.Task;
 import com.asml.apa.wta.core.model.Workflow;
 import com.asml.apa.wta.core.model.Workload;
 import com.asml.apa.wta.core.model.Workload.WorkloadBuilder;
-import com.asml.apa.wta.core.streams.Stream;
-import com.asml.apa.wta.core.utils.KthLargest;
+import com.asml.apa.wta.core.stream.Stream;
+import com.asml.apa.wta.core.util.KthSmallest;
 import com.asml.apa.wta.spark.datasource.SparkDataSource;
 import com.asml.apa.wta.spark.dto.ResourceAndStateWrapper;
-import com.asml.apa.wta.spark.streams.MetricStreamingEngine;
+import com.asml.apa.wta.spark.stream.MetricStreamingEngine;
 import java.util.List;
 import java.util.function.Function;
 import lombok.Getter;
@@ -354,7 +354,7 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
    * @author Pil Kyu Cho
    * @since 1.0.0
    */
-  private double computeMin(Stream<Double> data) {
+  public double computeMin(Stream<Double> data) {
     return data.filter(x -> x >= 0.0).reduce(Double::min).orElse(-1.0);
   }
 
@@ -368,7 +368,7 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
    * @author Pil Kyu Cho
    * @since 1.0.0
    */
-  private double computeMean(Stream<Double> data, long size) {
+  public double computeMean(Stream<Double> data, long size) {
     if (size == 0) {
       return -1.0;
     }
@@ -424,7 +424,7 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
    * @since 1.0.0
    */
   private double computeMedian(Stream<Double> data) {
-    return new KthLargest().findKthSmallest(data.copy(), data.copy().count() / 2);
+    return new KthSmallest().find(data.copy(), data.copy().count() / 2);
   }
 
   /**
@@ -436,7 +436,7 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
    * @since 1.0.0
    */
   private double computeFirstQuantile(Stream<Double> data) {
-    return new KthLargest().findKthSmallest(data.copy(), data.copy().count() / 4);
+    return new KthSmallest().find(data.copy(), data.copy().count() / 4);
   }
 
   /**
@@ -449,6 +449,6 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
    * @since 1.0.0
    */
   private double computeThirdQuantile(Stream<Double> data) {
-    return new KthLargest().findKthSmallest(data.copy(), data.copy().count() * 3 / 4);
+    return new KthSmallest().find(data.copy(), data.copy().count() * 3 / 4);
   }
 }

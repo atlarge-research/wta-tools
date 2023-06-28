@@ -9,6 +9,7 @@
 
 # Log file
 logging
+logs
 *.log
 
 # BlueJ files
@@ -71,17 +72,11 @@ tmp
 # jqwik
 .jqwik-database
 
-# logs
-logs
-*.log
-
 # test output
 core/src/test/resources/WTA
 core/src/test/resources/AvroOutput
 adapter/spark/src/test/resources/WTA
 wta-output
-test.json
-test.parquet
 
 # DAS config files
 *.pyc

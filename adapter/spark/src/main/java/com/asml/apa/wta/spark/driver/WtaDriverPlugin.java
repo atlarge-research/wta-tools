@@ -6,7 +6,7 @@ import com.asml.apa.wta.core.io.DiskOutputFile;
 import com.asml.apa.wta.core.io.OutputFile;
 import com.asml.apa.wta.spark.datasource.SparkDataSource;
 import com.asml.apa.wta.spark.dto.ResourceCollectionDto;
-import com.asml.apa.wta.spark.streams.MetricStreamingEngine;
+import com.asml.apa.wta.spark.stream.MetricStreamingEngine;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
