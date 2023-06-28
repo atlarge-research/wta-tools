@@ -154,13 +154,15 @@ public class TaskLevelListener extends TaskStageBaseListener {
 
       final int resourceProfileId =
           stageLevelListener.getStageToResource().getOrDefault(stageId, -1);
-      final ResourceProfile resourceProfile =
-          getSparkContext().resourceProfileManager().resourceProfileFromId(resourceProfileId);
-      final List<TaskResourceRequest> resources = JavaConverters.seqAsJavaList(
-          resourceProfile.taskResources().values().toList());
-      if (resources.size() > 0) {
-        task.setResourceType(resources.get(0).resourceName());
-        task.setResourceAmountRequested(resources.get(0).amount());
+      if (resourceProfileId >= 0) {
+        final ResourceProfile resourceProfile =
+            getSparkContext().resourceProfileManager().resourceProfileFromId(resourceProfileId);
+        final List<TaskResourceRequest> resources = JavaConverters.seqAsJavaList(
+            resourceProfile.taskResources().values().toList());
+        if (!resources.isEmpty()) {
+          task.setResourceType(resources.get(0).resourceName());
+          task.setResourceAmountRequested(resources.get(0).amount());
+        }
       }
     });
   }

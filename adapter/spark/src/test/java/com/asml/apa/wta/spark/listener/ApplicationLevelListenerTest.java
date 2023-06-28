@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
@@ -455,5 +456,32 @@ class ApplicationLevelListenerTest {
     List<Double> minList = List.of(1.0, 19.2, 0.1, 0.03, 1.0, 891.0);
     Stream<Double> minStream = new Stream<>(minList);
     assertThat(listener.computeMin(minStream)).isEqualTo(0.03);
+  }
+
+  @Test
+  void computeMeanWithZero() {
+    ApplicationLevelListener listener = mock(ApplicationLevelListener.class);
+    when(listener.computeMean(any(Stream.class), anyLong())).thenCallRealMethod();
+    List<Double> meanList = List.of(-1.0, 0.0, 1.0, 2.0);
+    Stream<Double> meanStream = new Stream<>(meanList);
+    assertThat(listener.computeMean(meanStream, 3)).isEqualTo(1.0);
+  }
+
+  @Test
+  void computeMeanWithAllNegatives() {
+    ApplicationLevelListener listener = mock(ApplicationLevelListener.class);
+    when(listener.computeMean(any(Stream.class), anyLong())).thenCallRealMethod();
+    List<Double> meanList = List.of(-1.0, -2.0, -5.0, -0.01);
+    Stream<Double> meanStream = new Stream<>(meanList);
+    assertThat(listener.computeMean(meanStream, 4)).isEqualTo(-1.0);
+  }
+
+  @Test
+  void computeMeanWithOnlyPositive() {
+    ApplicationLevelListener listener = mock(ApplicationLevelListener.class);
+    when(listener.computeMean(any(Stream.class), anyLong())).thenCallRealMethod();
+    List<Double> meanList = List.of(1.0, 2.0, 3.0);
+    Stream<Double> meanStream = new Stream<>(meanList);
+    assertThat(listener.computeMean(meanStream, 3)).isEqualTo(2.0);
   }
 }

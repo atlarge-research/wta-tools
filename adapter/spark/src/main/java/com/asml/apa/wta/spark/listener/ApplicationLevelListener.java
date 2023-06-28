@@ -368,7 +368,7 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
    * @author Pil Kyu Cho
    * @since 1.0.0
    */
-  private double computeMean(Stream<Double> data, long size) {
+  public double computeMean(Stream<Double> data, long size) {
     if (size == 0) {
       return -1.0;
     }
