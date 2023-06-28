@@ -108,6 +108,7 @@ For the most part, since we are pre-release this will serve no real purpose, oth
 - Fixed some of the OOM issues by replacing Lists with Streams [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 - Fixed the WTA writer to remove pre-existing files to write traces [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 - Fixed inefficient map interactions [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
+- Fixed default values for trace objects [@pcho](https://gitlab.ewi.tudelft.nl/pcho)
 - Fixed recursive method with `StackOverflowError` potential [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 
 ### Deprecated
