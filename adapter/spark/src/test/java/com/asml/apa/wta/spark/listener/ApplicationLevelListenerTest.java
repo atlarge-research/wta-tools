@@ -3,6 +3,7 @@ package com.asml.apa.wta.spark.listener;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
@@ -436,5 +437,23 @@ class ApplicationLevelListenerTest {
       assertThat(resourceArgumentCaptor.getValue().head().getOs()).isEqualTo("Hannah Montana Linux");
       streamMock.verify(Stream::deleteAllSerializedFiles);
     }
+  }
+
+  @Test
+  void computeMinWithZero() {
+    ApplicationLevelListener listener = mock(ApplicationLevelListener.class);
+    when(listener.computeMin(any(Stream.class))).thenCallRealMethod();
+    List<Double> minList = List.of(-1.0, 0.0, 0.1, 0.03, 1.0, 891.0);
+    Stream<Double> minStream = new Stream<>(minList);
+    assertThat(listener.computeMin(minStream)).isEqualTo(0.0);
+  }
+
+  @Test
+  void computeMinWithOnlyPositive() {
+    ApplicationLevelListener listener = mock(ApplicationLevelListener.class);
+    when(listener.computeMin(any(Stream.class))).thenCallRealMethod();
+    List<Double> minList = List.of(1.0, 19.2, 0.1, 0.03, 1.0, 891.0);
+    Stream<Double> minStream = new Stream<>(minList);
+    assertThat(listener.computeMin(minStream)).isEqualTo(0.03);
   }
 }

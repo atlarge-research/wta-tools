@@ -354,7 +354,7 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
    * @author Pil Kyu Cho
    * @since 1.0.0
    */
-  private double computeMin(Stream<Double> data) {
+  public double computeMin(Stream<Double> data) {
     return data.filter(x -> x >= 0.0).reduce(Double::min).orElse(-1.0);
   }
 

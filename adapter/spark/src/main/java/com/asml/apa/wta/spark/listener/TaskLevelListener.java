@@ -125,7 +125,8 @@ public class TaskLevelListener extends TaskStageBaseListener {
    */
   public void setTasks(StageLevelListener stageLevelListener, long jobId) {
     getWorkflowsToTasks().onKey(jobId).forEach(task -> {
-      final long stageId = getTaskToStage().remove(task.getId());
+      final Long nullableStageId = getTaskToStage().remove(task.getId());
+      final long stageId = nullableStageId == null ? -1 : nullableStageId;
       final Long[] parentStages = stageLevelListener.getStageToParents().get(stageId);
       if (parentStages != null) {
         final long[] parents = Arrays.stream(parentStages)
