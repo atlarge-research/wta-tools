@@ -90,16 +90,25 @@ public class StageLevelListener extends TaskStageBaseListener {
   @Override
   public void onStageCompleted(SparkListenerStageCompleted stageCompleted) {
     final StageInfo curStageInfo = stageCompleted.stageInfo();
-    final TaskMetrics curStageMetrics = curStageInfo.taskMetrics();
     final long stageId = curStageInfo.stageId() + 1;
     stageToResource.put(stageId, curStageInfo.resourceProfileId());
 
     final long tsSubmit = curStageInfo.submissionTime().getOrElse(() -> -1L);
-    final long runtime = curStageInfo.taskMetrics().executorRunTime();
     final int userId = Math.abs(getSparkContext().sparkUser().hashCode());
     final long workflowId = getStageToJob().get(stageId);
-    final double diskSpaceRequested = (double) curStageMetrics.diskBytesSpilled()
-        + curStageMetrics.shuffleWriteMetrics().bytesWritten();
+
+    long runtime;
+    double diskSpaceRequested;
+
+    try {
+      final TaskMetrics curStageMetrics = curStageInfo.taskMetrics();
+      runtime = curStageMetrics.executorRunTime();
+      diskSpaceRequested = (double) curStageMetrics.diskBytesSpilled()
+          + curStageMetrics.shuffleWriteMetrics().bytesWritten();
+    } catch (RuntimeException e) {
+      runtime = -1L;
+      diskSpaceRequested = -1.0;
+    }
 
     Task task = Task.builder()
         .id(stageId)
@@ -130,10 +139,11 @@ public class StageLevelListener extends TaskStageBaseListener {
    * @since 1.0.0
    */
   public void setStages(long jobId) {
-    final List<Task> filteredStages = getWorkflowsToTasks().onKey(jobId).toList();
-    filteredStages.forEach(stage -> stage.setChildren(
-        this.getParentStageToChildrenStages().getOrDefault(stage.getId(), new ArrayList<>()).stream()
-            .mapToLong(Long::longValue)
-            .toArray()));
+    getWorkflowsToTasks()
+        .onKey(jobId)
+        .forEach(stage -> stage.setChildren(
+            this.getParentStageToChildrenStages().getOrDefault(stage.getId(), new ArrayList<>()).stream()
+                .mapToLong(Long::longValue)
+                .toArray()));
   }
 }

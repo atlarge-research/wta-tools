@@ -4,7 +4,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 import com.asml.apa.wta.core.model.Domain;
 import com.asml.apa.wta.core.model.Workflow;
-import com.asml.apa.wta.core.streams.Stream;
+import com.asml.apa.wta.core.stream.Stream;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;

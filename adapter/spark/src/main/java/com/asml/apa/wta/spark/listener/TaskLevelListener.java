@@ -79,12 +79,21 @@ public class TaskLevelListener extends TaskStageBaseListener {
 
     final String type = taskEnd.taskType();
     final long tsSubmit = curTaskInfo.launchTime();
-    final long runtime = curTaskMetrics.executorRunTime();
     final int userId = Math.abs(getSparkContext().sparkUser().hashCode());
     final long workflowId = getStageToJob().get(stageId);
-    final double diskSpaceRequested = (double) curTaskMetrics.diskBytesSpilled()
-        + curTaskMetrics.shuffleWriteMetrics().bytesWritten();
     final long resourceUsed = Math.abs(curTaskInfo.executorId().hashCode());
+
+    long runtime;
+    double diskSpaceRequested;
+
+    try {
+      runtime = curTaskMetrics.executorRunTime();
+      diskSpaceRequested = (double) curTaskMetrics.diskBytesSpilled()
+          + curTaskMetrics.shuffleWriteMetrics().bytesWritten();
+    } catch (RuntimeException e) {
+      runtime = -1L;
+      diskSpaceRequested = -1.0;
+    }
 
     Task task = Task.builder()
         .id(taskId)
@@ -115,10 +124,9 @@ public class TaskLevelListener extends TaskStageBaseListener {
    * @since 1.0.0
    */
   public void setTasks(StageLevelListener stageLevelListener, long jobId) {
-    final List<Task> filteredTasks = getWorkflowsToTasks().onKey(jobId).toList();
-    for (Task task : filteredTasks) {
-      // set parent field: all Tasks in are guaranteed to be in taskToStage
-      final long stageId = getTaskToStage().remove(task.getId());
+    getWorkflowsToTasks().onKey(jobId).forEach(task -> {
+      final Long nullableStageId = getTaskToStage().remove(task.getId());
+      final long stageId = nullableStageId == null ? -1 : nullableStageId;
       final Long[] parentStages = stageLevelListener.getStageToParents().get(stageId);
       if (parentStages != null) {
         final long[] parents = Arrays.stream(parentStages)
@@ -131,7 +139,6 @@ public class TaskLevelListener extends TaskStageBaseListener {
         task.setParents(parents);
       }
 
-      // set children field
       List<Long> childrenStages =
           stageLevelListener.getParentStageToChildrenStages().get(stageId);
       if (childrenStages != null) {
@@ -145,17 +152,18 @@ public class TaskLevelListener extends TaskStageBaseListener {
         task.setChildren(childrenTaskIds);
       }
 
-      // set resource related fields
       final int resourceProfileId =
           stageLevelListener.getStageToResource().getOrDefault(stageId, -1);
-      final ResourceProfile resourceProfile =
-          getSparkContext().resourceProfileManager().resourceProfileFromId(resourceProfileId);
-      final List<TaskResourceRequest> resources = JavaConverters.seqAsJavaList(
-          resourceProfile.taskResources().values().toList());
-      if (resources.size() > 0) {
-        task.setResourceType(resources.get(0).resourceName());
-        task.setResourceAmountRequested(resources.get(0).amount());
+      if (resourceProfileId >= 0) {
+        final ResourceProfile resourceProfile =
+            getSparkContext().resourceProfileManager().resourceProfileFromId(resourceProfileId);
+        final List<TaskResourceRequest> resources = JavaConverters.seqAsJavaList(
+            resourceProfile.taskResources().values().toList());
+        if (!resources.isEmpty()) {
+          task.setResourceType(resources.get(0).resourceName());
+          task.setResourceAmountRequested(resources.get(0).amount());
+        }
       }
-    }
+    });
   }
 }

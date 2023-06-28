@@ -4,8 +4,8 @@ import com.asml.apa.wta.core.config.RuntimeConfig;
 import com.asml.apa.wta.core.model.Domain;
 import com.asml.apa.wta.core.model.Task;
 import com.asml.apa.wta.core.model.Workflow;
-import com.asml.apa.wta.core.streams.Stream;
-import com.asml.apa.wta.spark.dagsolver.DagSolver;
+import com.asml.apa.wta.core.stream.Stream;
+import com.asml.apa.wta.spark.util.DagSolver;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -113,7 +113,6 @@ public class JobLevelListener extends AbstractListener<Workflow> {
     final long tsSubmit = jobSubmitTimes.get(jobId);
     final Stream<Task> tasks = wtaTaskListener.getWorkflowsToTasks().onKey(jobId);
 
-    // we can also get the mode from the config, if that's what the user wants?
     final String scheduler = getSparkContext().getConf().get("spark.scheduler.mode", "FIFO");
     final Domain domain = getConfig().getDomain();
     final String appName = getSparkContext().appName();
@@ -127,8 +126,8 @@ public class JobLevelListener extends AbstractListener<Workflow> {
         .reduce(Double::sum)
         .orElse(-1.0);
 
-    long criticalPathLength;
-    int criticalPathTaskCount;
+    final long criticalPathLength;
+    final long criticalPathTaskCount;
     if (getConfig().isStageLevel()) {
       stageLevelListener.setStages(jobId);
       criticalPathLength = -1L;
@@ -148,12 +147,7 @@ public class JobLevelListener extends AbstractListener<Workflow> {
 
       final List<Task> criticalPath = solveCriticalPath(jobStages);
       final Map<Long, List<Task>> stageToTasks = taskLevelListener.getStageToTasks();
-      criticalPathTaskCount = criticalPath.stream()
-          .map(stage -> stageToTasks
-              .getOrDefault(stage.getId(), new ArrayList<>())
-              .size())
-          .reduce(Integer::sum)
-          .orElse(-1);
+      criticalPathTaskCount = criticalPath.isEmpty() ? -1L : criticalPath.size();
       criticalPathLength = criticalPath.stream()
           .map(stage -> stageToTasks.getOrDefault(stage.getId(), new ArrayList<>()).stream()
               .map(Task::getRuntime)

@@ -3,6 +3,7 @@ package com.asml.apa.wta.core.io;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -10,12 +11,15 @@ import org.apache.parquet.io.PositionOutputStream;
 import org.junit.jupiter.api.Test;
 
 public class DiskParquetOutputFileTest {
+
   @Test
   void testGetPos() throws IOException {
     DiskParquetOutputFile diskParquetOutputFile = new DiskParquetOutputFile(Path.of("test.parquet"));
-    PositionOutputStream sut = diskParquetOutputFile.createOrOverwrite(1);
-    sut.write(42);
-    assertEquals(1, sut.getPos());
+    try (PositionOutputStream sut = diskParquetOutputFile.createOrOverwrite(1)) {
+      sut.write(42);
+      assertEquals(1, sut.getPos());
+    }
+    new File("test.parquet").delete();
   }
 
   @Test

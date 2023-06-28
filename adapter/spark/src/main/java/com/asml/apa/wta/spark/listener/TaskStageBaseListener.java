@@ -2,7 +2,7 @@ package com.asml.apa.wta.spark.listener;
 
 import com.asml.apa.wta.core.config.RuntimeConfig;
 import com.asml.apa.wta.core.model.Task;
-import com.asml.apa.wta.core.streams.KeyedStream;
+import com.asml.apa.wta.core.stream.KeyedStream;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.Getter;
@@ -50,7 +50,7 @@ public abstract class TaskStageBaseListener extends AbstractListener<Task> {
 
   /**
    * Associates a {@link Task} with a {@link com.asml.apa.wta.core.model.Workflow}.
-   * Also adds the {@link Task} to the processed objects {@link com.asml.apa.wta.core.streams.Stream}.
+   * Also adds the {@link Task} to the processed objects {@link com.asml.apa.wta.core.stream.Stream}.
    *
    * @param workflowId the id of the {@link com.asml.apa.wta.core.model.Workflow} to add the {@link Task} to
    * @param task the {@link Task} to add

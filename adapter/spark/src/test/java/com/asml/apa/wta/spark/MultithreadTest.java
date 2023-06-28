@@ -6,8 +6,8 @@ import static org.mockito.Mockito.*;
 
 import com.asml.apa.wta.spark.dto.ResourceCollectionDto;
 import com.asml.apa.wta.spark.dto.SparkBaseSupplierWrapperDto;
-import com.asml.apa.wta.spark.executor.engine.SparkSupplierExtractionEngine;
-import com.asml.apa.wta.spark.executor.plugin.WtaExecutorPlugin;
+import com.asml.apa.wta.spark.executor.SparkSupplierExtractionEngine;
+import com.asml.apa.wta.spark.executor.WtaExecutorPlugin;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;

@@ -110,6 +110,7 @@ For the most part, since we are pre-release this will serve no real purpose, oth
 - Fixed inefficient map interactions [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 - Fixed default values for trace objects [@pcho](https://gitlab.ewi.tudelft.nl/pcho)
 - Fixed recursive method with `StackOverflowError` potential [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
+- Cleaned up repository [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
 
 ### Deprecated
 
