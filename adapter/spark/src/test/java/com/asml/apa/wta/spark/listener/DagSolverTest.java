@@ -234,4 +234,16 @@ class DagSolverTest {
     assertThat(cp.contains(5L)).isTrue();
     assertThat(cp.contains(7L)).isTrue();
   }
+
+  @Test
+  void criticalPathTaskCountTest() {
+    Map<Long, List<Task>> stageToTasks = mock(Map.class);
+    Task mockedTask = mock(Task.class);
+    when(stageToTasks.get(2L)).thenReturn(List.of(mockedTask, mockedTask));
+    when(stageToTasks.get(5L)).thenReturn(List.of(mockedTask, mockedTask));
+    when(stageToTasks.get(7L)).thenReturn(List.of(mockedTask, mockedTask));
+    List<Task> criticalPath = fakeJobListener1.solveCriticalPath(stages2);
+    long criticalPathTaskCount = criticalPath.isEmpty() ? -1L : criticalPath.size();
+    assertThat(criticalPathTaskCount).isEqualTo(3);
+  }
 }

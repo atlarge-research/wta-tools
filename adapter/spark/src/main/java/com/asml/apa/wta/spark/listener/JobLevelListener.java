@@ -127,7 +127,7 @@ public class JobLevelListener extends AbstractListener<Workflow> {
         .orElse(-1.0);
 
     final long criticalPathLength;
-    final int criticalPathTaskCount;
+    final long criticalPathTaskCount;
     if (getConfig().isStageLevel()) {
       stageLevelListener.setStages(jobId);
       criticalPathLength = -1L;
@@ -147,12 +147,7 @@ public class JobLevelListener extends AbstractListener<Workflow> {
 
       final List<Task> criticalPath = solveCriticalPath(jobStages);
       final Map<Long, List<Task>> stageToTasks = taskLevelListener.getStageToTasks();
-      criticalPathTaskCount = criticalPath.stream()
-          .map(stage -> stageToTasks
-              .getOrDefault(stage.getId(), new ArrayList<>())
-              .size())
-          .reduce(Integer::sum)
-          .orElse(-1);
+      criticalPathTaskCount = criticalPath.isEmpty() ? -1L : criticalPath.size();
       criticalPathLength = criticalPath.stream()
           .map(stage -> stageToTasks.getOrDefault(stage.getId(), new ArrayList<>()).stream()
               .map(Task::getRuntime)
