@@ -14,7 +14,6 @@ import java.io.Serializable;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Instant;
-import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -43,6 +42,131 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 public class Stream<V extends Serializable> implements Cloneable {
+
+  private class FilteredStream extends Stream<V> {
+
+    private final Predicate<V> predicate;
+    private boolean applied;
+
+    private FilteredStream(Predicate<V> filter) {
+      super(
+          diskLocations,
+          additionsSinceLastWriteToDisk,
+          serializationTrigger,
+          deserializationStart,
+          deserializationEnd,
+          head,
+          tail);
+      applied = false;
+      predicate = filter;
+    }
+
+    @Override
+    public synchronized Stream<V> filter(@NonNull Predicate<V> filter) {
+      if (applied) {
+        return new FilteredStream(filter);
+      }
+      return new FilteredStream(predicate.and(filter));
+    }
+
+    @Override
+    public synchronized V head() {
+      V elem = super.head();
+      while (!predicate.test(elem)) {
+        elem = super.head();
+      }
+      return elem;
+    }
+
+    @Override
+    public synchronized Optional<V> findFirst() {
+      super.forceFilter(predicate);
+      return super.findFirst();
+    }
+
+    @Override
+    public synchronized V peek() {
+      V elem = super.peek();
+      while (!predicate.test(elem)) {
+        super.head();
+        elem = super.peek();
+      }
+      return elem;
+    }
+
+    @Override
+    public synchronized long count() {
+      return super.countFilter(predicate);
+    }
+
+    @Override
+    public synchronized long countFilter(@NonNull Predicate<V> filter) {
+      return super.countFilter(predicate.and(filter));
+    }
+
+    @Override
+    public synchronized <R extends Serializable> Stream<R> map(@NonNull Function<V, R> mapper) {
+      if (!applied) {
+        super.forceFilter(predicate);
+        applied = true;
+      }
+      return super.map(mapper);
+    }
+
+    @Override
+    public synchronized void forEach(Consumer<? super V> consumer) {
+      if (!applied) {
+        super.forceFilter(predicate);
+        applied = true;
+      }
+      super.forEach(consumer);
+    }
+
+    @Override
+    public synchronized boolean isEmpty() {
+      if (!applied) {
+        super.forceFilter(predicate);
+        applied = true;
+      }
+      return super.isEmpty();
+    }
+
+    @Override
+    public synchronized void addToStream(V elem) {
+      if (!applied) {
+        super.forceFilter(predicate);
+        applied = true;
+      }
+      super.addToStream(elem);
+    }
+
+    @Override
+    public synchronized Optional<V> reduce(@NonNull BinaryOperator<V> accumulator) {
+      if (!applied) {
+        super.forceFilter(predicate);
+        applied = true;
+      }
+      return super.reduce(accumulator);
+    }
+
+    @Override
+    public synchronized List<V> toList() {
+      if (!applied) {
+        super.forceFilter(predicate);
+        applied = true;
+      }
+      return super.toList();
+    }
+
+    @Override
+    public synchronized <R> R foldLeft(R init, @NonNull BiFunction<R, V, R> op) {
+      if (!applied) {
+        super.forceFilter(predicate);
+        applied = true;
+      }
+      return super.foldLeft(init, op);
+    }
+  }
 
   /**
    * Internal node of the {@link com.asml.apa.wta.core.stream.Stream}.
@@ -78,13 +202,31 @@ public class Stream<V extends Serializable> implements Cloneable {
 
   private Queue<String> diskLocations;
   private int additionsSinceLastWriteToDisk;
-  private final int serializationTrigger;
+  private int serializationTrigger;
 
   private StreamNode<V> deserializationStart;
   private StreamNode<V> deserializationEnd;
 
   private StreamNode<V> head;
   private StreamNode<V> tail;
+
+  private Stream(
+      Queue<String> diskQueue,
+      int additionsSinceLastWrite,
+      int trigger,
+      StreamNode<V> start,
+      StreamNode<V> end,
+      StreamNode<V> headNode,
+      StreamNode<V> tailNode) {
+    id = UUID.randomUUID();
+    diskLocations = diskQueue;
+    additionsSinceLastWriteToDisk = additionsSinceLastWrite;
+    serializationTrigger = trigger;
+    deserializationStart = start;
+    deserializationEnd = end;
+    head = headNode;
+    tail = tailNode;
+  }
 
   /**
    * Constructs a stream with one element.
@@ -148,6 +290,33 @@ public class Stream<V extends Serializable> implements Cloneable {
     for (V elem : content) {
       addToStream(elem);
     }
+  }
+
+  private void forceFilter(Predicate<V> predicate) {
+    log.trace("Consuming and applying filter on Stream {}.", id);
+    StreamNode<V> next = head;
+    Stream<V> ret = new Stream<>();
+    while (next != null) {
+      if (next.getNext() == null) {
+        deserializationStart = next;
+        deserializationEnd = null;
+      }
+      if (next == deserializationStart && !diskLocations.isEmpty()) {
+        head = next;
+        deserializeInternals(diskLocations.poll());
+      }
+      if (predicate.test(next.getContent())) {
+        ret.addToStream(next.getContent());
+      }
+      next = next.getNext();
+    }
+    head = ret.head;
+    tail = ret.tail;
+    deserializationStart = ret.deserializationStart;
+    deserializationEnd = ret.deserializationEnd;
+    diskLocations = ret.diskLocations;
+    additionsSinceLastWriteToDisk = ret.additionsSinceLastWriteToDisk;
+    serializationTrigger = ret.serializationTrigger;
   }
 
   /**
@@ -224,8 +393,7 @@ public class Stream<V extends Serializable> implements Cloneable {
     try {
       Stream<V> clone = (Stream<V>) super.clone();
       clone.id = UUID.randomUUID();
-      clone.diskLocations = new ArrayDeque<>();
-      clone.diskLocations.addAll(diskLocations);
+      clone.diskLocations = new ConcurrentLinkedDeque<>(diskLocations);
       return clone;
     } catch (CloneNotSupportedException e) {
       log.error("Could not clone Stream because {}.", e.getMessage());
@@ -241,7 +409,7 @@ public class Stream<V extends Serializable> implements Cloneable {
    * @since 1.0.0
    */
   public boolean isEmpty() {
-    log.trace("Checking whether stream {} is empty.", id);
+    log.trace("Checking whether Stream {} is empty.", id);
     return head == null;
   }
 
@@ -357,7 +525,6 @@ public class Stream<V extends Serializable> implements Cloneable {
    * @since 1.0.0
    */
   public synchronized void addToStream(V content) {
-    log.trace("Added content to stream {}", this.id);
     if (head == null) {
       head = new StreamNode<>(content);
       tail = head;
@@ -378,6 +545,7 @@ public class Stream<V extends Serializable> implements Cloneable {
           additionsSinceLastWriteToDisk);
       serializeInternals();
     }
+    log.trace("Added content to stream {}", id);
   }
 
   /**
@@ -427,9 +595,26 @@ public class Stream<V extends Serializable> implements Cloneable {
    * @since 1.0.0
    */
   public synchronized Stream<V> filter(@NonNull Predicate<V> predicate) {
-    log.trace("Consuming and applying filter on stream {}", this.id);
+    Stream<V> ret = new FilteredStream(predicate);
+    head = null;
+    tail = null;
+    deserializationStart = null;
+    deserializationEnd = null;
+    return ret;
+  }
+
+  /**
+   * Counts the elements that satisfy the given {@link Predicate}.
+   *
+   * @param predicate the {@link Predicate} for which to run the count
+   * @return the amount of elements that satisfy the {@link Predicate}
+   * @author Atour Mousavi Gourabi
+   * @since 1.0.0
+   */
+  public synchronized long countFilter(@NonNull Predicate<V> predicate) {
+    log.trace("Consuming and applying filtered count on Stream {}.", id);
     StreamNode<V> next = head;
-    Stream<V> ret = new Stream<>();
+    long ret = 0;
     while (next != null) {
       if (next.getNext() == null) {
         deserializationStart = next;
@@ -440,7 +625,7 @@ public class Stream<V extends Serializable> implements Cloneable {
         deserializeInternals(diskLocations.poll());
       }
       if (predicate.test(next.getContent())) {
-        ret.addToStream(next.getContent());
+        ret++;
       }
       next = next.getNext();
     }

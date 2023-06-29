@@ -178,8 +178,7 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
     final long totalWorkflows = workflows.copy().count();
     final long totalTasks =
         workflows.map(Workflow::getTaskCount).reduce(Long::sum).orElse(0L);
-    long numSites =
-        tasks.copy().filter(task -> task.getSubmissionSite() >= 0).count();
+    long numSites = tasks.copy().countFilter(task -> task.getSubmissionSite() >= 0);
     numSites = numSites < 1 ? -1 : numSites;
     final long numResources = tasks.copy()
         .map(Task::getResourceAmountRequested)
@@ -187,9 +186,9 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
         .reduce(Double::sum)
         .orElse(-1.0)
         .longValue();
-    long numUsers = tasks.copy().filter(task -> task.getUserId() >= 0).count();
+    long numUsers = tasks.copy().countFilter(task -> task.getUserId() >= 0);
     numUsers = numUsers < 1 ? -1 : numUsers;
-    long numGroups = tasks.copy().filter(task -> task.getGroupId() >= 0).count();
+    long numGroups = tasks.copy().countFilter(task -> task.getGroupId() >= 0);
     numGroups = numGroups < 1 ? -1 : numGroups;
     final double totalResourceSeconds = tasks.copy()
         .filter(task -> task.getRuntime() >= 0 && task.getResourceAmountRequested() >= 0.0)
