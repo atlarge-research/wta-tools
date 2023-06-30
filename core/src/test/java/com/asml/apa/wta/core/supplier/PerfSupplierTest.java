@@ -10,7 +10,7 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import org.junit.jupiter.api.Test;
 
-public class PerfSupplierTest {
+class PerfSupplierTest {
 
   private final ShellRunner shellRunner = mock(ShellRunner.class);
 

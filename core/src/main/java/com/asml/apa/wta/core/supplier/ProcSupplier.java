@@ -21,13 +21,14 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * ProcSupplier class.
+ * ProcSupplier class for the pseudo-file system proc.
  *
  * @author Lohithsai Yadala Chanchu
  * @since 1.0.0
  */
 @Slf4j
 public class ProcSupplier implements InformationSupplier<ProcDto> {
+
   private final ShellRunner shellRunner;
 
   @Setter
@@ -35,7 +36,9 @@ public class ProcSupplier implements InformationSupplier<ProcDto> {
 
   private final boolean isDiskMetricsAvailable;
   private final boolean isMemMetricsAvailable;
+
   private final boolean isCpuMetricsAvailable;
+
   private final boolean isLoadAvgMetricsAvailable;
 
   public ProcSupplier(ShellRunner shellRunner) {
@@ -59,8 +62,6 @@ public class ProcSupplier implements InformationSupplier<ProcDto> {
    * Checks if the system runs Linux.
    *
    * @return a {@code boolean} that represents if the proc directory is available
-   * @author Lohithsai Yadala Chanchu
-   * @since 1.0.0
    */
   @Override
   public boolean isAvailable() {
@@ -71,8 +72,6 @@ public class ProcSupplier implements InformationSupplier<ProcDto> {
    * Gets information from proc directory to get disk and memory metrics.
    *
    * @return CompletableFuture&lt;ProcDto&gt; that will be sent to the driver
-   * @author Lohithsai Yadala Chanchu
-   * @since 1.0.0
    */
   public CompletableFuture<Optional<ProcDto>> getSnapshot() {
     if (!isProcAvailable) {
@@ -199,8 +198,6 @@ public class ProcSupplier implements InformationSupplier<ProcDto> {
    * Get contents of /proc/meminfo.
    *
    * @return CompletableFuture&lt;Optional&lt;Long&gt;[]&gt; of the parsed numbers from the /proc/meminfo file
-   * @author Lohithsai Yadala Chanchu
-   * @since 1.0.0
    */
   private CompletableFuture<Optional<Long>[]> getMemMetrics() {
     CompletableFuture<String> memMetrics = shellRunner.executeCommand("cat /proc/meminfo", false);
@@ -220,8 +217,6 @@ public class ProcSupplier implements InformationSupplier<ProcDto> {
    * Get contents /proc/diskstats.
    *
    * @return CompletableFuture&lt;Optional&lt;Long&gt;[]&gt; of the parsed numbers from the /proc/diskstats file
-   * @author Lohithsai Yadala Chanchu
-   * @since 1.0.0
    */
   private CompletableFuture<Optional<Long>[]> getDiskMetrics() {
     CompletableFuture<String> diskMetrics = shellRunner.executeCommand("cat /proc/diskstats", false);
@@ -250,8 +245,6 @@ public class ProcSupplier implements InformationSupplier<ProcDto> {
    * Get cpu model from /proc/cpuinfo.
    *
    * @return CompletableFuture&lt;Optional&lt;Long&gt;&gt; of the parsed cpu model from the /proc/cpuinfo file
-   * @author Lohithsai Yadala Chanchu
-   * @since 1.0.0
    */
   private CompletableFuture<Optional<String>> getCpuModel() {
     CompletableFuture<String> cpuMetrics = shellRunner.executeCommand(
@@ -268,8 +261,6 @@ public class ProcSupplier implements InformationSupplier<ProcDto> {
    * Get loadAvgStats from /proc/loadavg.
    *
    * @return CompletableFuture of the parsed numbers from the /proc/loadavg file
-   * @author Lohithsai Yadala Chanchu
-   * @since 1.0.0
    */
   private CompletableFuture<Optional<Double>[]> getLoadAvgMetrics() {
     CompletableFuture<String> loadAvgMetrics = shellRunner.executeCommand("cat /proc/loadavg", false);
@@ -299,8 +290,6 @@ public class ProcSupplier implements InformationSupplier<ProcDto> {
    *
    * @param input the input to be parsed
    * @return List&lt;List&lt;String&gt;&gt; of the parsed numbers from the /proc/diskstats file
-   * @author Lohithsai Yadala Chanchu
-   * @since 1.0.0
    */
   private List<OutputLine> parseDiskMetrics(String input) {
     List<OutputLine> result = new ArrayList<>();
@@ -328,8 +317,6 @@ public class ProcSupplier implements InformationSupplier<ProcDto> {
    *
    * @param input the input to be parsed
    * @return List&lt;Long&gt; of the parsed numbers from the /proc/meminfo file
-   * @author Lohithsai Yadala Chanchu
-   * @since 1.0.0
    */
   private List<Long> parseMemMetrics(String input) {
     String[] lines = input.split("\n");
@@ -354,8 +341,6 @@ public class ProcSupplier implements InformationSupplier<ProcDto> {
    *
    * @param output the output of the cat terminal command
    * @return a boolean value that represents if the file was not found
-   * @author Lohithsai Yadala Chanchu
-   * @since 1.0.0
    */
   private boolean fileNotFound(String output) {
     return output.contains("No such file or directory");
@@ -376,8 +361,6 @@ public class ProcSupplier implements InformationSupplier<ProcDto> {
      * Add an element to the outputLine.
      *
      * @param element the string to be added to the outputLine
-     * @author Lohithsai Yadala Chanchu
-     * @since 1.0.0
      */
     public void addToLine(String element) {
       this.outputLine.add(element);
@@ -387,8 +370,6 @@ public class ProcSupplier implements InformationSupplier<ProcDto> {
      * Gets the length of the outputLine.
      *
      * @return the length of the outputLine
-     * @author Lohithsai Yadala Chanchu
-     * @since 1.0.0
      */
     public int getLineLength() {
       return this.outputLine.size();
@@ -399,8 +380,6 @@ public class ProcSupplier implements InformationSupplier<ProcDto> {
      *
      * @param index the index of the element we want to receive
      * @return the string that is at the specified index
-     * @author Lohithsai Yadala Chanchu
-     * @since 1.0.0
      */
     public String getElementAt(int index) {
       return this.outputLine.get(index);

@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 
 class JavaFileSupplierIntegrationTest {
 
-  JavaFileSupplier sut;
+  private JavaFileSupplier sut;
 
   @BeforeEach
   void setup() {

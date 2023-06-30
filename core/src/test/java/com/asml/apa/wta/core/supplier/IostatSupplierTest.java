@@ -11,10 +11,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-public class IostatSupplierTest {
+class IostatSupplierTest {
 
-  ShellRunner shellRunner;
-  IostatSupplier sut;
+  private ShellRunner shellRunner;
+  private IostatSupplier sut;
 
   @BeforeEach
   void setup() {

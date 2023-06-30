@@ -9,10 +9,10 @@ import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
 
-public class ProcSupplierIntegrationTest {
+class ProcSupplierIntegrationTest {
   @Test
   @Timeout(value = 10000L, unit = TimeUnit.MILLISECONDS)
-  public void procSuccesfullyReturnsDtoObject() {
+  public void procSuccessfullyReturnsDtoObject() {
     ProcSupplier a = new ProcSupplier(new ShellRunner());
     Optional<ProcDto> actual = a.getSnapshot().join();
     if (a.isAvailable()) {

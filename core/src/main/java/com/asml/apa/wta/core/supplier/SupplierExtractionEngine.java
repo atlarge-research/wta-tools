@@ -52,10 +52,6 @@ public abstract class SupplierExtractionEngine<T extends BaseSupplierDto> {
    * Suppliers should be injected here.
    *
    * @param resourcePingInterval How often to ping the suppliers, in milliseconds
-   * @author Henry Page
-   * @author Lohithsai Yadala Chanchu
-   * @author Pil Kyu Cho
-   * @since 1.0.0
    */
   public SupplierExtractionEngine(int resourcePingInterval) {
     ShellRunner shellRunner = new ShellRunner();
@@ -73,8 +69,6 @@ public abstract class SupplierExtractionEngine<T extends BaseSupplierDto> {
    * Developers are encouraged to override this to add/remove additional information.
    *
    * @return A {@link CompletableFuture} that completes when the result has been resolved
-   * @author Henry Page
-   * @since 1.0.0
    */
   protected CompletableFuture<T> ping() {
     CompletableFuture<Optional<OsInfoDto>> osInfoDtoCompletableFuture = this.operatingSystemSupplier.getSnapshot();
@@ -116,9 +110,6 @@ public abstract class SupplierExtractionEngine<T extends BaseSupplierDto> {
 
   /**
    * Starts pinging the suppliers at a fixed rate.
-   *
-   * @author Henry Page
-   * @since 1.0.0
    */
   public void startPinging() {
     log.trace("Starting to ping suppliers.");
@@ -127,9 +118,6 @@ public abstract class SupplierExtractionEngine<T extends BaseSupplierDto> {
 
   /**
    * Stops pinging the suppliers.
-   *
-   * @author Henry Page
-   * @since 1.0.0
    */
   public void stopPinging() {
     log.trace("Stopping to ping suppliers.");
@@ -142,8 +130,6 @@ public abstract class SupplierExtractionEngine<T extends BaseSupplierDto> {
    *
    * @param record The 'bare-bones' information that needs to be augmented
    * @return The transformed resource metrics record, with additional information
-   * @author Henry Page
-   * @since 1.0.0
    */
   public abstract T transform(BaseSupplierDto record);
 
@@ -151,8 +137,6 @@ public abstract class SupplierExtractionEngine<T extends BaseSupplierDto> {
    * Get and clear the buffer.
    *
    * @return The buffer contents as a list
-   * @author Henry Page
-   * @since 1.0.0
    */
   public List<T> getAndClear() {
     log.trace("Getting and clearing buffer.");

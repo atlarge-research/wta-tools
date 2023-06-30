@@ -13,7 +13,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import org.junit.jupiter.api.Test;
 
-public class WtaWriterTest {
+class WtaWriterTest {
 
   @Test
   void workloadWriterWasActuallyCalled() throws IOException {

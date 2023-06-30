@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import org.junit.jupiter.api.Test;
 
-public class ParquetWriterIntegrationTest {
+class ParquetWriterIntegrationTest {
 
   @Test
   void generateAndWrite() throws IOException {

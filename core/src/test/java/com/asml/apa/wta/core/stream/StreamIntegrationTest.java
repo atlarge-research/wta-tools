@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Test;
 /**
  * Fixture for stream integration testing on serialization.
  */
-public class StreamIntegrationTest {
+class StreamIntegrationTest {
 
   private static final int defaultSerTrigger = 10;
 

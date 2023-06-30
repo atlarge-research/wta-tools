@@ -6,6 +6,12 @@ import java.io.InputStreamReader;
 import java.util.concurrent.CompletableFuture;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * Utility class to run shell commands.
+ *
+ * @author Lohithsai Yadala Chanchu
+ * @since 1.0.0
+ */
 @Slf4j
 public class ShellRunner {
 
@@ -15,8 +21,6 @@ public class ShellRunner {
    * @param command The shell command string that is run.
    * @param suppressErrors Decides if logs written on error
    * @return {@link CompletableFuture} that returns the output of the command
-   * @author Lohithsai Yadala Chanchu
-   * @since 1.0.0
    */
   public CompletableFuture<String> executeCommand(String command, boolean suppressErrors) {
     log.trace("Executing shell command: {}.", command);
@@ -48,8 +52,6 @@ public class ShellRunner {
    * Reads the terminal output.
    *
    * @return String that is the terminal output
-   * @author Lohithsai Yadala Chanchu
-   * @since 1.0.0
    */
   private String readProcessOutput(Process process) {
     log.trace("Reading shell command outputs.");

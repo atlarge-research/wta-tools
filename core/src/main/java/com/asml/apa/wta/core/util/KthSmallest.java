@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Util class to find the kth smallest number in a {@link Stream} of {@code doubles}.
+ * Utility class to find the kth smallest number in a {@link Stream} of {@code doubles}.
  *
  * @author Atour Mousavi Gourabi
  * @since 1.0.0
@@ -17,8 +17,6 @@ public class KthSmallest {
    *
    * @param fiveDoubles the {@link List} of at most five doubles
    * @return the median of the {@link List}
-   * @author Atour Mousavi Gourabi
-   * @since 1.0.0
    */
   private double findMedian(List<Double> fiveDoubles) {
     if (fiveDoubles.size() > 5 || fiveDoubles.size() < 1) {
@@ -38,8 +36,6 @@ public class KthSmallest {
    *
    * @param data the {@link Stream} to compute the median of medians over
    * @return the median of medians
-   * @author Atour Mousavi Gourabi
-   * @since 1.0.0
    */
   private double medianOfMedians(Stream<Double> data) {
     Stream<Double> stream = data;
@@ -71,8 +67,6 @@ public class KthSmallest {
    * @param data the {@link Stream} to query
    * @param kthSmallest the amount of numbers smaller than the one we want to fetch
    * @return the kth smallest number in the {@link Stream}
-   * @author Atour Mousavi Gourabi
-   * @since 1.0.0
    */
   public double find(Stream<Double> data, long kthSmallest) {
     Stream<Double> stream = data;

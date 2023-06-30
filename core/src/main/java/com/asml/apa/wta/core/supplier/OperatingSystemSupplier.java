@@ -21,9 +21,6 @@ public class OperatingSystemSupplier implements InformationSupplier<OsInfoDto> {
 
   /**
    * Constructs the Supplier.
-   *
-   * @author Atour Mousavi Gourabi
-   * @since 1.0.0
    */
   public OperatingSystemSupplier() {
     bean = (OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
@@ -34,8 +31,6 @@ public class OperatingSystemSupplier implements InformationSupplier<OsInfoDto> {
    * Verifies that the supplier is available.
    *
    * @return a {@code boolean} indicating the validity of this supplier
-   * @author Atour Mousavi Gourabi
-   * @since 1.0.0
    */
   @Override
   public boolean isAvailable() {
@@ -47,8 +42,6 @@ public class OperatingSystemSupplier implements InformationSupplier<OsInfoDto> {
    * If this metric is unavailable it returns -1.
    *
    * @return the amount of virtual memory that is available in bytes, -1 if unavailable
-   * @author Atour Mousavi Gourabi
-   * @since 1.0.0
    */
   public long getCommittedVirtualMemorySize() {
     return bean.getCommittedVirtualMemorySize();
@@ -58,8 +51,6 @@ public class OperatingSystemSupplier implements InformationSupplier<OsInfoDto> {
    * Retrieves the amount of free physical memory in bytes.
    *
    * @return the amount of free physical memory in bytes
-   * @author Atour Mousavi Gourabi
-   * @since 1.0.0
    */
   @SuppressWarnings("deprecation")
   public long getFreePhysicalMemorySize() {
@@ -71,8 +62,6 @@ public class OperatingSystemSupplier implements InformationSupplier<OsInfoDto> {
    * The value is a double between 0 and 1.
    *
    * @return a value between 0 and 1 indicating the recent CPU usage for the JVM
-   * @author Atour Mousavi Gourabi
-   * @since 1.0.0
    */
   public double getProcessCpuLoad() {
     return bean.getProcessCpuLoad();
@@ -84,8 +73,6 @@ public class OperatingSystemSupplier implements InformationSupplier<OsInfoDto> {
    * If this metric is unavailable it returns -1.
    *
    * @return the CPU time used by the JVM in nanoseconds, -1 if unavailable
-   * @author Atour Mousavi Gourabi
-   * @since 1.0.0
    */
   public long getProcessCpuTime() {
     return bean.getProcessCpuTime();
@@ -95,8 +82,6 @@ public class OperatingSystemSupplier implements InformationSupplier<OsInfoDto> {
    * Retrieves the amount of total physical memory in bytes.
    *
    * @return the amount of total physical memory in bytes
-   * @author Atour Mousavi Gourabi
-   * @since 1.0.0
    */
   @SuppressWarnings("deprecation")
   public long getTotalPhysicalMemorySize() {
@@ -108,8 +93,6 @@ public class OperatingSystemSupplier implements InformationSupplier<OsInfoDto> {
    * If this metric is unavailable it returns some negative value.
    *
    * @return the system load average, negative if unavailable
-   * @author Atour Mousavi Gourabi
-   * @since 1.0.0
    */
   public double getSystemLoadAverage() {
     return bean.getSystemLoadAverage();
@@ -120,8 +103,6 @@ public class OperatingSystemSupplier implements InformationSupplier<OsInfoDto> {
    * The value returned may change during a JVM run, it will never be smaller than 1.
    *
    * @return the number of processors available, never smaller than 1
-   * @author Atour Mousavi Gourabi
-   * @since 1.0.0
    */
   public int getAvailableProcessors() {
     return bean.getAvailableProcessors();
@@ -131,8 +112,6 @@ public class OperatingSystemSupplier implements InformationSupplier<OsInfoDto> {
    * Retrieves the architecture abbreviation.
    *
    * @return The underlying architecture e.g. amd64
-   * @author Henry Page
-   * @since 1.0.0
    */
   public String getArch() {
     return bean.getArch();
@@ -151,8 +130,6 @@ public class OperatingSystemSupplier implements InformationSupplier<OsInfoDto> {
    * Gathers the metrics the supplier provides (computed asynchronously).
    *
    * @return an {@link OsInfoDto} containing the gathered metrics
-   * @author Atour Mousavi Gourabi
-   * @since 1.0.0
    */
   @Override
   public CompletableFuture<Optional<OsInfoDto>> getSnapshot() {

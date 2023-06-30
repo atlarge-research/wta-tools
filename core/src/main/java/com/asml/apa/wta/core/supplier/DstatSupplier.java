@@ -12,7 +12,7 @@ import java.util.regex.Pattern;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * DstatDataSource class.
+ * DstatDataSource class for the Dstat tool.
  *
  * @author Lohithsai Yadala Chanchu
  * @since 1.0.0
@@ -31,15 +31,12 @@ public class DstatSupplier implements InformationSupplier<DstatDto> {
    * Uses the Dstat dependency to get io metrics.
    *
    * @return DstatDataSourceDto object that will be sent to the driver (with the necessary information filled out)
-   * @author Lohithsai Yadala Chanchu
-   * @since 1.0.0
    */
   @Override
   public CompletableFuture<Optional<DstatDto>> getSnapshot() {
     if (!isDstatAvailable) {
       return notAvailableResult();
     }
-
     CompletableFuture<String> allMetrics = shellRunner.executeCommand("dstat -cdngy 1 1", false);
 
     return allMetrics.thenApply(result -> {
@@ -81,11 +78,8 @@ public class DstatSupplier implements InformationSupplier<DstatDto> {
    * Parse dstat terminal output.
    *
    * @return List of the parsed numbers from the dstat terminal output
-   * @author Lohithsai Yadala Chanchu
-   * @since 1.0.0
    */
   private static List<Long> extractNumbers(String input) {
-
     List<Long> numbers = new ArrayList<>();
     Pattern pattern = Pattern.compile("\\b(\\d+)(k|B|G|M)?\\b");
     Matcher matcher = pattern.matcher(input);
@@ -113,8 +107,6 @@ public class DstatSupplier implements InformationSupplier<DstatDto> {
    * Checks if the dstat datasource is available.
    *
    * @return A boolean that represents if the dstat datasource is available
-   * @author Lohithsai Yadala Chanchu
-   * @since 1.0.0
    */
   @Override
   public boolean isAvailable() {

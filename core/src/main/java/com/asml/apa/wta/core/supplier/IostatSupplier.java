@@ -33,8 +33,6 @@ public class IostatSupplier implements InformationSupplier<IostatDto> {
    * Constructs the supplier with a given instance of shell utils.
    *
    * @param shellRunner the shell utils instance to use
-   * @author Henry Page
-   * @since 1.0.0
    */
   public IostatSupplier(ShellRunner shellRunner) {
     this.shellRunner = shellRunner;
@@ -45,8 +43,6 @@ public class IostatSupplier implements InformationSupplier<IostatDto> {
    * Checks if the supplier is available.
    *
    * @return A boolean that represents if the iostat supplier is available
-   * @author Lohithsai Yadala Chanchu
-   * @since 1.0.0
    */
   @Override
   public boolean isAvailable() {
@@ -69,9 +65,6 @@ public class IostatSupplier implements InformationSupplier<IostatDto> {
    * Uses the iostat dependency to get io metrics (computed asynchronously).
    *
    * @return IostatDto object that will be sent to the driver (with the necessary information filled out)
-   * @author Lohithsai Yadala Chanchu
-   * @author Henry Page
-   * @since 1.0.0
    */
   @Override
   public CompletableFuture<Optional<IostatDto>> getSnapshot() {
@@ -117,13 +110,10 @@ public class IostatSupplier implements InformationSupplier<IostatDto> {
    *
    * @param input output of the iostat command
    * @return Parsed ouptut of the iostat command
-   * @author Lohithsai Yadala Chanchu
-   * @since 1.0.0
    */
   private List<OutputLine> parseIostat(String input) {
     List<OutputLine> rows =
         Arrays.stream(input.split("\n")).skip(1).map(OutputLine::new).collect(Collectors.toList());
-
     return rows;
   }
 
@@ -132,8 +122,6 @@ public class IostatSupplier implements InformationSupplier<IostatDto> {
    *
    * @param rows List of output rows
    * @return Aggregated array of doubles
-   * @author Lohithsai Yadala Chanchu
-   * @since 1.0.0
    */
   private double[] aggregateIostat(List<OutputLine> rows) {
     if (rows.size() != 0) {
@@ -149,6 +137,7 @@ public class IostatSupplier implements InformationSupplier<IostatDto> {
     }
     return new double[NUMBER_OF_IOSTAT_METRICS];
   }
+
   /**
    * Container class to be used in nested String Lists.
    *
@@ -167,8 +156,6 @@ public class IostatSupplier implements InformationSupplier<IostatDto> {
      * Returns the row size of the output line.
      *
      * @return The size of the outputLine
-     * @author Lohithsai Yadala Chanchu
-     * @since 1.0.0
      */
     public int getRowSize() {
       return this.outputLine.size();
@@ -179,8 +166,6 @@ public class IostatSupplier implements InformationSupplier<IostatDto> {
      *
      * @param index the string that is at the specified index
      * @return The string at the specified index in outputLine
-     * @author Lohithsai Yadala Chanchu
-     * @since 1.0.0
      */
     public String getMetricAt(int index) {
       return this.outputLine.get(index);

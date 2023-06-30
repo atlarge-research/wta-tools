@@ -18,8 +18,6 @@ public interface InformationSupplier<T extends SupplierDto> {
    * Implementations should be inexpensive to call.
    *
    * @return true iff it is available, false otherwise
-   * @author Henry Page
-   * @since 1.0.0
    */
   boolean isAvailable();
 
@@ -27,8 +25,6 @@ public interface InformationSupplier<T extends SupplierDto> {
    * Gets a snapshot of the information in an async manner provided by the supplier.
    *
    * @return A {@link CompletableFuture} containing the snapshot of the information
-   * @author Henry Page
-   * @since 1.0.0
    */
   CompletableFuture<Optional<T>> getSnapshot();
 
@@ -36,8 +32,6 @@ public interface InformationSupplier<T extends SupplierDto> {
    * Returns a {@link CompletableFuture} resolved with an empty {@link Optional}.
    *
    * @return A {@link CompletableFuture} with an empty Optional
-   * @author Henry Page
-   * @since 1.0.0
    */
   default CompletableFuture<Optional<T>> notAvailableResult() {
     return CompletableFuture.completedFuture(Optional.empty());

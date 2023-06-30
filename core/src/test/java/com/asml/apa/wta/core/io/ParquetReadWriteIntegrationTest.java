@@ -12,7 +12,7 @@ import org.apache.avro.generic.GenericRecord;
 import org.apache.avro.util.Utf8;
 import org.junit.jupiter.api.Test;
 
-public class ParquetReadWriteIntegrationTest {
+class ParquetReadWriteIntegrationTest {
 
   @Test
   void generateAndWrite() throws IOException {

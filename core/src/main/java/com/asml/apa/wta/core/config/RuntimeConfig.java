@@ -56,7 +56,6 @@ public class RuntimeConfig {
    *
    * @param configFile The filepath to the config file
    * @return The associated config object
-   * @author Atour Mousavi Gourabi
    */
   @SuppressWarnings("CyclomaticComplexity")
   public static RuntimeConfig readConfig(String configFile) {
