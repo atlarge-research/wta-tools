@@ -55,7 +55,7 @@ public class MetricStreamingEngine {
   /**
    * Consumes all resource related streams and aggregates them into objects.
    *
-   * @return                  list of {@link ResourceAndStateWrapper} objects containing the resource and its states.
+   * @return      list of {@link ResourceAndStateWrapper} objects containing the resource and its states.
    */
   public List<ResourceAndStateWrapper> collectResourceInformation() {
     return executorResourceStream.mapKeyList((key, value) -> {

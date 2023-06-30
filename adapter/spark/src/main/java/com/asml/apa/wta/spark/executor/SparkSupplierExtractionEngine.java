@@ -31,9 +31,9 @@ public class SparkSupplierExtractionEngine extends SupplierExtractionEngine<Spar
   /**
    * Specialised extraction engine for Spark.
    *
-   * @param resourcePingInterval How often to ping the suppliers, in milliseconds
-   * @param pluginContext The plugin context
-   * @param executorSynchronizationInterval How often to send the buffer, in milliseconds
+   * @param resourcePingInterval                  how often to ping the suppliers, in milliseconds.
+   * @param pluginContext                         plugin context
+   * @param executorSynchronizationInterval       how often to send the buffer, in milliseconds.
    */
   public SparkSupplierExtractionEngine(
       int resourcePingInterval, PluginContext pluginContext, int executorSynchronizationInterval) {
@@ -43,10 +43,10 @@ public class SparkSupplierExtractionEngine extends SupplierExtractionEngine<Spar
   }
 
   /**
-   * Overridden method to ping the resource and buffer the result.
-   * If a non-positive executor synchronization interval is set, the result is sent immediately.
+   * Overridden method to ping the resource and buffer the result. If a non-positive executor
+   * synchronization interval is set, the result is sent immediately.
    *
-   * @return A {@link CompletableFuture} representing the result of the ping and buffer operation
+   * @return        {@link CompletableFuture} representing the result of the ping and buffer operation
    */
   @Override
   public CompletableFuture<Void> pingAndBuffer() {
@@ -62,9 +62,8 @@ public class SparkSupplierExtractionEngine extends SupplierExtractionEngine<Spar
 
   /**
    * This method gets called by the scheduler to send the resource buffer of the extraction engine.
-   * This happens every 5 seconds.
    *
-   * @param snapshots Snapshots to send to the buffer
+   * @param snapshots         snapshots to send to the buffer.
    */
   private void sendBuffer(List<SparkBaseSupplierWrapperDto> snapshots) {
     ResourceCollectionDto bufferSnapshot = new ResourceCollectionDto(snapshots);
@@ -88,8 +87,9 @@ public class SparkSupplierExtractionEngine extends SupplierExtractionEngine<Spar
   }
 
   /**
-   * Scheduled task to send the resource buffer of the extraction engine.
-   * If the {@link #executorSynchronizationInterval} is set to a non-positive value, resource information gets sent immediately.
+   * Scheduled task to send the resource buffer of the extraction engine. If the
+   * {@link #executorSynchronizationInterval} is set to a non-positive value, resource information gets
+   * sent immediately.
    */
   public void startSynchonizing() {
     if (this.executorSynchronizationInterval > 0) {
@@ -110,8 +110,8 @@ public class SparkSupplierExtractionEngine extends SupplierExtractionEngine<Spar
   /**
    * Augments the base supplier Dto with Spark information.
    *
-   * @param record The {@link BaseSupplierDto} to transform
-   * @return A {@link SparkBaseSupplierWrapperDto} containing information pertaining to Spark
+   * @param record        {@link BaseSupplierDto} to transform.
+   * @return              {@link SparkBaseSupplierWrapperDto} containing information pertaining to Spark.
    */
   @Override
   public SparkBaseSupplierWrapperDto transform(BaseSupplierDto record) {

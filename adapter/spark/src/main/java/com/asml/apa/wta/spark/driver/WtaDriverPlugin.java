@@ -41,11 +41,11 @@ public class WtaDriverPlugin implements DriverPlugin {
    * This method is called early in the initialization of the Spark driver.
    * Explicitly, it is called before the Spark driver's task scheduler is initialized. It is blocking.
    * Expensive calls should be postponed or delegated to another thread. If an error occurs while
-   * initializing the plugin, the plugin should call {@link #shutdown()} with {@link #error} set to false.
+   * initializing the plugin it will set {@link #error} to false.
    *
-   * @param sparkCtx The current SparkContext.
-   * @param pluginCtx Additional plugin-specific about the Spark application where the plugin is running.
-   * @return Extra information provided to the executor
+   * @param sparkCtx        current SparkContext.
+   * @param pluginCtx       additional plugin-specific about the Spark application where the plugin is running.
+   * @return                extra information provided to the executor.
    */
   @Override
   public Map<String, String> init(SparkContext sparkCtx, PluginContext pluginCtx) {
@@ -78,8 +78,8 @@ public class WtaDriverPlugin implements DriverPlugin {
   /**
    * Receives messages from the executors.
    *
-   * @param message the message that was sent by the executors, to be serializable
-   * @return a response to the executor, if no response is expected the result is ignored
+   * @param message       message that was sent by the executors, to be serializable.
+   * @return              response to the executor, if no response is expected the result is ignored.
    */
   @Override
   public Object receive(Object message) {

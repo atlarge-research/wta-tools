@@ -35,8 +35,8 @@ public class StageLevelListener extends TaskStageBaseListener {
   /**
    * Constructor for the stage-level listener from Spark datasource class.
    *
-   * @param sparkContext          current spark context
-   * @param config                additional config specified by the user for the plugin
+   * @param sparkContext          current spark context.
+   * @param config                additional config specified by the user for the plugin.
    */
   public StageLevelListener(SparkContext sparkContext, RuntimeConfig config) {
     super(sparkContext, config);
@@ -47,9 +47,9 @@ public class StageLevelListener extends TaskStageBaseListener {
    * Only the parents of the current stage is determined here. The children are determined on application end in
    * ApplicationLevelListener.
    *
-   * @param stageId               current stage id
-   * @param task                  task object of current stage metrics
-   * @param curStageInfo          current stage info
+   * @param stageId               current stage id.
+   * @param task                  task object of current stage metrics.
+   * @param curStageInfo          current stage info.
    */
   public void fillInParentChildMaps(long stageId, Task task, StageInfo curStageInfo) {
     final long[] parentStageIds = JavaConverters.seqAsJavaList(
@@ -79,7 +79,7 @@ public class StageLevelListener extends TaskStageBaseListener {
    * This method is called every time a stage is completed. Stage-level metrics are collected, aggregated,
    * and added here.
    *
-   * @param stageCompleted        SparkListenerStageCompleted object corresponding to information on stage completion
+   * @param stageCompleted        SparkListenerStageCompleted object corresponding to information on stage completion.
    */
   @Override
   public void onStageCompleted(SparkListenerStageCompleted stageCompleted) {
@@ -127,7 +127,7 @@ public class StageLevelListener extends TaskStageBaseListener {
    * {@link JobLevelListener#onJobEnd(SparkListenerJobEnd)}. It only sets the Stages which are
    * affiliated to the passed jobId.
    *
-   * @param jobId                 Spark Job id to filter Stages by
+   * @param jobId                 Spark Job id to filter Stages by.
    */
   public void setStages(long jobId) {
     getWorkflowsToTasks()

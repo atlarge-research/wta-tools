@@ -14,7 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.spark.SparkContext;
 
 /**
- * This class is a Stage data source.
+ * Spark data source class for the WTA plugin.
  *
  * @author Pil Kyu Cho
  * @author Henry Page
@@ -38,7 +38,7 @@ public class SparkDataSource {
   /**
    * Awaits the thread pool.
    *
-   * @param awaitSeconds the amount of seconds to wait for
+   * @param awaitSeconds      amount of seconds to wait for.
    */
   public void awaitAndShutdownThreadPool(int awaitSeconds) {
     AbstractListener.getThreadPool().shutdown();
@@ -55,10 +55,10 @@ public class SparkDataSource {
    * Constructor for the Spark data source. This requires a Spark context to ensure a Spark session
    * is available before the data source is initialized.
    *
-   * @param sparkContext  SparkContext of the running Spark session
-   * @param config Additional config specified by the user for the plugin
-   * @param metricStreamingEngine the driver's {@link MetricStreamingEngine} to inject
-   * @param wtaWriter the {@link WtaWriter} to write to
+   * @param sparkContext              SparkContext of the running Spark session.
+   * @param config                    additional config specified by the user for the plugin.
+   * @param metricStreamingEngine     driver's {@link MetricStreamingEngine} to inject.
+   * @param wtaWriter                 {@link WtaWriter} to write to.
    */
   public SparkDataSource(
       SparkContext sparkContext,
@@ -91,7 +91,7 @@ public class SparkDataSource {
   }
 
   /**
-   * This method registers a task listener to the Spark context.
+   * Registers a task listener to the Spark context.
    */
   public void registerTaskListener() {
     log.debug("Registering task listener.");
@@ -115,7 +115,7 @@ public class SparkDataSource {
   }
 
   /**
-   * This method registers a stage listener to the Spark context.
+   * Registers a stage listener to the Spark context.
    */
   public void registerStageListener() {
     log.debug("Registering stage level listener.");
