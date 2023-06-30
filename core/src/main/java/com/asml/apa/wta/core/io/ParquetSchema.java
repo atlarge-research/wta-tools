@@ -42,8 +42,6 @@ public class ParquetSchema {
    * @param objects the {@link Stream} of objects to create the schema for
    * @param name the name of the schema
    * @param <T> the type parameter for the {@link Class} and {@link Stream}
-   * @author Atour Mousavi Gourabi
-   * @since 1.0.0
    */
   @SuppressWarnings("CyclomaticComplexity")
   public <T extends BaseTraceObject> ParquetSchema(Class<T> clazz, Stream<T> objects, String name) {
@@ -129,8 +127,6 @@ public class ParquetSchema {
    * @param clazz the {@link Class} to which the POJO belongs
    * @param <T> type parameter for the {@link Class} and POJO
    * @return a {@link GenericRecord} containing the POJO
-   * @author Atour Mousavi Gourabi
-   * @since 1.0.0
    */
   public <T> GenericRecord convertFromPojo(T pojo, Class<T> clazz) {
     Field[] fields = clazz.getDeclaredFields();

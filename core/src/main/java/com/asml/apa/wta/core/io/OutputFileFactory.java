@@ -19,14 +19,10 @@ public class OutputFileFactory {
    *
    * @param path a {@link String} representation of the path to write to
    * @return an appropriate {@link OutputFile} implementation for this path when possible
-   * @author Atour Mousavi Gourabi
-   * @since 1.0.0
    */
   public OutputFile create(String path) {
     ServiceLoader<OutputFile> serviceLoader = ServiceLoader.load(OutputFile.class);
-
     log.trace("Started loading the OutputFile implementation from the classpath.");
-
     for (OutputFile implementation : serviceLoader) {
       try {
         if (!implementation.acceptsLocation(path)) {
@@ -44,9 +40,7 @@ public class OutputFileFactory {
             path);
       }
     }
-
     log.info("Could not find a custom OutputFile implementation in the classpath, defaulting to DiskOutputFile.");
-
     return new DiskOutputFile(Path.of(path));
   }
 }

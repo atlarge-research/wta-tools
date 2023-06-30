@@ -23,6 +23,7 @@ public class DiskParquetOutputFile implements OutputFile {
   private class LocalPositionOutputStream extends PositionOutputStream {
 
     private final BufferedOutputStream stream;
+
     private long pos = 0;
 
     LocalPositionOutputStream(int buffer, StandardOpenOption... openOption) throws IOException {
@@ -33,8 +34,6 @@ public class DiskParquetOutputFile implements OutputFile {
      * Get current position in the {@link BufferedOutputStream}.
      *
      * @return the current position
-     * @author Atour Mousavi Gourabi
-     * @since 1.0.0
      */
     @Override
     public long getPos() {
@@ -49,8 +48,6 @@ public class DiskParquetOutputFile implements OutputFile {
      *
      * @param data the {@code byte}
      * @throws IOException when something goes wrong during I/O
-     * @author Atour Mousavi Gourabi
-     * @since 1.0.0
      */
     @Override
     public void write(int data) throws IOException {
@@ -66,8 +63,6 @@ public class DiskParquetOutputFile implements OutputFile {
      *
      * @param data the data
      * @throws IOException when something goes wrong during I/O
-     * @author Atour Mousavi Gourabi
-     * @since 1.0.0
      */
     @Override
     public void write(byte[] data) throws IOException {
@@ -85,8 +80,6 @@ public class DiskParquetOutputFile implements OutputFile {
      * @param off the start offset in the data
      * @param len the number of bytes to write
      * @throws IOException when something goes wrong during I/O
-     * @author Atour Mousavi Gourabi
-     * @since 1.0.0
      */
     @Override
     public void write(byte[] data, int off, int len) throws IOException {
@@ -99,8 +92,6 @@ public class DiskParquetOutputFile implements OutputFile {
      * Flushes the {@link DiskParquetOutputFile}.
      *
      * @throws IOException when something goes wrong during I/O
-     * @author Atour Mousavi Gourabi
-     * @since 1.0.0
      */
     @Override
     public void flush() throws IOException {
@@ -111,8 +102,6 @@ public class DiskParquetOutputFile implements OutputFile {
      * Closes the {@link DiskParquetOutputFile}.
      *
      * @throws IOException when something goes wrong during I/O
-     * @author Atour Mousavi Gourabi
-     * @since 1.0.0
      */
     @Override
     public void close() throws IOException {
@@ -128,8 +117,6 @@ public class DiskParquetOutputFile implements OutputFile {
    * @param buffer buffer hint, should not exceed {@link Integer#MAX_VALUE}
    * @return the created {@link PositionOutputStream}
    * @throws IOException when something goes wrong during I/O
-   * @author Atour Mousavi Gourabi
-   * @since 1.0.0
    */
   @Override
   public PositionOutputStream create(long buffer) throws IOException {
@@ -144,8 +131,6 @@ public class DiskParquetOutputFile implements OutputFile {
    * @param buffer buffer hint
    * @return the created {@link PositionOutputStream}
    * @throws IOException when something goes wrong during I/O
-   * @author Atour Mousavi Gourabi
-   * @since 1.0.0
    */
   @Override
   public PositionOutputStream createOrOverwrite(long buffer) throws IOException {
@@ -157,8 +142,6 @@ public class DiskParquetOutputFile implements OutputFile {
    * Checks whether the output file supports block size.
    *
    * @return {@code true}
-   * @author Atour Mousavi Gourabi
-   * @since 1.0.0
    */
   @Override
   public boolean supportsBlockSize() {
@@ -169,8 +152,6 @@ public class DiskParquetOutputFile implements OutputFile {
    * Returns the default block size.
    *
    * @return {@code 512}, the default value for {@link BufferedOutputStream}
-   * @author Atour Mousavi Gourabi
-   * @since 1.0.0
    */
   @Override
   public long defaultBlockSize() {
@@ -181,8 +162,6 @@ public class DiskParquetOutputFile implements OutputFile {
    * Returns the path of the {@link com.asml.apa.wta.core.io.OutputFile} as a {@link String}.
    *
    * @return the path of this {@link com.asml.apa.wta.core.io.OutputFile} as a {@link String}
-   * @author Atour Mousavi Gourabi
-   * @since 1.0.0
    */
   @Override
   public String getPath() {
