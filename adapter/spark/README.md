@@ -80,7 +80,7 @@ There are two ways to make use of the plugin
 1. Integrate the plugin into the Spark application source code
 2. Create the plugin as a JAR and run alongside the main Spark application via **spark-submit**
 
-Note that for either approaches, `sparkContext.stop()` must be specified at the end of the main Java application to invoke the plugin's application finished callback. Otherwise, the plugin doesn't end properly.
+Note that for either approaches, `sparkSession.close()` must be specified at the end of each Spark session to invoke the plugin's application finished callback. Otherwise, the plugin doesn't end properly.
 
 ### Plugin Integration
 For the first approach, create a `SparkConf` object and set the following config:
@@ -102,7 +102,7 @@ For the second approach, create a JAR file of the plugin and run it alongside th
 ```shell
 spark-submit --class <main class path to spark application> --master local \
 --conf spark.plugins=com.asml.apa.wta.spark.WtaPlugin \
---conf spark.driver.extraJavaOptions=-DconfigFile=<config.json_location> \
+--conf "spark.driver.extraJavaOptions=-DconfigFile=<config.json_location>" \
 --jars <plugin_JAR_location> <Spark_JAR_location> \
 <optional arguments for spark application>
 ```
@@ -137,13 +137,9 @@ from pyspark import SparkConf, SparkContext
 
 conf = SparkConf().setAppName("MyApp").set("spark.plugins", "com.asml.apa.wta.spark.WtaPlugin").set("spark.driver.extraJavaOptions", "-DconfigFile=/home/user/sp_resources/config.json")
 sc = SparkContext(conf=conf)
-
-...
-
-sc.stop()
 ```
 
-Note that in the Python script, `sc.stop()` must also be specified at the end to invoke the plugin's application finished callback.
+Note that in the Python script, `sparkSession.close()` must also be specified at the end to invoke the plugin's application finished callback.
 
 Now execute the following command and submit the Python script along with the JAR file of the plugin to **spark-submit**.
 
@@ -282,6 +278,7 @@ Just like Spark, this plugin uses the [SLF4J](http://www.slf4j.org/) logging API
 the desired logging frameworks (e.g. `java.util.logging`, logback, log4j). The plugin itself does not depend on any
 logging implementation. The plugin log level corresponds to the Spark log level. This means that the plugin log level
 can be configured using the Spark configuration through the following:
+
 ```java
 sc.setLogLevel("INFO");
 ```

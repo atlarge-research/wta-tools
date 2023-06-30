@@ -150,23 +150,22 @@ public class EndToEnd {
         .set("spark.driver.extraJavaOptions", "-DconfigFile=" + args[0]);
     //        .set("spark.driver.extraJavaOptions", "-DconfigFile=" +
     // "adapter/spark/src/test/resources/config.json");
-    SparkSession spark = SparkSession.builder().config(conf).getOrCreate();
-    SparkContext sc = spark.sparkContext();
+    SparkSession sparkSession = SparkSession.builder().config(conf).getOrCreate();
+    SparkContext sc = sparkSession.sparkContext();
     sc.setLogLevel("INFO");
     sparkOperation(JavaSparkContext.fromSparkContext(sc).textFile(args[1]));
     //    sparkOperation(
     //            JavaSparkContext.fromSparkContext(sc).textFile("adapter/spark/src/test/resources/e2e-input.txt"));
-    spark.close();
+    sparkSession.close();
 
     // must move traces afterwards (or give it a unique name, otherwise, could get overwritten)
     // also takes a bit of time to generate?
-    SparkSession spark2 = SparkSession.builder().config(conf).getOrCreate();
-    SparkContext sc2 = spark.sparkContext();
-    spark2.close();
+    SparkSession sparkSession2 = SparkSession.builder().config(conf).getOrCreate();
+    SparkContext sc2 = sparkSession2.sparkContext();
     for (int i = 0; i < 2; i++) {
       sparkOperation(
               JavaSparkContext.fromSparkContext(sc2).textFile("adapter/spark/src/test/resources/e2e-input.txt"));
     }
-    spark2.close();
+    sparkSession2.close();
   }
 }
