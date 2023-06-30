@@ -18,7 +18,7 @@ import org.apache.spark.scheduler.SparkListenerJobStart;
 import scala.collection.JavaConverters;
 
 /**
- * This class is a job-level listener for the Spark data source.
+ * Job-level listener for the Spark data source.
  *
  * @author Henry Page
  * @since 1.0.0

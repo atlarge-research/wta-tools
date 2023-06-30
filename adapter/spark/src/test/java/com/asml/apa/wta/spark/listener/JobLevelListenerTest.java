@@ -39,99 +39,101 @@ import scala.collection.mutable.ListBuffer;
 
 class JobLevelListenerTest {
 
-  protected SparkContext mockedSparkContext;
+  private SparkContext mockedSparkContext;
 
-  protected ResourceProfileManager mockedResourceProfileManager;
+  private ResourceProfileManager mockedResourceProfileManager;
 
-  protected ResourceProfile mockedResource;
+  private ResourceProfile mockedResource;
 
-  protected Map<String, TaskResourceRequest> mapResource;
+  private Map<String, TaskResourceRequest> mapResource;
 
-  protected SparkContext mockedSparkContext2;
+  private SparkContext mockedSparkContext2;
 
-  protected ResourceProfileManager mockedResourceProfileManager2;
+  private ResourceProfileManager mockedResourceProfileManager2;
 
-  protected ResourceProfile mockedResource2;
+  private ResourceProfile mockedResource2;
 
-  protected Map<String, TaskResourceRequest> mapResource2;
+  private Map<String, TaskResourceRequest> mapResource2;
 
-  protected RuntimeConfig fakeConfig1;
+  private RuntimeConfig fakeConfig1;
 
-  protected RuntimeConfig fakeConfig2;
+  private RuntimeConfig fakeConfig2;
 
-  protected TaskLevelListener fakeTaskListener1;
-  protected StageLevelListener fakeStageListener1;
-  protected JobLevelListener fakeJobListener1;
-  protected ApplicationLevelListener fakeApplicationListener1;
+  private TaskLevelListener fakeTaskListener1;
 
-  protected TaskLevelListener fakeTaskListener2;
-  protected StageLevelListener fakeStageListener2;
-  protected JobLevelListener fakeJobListener2;
-  protected ApplicationLevelListener fakeApplicationListener2;
+  private StageLevelListener fakeStageListener1;
 
-  TaskInfo testTaskInfo1;
+  private JobLevelListener fakeJobListener1;
 
-  TaskInfo testTaskInfo2;
+  private TaskLevelListener fakeTaskListener2;
 
-  TaskInfo testTaskInfo3;
+  private StageLevelListener fakeStageListener2;
 
-  TaskInfo testTaskInfo4;
+  private JobLevelListener fakeJobListener2;
 
-  StageInfo testStageInfo1;
+  private TaskInfo testTaskInfo1;
 
-  StageInfo testStageInfo2;
+  private TaskInfo testTaskInfo2;
 
-  StageInfo testStageInfo3;
+  private TaskInfo testTaskInfo3;
 
-  StageInfo testStageInfo4;
+  private TaskInfo testTaskInfo4;
 
-  SparkListenerTaskEnd taskEndEvent1;
+  private StageInfo testStageInfo1;
 
-  SparkListenerTaskEnd taskEndEvent2;
+  private StageInfo testStageInfo2;
 
-  SparkListenerTaskEnd taskEndEvent3;
+  private StageInfo testStageInfo3;
 
-  SparkListenerTaskEnd taskEndEvent4;
+  private StageInfo testStageInfo4;
 
-  SparkListenerStageCompleted stageCompleted1;
+  private SparkListenerTaskEnd taskEndEvent1;
 
-  SparkListenerStageCompleted stageCompleted2;
+  private SparkListenerTaskEnd taskEndEvent2;
 
-  SparkListenerStageCompleted stageCompleted3;
+  private SparkListenerTaskEnd taskEndEvent3;
 
-  SparkListenerStageCompleted stageCompleted4;
+  private SparkListenerTaskEnd taskEndEvent4;
 
-  SparkListenerJobEnd jobEndEvent1;
+  private SparkListenerStageCompleted stageCompleted1;
 
-  SparkListenerJobEnd jobEndEvent2;
+  private SparkListenerStageCompleted stageCompleted2;
 
-  int taskId1;
+  private  SparkListenerStageCompleted stageCompleted3;
 
-  int taskId2;
+  private SparkListenerStageCompleted stageCompleted4;
 
-  int taskId3;
+  private SparkListenerJobEnd jobEndEvent1;
 
-  int taskId4;
+  private SparkListenerJobEnd jobEndEvent2;
 
-  int stageId1;
+  private int taskId1;
 
-  int stageId2;
+  private int taskId2;
 
-  int stageId3;
+  private int taskId3;
 
-  int stageId4;
+  private int taskId4;
 
-  int jobId1;
+  private int stageId1;
 
-  int jobId2;
+  private int stageId2;
 
-  TaskMetrics mockedMetrics1;
+  private int stageId3;
 
-  TaskMetrics mockedMetrics2;
+  private int stageId4;
 
-  TaskMetrics mockedMetrics3;
+  private int jobId1;
 
-  TaskMetrics mockedMetrics4;
+  private int jobId2;
+
+  private TaskMetrics mockedMetrics1;
+
+  private TaskMetrics mockedMetrics2;
+
+  private TaskMetrics mockedMetrics3;
+
+  private TaskMetrics mockedMetrics4;
 
   @BeforeEach
   void setup() {
@@ -167,7 +169,6 @@ class JobLevelListenerTest {
         .isStageLevel(false)
         .description("Yer a wizard harry")
         .build();
-    fakeStageListener1 = new StageLevelListener(mockedSparkContext, fakeConfig1);
 
     fakeTaskListener1 = new TaskLevelListener(mockedSparkContext, fakeConfig1);
 
@@ -180,16 +181,6 @@ class JobLevelListenerTest {
     when(sparkDataSource.getTaskLevelListener()).thenReturn(mock(TaskLevelListener.class));
     when(sparkDataSource.getStageLevelListener()).thenReturn(mock(StageLevelListener.class));
     when(sparkDataSource.getJobLevelListener()).thenReturn(mock(JobLevelListener.class));
-
-    fakeApplicationListener1 = new ApplicationLevelListener(
-        mockedSparkContext,
-        fakeConfig1,
-        fakeTaskListener1,
-        fakeStageListener1,
-        fakeJobListener1,
-        sparkDataSource,
-        mock(MetricStreamingEngine.class),
-        mock(WtaWriter.class));
 
     fakeConfig2 = RuntimeConfig.builder()
         .authors(new String[] {"Harry Potter"})
@@ -205,15 +196,6 @@ class JobLevelListenerTest {
     fakeJobListener2 =
         new JobLevelListener(mockedSparkContext2, fakeConfig2, fakeTaskListener2, fakeStageListener2);
 
-    fakeApplicationListener2 = new ApplicationLevelListener(
-        mockedSparkContext2,
-        fakeConfig2,
-        fakeTaskListener2,
-        fakeStageListener2,
-        fakeJobListener2,
-        sparkDataSource,
-        mock(MetricStreamingEngine.class),
-        mock(WtaWriter.class));
     taskId1 = 0;
     taskId2 = 1;
     taskId3 = 2;

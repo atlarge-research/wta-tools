@@ -34,8 +34,6 @@ public class SparkSupplierExtractionEngine extends SupplierExtractionEngine<Spar
    * @param resourcePingInterval How often to ping the suppliers, in milliseconds
    * @param pluginContext The plugin context
    * @param executorSynchronizationInterval How often to send the buffer, in milliseconds
-   * @author Henry Page
-   * @since 1.0.0
    */
   public SparkSupplierExtractionEngine(
       int resourcePingInterval, PluginContext pluginContext, int executorSynchronizationInterval) {
@@ -49,8 +47,6 @@ public class SparkSupplierExtractionEngine extends SupplierExtractionEngine<Spar
    * If a non-positive executor synchronization interval is set, the result is sent immediately.
    *
    * @return A {@link CompletableFuture} representing the result of the ping and buffer operation
-   * @author Henry Page
-   * @since 1.0.0
    */
   @Override
   public CompletableFuture<Void> pingAndBuffer() {
@@ -69,8 +65,6 @@ public class SparkSupplierExtractionEngine extends SupplierExtractionEngine<Spar
    * This happens every 5 seconds.
    *
    * @param snapshots Snapshots to send to the buffer
-   * @author Henry Page
-   * @since 1.0.0
    */
   private void sendBuffer(List<SparkBaseSupplierWrapperDto> snapshots) {
     ResourceCollectionDto bufferSnapshot = new ResourceCollectionDto(snapshots);
@@ -88,9 +82,6 @@ public class SparkSupplierExtractionEngine extends SupplierExtractionEngine<Spar
 
   /**
    * This method gets called by the scheduler to send the resource buffer of the extraction engine.
-   *
-   * @author Henry Page
-   * @since 1.0.0
    */
   private void sendBuffer() {
     sendBuffer(getAndClear());
@@ -99,9 +90,6 @@ public class SparkSupplierExtractionEngine extends SupplierExtractionEngine<Spar
   /**
    * Scheduled task to send the resource buffer of the extraction engine.
    * If the {@link #executorSynchronizationInterval} is set to a non-positive value, resource information gets sent immediately.
-   *
-   * @author Henry Page
-   * @since 1.0.0
    */
   public void startSynchonizing() {
     if (this.executorSynchronizationInterval > 0) {
@@ -113,9 +101,6 @@ public class SparkSupplierExtractionEngine extends SupplierExtractionEngine<Spar
 
   /**
    * Stops the synchronizer from sending information to the driver.
-   *
-   * @author Henry Page
-   * @since 1.0.0
    */
   public void stopSynchronizing() {
     log.trace(pluginContext.executorID() + " is stopping to synchronize.");
@@ -127,8 +112,6 @@ public class SparkSupplierExtractionEngine extends SupplierExtractionEngine<Spar
    *
    * @param record The {@link BaseSupplierDto} to transform
    * @return A {@link SparkBaseSupplierWrapperDto} containing information pertaining to Spark
-   * @author Henry Page
-   * @since 1.0.0
    */
   @Override
   public SparkBaseSupplierWrapperDto transform(BaseSupplierDto record) {

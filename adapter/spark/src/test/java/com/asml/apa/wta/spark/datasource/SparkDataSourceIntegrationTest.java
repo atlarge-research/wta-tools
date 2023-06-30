@@ -20,19 +20,13 @@ import scala.Tuple2;
 
 class SparkDataSourceIntegrationTest {
 
-  protected SparkSession spark;
+  private SparkSession spark;
 
-  protected SparkDataSource sut1;
+  private SparkDataSource sut;
 
-  protected SparkDataSource sut2;
+  private JavaRDD<String> textFile;
 
-  protected JavaRDD<String> textFile;
-
-  RuntimeConfig fakeConfig;
-
-  RuntimeConfig fakeConfig2;
-
-  MetricStreamingEngine fakeMetricStreamingEngine;
+  private RuntimeConfig fakeConfig;
 
   @BeforeEach
   void setupBaseIntegrationTest() {
@@ -46,26 +40,13 @@ class SparkDataSourceIntegrationTest {
         .outputPath("src/test/resources/wta-output")
         .build();
 
-    fakeConfig2 = RuntimeConfig.builder()
-        .authors(new String[] {"Harry Potter"})
-        .isStageLevel(true)
-        .domain(Domain.SCIENTIFIC)
-        .resourcePingInterval(500)
-        .executorSynchronizationInterval(-100)
-        .description("Yer a wizard harry")
-        .outputPath("src/test/resources/wta-output")
-        .build();
-
     SparkConf conf = new SparkConf().setAppName("SparkTestRunner").setMaster("local");
     spark = SparkSession.builder().config(conf).getOrCreate();
     spark.sparkContext().setLogLevel("ERROR");
 
-    fakeMetricStreamingEngine = new MetricStreamingEngine();
-
-    sut1 = new SparkDataSource(
+    sut = new SparkDataSource(
         spark.sparkContext(), fakeConfig, mock(MetricStreamingEngine.class), mock(WtaWriter.class));
-    sut2 = new SparkDataSource(
-        spark.sparkContext(), fakeConfig2, mock(MetricStreamingEngine.class), mock(WtaWriter.class));
+
     String resourcePath = "src/test/resources/wordcount.txt";
     textFile = JavaSparkContext.fromSparkContext(spark.sparkContext()).textFile(resourcePath);
   }
@@ -80,23 +61,23 @@ class SparkDataSourceIntegrationTest {
   @Test
   public void taskListenerReturnsList() {
     await().atMost(20, SECONDS)
-        .until(() -> sut1.getTaskLevelListener().getProcessedObjects().count() >= 0);
+        .until(() -> sut.getTaskLevelListener().getProcessedObjects().count() >= 0);
   }
 
   @Test
   public void unregisteredTaskListenerDoesNotCollect() {
-    assertThat(sut1.getTaskLevelListener().getProcessedObjects().isEmpty()).isTrue();
+    assertThat(sut.getTaskLevelListener().getProcessedObjects().isEmpty()).isTrue();
     invokeJob();
     await().atMost(20, SECONDS)
-        .until(() -> sut1.getTaskLevelListener().getProcessedObjects().isEmpty());
+        .until(() -> sut.getTaskLevelListener().getProcessedObjects().isEmpty());
   }
 
   @Test
   public void removedTaskListenerDoesNotCollect() {
-    sut1.registerTaskListener();
-    sut1.removeListeners();
+    sut.registerTaskListener();
+    sut.removeListeners();
     invokeJob();
     await().atMost(20, SECONDS)
-        .until(() -> sut1.getTaskLevelListener().getProcessedObjects().isEmpty());
+        .until(() -> sut.getTaskLevelListener().getProcessedObjects().isEmpty());
   }
 }

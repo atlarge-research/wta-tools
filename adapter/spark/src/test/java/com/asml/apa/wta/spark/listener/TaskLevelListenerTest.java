@@ -7,12 +7,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.asml.apa.wta.core.WtaWriter;
 import com.asml.apa.wta.core.config.RuntimeConfig;
 import com.asml.apa.wta.core.model.Domain;
 import com.asml.apa.wta.core.model.Task;
 import com.asml.apa.wta.spark.datasource.SparkDataSource;
-import com.asml.apa.wta.spark.stream.MetricStreamingEngine;
+
 import java.util.Properties;
 import java.util.stream.Collectors;
 import org.apache.spark.SparkConf;
@@ -24,7 +23,6 @@ import org.apache.spark.resource.ResourceProfile;
 import org.apache.spark.resource.ResourceProfileManager;
 import org.apache.spark.resource.TaskResourceRequest;
 import org.apache.spark.scheduler.SparkListenerJobStart;
-import org.apache.spark.scheduler.SparkListenerStageCompleted;
 import org.apache.spark.scheduler.SparkListenerTaskEnd;
 import org.apache.spark.scheduler.StageInfo;
 import org.apache.spark.scheduler.TaskInfo;
@@ -39,47 +37,35 @@ import scala.collection.mutable.ListBuffer;
 
 class TaskLevelListenerTest {
 
-  protected SparkContext mockedSparkContext;
+  private SparkContext mockedSparkContext;
 
-  protected ResourceProfileManager mockedResourceProfileManager;
+  private ResourceProfileManager mockedResourceProfileManager;
 
-  protected ResourceProfile mockedResource;
+  private ResourceProfile mockedResource;
 
-  protected Map<String, TaskResourceRequest> mapResource;
+  private Map<String, TaskResourceRequest> mapResource;
 
-  protected SparkContext mockedSparkContext2;
+  private SparkContext mockedSparkContext2;
 
-  protected ResourceProfileManager mockedResourceProfileManager2;
+  private ResourceProfileManager mockedResourceProfileManager2;
 
-  protected ResourceProfile mockedResource2;
+  private ResourceProfile mockedResource2;
 
-  protected Map<String, TaskResourceRequest> mapResource2;
+  private Map<String, TaskResourceRequest> mapResource2;
 
-  protected RuntimeConfig fakeConfig1;
+  private RuntimeConfig fakeConfig;
 
-  protected RuntimeConfig fakeConfig2;
+  private TaskLevelListener fakeTaskListener;
 
-  protected TaskLevelListener fakeTaskListener1;
-  protected StageLevelListener fakeStageListener1;
-  protected JobLevelListener fakeJobListener1;
-  protected ApplicationLevelListener fakeApplicationListener1;
+  private TaskInfo testTaskInfo1;
 
-  protected TaskLevelListener fakeTaskListener2;
-  protected StageLevelListener fakeStageListener2;
-  protected JobLevelListener fakeJobListener2;
-  protected ApplicationLevelListener fakeApplicationListener2;
+  private TaskInfo testTaskInfo2;
 
-  TaskInfo testTaskInfo1;
+  private StageInfo testStageInfo;
 
-  TaskInfo testTaskInfo2;
+  private SparkListenerTaskEnd taskEndEvent;
 
-  StageInfo testStageInfo;
-
-  SparkListenerTaskEnd taskEndEvent;
-
-  SparkListenerTaskEnd taskEndEvent2;
-
-  SparkListenerStageCompleted stageCompleted;
+  private SparkListenerTaskEnd taskEndEvent2;
 
   @BeforeEach
   void setup() {
@@ -109,19 +95,13 @@ class TaskLevelListenerTest {
     when(mockedResourceProfileManager2.resourceProfileFromId(100)).thenReturn(mockedResource2);
     when(mockedResource2.taskResources()).thenReturn(mapResource2);
 
-    fakeConfig1 = RuntimeConfig.builder()
+    fakeConfig = RuntimeConfig.builder()
         .authors(new String[] {"Harry Potter"})
         .domain(Domain.SCIENTIFIC)
         .isStageLevel(false)
         .description("Yer a wizard harry")
         .build();
-    fakeStageListener1 = new StageLevelListener(mockedSparkContext, fakeConfig1);
-
-    fakeTaskListener1 = new TaskLevelListener(mockedSparkContext, fakeConfig1);
-
-    fakeStageListener1 = new StageLevelListener(mockedSparkContext, fakeConfig1);
-
-    fakeJobListener1 = new JobLevelListener(mockedSparkContext, fakeConfig1, fakeTaskListener1, fakeStageListener1);
+    fakeTaskListener = new TaskLevelListener(mockedSparkContext, fakeConfig);
 
     SparkDataSource sparkDataSource = mock(SparkDataSource.class);
     when(sparkDataSource.getRuntimeConfig()).thenReturn(mock(RuntimeConfig.class));
@@ -129,39 +109,6 @@ class TaskLevelListenerTest {
     when(sparkDataSource.getStageLevelListener()).thenReturn(mock(StageLevelListener.class));
     when(sparkDataSource.getJobLevelListener()).thenReturn(mock(JobLevelListener.class));
 
-    fakeApplicationListener1 = new ApplicationLevelListener(
-        mockedSparkContext,
-        fakeConfig1,
-        fakeTaskListener1,
-        fakeStageListener1,
-        fakeJobListener1,
-        sparkDataSource,
-        mock(MetricStreamingEngine.class),
-        mock(WtaWriter.class));
-
-    fakeConfig2 = RuntimeConfig.builder()
-        .authors(new String[] {"Harry Potter"})
-        .domain(Domain.SCIENTIFIC)
-        .isStageLevel(true)
-        .description("Yer a wizard harry")
-        .build();
-
-    fakeTaskListener2 = new TaskLevelListener(mockedSparkContext2, fakeConfig2);
-
-    fakeStageListener2 = new StageLevelListener(mockedSparkContext2, fakeConfig2);
-
-    fakeJobListener2 =
-        new JobLevelListener(mockedSparkContext2, fakeConfig2, fakeTaskListener2, fakeStageListener2);
-
-    fakeApplicationListener2 = new ApplicationLevelListener(
-        mockedSparkContext2,
-        fakeConfig2,
-        fakeTaskListener2,
-        fakeStageListener2,
-        fakeJobListener2,
-        sparkDataSource,
-        mock(MetricStreamingEngine.class),
-        mock(WtaWriter.class));
     testTaskInfo1 = new TaskInfo(0, 0, 1, 50L, "testExecutor", "local", TaskLocality.NODE_LOCAL(), false);
     testTaskInfo2 = new TaskInfo(1, 0, 1, 50L, "testExecutor", "local", TaskLocality.NODE_LOCAL(), false);
 
@@ -198,7 +145,6 @@ class TaskLevelListenerTest {
         2, 1, "testTaskType", null, testTaskInfo1, new ExecutorMetrics(), mockedMetrics);
     taskEndEvent2 = new SparkListenerTaskEnd(
         2, 1, "testTaskType", null, testTaskInfo2, new ExecutorMetrics(), mockedMetrics);
-    stageCompleted = new SparkListenerStageCompleted(testStageInfo);
   }
 
   @Test
@@ -206,21 +152,21 @@ class TaskLevelListenerTest {
     ListBuffer<StageInfo> stageBuffer = new ListBuffer<>();
     stageBuffer.$plus$eq(testStageInfo);
 
-    fakeTaskListener1.onJobStart(new SparkListenerJobStart(0, 2L, stageBuffer.toList(), new Properties()));
-    fakeTaskListener1.onTaskEnd(taskEndEvent);
-    assertThat(fakeTaskListener1.getStageToTasks().size()).isEqualTo(1);
-    assertThat(fakeTaskListener1.getStageToTasks().get(3L).size()).isEqualTo(1);
-    assertThat(fakeTaskListener1.getStageToTasks().get(3L).get(0).getId()).isEqualTo(1);
-    assertThat(fakeTaskListener1.getTaskToStage().size()).isEqualTo(1);
-    assertThat(fakeTaskListener1.getTaskToStage()).containsEntry(1L, 3L);
-    fakeTaskListener1.onTaskEnd(taskEndEvent2);
-    assertThat(fakeTaskListener1.getStageToTasks().size()).isEqualTo(1);
-    assertThat(fakeTaskListener1.getStageToTasks().get(3L).size()).isEqualTo(2);
-    assertThat(fakeTaskListener1.getStageToTasks().get(3L).get(0).getId()).isEqualTo(1);
-    assertThat(fakeTaskListener1.getStageToTasks().get(3L).get(1).getId()).isEqualTo(2);
-    assertThat(fakeTaskListener1.getTaskToStage().size()).isEqualTo(2);
-    assertThat(fakeTaskListener1.getTaskToStage()).containsEntry(1L, 3L);
-    assertThat(fakeTaskListener1.getTaskToStage()).containsEntry(2L, 3L);
+    fakeTaskListener.onJobStart(new SparkListenerJobStart(0, 2L, stageBuffer.toList(), new Properties()));
+    fakeTaskListener.onTaskEnd(taskEndEvent);
+    assertThat(fakeTaskListener.getStageToTasks().size()).isEqualTo(1);
+    assertThat(fakeTaskListener.getStageToTasks().get(3L).size()).isEqualTo(1);
+    assertThat(fakeTaskListener.getStageToTasks().get(3L).get(0).getId()).isEqualTo(1);
+    assertThat(fakeTaskListener.getTaskToStage().size()).isEqualTo(1);
+    assertThat(fakeTaskListener.getTaskToStage()).containsEntry(1L, 3L);
+    fakeTaskListener.onTaskEnd(taskEndEvent2);
+    assertThat(fakeTaskListener.getStageToTasks().size()).isEqualTo(1);
+    assertThat(fakeTaskListener.getStageToTasks().get(3L).size()).isEqualTo(2);
+    assertThat(fakeTaskListener.getStageToTasks().get(3L).get(0).getId()).isEqualTo(1);
+    assertThat(fakeTaskListener.getStageToTasks().get(3L).get(1).getId()).isEqualTo(2);
+    assertThat(fakeTaskListener.getTaskToStage().size()).isEqualTo(2);
+    assertThat(fakeTaskListener.getTaskToStage()).containsEntry(1L, 3L);
+    assertThat(fakeTaskListener.getTaskToStage()).containsEntry(2L, 3L);
   }
 
   @Test
@@ -228,13 +174,13 @@ class TaskLevelListenerTest {
     ListBuffer<StageInfo> stageBuffer = new ListBuffer<>();
     stageBuffer.$plus$eq(testStageInfo);
 
-    fakeTaskListener1.onJobStart(new SparkListenerJobStart(0, 2L, stageBuffer.toList(), new Properties()));
-    fakeTaskListener1.onTaskEnd(taskEndEvent);
+    fakeTaskListener.onJobStart(new SparkListenerJobStart(0, 2L, stageBuffer.toList(), new Properties()));
+    fakeTaskListener.onTaskEnd(taskEndEvent);
 
     await().atMost(20, SECONDS)
-        .until(() -> fakeTaskListener1.getProcessedObjects().count() == 1);
+        .until(() -> fakeTaskListener.getProcessedObjects().count() == 1);
 
-    Task curTask = fakeTaskListener1.getProcessedObjects().head();
+    Task curTask = fakeTaskListener.getProcessedObjects().head();
     assertEquals(1, curTask.getId());
     assertEquals("testTaskType", curTask.getType());
     assertEquals(50L, curTask.getTsSubmit());

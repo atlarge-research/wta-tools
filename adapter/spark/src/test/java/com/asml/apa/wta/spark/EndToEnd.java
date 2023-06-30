@@ -26,9 +26,8 @@ public class EndToEnd {
    * Private method to invoke the Spark application with complex jobs involving partitions shuffling. Results don't
    * matter as the purpose is to generate Spark tasks with multiple parent-child relations and jobs with diverse
    * number of tasks for generated traces.
+   *
    * @param textFile  The text file to read from.
-   * @author Pil Kyu Cho
-   * @since 1.0.0
    */
   private static void sparkOperation(JavaRDD<String> textFile) {
     JavaRDD<String> words1 = textFile.flatMap(
@@ -134,10 +133,9 @@ public class EndToEnd {
    * Entry point for the e2e test. This method will create a spark session along with the plugin.
    * The 'configFile' environment variable must be specified. Even if an error occurs on the plugin,
    * it will not shut down the entire Spark job.
-   * @param args First argument must be filepath to config file. Second argument must be filepath to
-   *             resources file.
-   * @author Pil Kyu Cho
-   * @since 1.0.0
+   *
+   * @param args      first argument must be filepath to config file.
+   *                  second argument must be filepath to resources file.
    */
   public static void main(String[] args) {
     SparkConf conf = new SparkConf()

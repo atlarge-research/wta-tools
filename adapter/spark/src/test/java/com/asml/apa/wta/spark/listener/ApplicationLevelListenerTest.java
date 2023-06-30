@@ -50,71 +50,71 @@ import scala.collection.mutable.ListBuffer;
 
 class ApplicationLevelListenerTest {
 
-  protected SparkContext mockedSparkContext;
+  private SparkContext mockedSparkContext;
 
-  protected ResourceProfileManager mockedResourceProfileManager;
+  private ResourceProfileManager mockedResourceProfileManager;
 
-  protected ResourceProfile mockedResource;
+  private ResourceProfile mockedResource;
 
-  protected Map<String, TaskResourceRequest> mapResource;
+  private Map<String, TaskResourceRequest> mapResource;
 
-  protected SparkContext mockedSparkContext2;
+  private SparkContext mockedSparkContext2;
 
-  protected ResourceProfileManager mockedResourceProfileManager2;
+  private ResourceProfileManager mockedResourceProfileManager2;
 
-  protected ResourceProfile mockedResource2;
+  private ResourceProfile mockedResource2;
 
-  protected Map<String, TaskResourceRequest> mapResource2;
+  private Map<String, TaskResourceRequest> mapResource2;
 
-  protected RuntimeConfig fakeConfig1;
+  private RuntimeConfig fakeConfig1;
 
-  protected RuntimeConfig fakeConfig2;
+  private RuntimeConfig fakeConfig2;
 
-  protected TaskLevelListener fakeTaskListener1;
-  protected StageLevelListener fakeStageListener1;
-  protected JobLevelListener fakeJobListener1;
-  protected ApplicationLevelListener fakeApplicationListener1;
+  private TaskLevelListener fakeTaskListener1;
+  private StageLevelListener fakeStageListener1;
+  private JobLevelListener fakeJobListener1;
+  private ApplicationLevelListener fakeApplicationListener1;
 
-  protected TaskLevelListener fakeTaskListener2;
-  protected StageLevelListener fakeStageListener2;
-  protected JobLevelListener fakeJobListener2;
-  protected ApplicationLevelListener fakeApplicationListener2;
+  private TaskLevelListener fakeTaskListener2;
+  private StageLevelListener fakeStageListener2;
+  private JobLevelListener fakeJobListener2;
+  private ApplicationLevelListener fakeApplicationListener2;
 
   private SparkDataSource sparkDataSource;
 
-  SparkListenerApplicationEnd applicationEndObj;
+  private SparkListenerApplicationEnd applicationEndObj;
 
-  TaskInfo testTaskInfo1;
+  private TaskInfo testTaskInfo1;
 
-  TaskInfo testTaskInfo2;
+  private TaskInfo testTaskInfo2;
 
-  TaskInfo testTaskInfo3;
+  private TaskInfo testTaskInfo3;
 
-  TaskInfo testTaskInfo4;
+  private TaskInfo testTaskInfo4;
 
-  StageInfo testStageInfo1;
+  private StageInfo testStageInfo1;
 
-  StageInfo testStageInfo2;
+  private StageInfo testStageInfo2;
 
-  SparkListenerTaskEnd taskEndEvent1;
+  private SparkListenerTaskEnd taskEndEvent1;
 
-  SparkListenerTaskEnd taskEndEvent2;
+  private SparkListenerTaskEnd taskEndEvent2;
 
-  SparkListenerTaskEnd taskEndEvent3;
+  private SparkListenerTaskEnd taskEndEvent3;
 
   SparkListenerTaskEnd taskEndEvent4;
 
-  SparkListenerStageCompleted stageCompleted1;
+  private SparkListenerStageCompleted stageCompleted1;
 
-  SparkListenerStageCompleted stageCompleted2;
+  private SparkListenerStageCompleted stageCompleted2;
 
-  int stageId1;
+  private int stageId1;
 
-  int stageId2;
+  private int stageId2;
 
-  long applicationDateEnd;
+  private long applicationDateEnd;
 
-  MetricStreamingEngine metricStreamingEngine;
+  private MetricStreamingEngine metricStreamingEngine;
 
   @BeforeEach
   void setup() {

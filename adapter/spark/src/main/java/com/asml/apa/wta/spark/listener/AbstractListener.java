@@ -15,6 +15,7 @@ import org.apache.spark.scheduler.SparkListener;
  *
  * @param <T> The domain object generic
  * @author Henry Page
+ * @author Atour Mousavi Gourabi
  * @since 1.0.0
  */
 @RequiredArgsConstructor
@@ -48,8 +49,6 @@ public abstract class AbstractListener<T extends BaseTraceObject> extends SparkL
    * Returns a clone of the processed objects {@link Stream}.
    *
    * @return a clone of the processed objects
-   * @author Atour Mousavi Gourabi
-   * @since 1.0.0
    */
   public Stream<T> getProcessedObjects() {
     return processedObjects.copy();
@@ -59,8 +58,6 @@ public abstract class AbstractListener<T extends BaseTraceObject> extends SparkL
    * Adds a processed object to the {@link Stream} maintained by the listener.
    *
    * @param object the processed object to add
-   * @author Atour Mousavi Gourabi
-   * @since 1.0.0
    */
   public void addProcessedObject(T object) {
     processedObjects.addToStream(object);
@@ -68,9 +65,6 @@ public abstract class AbstractListener<T extends BaseTraceObject> extends SparkL
 
   /**
    * Registers the listener to the current spark context.
-   *
-   * @author Henry Page
-   * @since 1.0.0
    */
   public void register() {
     sparkContext.addSparkListener(this);
@@ -78,9 +72,6 @@ public abstract class AbstractListener<T extends BaseTraceObject> extends SparkL
 
   /**
    * Removes the listener to the current spark context.
-   *
-   * @author Henry Page
-   * @since 1.0.0
    */
   public void remove() {
     sparkContext.removeSparkListener(this);

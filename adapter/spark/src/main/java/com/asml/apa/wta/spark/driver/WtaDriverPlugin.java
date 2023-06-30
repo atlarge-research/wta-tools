@@ -46,9 +46,6 @@ public class WtaDriverPlugin implements DriverPlugin {
    * @param sparkCtx The current SparkContext.
    * @param pluginCtx Additional plugin-specific about the Spark application where the plugin is running.
    * @return Extra information provided to the executor
-   * @author Pil Kyu Cho
-   * @author Henry Page
-   * @since 1.0.0
    */
   @Override
   public Map<String, String> init(SparkContext sparkCtx, PluginContext pluginCtx) {
@@ -83,7 +80,6 @@ public class WtaDriverPlugin implements DriverPlugin {
    *
    * @param message the message that was sent by the executors, to be serializable
    * @return a response to the executor, if no response is expected the result is ignored
-   * @author Atour Mousavi Gourabi
    */
   @Override
   public Object receive(Object message) {
@@ -97,13 +93,8 @@ public class WtaDriverPlugin implements DriverPlugin {
   }
 
   /**
-   * Gets called just before shutdown.
-   * If an error occurred, it is logged before shutdown.
+   * Gets called just before shutdown. If an error occurred, it is logged before shutdown.
    * Recommended that no Spark functions are used here.
-   *
-   * @author Pil Kyu Cho
-   * @author Henry Page
-   * @since 1.0.0
    */
   @Override
   public void shutdown() {
@@ -116,9 +107,6 @@ public class WtaDriverPlugin implements DriverPlugin {
 
   /**
    * Initializes the listeners to get Spark metrics.
-   *
-   * @author Lohithsai Yadala Chanchu
-   * @since 1.0.0
    */
   public void initListeners() {
     log.trace("Initializing listeners.");

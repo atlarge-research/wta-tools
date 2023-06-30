@@ -14,6 +14,7 @@ import org.apache.spark.api.plugin.PluginContext;
  * Executor component of the plugin.
  *
  * @author Henry Page
+ * @author Pil Kyu Cho
  * @author Lohithsai Yadala Chanchu
  * @since 1.0.0
  */
@@ -35,10 +36,6 @@ public class WtaExecutorPlugin implements ExecutorPlugin {
    *                  is directly returned from {@link WtaDriverPlugin#init(SparkContext, PluginContext)}
    * @see WtaPlugin#executorPlugin() where a new instance of the plugin is created. This gets called as soon
    * as it is loaded on to the executor.
-   *
-   * @author Henry Page
-   * @author Pil Kyu Cho
-   * @since 1.0.0
    */
   @Override
   public void init(PluginContext pCtx, Map<String, String> extraConf) {
@@ -72,9 +69,6 @@ public class WtaExecutorPlugin implements ExecutorPlugin {
    * Developers should note that expensive operations should be avoided, since it gets called on every task.
    * Exceptions thrown here are not propagated, meaning a task won't fail if this method throws an exception.
    * <a href="https://spark.apache.org/docs/3.2.1/api/java/org/apache/spark/api/plugin/ExecutorPlugin.html#init-org.apache.spark.api.plugin.PluginContext-java.util.Map-">Refer to the docs</a> for more information.
-   *
-   * @author Henry Page
-   * @since 1.0.0
    */
   @Override
   public void onTaskStart() {}
@@ -82,9 +76,6 @@ public class WtaExecutorPlugin implements ExecutorPlugin {
   /**
    * Gets called when a task is successfully completed.
    * Gets called even if {@link #onTaskStart()} threw an exception.
-   *
-   * @author Henry Page
-   * @since 1.0.0
    */
   @Override
   public void onTaskSucceeded() {}
@@ -93,9 +84,6 @@ public class WtaExecutorPlugin implements ExecutorPlugin {
    * Gets called if a task fails.
    *
    * @param failureReason The reason the task failed, accessible through a string.
-   *
-   * @author Henry Page
-   * @since 1.0.0
    */
   @Override
   public void onTaskFailed(TaskFailedReason failureReason) {
@@ -104,10 +92,6 @@ public class WtaExecutorPlugin implements ExecutorPlugin {
 
   /**
    * Gets called just before shutdown. Blocks executor shutdown until it is completed.
-   *
-   * @author Henry Page
-   * @author Pil Kyu Cho
-   * @since 1.0.0
    */
   @Override
   public void shutdown() {

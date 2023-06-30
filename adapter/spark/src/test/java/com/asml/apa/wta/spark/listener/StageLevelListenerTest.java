@@ -39,41 +39,35 @@ import scala.collection.mutable.ListBuffer;
 
 class StageLevelListenerTest {
 
-  protected SparkContext mockedSparkContext;
+  private SparkContext mockedSparkContext;
 
-  protected ResourceProfileManager mockedResourceProfileManager;
+  private ResourceProfileManager mockedResourceProfileManager;
 
-  protected ResourceProfile mockedResource;
+  private ResourceProfile mockedResource;
 
-  protected Map<String, TaskResourceRequest> mapResource;
+  private Map<String, TaskResourceRequest> mapResource;
 
-  protected SparkContext mockedSparkContext2;
+  private SparkContext mockedSparkContext2;
 
-  protected ResourceProfileManager mockedResourceProfileManager2;
+  private ResourceProfileManager mockedResourceProfileManager2;
 
-  protected ResourceProfile mockedResource2;
+  private ResourceProfile mockedResource2;
 
-  protected Map<String, TaskResourceRequest> mapResource2;
+  private Map<String, TaskResourceRequest> mapResource2;
 
-  protected RuntimeConfig fakeConfig1;
+  private RuntimeConfig fakeConfig1;
 
-  protected RuntimeConfig fakeConfig2;
+  private RuntimeConfig fakeConfig2;
 
-  protected TaskLevelListener fakeTaskListener1;
-  protected StageLevelListener fakeStageListener1;
-  protected JobLevelListener fakeJobListener1;
-  protected ApplicationLevelListener fakeApplicationListener1;
+  private StageLevelListener fakeStageListener1;
 
-  protected TaskLevelListener fakeTaskListener2;
-  protected StageLevelListener fakeStageListener2;
-  protected JobLevelListener fakeJobListener2;
-  protected ApplicationLevelListener fakeApplicationListener2;
+  private StageLevelListener fakeStageListener2;
 
-  SparkListenerStageCompleted stageEndEvent;
+  private SparkListenerStageCompleted stageEndEvent;
 
-  StageInfo testStageInfo;
+  private StageInfo testStageInfo;
 
-  StageInfo spyStageInfo;
+  private StageInfo spyStageInfo;
 
   @BeforeEach
   void setup() {
@@ -109,29 +103,14 @@ class StageLevelListenerTest {
         .isStageLevel(false)
         .description("Yer a wizard harry")
         .build();
-    fakeStageListener1 = new StageLevelListener(mockedSparkContext, fakeConfig1);
-
-    fakeTaskListener1 = new TaskLevelListener(mockedSparkContext, fakeConfig1);
 
     fakeStageListener1 = new StageLevelListener(mockedSparkContext, fakeConfig1);
-
-    fakeJobListener1 = new JobLevelListener(mockedSparkContext, fakeConfig1, fakeTaskListener1, fakeStageListener1);
 
     SparkDataSource sparkDataSource = mock(SparkDataSource.class);
     when(sparkDataSource.getRuntimeConfig()).thenReturn(mock(RuntimeConfig.class));
     when(sparkDataSource.getTaskLevelListener()).thenReturn(mock(TaskLevelListener.class));
     when(sparkDataSource.getStageLevelListener()).thenReturn(mock(StageLevelListener.class));
     when(sparkDataSource.getJobLevelListener()).thenReturn(mock(JobLevelListener.class));
-
-    fakeApplicationListener1 = new ApplicationLevelListener(
-        mockedSparkContext,
-        fakeConfig1,
-        fakeTaskListener1,
-        fakeStageListener1,
-        fakeJobListener1,
-        sparkDataSource,
-        mock(MetricStreamingEngine.class),
-        mock(WtaWriter.class));
 
     fakeConfig2 = RuntimeConfig.builder()
         .authors(new String[] {"Harry Potter"})
@@ -140,22 +119,8 @@ class StageLevelListenerTest {
         .description("Yer a wizard harry")
         .build();
 
-    fakeTaskListener2 = new TaskLevelListener(mockedSparkContext2, fakeConfig2);
-
     fakeStageListener2 = new StageLevelListener(mockedSparkContext2, fakeConfig2);
 
-    fakeJobListener2 =
-        new JobLevelListener(mockedSparkContext2, fakeConfig2, fakeTaskListener2, fakeStageListener2);
-
-    fakeApplicationListener2 = new ApplicationLevelListener(
-        mockedSparkContext2,
-        fakeConfig2,
-        fakeTaskListener2,
-        fakeStageListener2,
-        fakeJobListener2,
-        sparkDataSource,
-        mock(MetricStreamingEngine.class),
-        mock(WtaWriter.class));
     TaskMetrics mockedMetrics = mock(TaskMetrics.class);
     when(mockedMetrics.executorRunTime()).thenReturn(100L);
     ShuffleWriteMetrics mockedShuffleMetrics = mock(ShuffleWriteMetrics.class);

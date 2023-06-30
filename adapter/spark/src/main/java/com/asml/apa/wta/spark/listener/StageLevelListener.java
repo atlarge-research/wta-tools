@@ -16,8 +16,9 @@ import org.apache.spark.scheduler.StageInfo;
 import scala.collection.JavaConverters;
 
 /**
- * This class is a stage-level listener for the Spark data source.
+ * Stage-level listener for the Spark data source.
  *
+ * @author Pil Kyu Cho
  * @author Tianchen Qu
  * @author Lohithsai Yadala Chanchu
  * @since 1.0.0
@@ -34,10 +35,8 @@ public class StageLevelListener extends TaskStageBaseListener {
   /**
    * Constructor for the stage-level listener from Spark datasource class.
    *
-   * @param sparkContext       The current spark context
-   * @param config             Additional config specified by the user for the plugin
-   * @author Pil Kyu Cho
-   * @since 1.0.0
+   * @param sparkContext          current spark context
+   * @param config                additional config specified by the user for the plugin
    */
   public StageLevelListener(SparkContext sparkContext, RuntimeConfig config) {
     super(sparkContext, config);
@@ -47,11 +46,10 @@ public class StageLevelListener extends TaskStageBaseListener {
    * This method will store the stage hierarchy information from the callback, depending on the isStageLevel config.
    * Only the parents of the current stage is determined here. The children are determined on application end in
    * ApplicationLevelListener.
-   * @param stageId           Current stage id
-   * @param task              Task object of current stage metrics
-   * @param curStageInfo      Current stage info
-   * @author Pil Kyu Cho
-   * @since 1.0.0
+   *
+   * @param stageId               current stage id
+   * @param task                  task object of current stage metrics
+   * @param curStageInfo          current stage info
    */
   public void fillInParentChildMaps(long stageId, Task task, StageInfo curStageInfo) {
     final long[] parentStageIds = JavaConverters.seqAsJavaList(
@@ -81,11 +79,7 @@ public class StageLevelListener extends TaskStageBaseListener {
    * This method is called every time a stage is completed. Stage-level metrics are collected, aggregated,
    * and added here.
    *
-   * @param stageCompleted   SparkListenerStageCompleted The object corresponding to information on stage completion
-   * @author Tianchen Qu
-   * @author Lohithsai Yadala Chanchu
-   * @author Pil Kyu Cho
-   * @since 1.0.0
+   * @param stageCompleted        SparkListenerStageCompleted object corresponding to information on stage completion
    */
   @Override
   public void onStageCompleted(SparkListenerStageCompleted stageCompleted) {
@@ -133,10 +127,7 @@ public class StageLevelListener extends TaskStageBaseListener {
    * {@link JobLevelListener#onJobEnd(SparkListenerJobEnd)}. It only sets the Stages which are
    * affiliated to the passed jobId.
    *
-   * @param jobId            Spark Job id to filter Stages by
-   * @author Tianchen Qu
-   * @author Pil Kyu Cho
-   * @since 1.0.0
+   * @param jobId                 Spark Job id to filter Stages by
    */
   public void setStages(long jobId) {
     getWorkflowsToTasks()

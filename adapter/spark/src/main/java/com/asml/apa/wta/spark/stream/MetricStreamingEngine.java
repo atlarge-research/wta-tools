@@ -11,6 +11,7 @@ import com.asml.apa.wta.core.stream.KeyedStream;
 import com.asml.apa.wta.core.stream.Stream;
 import com.asml.apa.wta.spark.dto.ResourceAndStateWrapper;
 import com.asml.apa.wta.spark.dto.SparkBaseSupplierWrapperDto;
+import com.asml.apa.wta.spark.datasource.SparkDataSource;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Objects;
@@ -36,9 +37,6 @@ public class MetricStreamingEngine {
 
   /**
    * Initializes the streams.
-   *
-   * @author Atour Mousavi Gourabi
-   * @since 1.0.0
    */
   public MetricStreamingEngine() {
     executorResourceStream = new KeyedStream<>();
@@ -47,10 +45,8 @@ public class MetricStreamingEngine {
   /**
    * Adds resource metrics to the resource stream.
    *
-   * @param resourceKey A {@link String} identifying the resource. This is usually the executorID.
-   * @param record the {@link com.asml.apa.wta.spark.datasource.SparkDataSource} containing metrics.
-   * @author Atour Mousavi Gourabi
-   * @since 1.0.0
+   * @param resourceKey       {@link String} identifying the resource. This is usually the executorID.
+   * @param record            {@link SparkDataSource} containing metrics.
    */
   public void addToResourceStream(String resourceKey, SparkBaseSupplierWrapperDto record) {
     executorResourceStream.addToStream(resourceKey, record);
@@ -59,9 +55,7 @@ public class MetricStreamingEngine {
   /**
    * Consumes all resource related streams and aggregates them into objects.
    *
-   * @return a list of {@link ResourceAndStateWrapper} objects containing the resource and its states
-   * @author Henry Page
-   * @since 1.0.0
+   * @return                  list of {@link ResourceAndStateWrapper} objects containing the resource and its states.
    */
   public List<ResourceAndStateWrapper> collectResourceInformation() {
     return executorResourceStream.mapKeyList((key, value) -> {
@@ -75,11 +69,9 @@ public class MetricStreamingEngine {
   /**
    * Constructs a resource from a stream of pings.
    *
-   * @param executorId The transformed id of the executor
-   * @param pings The stream of pings that correspond to this executor
-   * @return A Resource object that is constructed from the given information
-   * @author Henry Page
-   * @since 1.0.0
+   * @param executorId      transformed id of the executor.
+   * @param pings           stream of pings that correspond to this executor.
+   * @return                {@link Resource} object that is constructed from the given information.
    */
   private Resource produceResourceFromExecutorInfo(long executorId, Stream<SparkBaseSupplierWrapperDto> pings) {
     Optional<OsInfoDto> sampleOsInfo = getFirstAvailable(pings.copy(), BaseSupplierDto::getOsInfoDto);
@@ -126,11 +118,9 @@ public class MetricStreamingEngine {
   /**
    * Constructs a list of resource states from a stream of pings.
    *
-   * @param resourceId    associated resource id
-   * @param pings         stream of pings that are to be transformed to states
-   * @return              list of resource states that is constructed from the given information
-   * @author Henry Page
-   * @since 1.0.0
+   * @param resourceId      associated resource id.
+   * @param pings           stream of pings that are to be transformed to states.
+   * @return                list of resource states that is constructed from the given information.
    */
   private Stream<ResourceState> produceResourceStatesFromExecutorInfo(
       long resourceId, Stream<SparkBaseSupplierWrapperDto> pings) {
@@ -197,10 +187,10 @@ public class MetricStreamingEngine {
   /**
    * Used for getting information across all pings that is constant.
    *
-   * @param pings A list of pings to analyse
-   * @param mapper The mapping function that should map the dto to an optional data supplier object
-   * @param <R> The type of the data supplier object
-   * @return The constant information that is requested
+   * @param pings       list of pings to analyse.
+   * @param mapper      mapping function that should map the dto to an optional data supplier object.
+   * @param <R>         type of the data supplier object.
+   * @return            constant information that is requested.
    */
   private <R extends Serializable> Optional<R> getFirstAvailable(
       Stream<SparkBaseSupplierWrapperDto> pings, Function<SparkBaseSupplierWrapperDto, R> mapper) {

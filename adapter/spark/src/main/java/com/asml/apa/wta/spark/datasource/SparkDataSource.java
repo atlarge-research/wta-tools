@@ -18,6 +18,7 @@ import org.apache.spark.SparkContext;
  *
  * @author Pil Kyu Cho
  * @author Henry Page
+ * @author Atour Mousavi Gourabi
  * @since 1.0.0
  */
 @Slf4j
@@ -38,8 +39,6 @@ public class SparkDataSource {
    * Awaits the thread pool.
    *
    * @param awaitSeconds the amount of seconds to wait for
-   * @author Atour Mousavi Gourabi
-   * @since 1.0.0
    */
   public void awaitAndShutdownThreadPool(int awaitSeconds) {
     AbstractListener.getThreadPool().shutdown();
@@ -60,12 +59,6 @@ public class SparkDataSource {
    * @param config Additional config specified by the user for the plugin
    * @param metricStreamingEngine the driver's {@link MetricStreamingEngine} to inject
    * @param wtaWriter the {@link WtaWriter} to write to
-   * @author Atour Mousavi Gourabi
-   * @author Pil Kyu Cho
-   * @author Henry Page
-   * @author Tianchen Qu
-   * @author Lohithsai Yadala Chanchu
-   * @since 1.0.0
    */
   public SparkDataSource(
       SparkContext sparkContext,
@@ -99,9 +92,6 @@ public class SparkDataSource {
 
   /**
    * This method registers a task listener to the Spark context.
-   *
-   * @author Pil Kyu Cho
-   * @since 1.0.0
    */
   public void registerTaskListener() {
     log.debug("Registering task listener.");
@@ -110,9 +100,6 @@ public class SparkDataSource {
 
   /**
    * Registers a job listener to the Spark context.
-   *
-   * @author Henry Page
-   * @since 1.0.0
    */
   public void registerJobListener() {
     log.debug("Registering job listener.");
@@ -121,9 +108,6 @@ public class SparkDataSource {
 
   /**
    * Registers an application listener to the Spark context.
-   *
-   * @author Henry Page
-   * @since 1.0.0
    */
   public void registerApplicationListener() {
     log.debug("Registering application listener.");
@@ -132,9 +116,6 @@ public class SparkDataSource {
 
   /**
    * This method registers a stage listener to the Spark context.
-   *
-   * @author Lohithsai Yadala Chanchu
-   * @since 1.0.0
    */
   public void registerStageListener() {
     log.debug("Registering stage level listener.");
@@ -143,9 +124,6 @@ public class SparkDataSource {
 
   /**
    * Removes the listeners from the Spark context.
-   *
-   * @author Atour Mousavi Gourabi
-   * @since 1.0.0
    */
   public void removeListeners() {
     log.debug("Removing the listeners from the Spark context.");
