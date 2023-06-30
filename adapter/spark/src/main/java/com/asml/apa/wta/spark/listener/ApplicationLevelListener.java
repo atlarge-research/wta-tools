@@ -314,20 +314,21 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
 
     WorkloadBuilder workloadBuilder = Workload.builder();
     final Stream<Task> tasks = wtaTaskListener.getProcessedObjects();
-    Function<Task, Long> networkFunction = Task::getNetworkIoTime;
 
     setGeneralFields(applicationEnd.time(), workloadBuilder);
     setCountFields(tasks.copy(), workloadBuilder);
-    setResourceStatisticsFields(
-        tasks.copy().map(Task::getResourceAmountRequested), ResourceType.RESOURCE, workloadBuilder);
-    setResourceStatisticsFields(tasks.copy().map(Task::getMemoryRequested), ResourceType.MEMORY, workloadBuilder);
-    setResourceStatisticsFields(
-        tasks.copy().map(networkFunction.andThen(Long::doubleValue)), ResourceType.NETWORK, workloadBuilder);
-    setResourceStatisticsFields(tasks.copy().map(Task::getDiskSpaceRequested), ResourceType.DISK, workloadBuilder);
-    setResourceStatisticsFields(tasks.copy().map(Task::getEnergyConsumption), ResourceType.ENERGY, workloadBuilder);
+    if (getConfig().isAggregateMetrics()) {
+      Function<Task, Long> networkFunction = Task::getNetworkIoTime;
+      setResourceStatisticsFields(
+              tasks.copy().map(Task::getResourceAmountRequested), ResourceType.RESOURCE, workloadBuilder);
+      setResourceStatisticsFields(tasks.copy().map(Task::getMemoryRequested), ResourceType.MEMORY, workloadBuilder);
+      setResourceStatisticsFields(
+              tasks.copy().map(networkFunction.andThen(Long::doubleValue)), ResourceType.NETWORK, workloadBuilder);
+      setResourceStatisticsFields(tasks.copy().map(Task::getDiskSpaceRequested), ResourceType.DISK, workloadBuilder);
+      setResourceStatisticsFields(tasks.copy().map(Task::getEnergyConsumption), ResourceType.ENERGY, workloadBuilder);
+    }
 
     sparkDataSource.removeListeners();
-
     workload = workloadBuilder.build();
     writeTrace();
   }

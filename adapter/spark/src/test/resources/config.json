@@ -5,5 +5,6 @@
   "outputPath": "wta-output",
   "isStageLevel": "false",
   "resourcePingInterval": 500,
-  "executorSynchronizationInterval": -1
+  "executorSynchronizationInterval": -1,
+  "aggregateMetrics": "false"
 }

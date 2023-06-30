@@ -48,6 +48,9 @@ public class RuntimeConfig {
 
   private String outputPath;
 
+  @Builder.Default
+  private boolean aggregateMetrics = false;
+
   /**
    * Reads the config file and creates the associated config object.
    *
