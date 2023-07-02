@@ -10,7 +10,7 @@ RUN     curl -s "https://get.sdkman.io" | bash && \
         mv /root/.sdkman/candidates/java/11.0.12-open/* /usr/local/openjdk/11.0.12 && \
         rm -rf /root/.sdkman/candidates/java
 ENV     JAVA_HOME=/usr/local/openjdk/11.0.12
-RUN     wget https://dlcdn.apache.org/maven/maven-3/3.9.2/binaries/apache-maven-3.9.2-bin.tar.gz && \
+RUN     wget https://dlcdn.apache.org/maven/maven-3/3.9.3/binaries/apache-maven-3.9.3-bin.tar.gz && \
         tar xvf apache-maven-3.9.2-bin.tar.gz && \
         rm -rf apache-maven-3.9.2-bin.tar.gz && \
         mkdir -p /opt/maven/3.9.2 && \
