@@ -7,7 +7,6 @@ import static org.mockito.Mockito.*;
 import com.asml.apa.wta.core.config.RuntimeConfig;
 import com.asml.apa.wta.spark.dto.ResourceCollectionDto;
 import com.asml.apa.wta.spark.dto.SparkBaseSupplierWrapperDto;
-
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -163,7 +162,10 @@ class WtaDriverPluginTest {
 
   @Test
   void wtaDriverPluginDoesNotInitializeWhenReadConfigThrowsIOException() {
-    given(RuntimeConfig.readConfig("src/test/resources/throwsIOException.json")).willAnswer(invocation -> { throw new IOException(); });
+    given(RuntimeConfig.readConfig("src/test/resources/throwsIOException.json"))
+        .willAnswer(invocation -> {
+          throw new IOException();
+        });
     Map<String, String> configMap = createSparkConfAndInitialize("src/test/resources/throwsIOException.json");
     assertThat(configMap).containsKeys("errorStatus");
     assertThat(configMap.get("errorStatus")).isEqualTo("true");
