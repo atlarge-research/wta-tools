@@ -11,11 +11,11 @@ RUN     curl -s "https://get.sdkman.io" | bash && \
         rm -rf /root/.sdkman/candidates/java
 ENV     JAVA_HOME=/usr/local/openjdk/11.0.12
 RUN     wget https://dlcdn.apache.org/maven/maven-3/3.9.3/binaries/apache-maven-3.9.3-bin.tar.gz && \
-        tar xvf apache-maven-3.9.2-bin.tar.gz && \
-        rm -rf apache-maven-3.9.2-bin.tar.gz && \
-        mkdir -p /opt/maven/3.9.2 && \
-        mv apache-maven-3.9.2/* /opt/maven/3.9.2 && \
-        rm -rf apache-maven-3.9.2
-ENV     MAVEN_HOME=/opt/maven/3.9.2 \
+        tar xvf apache-maven-3.9.3-bin.tar.gz && \
+        rm -rf apache-maven-3.9.3-bin.tar.gz && \
+        mkdir -p /opt/maven/3.9.3 && \
+        mv apache-maven-3.9.3/* /opt/maven/3.9.3 && \
+        rm -rf apache-maven-3.9.3
+ENV     MAVEN_HOME=/opt/maven/3.9.3 \
         MAVEN_CONFIG=/root/.m2
 ENV     PATH=$PATH:$MAVEN_HOME/bin
