@@ -42,8 +42,19 @@ public abstract class AbstractListener<T extends BaseTraceObject> extends SparkL
   /**
    * The thread pool.
    */
-  @Getter
-  private static final ExecutorService threadPool = Executors.newSingleThreadExecutor();
+  private static ExecutorService threadPool = Executors.newSingleThreadExecutor();
+
+  /**
+   * Getter for the thread pool.
+   *
+   * @return the {@link ExecutorService} to offload expensive computations to
+   */
+  public static ExecutorService getThreadPool() {
+    if (threadPool.isShutdown()) {
+      threadPool = Executors.newSingleThreadExecutor();
+    }
+    return threadPool;
+  }
 
   /**
    * Returns a clone of the processed objects {@link Stream}.

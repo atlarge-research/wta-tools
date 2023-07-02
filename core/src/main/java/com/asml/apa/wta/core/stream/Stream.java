@@ -194,7 +194,8 @@ public class Stream<V extends Serializable> implements Cloneable {
     }
   }
 
-  private static final String TEMP_SERIALIZATION_DIRECTORY = "tmp/wta/streams/" +  System.currentTimeMillis() + "/serialization/";
+  private static final String TEMP_SERIALIZATION_DIRECTORY =
+      "tmp/wta/streams/" + System.currentTimeMillis() + "/serialization/";
 
   private UUID id;
 

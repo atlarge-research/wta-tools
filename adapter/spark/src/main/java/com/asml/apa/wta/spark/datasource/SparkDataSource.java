@@ -8,6 +8,7 @@ import com.asml.apa.wta.spark.listener.JobLevelListener;
 import com.asml.apa.wta.spark.listener.StageLevelListener;
 import com.asml.apa.wta.spark.listener.TaskLevelListener;
 import com.asml.apa.wta.spark.stream.MetricStreamingEngine;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -41,9 +42,10 @@ public class SparkDataSource {
    * @param awaitSeconds      amount of seconds to wait for
    */
   public void awaitAndShutdownThreadPool(int awaitSeconds) {
-    AbstractListener.getThreadPool().shutdown();
+    ExecutorService threadPool = AbstractListener.getThreadPool();
+    threadPool.shutdown();
     try {
-      if (!AbstractListener.getThreadPool().awaitTermination(awaitSeconds, TimeUnit.SECONDS)) {
+      if (!threadPool.awaitTermination(awaitSeconds, TimeUnit.SECONDS)) {
         log.error("Could not await the thread pool because of a {} second timeout.", awaitSeconds);
       }
     } catch (InterruptedException e) {
