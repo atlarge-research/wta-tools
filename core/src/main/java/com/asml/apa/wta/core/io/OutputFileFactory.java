@@ -19,6 +19,7 @@ public class OutputFileFactory {
    *
    * @param path    {@link String} representation of the path to write to
    * @return        appropriate {@link OutputFile} implementation for this path when possible
+   * @since 1.0.0
    */
   public OutputFile create(String path) {
     ServiceLoader<OutputFile> serviceLoader = ServiceLoader.load(OutputFile.class);

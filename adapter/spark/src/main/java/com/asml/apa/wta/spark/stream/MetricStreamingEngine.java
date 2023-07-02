@@ -37,6 +37,8 @@ public class MetricStreamingEngine {
 
   /**
    * Initializes the streams.
+   *
+   * @since 1.0.0
    */
   public MetricStreamingEngine() {
     executorResourceStream = new KeyedStream<>();
@@ -47,6 +49,7 @@ public class MetricStreamingEngine {
    *
    * @param resourceKey       {@link String} identifying the resource. This is usually the executorID
    * @param record            {@link SparkDataSource} containing metrics
+   * @since 1.0.0
    */
   public void addToResourceStream(String resourceKey, SparkBaseSupplierWrapperDto record) {
     executorResourceStream.addToStream(resourceKey, record);
@@ -56,6 +59,7 @@ public class MetricStreamingEngine {
    * Consumes all resource related streams and aggregates them into objects.
    *
    * @return      list of {@link ResourceAndStateWrapper} objects containing the resource and its states
+   * @since 1.0.0
    */
   public List<ResourceAndStateWrapper> collectResourceInformation() {
     return executorResourceStream.mapKeyList((key, value) -> {
@@ -72,6 +76,7 @@ public class MetricStreamingEngine {
    * @param executorId      transformed id of the executor
    * @param pings           stream of pings that correspond to this executor
    * @return                {@link Resource} object that is constructed from the given information
+   * @since 1.0.0
    */
   private Resource produceResourceFromExecutorInfo(long executorId, Stream<SparkBaseSupplierWrapperDto> pings) {
     Optional<OsInfoDto> sampleOsInfo = getFirstAvailable(pings.copy(), BaseSupplierDto::getOsInfoDto);
@@ -121,6 +126,7 @@ public class MetricStreamingEngine {
    * @param resourceId      associated resource id
    * @param pings           stream of pings that are to be transformed to states
    * @return                list of resource states that is constructed from the given information
+   * @since 1.0.0
    */
   private Stream<ResourceState> produceResourceStatesFromExecutorInfo(
       long resourceId, Stream<SparkBaseSupplierWrapperDto> pings) {
@@ -191,6 +197,7 @@ public class MetricStreamingEngine {
    * @param mapper      mapping function that should map the dto to an optional data supplier object
    * @param <R>         type of the data supplier object
    * @return            constant information that is requested
+   * @since 1.0.0
    */
   private <R extends Serializable> Optional<R> getFirstAvailable(
       Stream<SparkBaseSupplierWrapperDto> pings, Function<SparkBaseSupplierWrapperDto, R> mapper) {

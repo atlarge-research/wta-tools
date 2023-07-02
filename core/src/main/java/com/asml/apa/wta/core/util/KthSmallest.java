@@ -17,6 +17,7 @@ public class KthSmallest {
    *
    * @param fiveDoubles     {@link List} of at most five doubles
    * @return                median of the {@link List}
+   * @since 1.0.0
    */
   private double findMedian(List<Double> fiveDoubles) {
     if (fiveDoubles.size() > 5 || fiveDoubles.size() < 1) {
@@ -36,6 +37,7 @@ public class KthSmallest {
    *
    * @param data            {@link Stream} to compute the median of medians over
    * @return                median of medians
+   * @since 1.0.0
    */
   private double medianOfMedians(Stream<Double> data) {
     Stream<Double> stream = data;
@@ -63,6 +65,7 @@ public class KthSmallest {
    * @param data          {@link Stream} to query
    * @param kthSmallest   amount of numbers smaller than the one we want to fetch
    * @return              kth smallest number in the {@link Stream}
+   * @since 1.0.0
    */
   public double find(Stream<Double> data, long kthSmallest) {
     Stream<Double> stream = data;

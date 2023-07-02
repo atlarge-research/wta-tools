@@ -21,6 +21,7 @@ public class ShellRunner {
    * @param command           shell command string that is run
    * @param suppressErrors    decides if logs written on error
    * @return                  {@link CompletableFuture} that returns the output of the command
+   * @since 1.0.0
    */
   public CompletableFuture<String> executeCommand(String command, boolean suppressErrors) {
     log.trace("Executing shell command: {}.", command);
@@ -52,6 +53,7 @@ public class ShellRunner {
    *
    * @param process   {@link Process}
    * @return          terminal output
+   * @since 1.0.0
    */
   private String readProcessOutput(Process process) {
     log.trace("Reading shell command outputs.");

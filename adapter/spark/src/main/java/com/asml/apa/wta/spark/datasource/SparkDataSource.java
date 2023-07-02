@@ -40,6 +40,7 @@ public class SparkDataSource {
    * Awaits the thread pool.
    *
    * @param awaitSeconds      amount of seconds to wait for
+   * @since 1.0.0
    */
   public void awaitAndShutdownThreadPool(int awaitSeconds) {
     ExecutorService threadPool = AbstractListener.getThreadPool();
@@ -61,6 +62,7 @@ public class SparkDataSource {
    * @param config                    additional config specified by the user for the plugin
    * @param metricStreamingEngine     driver's {@link MetricStreamingEngine} to inject
    * @param wtaWriter                 {@link WtaWriter} to write to
+   * @since 1.0.0
    */
   public SparkDataSource(
       SparkContext sparkContext,
@@ -94,6 +96,8 @@ public class SparkDataSource {
 
   /**
    * Registers a task listener to the Spark context.
+   *
+   * @since 1.0.0
    */
   public void registerTaskListener() {
     log.debug("Registering task listener.");
@@ -102,6 +106,8 @@ public class SparkDataSource {
 
   /**
    * Registers a job listener to the Spark context.
+   *
+   * @since 1.0.0
    */
   public void registerJobListener() {
     log.debug("Registering job listener.");
@@ -110,6 +116,8 @@ public class SparkDataSource {
 
   /**
    * Registers an application listener to the Spark context.
+   *
+   * @since 1.0.0
    */
   public void registerApplicationListener() {
     log.debug("Registering application listener.");
@@ -118,6 +126,8 @@ public class SparkDataSource {
 
   /**
    * Registers a stage listener to the Spark context.
+   *
+   * @since 1.0.0
    */
   public void registerStageListener() {
     log.debug("Registering stage level listener.");
@@ -126,6 +136,8 @@ public class SparkDataSource {
 
   /**
    * Removes the listeners from the Spark context.
+   *
+   * @since 1.0.0
    */
   public void removeListeners() {
     log.debug("Removing the listeners from the Spark context.");

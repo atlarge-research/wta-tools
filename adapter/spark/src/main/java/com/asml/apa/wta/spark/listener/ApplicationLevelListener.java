@@ -66,6 +66,7 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
    * @param dataSource                  {@link SparkDataSource} to inject
    * @param streamingEngine             driver's {@link MetricStreamingEngine} to use
    * @param traceWriter                 {@link WtaWriter} to write the traces with
+   * @since 1.0.0
    */
   public ApplicationLevelListener(
       SparkContext sparkContext,
@@ -95,6 +96,7 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
    * @param dataSource                  {@link SparkDataSource} to inject
    * @param streamingEngine             driver's {@link MetricStreamingEngine} to use
    * @param traceWriter                 {@link WtaWriter} to write the traces with
+   * @since 1.0.0
    */
   public ApplicationLevelListener(
       SparkContext sparkContext,
@@ -115,6 +117,8 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
 
   /**
    * Writes the trace to file.
+   *
+   * @since 1.0.0
    */
   public void writeTrace() {
     List<ResourceAndStateWrapper> resourceAndStateWrappers = metricStreamingEngine.collectResourceInformation();
@@ -144,6 +148,7 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
    *
    * @param dateEnd         end-date of the application
    * @param builder         WorkloadBuilder to be used to build the Workload
+   * @since 1.0.0
    */
   private void setGeneralFields(long dateEnd, WorkloadBuilder builder) {
     final Domain domain = getConfig().getDomain();
@@ -162,6 +167,7 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
    *
    * @param tasks           list of WTA Task objects
    * @param builder         WorkloadBuilder to be used to build the Workload
+   * @since 1.0.0
    */
   private void setCountFields(Stream<Task> tasks, WorkloadBuilder builder) {
     final Stream<Workflow> workflows = jobLevelListener.getProcessedObjects();
@@ -214,6 +220,7 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
    * @param metrics             {@link List} of WTA Task objects
    * @param resourceType        type of resource to be set
    * @param builder             WorkloadBuilder to be used to build the Workload
+   * @since 1.0.0
    */
   @SuppressWarnings("CyclomaticComplexity")
   private void setResourceStatisticsFields(
@@ -288,6 +295,7 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
    * is needed to determine if applicationEnd is called first or shutdown.
    *
    * @param applicationEnd        event corresponding to the end of the application
+   * @since 1.0.0
    */
   public void onApplicationEnd(SparkListenerApplicationEnd applicationEnd) {
     if (workload != null) {
@@ -326,6 +334,7 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
    *
    * @param data              stream of data
    * @return                  double maximum value from data
+   * @since 1.0.0
    */
   public double computeMax(Stream<Double> data) {
     return data.reduce(Double::max).orElse(-1.0);
@@ -336,6 +345,7 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
    *
    * @param data              stream of data
    * @return                  double minimum value from data
+   * @since 1.0.0
    */
   public double computeMin(Stream<Double> data) {
     return data.filter(x -> x >= 0.0).reduce(Double::min).orElse(-1.0);
@@ -347,6 +357,7 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
    * @param data              stream of data
    * @param size              size of the stream
    * @return                  mean value from data or -1.0
+   * @since 1.0.0
    */
   public double computeMean(Stream<Double> data, long size) {
     if (size == 0) {
@@ -363,6 +374,7 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
    * @param mean              mean value from {@link #computeMean(Stream, long)}
    * @param size              size from data
    * @return                  standard deviation value from data or -1.0
+   * @since 1.0.0
    */
   private double computeStd(Stream<Double> data, double mean, long size) {
     if (size == 0 || mean == -1.0) {
@@ -381,6 +393,7 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
    * @param mean              mean value from {@link #computeMean(Stream, long)}
    * @param std               standard deviation from {@link #computeStd(Stream, double, long)}
    * @return                  normalized standard deviation value from data or -1.0
+   * @since 1.0.0
    */
   private double computeCov(double mean, double std) {
     if (mean == 0.0 || mean == -1.0 || std == -1.0) {
@@ -394,6 +407,7 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
    *
    * @param data              {@link Stream} of data
    * @return                  median value of the data
+   * @since 1.0.0
    */
   private double computeMedian(Stream<Double> data) {
     return new KthSmallest().find(data.copy(), data.copy().count() / 2);
@@ -404,6 +418,7 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
    *
    * @param data              {@link Stream} of data
    * @return                  first quantile value of the data
+   * @since 1.0.0
    */
   private double computeFirstQuantile(Stream<Double> data) {
     return new KthSmallest().find(data.copy(), data.copy().count() / 4);
@@ -414,6 +429,7 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
    *
    * @param data              {@link Stream} of data
    * @return                  third quantile value of the data
+   * @since 1.0.0
    */
   private double computeThirdQuantile(Stream<Double> data) {
     return new KthSmallest().find(data.copy(), data.copy().count() * 3 / 4);

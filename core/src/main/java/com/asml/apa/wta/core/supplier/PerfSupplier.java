@@ -24,6 +24,7 @@ public class PerfSupplier implements InformationSupplier<PerfDto> {
    * Constructs a {@code perf} data source.
    *
    * @param     shellRunner the {@link ShellRunner} to inject
+   * @since 1.0.0
    */
   public PerfSupplier(ShellRunner shellRunner) {
     this.shellRunner = shellRunner;
@@ -34,6 +35,7 @@ public class PerfSupplier implements InformationSupplier<PerfDto> {
    * Verifies the availability of the perf energy data source.
    *
    * @return    {@code boolean} indicating the availability of this data source
+   * @since 1.0.0
    */
   @Override
   public boolean isAvailable() {
@@ -59,6 +61,7 @@ public class PerfSupplier implements InformationSupplier<PerfDto> {
    *
    * @return      if Perf is available, {@link Optional} {@link PerfDto} wrapped in a {@link CompletableFuture} that
    *              will be sent to the driver. Otherwise {@link CompletableFuture} with an empty {@link Optional}
+   * @since 1.0.0
    */
   @Override
   public CompletableFuture<Optional<PerfDto>> getSnapshot() {
@@ -85,6 +88,7 @@ public class PerfSupplier implements InformationSupplier<PerfDto> {
    * which is equivalent to watt.
    *
    * @return    Completable future string of joules used by the CPU package over the past second
+   * @since 1.0.0
    */
   public CompletableFuture<String> gatherMetrics() {
     return shellRunner.executeCommand(

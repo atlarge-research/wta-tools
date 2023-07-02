@@ -18,6 +18,7 @@ public interface BaseTraceObject extends Serializable {
    * Returns a hardcoded schema version.
    *
    * @return        associated config object
+   * @since 1.0.0
    */
   default String getSchemaVersion() {
     return "1.0";
@@ -29,6 +30,7 @@ public interface BaseTraceObject extends Serializable {
    *
    * @param schema  schema for the output object
    * @return        record of the object
+   * @since 1.0.0
    */
   GenericRecord convertToRecord(ParquetSchema schema);
 
@@ -36,6 +38,7 @@ public interface BaseTraceObject extends Serializable {
    * Creates a simple {@link RuntimeException}.
    *
    * @return        {@link RuntimeException} with a simple error message
+   * @since 1.0.0
    */
   default RuntimeException accessError() {
     return new RuntimeException("Something went wrong, this method shouldn't be called!");

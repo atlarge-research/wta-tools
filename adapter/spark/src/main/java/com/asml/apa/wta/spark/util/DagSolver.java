@@ -36,6 +36,7 @@ public class DagSolver {
      * Constructor for node with stage id.
      *
      * @param stage          Spark Stage to extract the id from
+     * @since 1.0.0
      */
     Node(Task stage) {
       id = stage.getId();
@@ -47,6 +48,7 @@ public class DagSolver {
      * collisions with the stage ids.
      *
      * @param nodeId        id 0 or -1
+     * @since 1.0.0
      */
     Node(long nodeId) {
       id = nodeId;
@@ -82,6 +84,7 @@ public class DagSolver {
    *
    * @param stage                 Spark Stage
    * @param taskLevelListener     TaskLevelListener
+   * @since 1.0.0
    */
   private void addNode(Task stage, TaskLevelListener taskLevelListener) {
     Node node = new Node(stage);
@@ -104,6 +107,7 @@ public class DagSolver {
    * The ids of the source and sink are chosen such that there will be no collisions with the stage ids.
    *
    * @param id            id of the source (id = 0) and sink (id = -1) node
+   * @since 1.0.0
    */
   private void addNode(Long id) {
     Node node = new Node(id);
@@ -124,6 +128,7 @@ public class DagSolver {
    * @param vertex1       vertex1
    * @param vertex2       vertex2
    * @param weight        weight of edge from vertex1 to vertex2
+   * @since 1.0.0
    */
   private void addEdge(long vertex1, long vertex2, long weight) {
     if (adjacencyMap.get(vertex1) == null) {
@@ -138,6 +143,8 @@ public class DagSolver {
 
   /**
    * This method links all nodes without a children to the sink node.
+   *
+   * @since 1.0.0
    */
   private void setFinalEdges() {
     for (Long node : nodes.keySet()) {
@@ -149,6 +156,8 @@ public class DagSolver {
 
   /**
    * This method does topological sorting on the DAG using a {@link Deque}.
+   *
+   * @since 1.0.0
    */
   private Deque<Long> topologicalSort() {
     Deque<Long> stack = new ConcurrentLinkedDeque<>();
@@ -163,6 +172,7 @@ public class DagSolver {
    * @param visited       map of all visited nodes
    * @param node          current node
    * @param stack         stack used for topological sorting
+   * @since 1.0.0
    */
   private void topoUtil(Map<Long, Boolean> visited, Long node, Deque<Long> stack) {
     visited.put(node, true);
@@ -178,6 +188,7 @@ public class DagSolver {
    * Computes the longest path on the DAG.
    *
    * @return              longest path
+   * @since 1.0.0
    */
   public List<Task> longestPath() {
     Deque<Long> stack = topologicalSort();
@@ -197,6 +208,7 @@ public class DagSolver {
    * Backtraces the longest path on the DAG based on each node's maximum value.
    *
    * @return              longest path
+   * @since 1.0.0
    */
   private List<Task> backTracing() {
     AtomicLong pointer = new AtomicLong(sinkId);

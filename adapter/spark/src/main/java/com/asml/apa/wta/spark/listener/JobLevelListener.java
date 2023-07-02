@@ -42,6 +42,7 @@ public class JobLevelListener extends AbstractListener<Workflow> {
    * @param config                additional config specified by the user for the plugin
    * @param wtaTaskListener       task-level listener to be used by this listener
    * @param stageLevelListener    stage-level listener
+   * @since 1.0.0
    */
   public JobLevelListener(
       SparkContext sparkContext,
@@ -59,6 +60,7 @@ public class JobLevelListener extends AbstractListener<Workflow> {
    * @param sparkContext          current spark context
    * @param config                additional config specified by the user for the plugin
    * @param stageLevelListener    stage-level listener
+   * @since 1.0.0
    */
   public JobLevelListener(SparkContext sparkContext, RuntimeConfig config, StageLevelListener stageLevelListener) {
     super(sparkContext, config);
@@ -71,6 +73,7 @@ public class JobLevelListener extends AbstractListener<Workflow> {
    * Spark Job.
    *
    * @param jobStart              SparkListenerJobStart event object containing information upon job start
+   * @since 1.0.0
    */
   @Override
   public void onJobStart(SparkListenerJobStart jobStart) {
@@ -94,6 +97,7 @@ public class JobLevelListener extends AbstractListener<Workflow> {
    * ConcurrentHashMap containers must also happen at the very end when a job finishes.
    *
    * @param jobEnd                SparkListenerJobEnd event object containing information upon job end
+   * @since 1.0.0
    */
   @Override
   public void onJobEnd(SparkListenerJobEnd jobEnd) {
@@ -173,6 +177,8 @@ public class JobLevelListener extends AbstractListener<Workflow> {
    * job start but never submitted.
    * <p>
    * For ConcurrentHashMap, remove() is thread-safe when removing based on key.
+   *
+   * @since 1.0.0
    */
   private void cleanUpContainers(long jobId) {
     jobSubmitTimes.remove(jobId);
@@ -204,6 +210,7 @@ public class JobLevelListener extends AbstractListener<Workflow> {
    *
    * @param data              stream of data
    * @return                  summation of positive values from data
+   * @since 1.0.0
    */
   private double computeSum(Stream<Double> data) {
     return data.filter(task -> task >= 0.0).reduce(Double::sum).orElse(-1.0);
@@ -214,6 +221,7 @@ public class JobLevelListener extends AbstractListener<Workflow> {
    *
    * @param stages            all completed stages in the Spark Job
    * @return                  critical path for this Spark Job
+   * @since 1.0.0
    */
   public List<Task> solveCriticalPath(List<Task> stages) {
     try {

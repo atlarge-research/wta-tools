@@ -33,6 +33,7 @@ public class IostatSupplier implements InformationSupplier<IostatDto> {
    * Constructs the supplier with a given instance of shell utils.
    *
    * @param shellRunner     shell utils instance to use
+   * @since 1.0.0
    */
   public IostatSupplier(ShellRunner shellRunner) {
     this.shellRunner = shellRunner;
@@ -43,6 +44,7 @@ public class IostatSupplier implements InformationSupplier<IostatDto> {
    * Checks if the supplier is available.
    *
    * @return      boolean that represents if the iostat supplier is available
+   * @since 1.0.0
    */
   @Override
   public boolean isAvailable() {
@@ -66,6 +68,7 @@ public class IostatSupplier implements InformationSupplier<IostatDto> {
    *
    * @return      if Iostat is available, {@link Optional} {@link IostatDto} wrapped in a {@link CompletableFuture} that
    *              will be sent to the driver. Otherwise {@link CompletableFuture} with an empty {@link Optional}
+   * @since 1.0.0
    */
   @Override
   public CompletableFuture<Optional<IostatDto>> getSnapshot() {
@@ -111,6 +114,7 @@ public class IostatSupplier implements InformationSupplier<IostatDto> {
    *
    * @param input     input of the Iostat command
    * @return          parsed output of the Iostat command
+   * @since 1.0.0
    */
   private List<OutputLine> parseIostat(String input) {
     List<OutputLine> rows =
@@ -123,6 +127,7 @@ public class IostatSupplier implements InformationSupplier<IostatDto> {
    *
    * @param rows      list of output rows
    * @return          aggregated array of doubles
+   * @since 1.0.0
    */
   private double[] aggregateIostat(List<OutputLine> rows) {
     if (rows.size() != 0) {
@@ -157,6 +162,7 @@ public class IostatSupplier implements InformationSupplier<IostatDto> {
      * Returns the row size of the output line.
      *
      * @return      size of the output line
+     * @since 1.0.0
      */
     public int getRowSize() {
       return this.outputLine.size();
@@ -167,6 +173,7 @@ public class IostatSupplier implements InformationSupplier<IostatDto> {
      *
      * @param index     string that is at the specified index
      * @return          string at the specified index in outputLine
+     * @since 1.0.0
      */
     public String getMetricAt(int index) {
       return this.outputLine.get(index);

@@ -28,6 +28,7 @@ public class KeyedStream<K, V extends Serializable> {
    *
    * @param key       record key
    * @param record    record
+   * @since 1.0.0
    */
   public void addToStream(K key, @NonNull V record) {
     log.trace("Adding object to stream");
@@ -41,7 +42,8 @@ public class KeyedStream<K, V extends Serializable> {
   /**
    * Drops the elements associated to the given key from the {@link KeyedStream}.
    *
-   * @param key       key to remove the elements from.
+   * @param key       key to remove the elements from
+   * @since 1.0.0
    */
   public void dropKey(K key) {
     streams.remove(key);
@@ -54,6 +56,7 @@ public class KeyedStream<K, V extends Serializable> {
    * @param mapper    mapping function, takes in the key and value of the element to map
    * @param <R>       type parameter for the mapper's return type
    * @return          result of the mapping operation
+   * @since 1.0.0
    */
   public <R> List<R> mapKeyList(@NonNull BiFunction<K, Stream<V>, R> mapper) {
     List<R> stream = new ArrayList<>();
@@ -68,6 +71,7 @@ public class KeyedStream<K, V extends Serializable> {
    *
    * @param key       key
    * @return          stream of objects with the provided key
+   * @since 1.0.0
    */
   public Stream<V> onKey(K key) {
     log.trace("Requested stream with key");

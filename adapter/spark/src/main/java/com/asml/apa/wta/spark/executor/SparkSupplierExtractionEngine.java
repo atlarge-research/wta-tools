@@ -34,6 +34,7 @@ public class SparkSupplierExtractionEngine extends SupplierExtractionEngine<Spar
    * @param resourcePingInterval                  how often to ping the suppliers, in milliseconds
    * @param pluginContext                         plugin contex
    * @param executorSynchronizationInterval       how often to send the buffer, in milliseconds
+   * @since 1.0.0
    */
   public SparkSupplierExtractionEngine(
       int resourcePingInterval, PluginContext pluginContext, int executorSynchronizationInterval) {
@@ -47,6 +48,7 @@ public class SparkSupplierExtractionEngine extends SupplierExtractionEngine<Spar
    * synchronization interval is set, the result is sent immediately.
    *
    * @return        {@link CompletableFuture} representing the result of the ping and buffer operation
+   * @since 1.0.0
    */
   @Override
   public CompletableFuture<Void> pingAndBuffer() {
@@ -64,6 +66,7 @@ public class SparkSupplierExtractionEngine extends SupplierExtractionEngine<Spar
    * This method gets called by the scheduler to send the resource buffer of the extraction engine.
    *
    * @param snapshots         snapshots to send to the buffer
+   * @since 1.0.0
    */
   private void sendBuffer(List<SparkBaseSupplierWrapperDto> snapshots) {
     ResourceCollectionDto bufferSnapshot = new ResourceCollectionDto(snapshots);
@@ -81,6 +84,8 @@ public class SparkSupplierExtractionEngine extends SupplierExtractionEngine<Spar
 
   /**
    * This method gets called by the scheduler to send the resource buffer of the extraction engine.
+   *
+   * @since 1.0.0
    */
   private void sendBuffer() {
     sendBuffer(getAndClear());
@@ -101,6 +106,8 @@ public class SparkSupplierExtractionEngine extends SupplierExtractionEngine<Spar
 
   /**
    * Stops the synchronizer from sending information to the driver.
+   *
+   * @since 1.0.0
    */
   public void stopSynchronizing() {
     log.trace(pluginContext.executorID() + " is stopping to synchronize.");
@@ -112,6 +119,7 @@ public class SparkSupplierExtractionEngine extends SupplierExtractionEngine<Spar
    *
    * @param record        {@link BaseSupplierDto} to transform
    * @return              {@link SparkBaseSupplierWrapperDto} containing information pertaining to Spark
+   * @since 1.0.0
    */
   @Override
   public SparkBaseSupplierWrapperDto transform(BaseSupplierDto record) {

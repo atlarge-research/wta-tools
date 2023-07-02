@@ -16,6 +16,7 @@ public interface OutputFile {
    *
    * @param path          {@link String} representing the path to resolve
    * @return              resolved location
+   * @since 1.0.0
    */
   OutputFile resolve(String path);
 
@@ -24,6 +25,7 @@ public interface OutputFile {
    *
    * @param path          {@link String} representation of the location to point to
    * @throws IOException  when something goes wrong during I/O
+   * @since 1.0.0
    */
   void setPath(String path) throws IOException;
 
@@ -32,6 +34,7 @@ public interface OutputFile {
    *
    * @param path          {@link String} representation of the location to point to
    * @return              {@code boolean} indicating whether the implementation can handle the given location
+   * @since 1.0.0
    */
   boolean acceptsLocation(String path);
 
@@ -40,6 +43,7 @@ public interface OutputFile {
    *
    * @return              opened {@link OutputFile} writer
    * @throws IOException  when no writer can be opened for the location of this {@link OutputFile}
+   * @since 1.0.0
    */
   BufferedOutputStream open() throws IOException;
 
@@ -48,6 +52,7 @@ public interface OutputFile {
    *
    * @return              {@link OutputFile} pointing to the cleared directory
    * @throws IOException  when something goes wrong during I/O
+   * @since 1.0.0
    */
   OutputFile clearDirectories() throws IOException;
 
@@ -55,6 +60,8 @@ public interface OutputFile {
    * Wraps this {@link OutputFile} into a Parquet {@link org.apache.parquet.io.OutputFile}.
    *
    * @return              wrapped disk path as a Parquet {@link org.apache.parquet.io.OutputFile}
+   * @throws IOException  when something goes wrong during I/O
+   * @since 1.0.0
    */
   org.apache.parquet.io.OutputFile wrap() throws IOException;
 }

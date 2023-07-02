@@ -37,6 +37,7 @@ public class StageLevelListener extends TaskStageBaseListener {
    *
    * @param sparkContext          current spark context
    * @param config                additional config specified by the user for the plugin
+   * @since 1.0.0
    */
   public StageLevelListener(SparkContext sparkContext, RuntimeConfig config) {
     super(sparkContext, config);
@@ -50,6 +51,7 @@ public class StageLevelListener extends TaskStageBaseListener {
    * @param stageId               current stage id
    * @param task                  task object of current stage metrics
    * @param curStageInfo          current stage info
+   * @since 1.0.0
    */
   public void fillInParentChildMaps(long stageId, Task task, StageInfo curStageInfo) {
     final long[] parentStageIds = JavaConverters.seqAsJavaList(
@@ -80,6 +82,7 @@ public class StageLevelListener extends TaskStageBaseListener {
    * and added here.
    *
    * @param stageCompleted        SparkListenerStageCompleted object corresponding to information on stage completion
+   * @since 1.0.0
    */
   @Override
   public void onStageCompleted(SparkListenerStageCompleted stageCompleted) {
@@ -128,6 +131,7 @@ public class StageLevelListener extends TaskStageBaseListener {
    * affiliated to the passed jobId.
    *
    * @param jobId       Spark Job id to filter Stages by
+   * @since 1.0.0
    */
   public void setStages(long jobId) {
     getWorkflowsToTasks()

@@ -37,6 +37,7 @@ public class TaskLevelListener extends TaskStageBaseListener {
    *
    * @param sparkContext          current spark context
    * @param config                additional config specified by the user for the plugin
+   * @since 1.0.0
    */
   public TaskLevelListener(SparkContext sparkContext, RuntimeConfig config) {
     super(sparkContext, config);
@@ -48,6 +49,7 @@ public class TaskLevelListener extends TaskStageBaseListener {
    * @param taskId                Spark Task id
    * @param stageId               Spark Stage id
    * @param wtaTask               WTA Task object
+   * @since 1.0.0
    */
   private void fillInParentChildMaps(long taskId, long stageId, Task wtaTask) {
     taskToStage.put(taskId, stageId);
@@ -59,6 +61,7 @@ public class TaskLevelListener extends TaskStageBaseListener {
    * This method is called every time a task ends. Task-level metrics are collected, aggregated, and added here.
    *
    * @param taskEnd               SparkListenerTaskEnd object corresponding to information on task end
+   * @since 1.0.0
    */
   @Override
   public void onTaskEnd(SparkListenerTaskEnd taskEnd) {
@@ -111,6 +114,7 @@ public class TaskLevelListener extends TaskStageBaseListener {
    *
    * @param stageLevelListener        stage-level listener to get ConcurrentHashMap containers
    * @param jobId                     Spark Job id to filter Tasks by
+   * @since 1.0.0
    */
   public void setTasks(StageLevelListener stageLevelListener, long jobId) {
     getWorkflowsToTasks().onKey(jobId).forEach(task -> {

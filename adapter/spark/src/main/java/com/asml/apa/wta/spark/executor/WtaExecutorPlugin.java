@@ -36,6 +36,7 @@ public class WtaExecutorPlugin implements ExecutorPlugin {
    *                      from {@link WtaDriverPlugin#init(SparkContext, PluginContext)}
    * @see                 WtaPlugin#executorPlugin() where a new instance of the plugin is created. This gets
    *                      called as soon as it is loaded on to the executor
+   * @since 1.0.0
    */
   @Override
   public void init(PluginContext pCtx, Map<String, String> extraConf) {
@@ -69,12 +70,16 @@ public class WtaExecutorPlugin implements ExecutorPlugin {
    * Developers should note that expensive operations should be avoided, since it gets called on every task.
    * Exceptions thrown here are not propagated, meaning a task won't fail if this method throws an exception.
    * <a href="https://spark.apache.org/docs/3.2.1/api/java/org/apache/spark/api/plugin/ExecutorPlugin.html#init-org.apache.spark.api.plugin.PluginContext-java.util.Map-">Refer to the docs</a> for more information.
+   *
+   * @since 1.0.0
    */
   @Override
   public void onTaskStart() {}
 
   /**
    * Gets called when either a task is successfully completed or {@link #onTaskStart()} threw an exception.
+   *
+   * @since 1.0.0
    */
   @Override
   public void onTaskSucceeded() {}
@@ -83,6 +88,7 @@ public class WtaExecutorPlugin implements ExecutorPlugin {
    * Gets called if a task fails.
    *
    * @param failureReason       reason the task failed, accessible through a string
+   * @since 1.0.0
    */
   @Override
   public void onTaskFailed(TaskFailedReason failureReason) {
@@ -91,6 +97,8 @@ public class WtaExecutorPlugin implements ExecutorPlugin {
 
   /**
    * Gets called just before shutdown. Blocks executor shutdown until it is completed.
+   *
+   * @since 1.0.0
    */
   @Override
   public void shutdown() {

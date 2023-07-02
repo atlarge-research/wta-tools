@@ -28,6 +28,7 @@ public class DiskOutputFile implements OutputFile {
    *
    * @param path          {@link String} representing the path to resolve
    * @return              resolved location
+   * @since 1.0.0
    */
   @Override
   public OutputFile resolve(String path) {
@@ -41,6 +42,7 @@ public class DiskOutputFile implements OutputFile {
    *
    * @param path          {@link String} representation of the location to point to
    * @return              {@code boolean} indicating whether the implementation can handle the given location
+   * @since 1.0.0
    */
   @Override
   public boolean acceptsLocation(String path) {
@@ -51,6 +53,7 @@ public class DiskOutputFile implements OutputFile {
    * Sets the path of the disk output file.
    *
    * @param path          {@link String} representation of the {@link Path} to point to
+   * @since 1.0.0
    */
   public void setPath(String path) {
     outputFile = Path.of(path);
@@ -61,6 +64,7 @@ public class DiskOutputFile implements OutputFile {
    *
    * @return              opened {@link OutputFile} writer
    * @throws IOException  when no writer can be opened for the location of this {@link OutputFile}
+   * @since 1.0.0
    */
   @Override
   public BufferedOutputStream open() throws IOException {
@@ -74,6 +78,7 @@ public class DiskOutputFile implements OutputFile {
    *
    * @return              {@link OutputFile} pointing to the cleared directory
    * @throws IOException  when something goes wrong during I/O
+   * @since 1.0.0
    */
   @Override
   public OutputFile clearDirectories() throws IOException {
@@ -92,6 +97,7 @@ public class DiskOutputFile implements OutputFile {
    * Wraps this {@link DiskOutputFile} into a Parquet {@link org.apache.parquet.io.OutputFile}.
    *
    * @return              wrapped disk path as a Parquet {@link org.apache.parquet.io.OutputFile}
+   * @since 1.0.0
    */
   @Override
   public org.apache.parquet.io.OutputFile wrap() {
@@ -103,6 +109,7 @@ public class DiskOutputFile implements OutputFile {
    * Converts the object to a {@link String} for printing.
    *
    * @return              {@link String} representing the path this object points to
+   * @since 1.0.0
    */
   @Override
   public String toString() {

@@ -42,6 +42,7 @@ public class WtaWriter {
    * @param version       version of files to write
    * @param currentTime   current time in milliseconds
    * @param toolVersion   version of the tool that writes to file
+   * @since 1.0.0
    */
   public WtaWriter(@NonNull OutputFile path, String version, String currentTime, String toolVersion) {
     file = path.resolve(currentTime).resolve(toolVersion);
@@ -52,6 +53,7 @@ public class WtaWriter {
    * Writes a {@link Workload} to the corresponding JSON file.
    *
    * @param workload      {@link Workload} to write
+   * @since 1.0.0
    */
   public void write(Workload workload) {
     log.debug("Writing workload to file.");
@@ -68,6 +70,7 @@ public class WtaWriter {
    * @param clazz         class of WTA objects to write
    * @param wtaObjects    WTA objects to write
    * @param <T>           type parameter for the type of WTA object to write, should extend {@link BaseTraceObject}
+   * @since 1.0.0
    */
   public <T extends BaseTraceObject> void write(Class<T> clazz, Stream<T> wtaObjects) {
     log.debug("Writing objects of type {} to file.", clazz.getSimpleName());
@@ -92,6 +95,7 @@ public class WtaWriter {
    * Creates a Workload json writer.
    *
    * @return            {@link JsonWriter} that writes the workload json file
+   * @since 1.0.0
    */
   protected JsonWriter<Workload> createWorkloadWriter() throws IOException {
     OutputFile path = file.resolve("workload")

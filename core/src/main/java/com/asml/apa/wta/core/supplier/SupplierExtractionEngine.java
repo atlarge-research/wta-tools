@@ -52,6 +52,7 @@ public abstract class SupplierExtractionEngine<T extends BaseSupplierDto> {
    * Suppliers should be injected here.
    *
    * @param resourcePingInterval    how often to ping the suppliers, in milliseconds
+   * @since 1.0.0
    */
   public SupplierExtractionEngine(int resourcePingInterval) {
     ShellRunner shellRunner = new ShellRunner();
@@ -69,6 +70,7 @@ public abstract class SupplierExtractionEngine<T extends BaseSupplierDto> {
    * Developers are encouraged to override this to add/remove additional information.
    *
    * @return      {@link CompletableFuture} that completes when the result has been resolved
+   * @since 1.0.0
    */
   protected CompletableFuture<T> ping() {
     CompletableFuture<Optional<OsInfoDto>> osInfoDtoCompletableFuture = this.operatingSystemSupplier.getSnapshot();
@@ -102,6 +104,7 @@ public abstract class SupplierExtractionEngine<T extends BaseSupplierDto> {
    * Ping the suppliers and add the results to the buffer. This is done asynchronously.
    *
    * @return      {@link CompletableFuture} representing the result of the ping operation
+   * @since 1.0.0
    */
   public CompletableFuture<Void> pingAndBuffer() {
     log.trace("Pinging suppliers and buffering results.");
@@ -110,6 +113,8 @@ public abstract class SupplierExtractionEngine<T extends BaseSupplierDto> {
 
   /**
    * Starts pinging the suppliers at a fixed rate.
+   *
+   * @since 1.0.0
    */
   public void startPinging() {
     log.trace("Starting to ping suppliers.");
@@ -118,6 +123,8 @@ public abstract class SupplierExtractionEngine<T extends BaseSupplierDto> {
 
   /**
    * Stops pinging the suppliers.
+   *
+   * @since 1.0.0
    */
   public void stopPinging() {
     log.trace("Stopping to ping suppliers.");
@@ -130,6 +137,7 @@ public abstract class SupplierExtractionEngine<T extends BaseSupplierDto> {
    *
    * @param record      'bare-bones' information that needs to be augmented
    * @return            transformed resource metrics record, with additional information
+   * @since 1.0.0
    */
   public abstract T transform(BaseSupplierDto record);
 
@@ -137,6 +145,7 @@ public abstract class SupplierExtractionEngine<T extends BaseSupplierDto> {
    * Get and clear the buffer.
    *
    * @return            buffer contents as a list
+   * @since 1.0.0
    */
   public List<T> getAndClear() {
     log.trace("Getting and clearing buffer.");

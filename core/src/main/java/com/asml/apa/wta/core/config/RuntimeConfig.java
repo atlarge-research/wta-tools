@@ -54,8 +54,10 @@ public class RuntimeConfig {
   /**
    * Reads the config file and creates the associated config object.
    *
-   * @param configFile    filepath to the config file
-   * @return              associated config object
+   * @param configFile                  filepath to the config file
+   * @return                            associated config object
+   * @throws IllegalArgumentException   when the config file is invalid
+   * @since 1.0.0
    */
   @SuppressWarnings("CyclomaticComplexity")
   public static RuntimeConfig readConfig(String configFile) {

@@ -27,6 +27,7 @@ public class DiskParquetInputFile implements InputFile {
    *
    * @return                  total length of the file, in bytes
    * @throws IOException      if the length cannot be determined
+   * @since 1.0.0
    */
   @Override
   public long getLength() throws IOException {
@@ -43,6 +44,7 @@ public class DiskParquetInputFile implements InputFile {
    *
    * @return                  new {@link SeekableInputStream} to read the file
    * @throws IOException      if the stream cannot be opened
+   * @since 1.0.0
    */
   @Override
   public SeekableInputStream newStream() throws IOException {
@@ -55,6 +57,8 @@ public class DiskParquetInputFile implements InputFile {
        * Return the current position in the InputStream.
        *
        * @return              current position in bytes from the start of the stream
+       * @throws IOException  if the underlying stream throws IOException
+       * @since 1.0.0
        */
       @Override
       public long getPos() throws IOException {
@@ -66,6 +70,7 @@ public class DiskParquetInputFile implements InputFile {
        *
        * @param newPos        new position to seek to
        * @throws IOException  if the underlying stream throws IOException
+       * @since 1.0.0
        */
       @Override
       public void seek(long newPos) throws IOException {
@@ -82,6 +87,7 @@ public class DiskParquetInputFile implements InputFile {
        *
        * @return              the next byte of data, or {@code -1} if the end of the stream is reached
        * @throws IOException  if an I/O error occurs
+       * @since 1.0.0
        */
       @Override
       public int read() throws IOException {
@@ -99,6 +105,7 @@ public class DiskParquetInputFile implements InputFile {
        * @param buf           byte buffer to fill with data from the stream
        * @return              number of bytes read or -1 if the stream ended
        * @throws IOException  if the underlying stream throws IOException
+       * @since 1.0.0
        */
       @Override
       public int read(ByteBuffer buf) throws IOException {
@@ -120,6 +127,7 @@ public class DiskParquetInputFile implements InputFile {
        * @param bytes         byte array to fill with data from the stream
        * @throws IOException  if the underlying stream throws IOException
        * @throws EOFException if the stream has fewer bytes left than are needed to fill the array, {@code bytes.length}
+       * @since 1.0.0
        */
       @Override
       public void readFully(byte[] bytes) throws IOException {
@@ -138,6 +146,7 @@ public class DiskParquetInputFile implements InputFile {
        * @param len           length of bytes to read into the byte array
        * @throws IOException  if the underlying stream throws IOException
        * @throws EOFException if the stream has fewer than {@code len} bytes left
+       * @since 1.0.0
        */
       @Override
       public void readFully(byte[] bytes, int start, int len) throws IOException {
@@ -155,6 +164,7 @@ public class DiskParquetInputFile implements InputFile {
        * @throws IOException  if the underlying stream throws IOException
        * @throws EOFException if the stream has fewer bytes left than are needed to fill the
        *                      buffer {@code buf.remaining()}
+       * @since 1.0.0
        */
       @Override
       public void readFully(ByteBuffer buf) throws IOException {
@@ -167,6 +177,7 @@ public class DiskParquetInputFile implements InputFile {
        * Closes the resource.
        *
        * @throws IOException  if the underlying resource throws an IOException
+       * @since 1.0.0
        */
       @Override
       public void close() throws IOException {

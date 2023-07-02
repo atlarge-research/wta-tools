@@ -21,6 +21,8 @@ public class JavaFileSupplier implements InformationSupplier<JvmFileDto> {
 
   /**
    * Fetches the root directory, and tests for availability.
+   *
+   * @since 1.0.0
    */
   public JavaFileSupplier() {
     this.rootDir = new File("/");
@@ -31,6 +33,7 @@ public class JavaFileSupplier implements InformationSupplier<JvmFileDto> {
    * If there is a filesystem which does not have a root directory, this supplier will not be available.
    *
    * @return      true iff the directory exists and read perms are available, false otherwise
+   * @since 1.0.0
    */
   @Override
   public boolean isAvailable() {
@@ -50,6 +53,7 @@ public class JavaFileSupplier implements InformationSupplier<JvmFileDto> {
    * @return      if filesystem with root dir is available, {@link Optional} {@link JvmFileDto} wrapped in a
    *              {@link CompletableFuture} that will be sent to the driver. Otherwise {@link CompletableFuture} with
    *              an empty {@link Optional}
+   * @since 1.0.0
    */
   @Override
   public CompletableFuture<Optional<JvmFileDto>> getSnapshot() {

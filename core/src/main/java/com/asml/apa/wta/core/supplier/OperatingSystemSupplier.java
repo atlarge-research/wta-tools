@@ -21,6 +21,8 @@ public class OperatingSystemSupplier implements InformationSupplier<OsInfoDto> {
 
   /**
    * Constructs the Supplier.
+   *
+   * @since 1.0.0
    */
   public OperatingSystemSupplier() {
     bean = (OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
@@ -31,6 +33,7 @@ public class OperatingSystemSupplier implements InformationSupplier<OsInfoDto> {
    * Verifies that the supplier is available.
    *
    * @return      {@code boolean} indicating the validity of this supplier
+   * @since 1.0.0
    */
   @Override
   public boolean isAvailable() {
@@ -42,6 +45,7 @@ public class OperatingSystemSupplier implements InformationSupplier<OsInfoDto> {
    * If this metric is unavailable it returns -1.
    *
    * @return      amount of virtual memory that is available in bytes, -1 if unavailable
+   * @since 1.0.0
    */
   public long getCommittedVirtualMemorySize() {
     return bean.getCommittedVirtualMemorySize();
@@ -51,6 +55,7 @@ public class OperatingSystemSupplier implements InformationSupplier<OsInfoDto> {
    * Retrieves the amount of free physical memory in bytes.
    *
    * @return      amount of free physical memory in bytes
+   * @since 1.0.0
    */
   @SuppressWarnings("deprecation")
   public long getFreePhysicalMemorySize() {
@@ -61,6 +66,7 @@ public class OperatingSystemSupplier implements InformationSupplier<OsInfoDto> {
    * Retrieves the recent CPU usage for the JVM. The value is a double between 0 and 1.
    *
    * @return      value between 0 and 1 indicating the recent CPU usage for the JVM
+   * @since 1.0.0
    */
   public double getProcessCpuLoad() {
     return bean.getProcessCpuLoad();
@@ -71,6 +77,7 @@ public class OperatingSystemSupplier implements InformationSupplier<OsInfoDto> {
    * If this metric is unavailable it returns -1.
    *
    * @return      CPU time used by the JVM in nanoseconds, -1 if unavailable
+   * @since 1.0.0
    */
   public long getProcessCpuTime() {
     return bean.getProcessCpuTime();
@@ -80,6 +87,7 @@ public class OperatingSystemSupplier implements InformationSupplier<OsInfoDto> {
    * Retrieves the amount of total physical memory in bytes.
    *
    * @return      amount of total physical memory in bytes
+   * @since 1.0.0
    */
   @SuppressWarnings("deprecation")
   public long getTotalPhysicalMemorySize() {
@@ -91,6 +99,7 @@ public class OperatingSystemSupplier implements InformationSupplier<OsInfoDto> {
    * If this metric is unavailable it returns some negative value.
    *
    * @return      system load average, negative if unavailable
+   * @since 1.0.0
    */
   public double getSystemLoadAverage() {
     return bean.getSystemLoadAverage();
@@ -101,6 +110,7 @@ public class OperatingSystemSupplier implements InformationSupplier<OsInfoDto> {
    * The value returned may change during a JVM run, it will never be smaller than 1.
    *
    * @return      number of processors available, never smaller than 1
+   * @since 1.0.0
    */
   public int getAvailableProcessors() {
     return bean.getAvailableProcessors();
@@ -110,6 +120,7 @@ public class OperatingSystemSupplier implements InformationSupplier<OsInfoDto> {
    * Retrieves the architecture abbreviation.
    *
    * @return      underlying architecture e.g. amd64
+   * @since 1.0.0
    */
   public String getArch() {
     return bean.getArch();
@@ -119,6 +130,7 @@ public class OperatingSystemSupplier implements InformationSupplier<OsInfoDto> {
    * Retrieves the operating system name and version.
    *
    * @return      operating system name and version e.g. Windows 10.0 or Linux 4.4.0-18362-Microsoft
+   * @since 1.0.0
    */
   public String getOperatingSystem() {
     return bean.getName() + " " + bean.getVersion();
@@ -129,6 +141,7 @@ public class OperatingSystemSupplier implements InformationSupplier<OsInfoDto> {
    *
    * @return      if supplier is available, {@link Optional} {@link OsInfoDto} wrapped in a {@link CompletableFuture}
    *              that will be sent to the driver. Otherwise {@link CompletableFuture} with an empty {@link Optional}
+   * @since 1.0.0
    */
   @Override
   public CompletableFuture<Optional<OsInfoDto>> getSnapshot() {
