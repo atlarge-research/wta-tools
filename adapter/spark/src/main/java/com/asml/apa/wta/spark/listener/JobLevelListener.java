@@ -38,10 +38,10 @@ public class JobLevelListener extends AbstractListener<Workflow> {
   /**
    * Constructor for the job-level listener when collecting task-level metrics.
    *
-   * @param sparkContext          current spark context.
-   * @param config                additional config specified by the user for the plugin.
-   * @param wtaTaskListener       task-level listener to be used by this listener.
-   * @param stageLevelListener    stage-level listener.
+   * @param sparkContext          current spark context
+   * @param config                additional config specified by the user for the plugin
+   * @param wtaTaskListener       task-level listener to be used by this listener
+   * @param stageLevelListener    stage-level listener
    */
   public JobLevelListener(
       SparkContext sparkContext,
@@ -56,9 +56,9 @@ public class JobLevelListener extends AbstractListener<Workflow> {
   /**
    * Constructor for the job-level listener when collecting stage-level metrics.
    *
-   * @param sparkContext          current spark context.
-   * @param config                additional config specified by the user for the plugin.
-   * @param stageLevelListener    stage-level listener.
+   * @param sparkContext          current spark context
+   * @param config                additional config specified by the user for the plugin
+   * @param stageLevelListener    stage-level listener
    */
   public JobLevelListener(SparkContext sparkContext, RuntimeConfig config, StageLevelListener stageLevelListener) {
     super(sparkContext, config);
@@ -70,7 +70,7 @@ public class JobLevelListener extends AbstractListener<Workflow> {
    * Callback for job start event, tracks the submit time of the Spark Job and Spark Stages and its parents in the
    * Spark Job.
    *
-   * @param jobStart              SparkListenerJobStart event object containing information upon job start.
+   * @param jobStart              SparkListenerJobStart event object containing information upon job start
    */
   @Override
   public void onJobStart(SparkListenerJobStart jobStart) {
@@ -93,7 +93,7 @@ public class JobLevelListener extends AbstractListener<Workflow> {
    * depending on the config setting of isStageLevel. This needs to happen here as the clean-up of
    * ConcurrentHashMap containers must also happen at the very end when a job finishes.
    *
-   * @param jobEnd                SparkListenerJobEnd event object containing information upon job end.
+   * @param jobEnd                SparkListenerJobEnd event object containing information upon job end
    */
   @Override
   public void onJobEnd(SparkListenerJobEnd jobEnd) {
@@ -202,8 +202,8 @@ public class JobLevelListener extends AbstractListener<Workflow> {
   /**
    * Summation for Double stream for positive terms.
    *
-   * @param data              stream of data.
-   * @return                  summation of positive values from data.
+   * @param data              stream of data
+   * @return                  summation of positive values from data
    */
   private double computeSum(Stream<Double> data) {
     return data.filter(task -> task >= 0.0).reduce(Double::sum).orElse(-1.0);
@@ -212,8 +212,8 @@ public class JobLevelListener extends AbstractListener<Workflow> {
   /**
    * This method takes the stages inside this Spark Job and return the critical path.
    *
-   * @param stages            all completed stages in the Spark Job.
-   * @return                  critical path for this Spark Job.
+   * @param stages            all completed stages in the Spark Job
+   * @return                  critical path for this Spark Job
    */
   public List<Task> solveCriticalPath(List<Task> stages) {
     try {

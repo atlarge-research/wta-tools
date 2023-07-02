@@ -35,7 +35,7 @@ public class DagSolver {
     /**
      * Constructor for node with stage id.
      *
-     * @param stage          Spark Stage to extract the id from.
+     * @param stage          Spark Stage to extract the id from
      */
     Node(Task stage) {
       id = stage.getId();
@@ -46,7 +46,7 @@ public class DagSolver {
      * Constructor for node 0, -1 as the extra source/sink node. Ids of the source and sink are chosen to avoid
      * collisions with the stage ids.
      *
-     * @param nodeId        id 0 or -1.
+     * @param nodeId        id 0 or -1
      */
     Node(long nodeId) {
       id = nodeId;
@@ -80,8 +80,8 @@ public class DagSolver {
    * This will add the node and the adjacent edges of the node. If there is no parents, it will be linked to the
    * source node.
    *
-   * @param stage                 Spark Stage.
-   * @param taskLevelListener     TaskLevelListener.
+   * @param stage                 Spark Stage
+   * @param taskLevelListener     TaskLevelListener
    */
   private void addNode(Task stage, TaskLevelListener taskLevelListener) {
     Node node = new Node(stage);
@@ -103,7 +103,7 @@ public class DagSolver {
    * This method is used to create the additional source and sink node.
    * The ids of the source and sink are chosen such that there will be no collisions with the stage ids.
    *
-   * @param id            id of the source (id = 0) and sink (id = -1) node.
+   * @param id            id of the source (id = 0) and sink (id = -1) node
    */
   private void addNode(Long id) {
     Node node = new Node(id);
@@ -121,9 +121,9 @@ public class DagSolver {
   /**
    * This method add a directed edge from vertex1 to vertex2 with the specified weight.
    *
-   * @param vertex1       vertex1.
-   * @param vertex2       vertex2.
-   * @param weight        weight of edge from vertex1 to vertex2.
+   * @param vertex1       vertex1
+   * @param vertex2       vertex2
+   * @param weight        weight of edge from vertex1 to vertex2
    */
   private void addEdge(long vertex1, long vertex2, long weight) {
     if (adjacencyMap.get(vertex1) == null) {

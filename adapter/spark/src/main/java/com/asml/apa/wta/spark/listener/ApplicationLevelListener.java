@@ -58,14 +58,14 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
   /**
    * Constructor for the application-level listener.
    *
-   * @param sparkContext                current spark context.
-   * @param config                      additional config specified by the user for the plugin.
-   * @param wtaTaskLevelListener        task-level listener to be used by this listener.
-   * @param wtaStageLevelListener       stage-level listener to be used by this listener.
-   * @param wtaJobLevelListener         job-level listener to be used by this listener.
-   * @param dataSource                  {@link SparkDataSource} to inject.
-   * @param streamingEngine             driver's {@link MetricStreamingEngine} to use.
-   * @param traceWriter                 {@link WtaWriter} to write the traces with.
+   * @param sparkContext                current spark context
+   * @param config                      additional config specified by the user for the plugin
+   * @param wtaTaskLevelListener        task-level listener to be used by this listener
+   * @param wtaStageLevelListener       stage-level listener to be used by this listener
+   * @param wtaJobLevelListener         job-level listener to be used by this listener
+   * @param dataSource                  {@link SparkDataSource} to inject
+   * @param streamingEngine             driver's {@link MetricStreamingEngine} to use
+   * @param traceWriter                 {@link WtaWriter} to write the traces with
    */
   public ApplicationLevelListener(
       SparkContext sparkContext,
@@ -88,13 +88,13 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
   /**
    * Constructor for the application-level listener at stage level.
    *
-   * @param sparkContext                current spark context.
-   * @param config                      additional config specified by the user for the plugin.
-   * @param wtaStageLevelListener       stage-level listener to be used by this listener.
-   * @param wtaJobLevelListener         job-level listener to be used by this listener.
-   * @param dataSource                  {@link SparkDataSource} to inject.
-   * @param streamingEngine             driver's {@link MetricStreamingEngine} to use.
-   * @param traceWriter                 {@link WtaWriter} to write the traces with.
+   * @param sparkContext                current spark context
+   * @param config                      additional config specified by the user for the plugin
+   * @param wtaStageLevelListener       stage-level listener to be used by this listener
+   * @param wtaJobLevelListener         job-level listener to be used by this listener
+   * @param dataSource                  {@link SparkDataSource} to inject
+   * @param streamingEngine             driver's {@link MetricStreamingEngine} to use
+   * @param traceWriter                 {@link WtaWriter} to write the traces with
    */
   public ApplicationLevelListener(
       SparkContext sparkContext,
@@ -142,8 +142,8 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
   /**
    * Setters for the general fields of the Workload.
    *
-   * @param dateEnd         end-date of the application.
-   * @param builder         WorkloadBuilder to be used to build the Workload.
+   * @param dateEnd         end-date of the application
+   * @param builder         WorkloadBuilder to be used to build the Workload
    */
   private void setGeneralFields(long dateEnd, WorkloadBuilder builder) {
     final Domain domain = getConfig().getDomain();
@@ -160,8 +160,8 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
   /**
    * Setters for the count fields of the Workload.
    *
-   * @param tasks           list of WTA Task objects.
-   * @param builder         WorkloadBuilder to be used to build the Workload.
+   * @param tasks           list of WTA Task objects
+   * @param builder         WorkloadBuilder to be used to build the Workload
    */
   private void setCountFields(Stream<Task> tasks, WorkloadBuilder builder) {
     final Stream<Workflow> workflows = jobLevelListener.getProcessedObjects();
@@ -211,9 +211,9 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
   /**
    * Setters for the statistical resource fields of the Workload.
    *
-   * @param metrics             {@link List} of WTA Task objects.
-   * @param resourceType        type of resource to be set.
-   * @param builder             WorkloadBuilder to be used to build the Workload.
+   * @param metrics             {@link List} of WTA Task objects
+   * @param resourceType        type of resource to be set
+   * @param builder             WorkloadBuilder to be used to build the Workload
    */
   @SuppressWarnings("CyclomaticComplexity")
   private void setResourceStatisticsFields(
@@ -287,7 +287,7 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
    * Callback function that is called right at the end of the application. Further experimentation
    * is needed to determine if applicationEnd is called first or shutdown.
    *
-   * @param applicationEnd        event corresponding to the end of the application.
+   * @param applicationEnd        event corresponding to the end of the application
    */
   public void onApplicationEnd(SparkListenerApplicationEnd applicationEnd) {
     if (workload != null) {
@@ -324,8 +324,8 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
   /**
    * Finds the maximum element inside the double valued stream.
    *
-   * @param data              stream of data.
-   * @return                  double maximum value from data.
+   * @param data              stream of data
+   * @return                  double maximum value from data
    */
   private double computeMax(Stream<Double> data) {
     return data.reduce(Double::max).orElse(-1.0);
@@ -334,8 +334,8 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
   /**
    * Finds the minimum element of the double valued stream.
    *
-   * @param data              stream of data.
-   * @return                  double minimum value from data.
+   * @param data              stream of data
+   * @return                  double minimum value from data
    */
   public double computeMin(Stream<Double> data) {
     return data.filter(x -> x >= 0.0).reduce(Double::min).orElse(-1.0);
@@ -344,9 +344,9 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
   /**
    * Mean value for the double type data stream with invalid stream handling.
    *
-   * @param data              stream of data.
-   * @param size              size of the stream.
-   * @return                  mean value from data or -1.0.
+   * @param data              stream of data
+   * @param size              size of the stream
+   * @return                  mean value from data or -1.0
    */
   public double computeMean(Stream<Double> data, long size) {
     if (size == 0) {
@@ -359,10 +359,10 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
    * Standard deviation value for data stream with invalid stream handling. Assumes the data has
    * positive elements only.
    *
-   * @param data              stream of data.
-   * @param mean              mean value from {@link #computeMean(Stream, long)}.
-   * @param size              size from data.
-   * @return                  standard deviation value from data or -1.0.
+   * @param data              stream of data
+   * @param mean              mean value from {@link #computeMean(Stream, long)}
+   * @param size              size from data
+   * @return                  standard deviation value from data or -1.0
    */
   private double computeStd(Stream<Double> data, double mean, long size) {
     if (size == 0 || mean == -1.0) {
@@ -378,9 +378,9 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
   /**
    * Normalized deviation value for data stream with invalid stream handling.
    *
-   * @param mean              mean value from {@link #computeMean(Stream, long)}.
-   * @param std               standard deviation from {@link #computeStd(Stream, double, long)}.
-   * @return                  normalized standard deviation value from data or -1.0.
+   * @param mean              mean value from {@link #computeMean(Stream, long)}
+   * @param std               standard deviation from {@link #computeStd(Stream, double, long)}
+   * @return                  normalized standard deviation value from data or -1.0
    */
   private double computeCov(double mean, double std) {
     if (mean == 0.0 || mean == -1.0 || std == -1.0) {
@@ -392,8 +392,8 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
   /**
    * Median value for data stream. Assumes that data is not empty, sorted, and positive elements only.
    *
-   * @param data              {@link Stream} of data.
-   * @return                  median value of the data.
+   * @param data              {@link Stream} of data
+   * @return                  median value of the data
    */
   private double computeMedian(Stream<Double> data) {
     return new KthSmallest().find(data.copy(), data.copy().count() / 2);
@@ -402,8 +402,8 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
   /**
    * First quantile value for data stream. Assumes that data is not empty, sorted, and positive elements only.
    *
-   * @param data              {@link Stream} of data.
-   * @return                  first quantile value of the data.
+   * @param data              {@link Stream} of data
+   * @return                  first quantile value of the data
    */
   private double computeFirstQuantile(Stream<Double> data) {
     return new KthSmallest().find(data.copy(), data.copy().count() / 4);
@@ -412,8 +412,8 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
   /**
    * Third quantile value for data stream. Assumes that data is not empty, sorted, and positive elements only.
    *
-   * @param data              {@link Stream} of data.
-   * @return                  third quantile value of the data.
+   * @param data              {@link Stream} of data
+   * @return                  third quantile value of the data
    */
   private double computeThirdQuantile(Stream<Double> data) {
     return new KthSmallest().find(data.copy(), data.copy().count() * 3 / 4);

@@ -30,8 +30,8 @@ public abstract class TaskStageBaseListener extends AbstractListener<Task> {
   /**
    * Constructor for the stage-level listener.
    *
-   * @param sparkContext        current spark context.
-   * @param config              additional config specified by the user for the plugin.
+   * @param sparkContext        current spark context
+   * @param config              additional config specified by the user for the plugin
    */
   public TaskStageBaseListener(SparkContext sparkContext, RuntimeConfig config) {
     super(sparkContext, config);
@@ -40,7 +40,7 @@ public abstract class TaskStageBaseListener extends AbstractListener<Task> {
   /**
    * This method is called every time a job starts. In the context of the WTA, this is a workflow.
    *
-   * @param jobStart            SparkListenerJobStart object corresponding to information on job start.
+   * @param jobStart            SparkListenerJobStart object corresponding to information on job start
    */
   @Override
   public void onJobStart(SparkListenerJobStart jobStart) {
@@ -52,8 +52,8 @@ public abstract class TaskStageBaseListener extends AbstractListener<Task> {
    * Associates a {@link Task} with a {@link Workflow}.
    * Also adds the {@link Task} to the processed objects {@link Stream}.
    *
-   * @param workflowId          id of the {@link Workflow} to add the {@link Task} to.
-   * @param task                {@link Task} to add.
+   * @param workflowId          id of the {@link Workflow} to add the {@link Task} to
+   * @param task                {@link Task} to add
    */
   public void addTaskToWorkflow(long workflowId, Task task) {
     workflowsToTasks.addToStream(workflowId, task);

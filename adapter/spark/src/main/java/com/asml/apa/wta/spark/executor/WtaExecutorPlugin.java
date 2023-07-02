@@ -31,11 +31,11 @@ public class WtaExecutorPlugin implements ExecutorPlugin {
    * Developers are urged not to put inefficient code here as it blocks executor initialization until
    * it is completed.
    *
-   * @param pCtx          PluginContext object that represents the context of the plugin.
+   * @param pCtx          PluginContext object that represents the context of the plugin
    * @param extraConf     map object that contains any extra configuration information. This map is directly returned
-   *                      from {@link WtaDriverPlugin#init(SparkContext, PluginContext)}.
+   *                      from {@link WtaDriverPlugin#init(SparkContext, PluginContext)}
    * @see                 WtaPlugin#executorPlugin() where a new instance of the plugin is created. This gets
-   *                      called as soon as it is loaded on to the executor.
+   *                      called as soon as it is loaded on to the executor
    */
   @Override
   public void init(PluginContext pCtx, Map<String, String> extraConf) {
@@ -82,7 +82,7 @@ public class WtaExecutorPlugin implements ExecutorPlugin {
   /**
    * Gets called if a task fails.
    *
-   * @param failureReason       reason the task failed, accessible through a string.
+   * @param failureReason       reason the task failed, accessible through a string
    */
   @Override
   public void onTaskFailed(TaskFailedReason failureReason) {

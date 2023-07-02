@@ -43,9 +43,9 @@ public class WtaDriverPlugin implements DriverPlugin {
    * Expensive calls should be postponed or delegated to another thread. If an error occurs while
    * initializing the plugin it will set {@link #error} to false.
    *
-   * @param sparkCtx        current SparkContext.
-   * @param pluginCtx       additional plugin-specific about the Spark application where the plugin is running.
-   * @return                extra information provided to the executor.
+   * @param sparkCtx        current SparkContext
+   * @param pluginCtx       additional plugin-specific about the Spark application where the plugin is running
+   * @return                extra information provided to the executor
    */
   @Override
   public Map<String, String> init(SparkContext sparkCtx, PluginContext pluginCtx) {
@@ -78,8 +78,8 @@ public class WtaDriverPlugin implements DriverPlugin {
   /**
    * Receives messages from the executors.
    *
-   * @param message       message that was sent by the executors, to be serializable.
-   * @return              response to the executor, if no response is expected the result is ignored.
+   * @param message       message that was sent by the executors, to be serializable
+   * @return              response to the executor, if no response is expected the result is ignored
    */
   @Override
   public Object receive(Object message) {
@@ -93,8 +93,8 @@ public class WtaDriverPlugin implements DriverPlugin {
   }
 
   /**
-   * Gets called just before shutdown. If an error occurred, it is logged before shutdown.
-   * Recommended that no Spark functions are used here.
+   * Gets called just before shutdown. If an error occurred, it is logged before shutdown
+   * Recommended that no Spark functions are used here
    */
   @Override
   public void shutdown() {

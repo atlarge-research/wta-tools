@@ -48,7 +48,7 @@ public abstract class AbstractListener<T extends BaseTraceObject> extends SparkL
   /**
    * Returns a clone of the processed objects {@link Stream}.
    *
-   * @return          clone of the processed objects.
+   * @return          clone of the processed objects
    */
   public Stream<T> getProcessedObjects() {
     return processedObjects.copy();
@@ -57,7 +57,7 @@ public abstract class AbstractListener<T extends BaseTraceObject> extends SparkL
   /**
    * Adds a processed object to the {@link Stream} maintained by the listener.
    *
-   * @param object    processed object to add.
+   * @param object    processed object to add
    */
   public void addProcessedObject(T object) {
     processedObjects.addToStream(object);

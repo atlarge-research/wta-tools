@@ -31,9 +31,9 @@ public class SparkSupplierExtractionEngine extends SupplierExtractionEngine<Spar
   /**
    * Specialised extraction engine for Spark.
    *
-   * @param resourcePingInterval                  how often to ping the suppliers, in milliseconds.
-   * @param pluginContext                         plugin context
-   * @param executorSynchronizationInterval       how often to send the buffer, in milliseconds.
+   * @param resourcePingInterval                  how often to ping the suppliers, in milliseconds
+   * @param pluginContext                         plugin contex
+   * @param executorSynchronizationInterval       how often to send the buffer, in milliseconds
    */
   public SparkSupplierExtractionEngine(
       int resourcePingInterval, PluginContext pluginContext, int executorSynchronizationInterval) {
@@ -63,7 +63,7 @@ public class SparkSupplierExtractionEngine extends SupplierExtractionEngine<Spar
   /**
    * This method gets called by the scheduler to send the resource buffer of the extraction engine.
    *
-   * @param snapshots         snapshots to send to the buffer.
+   * @param snapshots         snapshots to send to the buffer
    */
   private void sendBuffer(List<SparkBaseSupplierWrapperDto> snapshots) {
     ResourceCollectionDto bufferSnapshot = new ResourceCollectionDto(snapshots);
@@ -110,8 +110,8 @@ public class SparkSupplierExtractionEngine extends SupplierExtractionEngine<Spar
   /**
    * Augments the base supplier Dto with Spark information.
    *
-   * @param record        {@link BaseSupplierDto} to transform.
-   * @return              {@link SparkBaseSupplierWrapperDto} containing information pertaining to Spark.
+   * @param record        {@link BaseSupplierDto} to transform
+   * @return              {@link SparkBaseSupplierWrapperDto} containing information pertaining to Spark
    */
   @Override
   public SparkBaseSupplierWrapperDto transform(BaseSupplierDto record) {

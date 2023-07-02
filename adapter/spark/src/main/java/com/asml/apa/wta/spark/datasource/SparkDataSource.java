@@ -38,7 +38,7 @@ public class SparkDataSource {
   /**
    * Awaits the thread pool.
    *
-   * @param awaitSeconds      amount of seconds to wait for.
+   * @param awaitSeconds      amount of seconds to wait for
    */
   public void awaitAndShutdownThreadPool(int awaitSeconds) {
     AbstractListener.getThreadPool().shutdown();
@@ -55,10 +55,10 @@ public class SparkDataSource {
    * Constructor for the Spark data source. This requires a Spark context to ensure a Spark session
    * is available before the data source is initialized.
    *
-   * @param sparkContext              SparkContext of the running Spark session.
-   * @param config                    additional config specified by the user for the plugin.
-   * @param metricStreamingEngine     driver's {@link MetricStreamingEngine} to inject.
-   * @param wtaWriter                 {@link WtaWriter} to write to.
+   * @param sparkContext              SparkContext of the running Spark session
+   * @param config                    additional config specified by the user for the plugin
+   * @param metricStreamingEngine     driver's {@link MetricStreamingEngine} to inject
+   * @param wtaWriter                 {@link WtaWriter} to write to
    */
   public SparkDataSource(
       SparkContext sparkContext,

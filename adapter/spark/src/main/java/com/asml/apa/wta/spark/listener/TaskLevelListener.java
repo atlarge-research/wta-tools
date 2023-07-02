@@ -35,8 +35,8 @@ public class TaskLevelListener extends TaskStageBaseListener {
   /**
    * Constructor for the task-level listener.
    *
-   * @param sparkContext          current spark context.
-   * @param config                additional config specified by the user for the plugin.
+   * @param sparkContext          current spark context
+   * @param config                additional config specified by the user for the plugin
    */
   public TaskLevelListener(SparkContext sparkContext, RuntimeConfig config) {
     super(sparkContext, config);
@@ -45,9 +45,9 @@ public class TaskLevelListener extends TaskStageBaseListener {
   /**
    * Fills in the maps used to determine parent-child relation of Tasks at on application end.
    *
-   * @param taskId                Spark Task id.
-   * @param stageId               Spark Stage id.
-   * @param wtaTask               WTA Task object.
+   * @param taskId                Spark Task id
+   * @param stageId               Spark Stage id
+   * @param wtaTask               WTA Task object
    */
   private void fillInParentChildMaps(long taskId, long stageId, Task wtaTask) {
     taskToStage.put(taskId, stageId);
@@ -58,7 +58,7 @@ public class TaskLevelListener extends TaskStageBaseListener {
   /**
    * This method is called every time a task ends. Task-level metrics are collected, aggregated, and added here.
    *
-   * @param taskEnd               SparkListenerTaskEnd object corresponding to information on task end.
+   * @param taskEnd               SparkListenerTaskEnd object corresponding to information on task end
    */
   @Override
   public void onTaskEnd(SparkListenerTaskEnd taskEnd) {
@@ -109,8 +109,8 @@ public class TaskLevelListener extends TaskStageBaseListener {
    * {@link JobLevelListener#onJobEnd(SparkListenerJobEnd)} and only sets the Tasks which are
    * affiliated to the passed jobId.
    *
-   * @param stageLevelListener        stage-level listener to get ConcurrentHashMap containers.
-   * @param jobId                     Spark Job id to filter Tasks by.
+   * @param stageLevelListener        stage-level listener to get ConcurrentHashMap containers
+   * @param jobId                     Spark Job id to filter Tasks by
    */
   public void setTasks(StageLevelListener stageLevelListener, long jobId) {
     getWorkflowsToTasks().onKey(jobId).forEach(task -> {
