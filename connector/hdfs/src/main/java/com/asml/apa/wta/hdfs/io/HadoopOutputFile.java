@@ -35,8 +35,8 @@ public class HadoopOutputFile implements OutputFile {
   /**
    * Constructs a HadoopOutputFile.
    *
-   * @param path          {@link String} representation of the {@link Path} to construct a {@link HadoopOutputFile}.
-   * @throws IOException  when something goes wrong during I/O.
+   * @param path          {@link String} representation of the {@link Path} to construct a {@link HadoopOutputFile}
+   * @throws IOException  when something goes wrong during I/O
    */
   public HadoopOutputFile(String path) throws IOException {
     outputFile = new Path(path);
@@ -47,8 +47,8 @@ public class HadoopOutputFile implements OutputFile {
   /**
    * Sets the path of the HDFS output file.
    *
-   * @param path          {@link String} representation of the {@link Path} to point to.
-   * @throws IOException  when something goes wrong during I/O.
+   * @param path          {@link String} representation of the {@link Path} to point to
+   * @throws IOException  when something goes wrong during I/O
    */
   public void setPath(String path) throws IOException {
     outputFile = new Path(path);
@@ -58,8 +58,8 @@ public class HadoopOutputFile implements OutputFile {
   /**
    * Signals whether this implementation can output to the specified location.
    *
-   * @param path          @{link String} representation of the location to point to.
-   * @return              {@code boolean} indicating whether the implementation can handle the given location.
+   * @param path          @{link String} representation of the location to point to
+   * @return              {@code boolean} indicating whether the implementation can handle the given location
    */
   @Override
   public boolean acceptsLocation(String path) {
@@ -69,8 +69,8 @@ public class HadoopOutputFile implements OutputFile {
   /**
    * Resolves a path in the current location.
    *
-   * @param path          {@link String} representing the path to resolve.
-   * @return              resolved location.
+   * @param path          {@link String} representing the path to resolve
+   * @return              resolved location
    */
   @Override
   public OutputFile resolve(String path) {
@@ -80,8 +80,8 @@ public class HadoopOutputFile implements OutputFile {
   /**
    * Open a writer resource for the {@link OutputFile}.
    *
-   * @return              opened {@link OutputFile} writer.
-   * @throws IOException  when no writer can be opened for the location of this {@link OutputFile}.
+   * @return              opened {@link OutputFile} writer
+   * @throws IOException  when no writer can be opened for the location of this {@link OutputFile}
    */
   @Override
   public BufferedOutputStream open() throws IOException {
@@ -91,8 +91,8 @@ public class HadoopOutputFile implements OutputFile {
   /**
    * If the location this points to does not exist yet, the directory is created.
    *
-   * @return              {@link OutputFile} pointing to the cleared directory.
-   * @throws IOException  when something goes wrong during I/O.
+   * @return              {@link OutputFile} pointing to the cleared directory
+   * @throws IOException  when something goes wrong during I/O
    */
   @Override
   public OutputFile clearDirectories() throws IOException {
@@ -104,7 +104,7 @@ public class HadoopOutputFile implements OutputFile {
   /**
    * Wraps this {@link HadoopOutputFile} into a Parquet {@link org.apache.parquet.io.OutputFile}.
    *
-   * @return              wrapped Hadoop path as a Parquet {@link org.apache.parquet.io.OutputFile}.
+   * @return              wrapped Hadoop path as a Parquet {@link org.apache.parquet.io.OutputFile}
    */
   @Override
   public org.apache.parquet.io.OutputFile wrap() throws IOException {
@@ -114,7 +114,7 @@ public class HadoopOutputFile implements OutputFile {
   /**
    * Converts the object to a {@link String} for printing.
    *
-   * @return              {@link String} representing the path this object points to.
+   * @return              {@link String} representing the path this object points to
    */
   @Override
   public String toString() {
