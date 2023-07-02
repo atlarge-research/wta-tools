@@ -455,7 +455,7 @@ class ApplicationLevelListenerTest {
     when(listener.computeMax(any(Stream.class))).thenCallRealMethod();
     List<Double> maxList = List.of(-2.0, -19.2, -0.1, -0.03, -1.0, -891.0);
     Stream<Double> maxStream = new Stream<>(maxList);
-    assertThat(listener.computeMax(maxStream)).isEqualTo(-0.0);
+    assertThat(listener.computeMax(maxStream)).isEqualTo(-0.03);
   }
 
   @Test
