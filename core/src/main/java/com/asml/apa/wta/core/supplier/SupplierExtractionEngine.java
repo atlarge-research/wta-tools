@@ -51,7 +51,7 @@ public abstract class SupplierExtractionEngine<T extends BaseSupplierDto> {
    * Constructor for the resource extraction engine.
    * Suppliers should be injected here.
    *
-   * @param resourcePingInterval How often to ping the suppliers, in milliseconds
+   * @param resourcePingInterval    how often to ping the suppliers, in milliseconds.
    */
   public SupplierExtractionEngine(int resourcePingInterval) {
     ShellRunner shellRunner = new ShellRunner();
@@ -68,7 +68,7 @@ public abstract class SupplierExtractionEngine<T extends BaseSupplierDto> {
    * Ping the suppliers and add the results to the buffer.
    * Developers are encouraged to override this to add/remove additional information.
    *
-   * @return A {@link CompletableFuture} that completes when the result has been resolved
+   * @return      {@link CompletableFuture} that completes when the result has been resolved.
    */
   protected CompletableFuture<T> ping() {
     CompletableFuture<Optional<OsInfoDto>> osInfoDtoCompletableFuture = this.operatingSystemSupplier.getSnapshot();
@@ -101,7 +101,7 @@ public abstract class SupplierExtractionEngine<T extends BaseSupplierDto> {
   /**
    * Ping the suppliers and add the results to the buffer. This is done asynchronously.
    *
-   * @return A {@link CompletableFuture} representing the result of the ping operation
+   * @return      {@link CompletableFuture} representing the result of the ping operation.
    */
   public CompletableFuture<Void> pingAndBuffer() {
     log.trace("Pinging suppliers and buffering results.");
@@ -125,18 +125,18 @@ public abstract class SupplierExtractionEngine<T extends BaseSupplierDto> {
   }
 
   /**
-   * Transform the resource metrics record.
-   * This method can be overridden by extending classes to add additional information.
+   * Transform the resource metrics record. This method can be overridden by extending classes to add additional
+   * information.
    *
-   * @param record The 'bare-bones' information that needs to be augmented
-   * @return The transformed resource metrics record, with additional information
+   * @param record      'bare-bones' information that needs to be augmented.
+   * @return            transformed resource metrics record, with additional information.
    */
   public abstract T transform(BaseSupplierDto record);
 
   /**
    * Get and clear the buffer.
    *
-   * @return The buffer contents as a list
+   * @return            buffer contents as a list.
    */
   public List<T> getAndClear() {
     log.trace("Getting and clearing buffer.");

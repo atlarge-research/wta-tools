@@ -17,8 +17,8 @@ public class OutputFileFactory {
   /**
    * Create an appropriate {@link OutputFile} implementation for the specified path.
    *
-   * @param path a {@link String} representation of the path to write to
-   * @return an appropriate {@link OutputFile} implementation for this path when possible
+   * @param path    {@link String} representation of the path to write to.
+   * @return        appropriate {@link OutputFile} implementation for this path when possible.
    */
   public OutputFile create(String path) {
     ServiceLoader<OutputFile> serviceLoader = ServiceLoader.load(OutputFile.class);

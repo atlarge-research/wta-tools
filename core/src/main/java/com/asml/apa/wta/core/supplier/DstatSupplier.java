@@ -30,7 +30,8 @@ public class DstatSupplier implements InformationSupplier<DstatDto> {
   /**
    * Uses the Dstat dependency to get io metrics.
    *
-   * @return DstatDataSourceDto object that will be sent to the driver (with the necessary information filled out)
+   * @return      if Dstat is available, {@link Optional} {@link DstatDto} wrapped in a {@link CompletableFuture} that
+   *              will be sent to the driver. Otherwise {@link CompletableFuture} with an empty {@link Optional}.
    */
   @Override
   public CompletableFuture<Optional<DstatDto>> getSnapshot() {
@@ -75,9 +76,9 @@ public class DstatSupplier implements InformationSupplier<DstatDto> {
   }
 
   /**
-   * Parse dstat terminal output.
+   * Parse Dstat terminal output.
    *
-   * @return List of the parsed numbers from the dstat terminal output
+   * @return      list of the parsed numbers from the Dstat terminal output.
    */
   private static List<Long> extractNumbers(String input) {
     List<Long> numbers = new ArrayList<>();
@@ -104,9 +105,9 @@ public class DstatSupplier implements InformationSupplier<DstatDto> {
   }
 
   /**
-   * Checks if the dstat datasource is available.
+   * Checks if the Dstat datasource is available.
    *
-   * @return A boolean that represents if the dstat datasource is available
+   * @return      boolean that represents if the Dstat datasource is available.
    */
   @Override
   public boolean isAvailable() {

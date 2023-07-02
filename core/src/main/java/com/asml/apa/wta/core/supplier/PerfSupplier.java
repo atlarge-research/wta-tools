@@ -1,5 +1,6 @@
 package com.asml.apa.wta.core.supplier;
 
+import com.asml.apa.wta.core.dto.IostatDto;
 import com.asml.apa.wta.core.dto.PerfDto;
 import com.asml.apa.wta.core.util.ShellRunner;
 import java.util.Optional;
@@ -23,7 +24,7 @@ public class PerfSupplier implements InformationSupplier<PerfDto> {
   /**
    * Constructs a {@code perf} data source.
    *
-   * @param shellRunner the {@link ShellRunner} to inject.
+   * @param     shellRunner the {@link ShellRunner} to inject.
    */
   public PerfSupplier(ShellRunner shellRunner) {
     this.shellRunner = shellRunner;
@@ -33,7 +34,7 @@ public class PerfSupplier implements InformationSupplier<PerfDto> {
   /**
    * Verifies the availability of the perf energy data source.
    *
-   * @return a {@code boolean} indicating the availability of this data source
+   * @return    {@code boolean} indicating the availability of this data source.
    */
   @Override
   public boolean isAvailable() {
@@ -57,7 +58,8 @@ public class PerfSupplier implements InformationSupplier<PerfDto> {
   /**
    * Uses the Perf dependency to get energy metrics (computed asynchronously).
    *
-   * @return PerfDto object that will be sent to the driver (with the necessary information filled out)
+   * @return      if Perf is available, {@link Optional} {@link PerfDto} wrapped in a {@link CompletableFuture} that
+   *              will be sent to the driver. Otherwise {@link CompletableFuture} with an empty {@link Optional}.
    */
   @Override
   public CompletableFuture<Optional<PerfDto>> getSnapshot() {
@@ -83,7 +85,7 @@ public class PerfSupplier implements InformationSupplier<PerfDto> {
    * Gather the perf energy metrics. Returns a completable future string of total joules in a second,
    * which is equivalent to watt.
    *
-   * @return Completable future string of joules used by the CPU package over the past second
+   * @return    Completable future string of joules used by the CPU package over the past second.
    */
   public CompletableFuture<String> gatherMetrics() {
     return shellRunner.executeCommand(

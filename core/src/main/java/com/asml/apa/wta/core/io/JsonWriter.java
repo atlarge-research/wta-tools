@@ -20,7 +20,7 @@ public class JsonWriter<T> implements AutoCloseable, Flushable {
   /**
    * Constructs a writer to write records as JSON.
    *
-   * @param path the {@link OutputFile} to write to
+   * @param path          {@link OutputFile} to write to.
    */
   public JsonWriter(OutputFile path) throws IOException {
     outputStream = path.open();
@@ -29,8 +29,8 @@ public class JsonWriter<T> implements AutoCloseable, Flushable {
   /**
    * Writes object as JSON.
    *
-   * @param record the record to write
-   * @throws IOException when something goes wrong when writing
+   * @param record        record to write.
+   * @throws IOException  when something goes wrong when writing.
    */
   public void write(T record) throws IOException {
     Gson gson = new GsonBuilder()
@@ -42,7 +42,7 @@ public class JsonWriter<T> implements AutoCloseable, Flushable {
   /**
    * Closes the writer.
    *
-   * @throws IOException when something goes wrong during I/O
+   * @throws IOException  when something goes wrong during I/O.
    */
   @Override
   public void close() throws IOException {
@@ -52,7 +52,7 @@ public class JsonWriter<T> implements AutoCloseable, Flushable {
   /**
    * Flushes the writer.
    *
-   * @throws IOException when something goes wrong during I/O
+   * @throws IOException  when something goes wrong during I/O.
    */
   @Override
   public void flush() throws IOException {

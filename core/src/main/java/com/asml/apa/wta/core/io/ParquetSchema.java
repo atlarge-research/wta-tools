@@ -38,10 +38,10 @@ public class ParquetSchema {
   /**
    * Create a dense {@link ParquetSchema} for the given {@link Stream} of objects.
    *
-   * @param clazz the {@link Class} of objects to create the schema for
-   * @param objects the {@link Stream} of objects to create the schema for
-   * @param name the name of the schema
-   * @param <T> the type parameter for the {@link Class} and {@link Stream}
+   * @param clazz       {@link Class} of objects to create the schema for.
+   * @param objects     {@link Stream} of objects to create the schema for.
+   * @param name        name of the schema.
+   * @param <T>         type parameter for the {@link Class} and {@link Stream}.
    */
   @SuppressWarnings("CyclomaticComplexity")
   public <T extends BaseTraceObject> ParquetSchema(Class<T> clazz, Stream<T> objects, String name) {
@@ -123,10 +123,10 @@ public class ParquetSchema {
   /**
    * Convert POJO to a {@link GenericRecord} to write it with the {@link org.apache.parquet.avro.AvroParquetWriter}.
    *
-   * @param pojo the POJO to convert to a {@link GenericRecord}
-   * @param clazz the {@link Class} to which the POJO belongs
-   * @param <T> type parameter for the {@link Class} and POJO
-   * @return a {@link GenericRecord} containing the POJO
+   * @param pojo      POJO to convert to a {@link GenericRecord}.
+   * @param clazz     {@link Class} to which the POJO belongs.
+   * @param <T>       type parameter for the {@link Class} and POJO.
+   * @return          {@link GenericRecord} containing the POJO.
    */
   public <T> GenericRecord convertFromPojo(T pojo, Class<T> clazz) {
     Field[] fields = clazz.getDeclaredFields();

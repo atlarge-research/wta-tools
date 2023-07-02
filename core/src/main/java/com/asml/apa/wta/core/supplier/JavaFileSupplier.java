@@ -1,5 +1,6 @@
 package com.asml.apa.wta.core.supplier;
 
+import com.asml.apa.wta.core.dto.IostatDto;
 import com.asml.apa.wta.core.dto.JvmFileDto;
 import java.io.File;
 import java.util.Optional;
@@ -30,7 +31,7 @@ public class JavaFileSupplier implements InformationSupplier<JvmFileDto> {
   /**
    * If there is a filesystem which does not have a root directory, this supplier will not be available.
    *
-   * @return true iff the directory exists and read perms are available, false otherwise
+   * @return      true iff the directory exists and read perms are available, false otherwise.
    */
   @Override
   public boolean isAvailable() {
@@ -47,7 +48,9 @@ public class JavaFileSupplier implements InformationSupplier<JvmFileDto> {
   /**
    * Gets a snapshot of some disk metrics from the JVM.
    *
-   * @return A {@link CompletableFuture} containing the snapshot of metrics
+   * @return      if filesystem with root dir is available, {@link Optional} {@link JvmFileDto} wrapped in a
+   *              {@link CompletableFuture} that will be sent to the driver. Otherwise {@link CompletableFuture} with
+   *              an empty {@link Optional}.
    */
   @Override
   public CompletableFuture<Optional<JvmFileDto>> getSnapshot() {
