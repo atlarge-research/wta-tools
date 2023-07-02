@@ -30,6 +30,7 @@ class ConfigReaderIntegrationTest {
     assertThat(cr.getExecutorSynchronizationInterval()).isEqualTo(4000);
     assertThat(cr.isStageLevel()).isEqualTo(true);
     assertThat(cr.getOutputPath()).isEqualTo("/home/user/WTA");
+    assertThat(cr.isAggregateMetrics()).isTrue();
   }
 
   @Test
@@ -95,5 +96,11 @@ class ConfigReaderIntegrationTest {
     assertThat(cr.getDomain()).isEqualTo(Domain.SCIENTIFIC);
     assertThat(cr.getDescription()).isEqualTo("Test Description");
     assertThat(cr.isStageLevel()).isEqualTo(false);
+  }
+
+  @Test
+  void readsConfigFileWhereAggregateMetricsIsNotThereDefaultsToFalse() {
+    RuntimeConfig cr = RuntimeConfig.readConfig("src/test/resources/testConfigNoIsStageLevel.json");
+    assertThat(cr.isAggregateMetrics()).isFalse();
   }
 }

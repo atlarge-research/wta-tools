@@ -17,5 +17,6 @@ class RuntimeConfigTest {
     assertThat(cr.getResourcePingInterval()).isEqualTo(500);
     assertThat(cr.getExecutorSynchronizationInterval()).isEqualTo(-1);
     assertThat(cr.getOutputPath()).isNull();
+    assertThat(cr.isAggregateMetrics()).isFalse();
   }
 }
