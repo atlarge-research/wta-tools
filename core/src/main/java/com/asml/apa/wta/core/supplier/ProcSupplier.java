@@ -43,7 +43,8 @@ public class ProcSupplier implements InformationSupplier<ProcDto> {
   private final boolean isLoadAvgMetricsAvailable;
 
   /**
-   * Constructor for the Proc supplier. It checks not only whether Proc is available but also each of its subdirectories.
+   * Constructor for the Proc supplier. It checks not only whether Proc is available but also each of
+   * its subdirectories.
    *
    * @param shellRunner   shell utils instance to use
    * @since 1.0.0
