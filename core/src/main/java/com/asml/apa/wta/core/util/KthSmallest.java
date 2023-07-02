@@ -41,18 +41,14 @@ public class KthSmallest {
     Stream<Double> stream = data;
     while (!stream.isEmpty()) {
       Stream<Double> recursive = new Stream<>();
-      long amount = 0;
       while (!stream.isEmpty()) {
         List<Double> listOfFive = new ArrayList<>();
-        for (int i = 0; i < 5; i++) {
-          if (!stream.isEmpty()) {
-            listOfFive.add(stream.head());
-          }
+        for (int i = 0; i < 5 && !stream.isEmpty(); i++) {
+          listOfFive.add(stream.head());
         }
-        amount++;
         recursive.addToStream(findMedian(listOfFive));
       }
-      if (amount == 1) {
+      if (recursive.copy().count() == 1) {
         return recursive.head();
       } else {
         stream = recursive;
@@ -75,8 +71,8 @@ public class KthSmallest {
       double medianOfMedians = medianOfMedians(stream.copy());
       Stream<Double> smaller = stream.copy().filter(x -> x < medianOfMedians);
       Stream<Double> larger = stream.copy().filter(x -> x > medianOfMedians);
-      long equalSize = stream.copy().filter(x -> x == medianOfMedians).count();
-      long smallerSize = smaller.copy().count();
+      long equalSize = stream.copy().countFilter(x -> x == medianOfMedians);
+      long smallerSize = stream.copy().countFilter(x -> x < medianOfMedians);
       if (kth < smallerSize) {
         stream = smaller;
       } else if (kth < equalSize + smallerSize) {
