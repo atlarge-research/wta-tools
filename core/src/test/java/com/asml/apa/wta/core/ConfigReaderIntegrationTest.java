@@ -5,7 +5,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.asml.apa.wta.core.config.RuntimeConfig;
 import com.asml.apa.wta.core.model.Domain;
-import lombok.Builder;
 import org.junit.jupiter.api.Test;
 
 class ConfigReaderIntegrationTest {

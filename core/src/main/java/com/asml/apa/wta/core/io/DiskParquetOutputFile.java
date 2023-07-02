@@ -33,7 +33,7 @@ public class DiskParquetOutputFile implements OutputFile {
     /**
      * Get current position in the {@link BufferedOutputStream}.
      *
-     * @return      current position.
+     * @return      current position
      */
     @Override
     public long getPos() {
@@ -46,8 +46,8 @@ public class DiskParquetOutputFile implements OutputFile {
      *
      * @see BufferedOutputStream#write(int)
      *
-     * @param data          {@code byte}.
-     * @throws IOException  when something goes wrong during I/O.
+     * @param data          {@code byte}
+     * @throws IOException  when something goes wrong during I/O
      */
     @Override
     public void write(int data) throws IOException {
@@ -61,8 +61,8 @@ public class DiskParquetOutputFile implements OutputFile {
      *
      * @see BufferedOutputStream#write(byte[])
      *
-     * @param data          array of bytes.
-     * @throws IOException  when something goes wrong during I/O.
+     * @param data          array of bytes
+     * @throws IOException  when something goes wrong during I/O
      */
     @Override
     public void write(byte[] data) throws IOException {
@@ -76,10 +76,10 @@ public class DiskParquetOutputFile implements OutputFile {
      *
      * @see BufferedOutputStream#write(byte[], int, int)
      *
-     * @param data          array of bytes.
-     * @param off           start offset in the data.
-     * @param len           number of bytes to write.
-     * @throws IOException  when something goes wrong during I/O.
+     * @param data          array of bytes
+     * @param off           start offset in the data
+     * @param len           number of bytes to write
+     * @throws IOException  when something goes wrong during I/O
      */
     @Override
     public void write(byte[] data, int off, int len) throws IOException {
@@ -91,7 +91,7 @@ public class DiskParquetOutputFile implements OutputFile {
     /**
      * Flushes the {@link DiskParquetOutputFile}.
      *
-     * @throws IOException  when something goes wrong during I/O.
+     * @throws IOException  when something goes wrong during I/O
      */
     @Override
     public void flush() throws IOException {
@@ -101,7 +101,7 @@ public class DiskParquetOutputFile implements OutputFile {
     /**
      * Closes the {@link DiskParquetOutputFile}.
      *
-     * @throws IOException  when something goes wrong during I/O.
+     * @throws IOException  when something goes wrong during I/O
      */
     @Override
     public void close() throws IOException {
@@ -114,9 +114,9 @@ public class DiskParquetOutputFile implements OutputFile {
   /**
    * Creates a {@link PositionOutputStream} for the wrapped {@link Path}.
    *
-   * @param buffer        buffer hint, should not exceed {@link Integer#MAX_VALUE}.
-   * @return              created {@link PositionOutputStream}.
-   * @throws IOException  when something goes wrong during I/O.
+   * @param buffer        buffer hint, should not exceed {@link Integer#MAX_VALUE}
+   * @return              created {@link PositionOutputStream}
+   * @throws IOException  when something goes wrong during I/O
    */
   @Override
   public PositionOutputStream create(long buffer) throws IOException {
@@ -128,9 +128,9 @@ public class DiskParquetOutputFile implements OutputFile {
    * Creates a {@link PositionOutputStream} for the wrapped {@link Path}.
    * Overwrites files when they are already present.
    *
-   * @param buffer        buffer hint.
-   * @return              created {@link PositionOutputStream}.
-   * @throws IOException  when something goes wrong during I/O.
+   * @param buffer        buffer hint
+   * @return              created {@link PositionOutputStream}
+   * @throws IOException  when something goes wrong during I/O
    */
   @Override
   public PositionOutputStream createOrOverwrite(long buffer) throws IOException {
@@ -141,7 +141,7 @@ public class DiskParquetOutputFile implements OutputFile {
   /**
    * Checks whether the output file supports block size.
    *
-   * @return        {@code true}.
+   * @return        {@code true}
    */
   @Override
   public boolean supportsBlockSize() {
@@ -151,7 +151,7 @@ public class DiskParquetOutputFile implements OutputFile {
   /**
    * Returns the default block size.
    *
-   * @return        {@code 512}, the default value for {@link BufferedOutputStream}.
+   * @return        {@code 512}, the default value for {@link BufferedOutputStream}
    */
   @Override
   public long defaultBlockSize() {
@@ -161,7 +161,7 @@ public class DiskParquetOutputFile implements OutputFile {
   /**
    * Returns the path of the {@link com.asml.apa.wta.core.io.OutputFile} as a {@link String}.
    *
-   * @return        path of this {@link com.asml.apa.wta.core.io.OutputFile} as a {@link String}.
+   * @return        path of this {@link com.asml.apa.wta.core.io.OutputFile} as a {@link String}
    */
   @Override
   public String getPath() {

@@ -36,9 +36,9 @@ public class WtaWriter {
   /**
    * Sets up a WTA writer for the specified output path and version.
    *
-   * @param path          output path to write to.
-   * @param version       version of files to write.
-   * @param toolVersion   version of the tool that writes to file.
+   * @param path          output path to write to
+   * @param version       version of files to write
+   * @param toolVersion   version of the tool that writes to file
    */
   public WtaWriter(@NonNull OutputFile path, String version, String toolVersion) {
     file = path.resolve(String.valueOf(System.currentTimeMillis())).resolve(toolVersion);
@@ -48,7 +48,7 @@ public class WtaWriter {
   /**
    * Writes a {@link Workload} to the corresponding JSON file.
    *
-   * @param workload      {@link Workload} to write.
+   * @param workload      {@link Workload} to write
    */
   public void write(Workload workload) {
     log.debug("Writing workload to file.");
@@ -62,9 +62,9 @@ public class WtaWriter {
   /**
    * Writes a {@link Stream} of WTA objects to their corresponding Parquet file.
    *
-   * @param clazz         class of WTA objects to write.
-   * @param wtaObjects    WTA objects to write.
-   * @param <T>           type parameter for the type of WTA object to write, should extend {@link BaseTraceObject}.
+   * @param clazz         class of WTA objects to write
+   * @param wtaObjects    WTA objects to write
+   * @param <T>           type parameter for the type of WTA object to write, should extend {@link BaseTraceObject}
    */
   public <T extends BaseTraceObject> void write(Class<T> clazz, Stream<T> wtaObjects) {
     log.debug("Writing objects of type {} to file.", clazz.getSimpleName());
@@ -88,7 +88,7 @@ public class WtaWriter {
   /**
    * Creates a Workload json writer.
    *
-   * @return            {@link JsonWriter} that writes the workload json file.
+   * @return            {@link JsonWriter} that writes the workload json file
    */
   protected JsonWriter<Workload> createWorkloadWriter() throws IOException {
     OutputFile path = file.resolve("workload")

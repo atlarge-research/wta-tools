@@ -82,9 +82,9 @@ The generated traces will have the following directory structure:
                     tasks.parquet
             resources
                 schema-1.0
-                    resources.parquet    
+                    resources.parquet
             resource_states
-                schema-1.0 
+                schema-1.0
                     resource_states.parquet
 ```
 

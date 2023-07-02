@@ -303,12 +303,17 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
     if (getConfig().isAggregateMetrics()) {
       Function<Task, Long> networkFunction = Task::getNetworkIoTime;
       setResourceStatisticsFields(
-              tasks.copy().map(Task::getResourceAmountRequested), ResourceType.RESOURCE, workloadBuilder);
-      setResourceStatisticsFields(tasks.copy().map(Task::getMemoryRequested), ResourceType.MEMORY, workloadBuilder);
+          tasks.copy().map(Task::getResourceAmountRequested), ResourceType.RESOURCE, workloadBuilder);
       setResourceStatisticsFields(
-              tasks.copy().map(networkFunction.andThen(Long::doubleValue)), ResourceType.NETWORK, workloadBuilder);
-      setResourceStatisticsFields(tasks.copy().map(Task::getDiskSpaceRequested), ResourceType.DISK, workloadBuilder);
-      setResourceStatisticsFields(tasks.copy().map(Task::getEnergyConsumption), ResourceType.ENERGY, workloadBuilder);
+          tasks.copy().map(Task::getMemoryRequested), ResourceType.MEMORY, workloadBuilder);
+      setResourceStatisticsFields(
+          tasks.copy().map(networkFunction.andThen(Long::doubleValue)),
+          ResourceType.NETWORK,
+          workloadBuilder);
+      setResourceStatisticsFields(
+          tasks.copy().map(Task::getDiskSpaceRequested), ResourceType.DISK, workloadBuilder);
+      setResourceStatisticsFields(
+          tasks.copy().map(Task::getEnergyConsumption), ResourceType.ENERGY, workloadBuilder);
     }
 
     sparkDataSource.removeListeners();

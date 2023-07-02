@@ -1,6 +1,5 @@
 package com.asml.apa.wta.core.supplier;
 
-import com.asml.apa.wta.core.dto.IostatDto;
 import com.asml.apa.wta.core.dto.OsInfoDto;
 import com.sun.management.OperatingSystemMXBean;
 import java.lang.management.ManagementFactory;
@@ -31,7 +30,7 @@ public class OperatingSystemSupplier implements InformationSupplier<OsInfoDto> {
   /**
    * Verifies that the supplier is available.
    *
-   * @return      {@code boolean} indicating the validity of this supplier.
+   * @return      {@code boolean} indicating the validity of this supplier
    */
   @Override
   public boolean isAvailable() {
@@ -42,7 +41,7 @@ public class OperatingSystemSupplier implements InformationSupplier<OsInfoDto> {
    * Retrieves the amount of virtual memory guaranteed to be available in bytes.
    * If this metric is unavailable it returns -1.
    *
-   * @return      amount of virtual memory that is available in bytes, -1 if unavailable.
+   * @return      amount of virtual memory that is available in bytes, -1 if unavailable
    */
   public long getCommittedVirtualMemorySize() {
     return bean.getCommittedVirtualMemorySize();
@@ -51,7 +50,7 @@ public class OperatingSystemSupplier implements InformationSupplier<OsInfoDto> {
   /**
    * Retrieves the amount of free physical memory in bytes.
    *
-   * @return      amount of free physical memory in bytes.
+   * @return      amount of free physical memory in bytes
    */
   @SuppressWarnings("deprecation")
   public long getFreePhysicalMemorySize() {
@@ -61,7 +60,7 @@ public class OperatingSystemSupplier implements InformationSupplier<OsInfoDto> {
   /**
    * Retrieves the recent CPU usage for the JVM. The value is a double between 0 and 1.
    *
-   * @return      value between 0 and 1 indicating the recent CPU usage for the JVM.
+   * @return      value between 0 and 1 indicating the recent CPU usage for the JVM
    */
   public double getProcessCpuLoad() {
     return bean.getProcessCpuLoad();
@@ -71,7 +70,7 @@ public class OperatingSystemSupplier implements InformationSupplier<OsInfoDto> {
    * Retrieves the CPU time for the JVM in nanoseconds. The value is not necessarily with nanosecond accuracy.
    * If this metric is unavailable it returns -1.
    *
-   * @return      CPU time used by the JVM in nanoseconds, -1 if unavailable.
+   * @return      CPU time used by the JVM in nanoseconds, -1 if unavailable
    */
   public long getProcessCpuTime() {
     return bean.getProcessCpuTime();
@@ -80,7 +79,7 @@ public class OperatingSystemSupplier implements InformationSupplier<OsInfoDto> {
   /**
    * Retrieves the amount of total physical memory in bytes.
    *
-   * @return      amount of total physical memory in bytes.
+   * @return      amount of total physical memory in bytes
    */
   @SuppressWarnings("deprecation")
   public long getTotalPhysicalMemorySize() {
@@ -91,7 +90,7 @@ public class OperatingSystemSupplier implements InformationSupplier<OsInfoDto> {
    * Retrieves the system load average for the past minute.
    * If this metric is unavailable it returns some negative value.
    *
-   * @return      system load average, negative if unavailable.
+   * @return      system load average, negative if unavailable
    */
   public double getSystemLoadAverage() {
     return bean.getSystemLoadAverage();
@@ -101,7 +100,7 @@ public class OperatingSystemSupplier implements InformationSupplier<OsInfoDto> {
    * Retrieves the number of processors available to the JVM.
    * The value returned may change during a JVM run, it will never be smaller than 1.
    *
-   * @return      number of processors available, never smaller than 1.
+   * @return      number of processors available, never smaller than 1
    */
   public int getAvailableProcessors() {
     return bean.getAvailableProcessors();
@@ -110,7 +109,7 @@ public class OperatingSystemSupplier implements InformationSupplier<OsInfoDto> {
   /**
    * Retrieves the architecture abbreviation.
    *
-   * @return      underlying architecture e.g. amd64.
+   * @return      underlying architecture e.g. amd64
    */
   public String getArch() {
     return bean.getArch();
@@ -119,7 +118,7 @@ public class OperatingSystemSupplier implements InformationSupplier<OsInfoDto> {
   /**
    * Retrieves the operating system name and version.
    *
-   * @return      operating system name and version e.g. Windows 10.0 or Linux 4.4.0-18362-Microsoft.
+   * @return      operating system name and version e.g. Windows 10.0 or Linux 4.4.0-18362-Microsoft
    */
   public String getOperatingSystem() {
     return bean.getName() + " " + bean.getVersion();
@@ -129,7 +128,7 @@ public class OperatingSystemSupplier implements InformationSupplier<OsInfoDto> {
    * Gathers the metrics the supplier provides (computed asynchronously).
    *
    * @return      if supplier is available, {@link Optional} {@link OsInfoDto} wrapped in a {@link CompletableFuture}
-   *              that will be sent to the driver. Otherwise {@link CompletableFuture} with an empty {@link Optional}.
+   *              that will be sent to the driver. Otherwise {@link CompletableFuture} with an empty {@link Optional}
    */
   @Override
   public CompletableFuture<Optional<OsInfoDto>> getSnapshot() {

@@ -162,10 +162,10 @@ class ApplicationLevelListenerTest {
 
     fakeApplicationListener = new ApplicationLevelListener(
         mockedSparkContext,
-            fakeConfig,
-            fakeTaskListener,
-            fakeStageListener,
-            fakeJobListener,
+        fakeConfig,
+        fakeTaskListener,
+        fakeStageListener,
+        fakeJobListener,
         sparkDataSource,
         mock(MetricStreamingEngine.class),
         mock(WtaWriter.class));
@@ -396,10 +396,10 @@ class ApplicationLevelListenerTest {
         .thenReturn(List.of(new ResourceAndStateWrapper(resource, new Stream<>(resourceState))));
     ApplicationLevelListener listener = new ApplicationLevelListener(
         mockedSparkContext2,
-            fakeConfig,
-            fakeTaskListener,
-            fakeStageListener,
-            fakeJobListener,
+        fakeConfig,
+        fakeTaskListener,
+        fakeStageListener,
+        fakeJobListener,
         sparkDataSource,
         streamingEngine,
         writer);
@@ -461,25 +461,25 @@ class ApplicationLevelListenerTest {
   @Test
   void aggregateMetricsFalseSetsDefaultAggregationValues() {
     fakeConfig = RuntimeConfig.builder()
-            .authors(new String[] {"Harry Potter"})
-            .domain(Domain.SCIENTIFIC)
-            .isStageLevel(false)
-            .description("Yer a wizard harry")
-            .aggregateMetrics(false)
-            .build();
+        .authors(new String[] {"Harry Potter"})
+        .domain(Domain.SCIENTIFIC)
+        .isStageLevel(false)
+        .description("Yer a wizard harry")
+        .aggregateMetrics(false)
+        .build();
     fakeTaskListener = new TaskLevelListener(mockedSparkContext, fakeConfig);
     fakeStageListener = new StageLevelListener(mockedSparkContext, fakeConfig);
     fakeJobListener = new JobLevelListener(mockedSparkContext, fakeConfig, fakeTaskListener, fakeStageListener);
 
     fakeApplicationListener = new ApplicationLevelListener(
-            mockedSparkContext,
-            fakeConfig,
-            fakeTaskListener,
-            fakeStageListener,
-            fakeJobListener,
-            sparkDataSource,
-            mock(MetricStreamingEngine.class),
-            mock(WtaWriter.class));
+        mockedSparkContext,
+        fakeConfig,
+        fakeTaskListener,
+        fakeStageListener,
+        fakeJobListener,
+        sparkDataSource,
+        mock(MetricStreamingEngine.class),
+        mock(WtaWriter.class));
 
     ListBuffer<StageInfo> stageBuffer = new ListBuffer<>();
     stageBuffer.$plus$eq(testStageInfo1);

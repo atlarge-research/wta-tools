@@ -20,7 +20,7 @@ public class ParquetReader implements AutoCloseable {
   /**
    * Constructs a reader to read records from Parquet.
    *
-   * @param path          {@link DiskParquetInputFile} to read from.
+   * @param path          {@link DiskParquetInputFile} to read from
    */
   public ParquetReader(DiskParquetInputFile path) throws IOException {
     reader = AvroParquetReader.<GenericRecord>builder(path)
@@ -31,8 +31,8 @@ public class ParquetReader implements AutoCloseable {
   /**
    * Reads the next record.
    *
-   * @return              next record as a {@link GenericRecord}.
-   * @throws IOException  when something goes wrong when reading.
+   * @return              next record as a {@link GenericRecord}
+   * @throws IOException  when something goes wrong when reading
    */
   public GenericRecord read() throws IOException {
     return reader.read();
@@ -41,7 +41,7 @@ public class ParquetReader implements AutoCloseable {
   /**
    * Closes the reader.
    *
-   * @throws IOException  when something goes wrong when reading.
+   * @throws IOException  when something goes wrong when reading
    */
   @Override
   public void close() throws IOException {

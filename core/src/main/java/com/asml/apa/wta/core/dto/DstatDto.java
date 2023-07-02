@@ -45,5 +45,4 @@ public class DstatDto implements SupplierDto {
   private long systemInt;
 
   private long systemCsw;
-
 }

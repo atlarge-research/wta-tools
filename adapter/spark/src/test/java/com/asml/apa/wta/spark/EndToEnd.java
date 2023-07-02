@@ -27,7 +27,7 @@ public class EndToEnd {
    * matter as the purpose is to generate Spark tasks with multiple parent-child relations and jobs with diverse
    * number of tasks for generated traces.
    *
-   * @param textFile  The text file to read from.
+   * @param textFile  text file to read from.
    */
   private static void sparkOperation(JavaRDD<String> textFile) {
     JavaRDD<String> words1 = textFile.flatMap(
@@ -137,26 +137,28 @@ public class EndToEnd {
    * @param args      first argument must be filepath to config file.
    *                  second argument must be filepath to resources file.
    */
-  public static void main(String[] args) {
+  public static void main(String[] args) throws InterruptedException {
     SparkConf conf = new SparkConf()
         .setAppName("SystemTest")
         .setMaster("local")
         .set("spark.plugins", "com.asml.apa.wta.spark.WtaPlugin")
-//        .set("spark.driver.extraJavaOptions", "-DconfigFile=" + args[0]);
-            .set("spark.driver.extraJavaOptions", "-DconfigFile=" +
-     "adapter/spark/src/test/resources/config.json");
+        .set("spark.driver.extraJavaOptions", "-DconfigFile=" + args[0]);
+    //        .set("spark.driver.extraJavaOptions", "-DconfigFile=" +
+    // "adapter/spark/src/test/resources/config.json");
+
     SparkSession sparkSession = SparkSession.builder().config(conf).getOrCreate();
     SparkContext sc = sparkSession.sparkContext();
-//    sparkOperation(JavaSparkContext.fromSparkContext(sc).textFile(args[1]));
-    sparkOperation(
-            JavaSparkContext.fromSparkContext(sc).textFile("adapter/spark/src/test/resources/e2e-input.txt"));
+    sparkOperation(JavaSparkContext.fromSparkContext(sc).textFile(args[1]));
+    //
+    // sparkOperation(JavaSparkContext.fromSparkContext(sc).textFile("adapter/spark/src/test/resources/e2e-input.txt"));
     sparkSession.close();
 
     SparkSession sparkSession2 = SparkSession.builder().config(conf).getOrCreate();
     SparkContext sc2 = sparkSession2.sparkContext();
     for (int i = 0; i < 2; i++) {
-      sparkOperation(
-              JavaSparkContext.fromSparkContext(sc2).textFile("adapter/spark/src/test/resources/e2e-input.txt"));
+      sparkOperation(JavaSparkContext.fromSparkContext(sc2).textFile(args[1]));
+      //
+      // sparkOperation(JavaSparkContext.fromSparkContext(sc2).textFile("adapter/spark/src/test/resources/e2e-input.txt"));
     }
     sparkSession2.close();
   }

@@ -6,5 +6,5 @@
   "isStageLevel": "false",
   "resourcePingInterval": 500,
   "executorSynchronizationInterval": -1,
-  "aggregateMetrics": "false"
+  "aggregateMetrics": "true"
 }

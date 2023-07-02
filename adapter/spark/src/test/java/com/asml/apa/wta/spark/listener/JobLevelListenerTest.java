@@ -6,13 +6,11 @@ import static org.awaitility.Awaitility.await;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.asml.apa.wta.core.WtaWriter;
 import com.asml.apa.wta.core.config.RuntimeConfig;
 import com.asml.apa.wta.core.model.Domain;
 import com.asml.apa.wta.core.model.Task;
 import com.asml.apa.wta.core.model.Workflow;
 import com.asml.apa.wta.spark.datasource.SparkDataSource;
-import com.asml.apa.wta.spark.stream.MetricStreamingEngine;
 import java.util.Properties;
 import org.apache.spark.SparkConf;
 import org.apache.spark.SparkContext;
@@ -99,7 +97,7 @@ class JobLevelListenerTest {
 
   private SparkListenerStageCompleted stageCompleted2;
 
-  private  SparkListenerStageCompleted stageCompleted3;
+  private SparkListenerStageCompleted stageCompleted3;
 
   private SparkListenerStageCompleted stageCompleted4;
 

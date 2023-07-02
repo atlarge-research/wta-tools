@@ -11,7 +11,6 @@ import com.asml.apa.wta.core.config.RuntimeConfig;
 import com.asml.apa.wta.core.model.Domain;
 import com.asml.apa.wta.core.model.Task;
 import com.asml.apa.wta.spark.datasource.SparkDataSource;
-
 import java.util.Properties;
 import java.util.stream.Collectors;
 import org.apache.spark.SparkConf;

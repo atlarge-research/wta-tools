@@ -23,8 +23,8 @@ public class ParquetWriter<T extends BaseTraceObject> implements AutoCloseable {
   /**
    * Constructs a writer to write records to Parquet.
    *
-   * @param path        {@link OutputFile} to write to.
-   * @param schema      {@link ParquetSchema} to write.
+   * @param path        {@link OutputFile} to write to
+   * @param schema      {@link ParquetSchema} to write
    */
   public ParquetWriter(OutputFile path, ParquetSchema schema) throws IOException {
     parquetSchema = schema;
@@ -39,8 +39,8 @@ public class ParquetWriter<T extends BaseTraceObject> implements AutoCloseable {
    * Writes the record.
    * Provides no guarantee that the file is directly flushed.
    *
-   * @param record        record to write.
-   * @throws IOException  when something goes wrong when writing.
+   * @param record        record to write
+   * @throws IOException  when something goes wrong when writing
    */
   public void write(T record) throws IOException {
     writer.write(record.convertToRecord(parquetSchema));
@@ -49,7 +49,7 @@ public class ParquetWriter<T extends BaseTraceObject> implements AutoCloseable {
   /**
    * Closes the writer.
    *
-   * @throws IOException  when something goes wrong when writing.
+   * @throws IOException  when something goes wrong when writing
    */
   @Override
   public void close() throws IOException {

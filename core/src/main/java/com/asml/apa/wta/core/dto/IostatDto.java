@@ -33,5 +33,4 @@ public class IostatDto implements SupplierDto {
   private double kiloByteWrtn;
 
   private double kiloByteDscd;
-
 }
