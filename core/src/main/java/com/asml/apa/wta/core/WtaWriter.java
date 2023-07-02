@@ -26,7 +26,9 @@ import lombok.extern.slf4j.Slf4j;
 public class WtaWriter {
 
   private final OutputFile file;
+
   private final String schemaVersion;
+
   private final Map<Class<? extends BaseTraceObject>, String> parquetLabels = Map.of(
       Resource.class, "resources",
       ResourceState.class, "resource_states",
