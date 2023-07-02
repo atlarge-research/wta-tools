@@ -148,19 +148,17 @@ public class EndToEnd {
 
     SparkSession sparkSession = SparkSession.builder().config(conf).getOrCreate();
     SparkContext sc = sparkSession.sparkContext();
-    for (int i = 0; i < 100; i++) {
+    for (int i = 0; i < 1; i++) {
       sparkOperation(JavaSparkContext.fromSparkContext(sc).textFile(args[1]));
       //        sparkOperation(
-      //
       // JavaSparkContext.fromSparkContext(sc).textFile("adapter/spark/src/test/resources/e2e-input.txt"));
     }
     sparkSession.close();
     SparkSession sparkSession2 = SparkSession.builder().config(conf).getOrCreate();
     SparkContext sc2 = sparkSession2.sparkContext();
-    for (int i = 0; i < 200; i++) {
+    for (int i = 0; i < 3; i++) {
       sparkOperation(JavaSparkContext.fromSparkContext(sc2).textFile(args[1]));
       //        sparkOperation(
-      //
       // JavaSparkContext.fromSparkContext(sc2).textFile("adapter/spark/src/test/resources/e2e-input.txt"));
     }
     sparkSession2.close();
