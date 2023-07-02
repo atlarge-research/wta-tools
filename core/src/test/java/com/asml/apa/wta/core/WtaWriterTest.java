@@ -18,7 +18,11 @@ class WtaWriterTest {
   @Test
   void workloadWriterWasActuallyCalled() throws IOException {
     JsonWriter<Workload> workloadWriterMock = mock(JsonWriter.class);
-    WtaWriter sut = spy(new WtaWriter(new DiskOutputFile(Path.of("wta-output")), "schema-1.0", "spark-plugin-v3"));
+    WtaWriter sut = spy(new WtaWriter(
+        new DiskOutputFile(Path.of("wta-output")),
+        "schema-1.0",
+        String.valueOf(System.currentTimeMillis()),
+        "spark-plugin-v3"));
     when(sut.createWorkloadWriter()).thenReturn(workloadWriterMock);
     sut.write(Workload.builder().build());
     verify(workloadWriterMock, times(1)).write(Workload.builder().build());

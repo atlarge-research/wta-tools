@@ -38,10 +38,11 @@ public class WtaWriter {
    *
    * @param path          output path to write to
    * @param version       version of files to write
+   * @param currentTime   current time in milliseconds
    * @param toolVersion   version of the tool that writes to file
    */
-  public WtaWriter(@NonNull OutputFile path, String version, String toolVersion) {
-    file = path.resolve(String.valueOf(System.currentTimeMillis())).resolve(toolVersion);
+  public WtaWriter(@NonNull OutputFile path, String version, String currentTime, String toolVersion) {
+    file = path.resolve(currentTime).resolve(toolVersion);
     schemaVersion = version;
   }
 
