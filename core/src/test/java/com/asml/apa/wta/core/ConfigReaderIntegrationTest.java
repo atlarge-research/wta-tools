@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.asml.apa.wta.core.config.RuntimeConfig;
 import com.asml.apa.wta.core.model.Domain;
+import lombok.Builder;
 import org.junit.jupiter.api.Test;
 
 class ConfigReaderIntegrationTest {
@@ -101,6 +102,21 @@ class ConfigReaderIntegrationTest {
   @Test
   void readsConfigFileWhereAggregateMetricsIsNotThereDefaultsToFalse() {
     RuntimeConfig cr = RuntimeConfig.readConfig("src/test/resources/testConfigNoIsStageLevel.json");
+    assertThat(cr.isAggregateMetrics()).isFalse();
+  }
+
+  @Test
+  void stringNumbersAutoParsedToIntAndViceVersa() {
+    RuntimeConfig cr = RuntimeConfig.readConfig("src/test/resources/testConfigInvalidValues.json");
+    assertThat(cr.getResourcePingInterval()).isEqualTo(2000);
+    assertThat(cr.getExecutorSynchronizationInterval()).isEqualTo(2000);
+    assertThat(cr.getDescription()).isEqualTo("13");
+  }
+
+  @Test
+  void unparseableStringBooleansSetsToDefaultValues() {
+    RuntimeConfig cr = RuntimeConfig.readConfig("src/test/resources/testConfigInvalidValues.json");
+    assertThat(cr.isStageLevel()).isFalse();
     assertThat(cr.isAggregateMetrics()).isFalse();
   }
 }
