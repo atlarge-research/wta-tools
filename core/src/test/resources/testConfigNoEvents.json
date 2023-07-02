@@ -3,5 +3,5 @@
   "domain": "Industrial",
   "description": "Test Description",
   "outputPath": "/home/user/WTA",
-  "isStageLevel": "true"
+  "isStageLevel": true
 }

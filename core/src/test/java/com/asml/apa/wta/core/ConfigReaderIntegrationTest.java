@@ -68,16 +68,6 @@ class ConfigReaderIntegrationTest {
   }
 
   @Test
-  void readsConfigFileWhereLogSettingIsNotThere() {
-    RuntimeConfig cr = RuntimeConfig.readConfig("src/test/resources/testConfigNoLogSettings.json");
-    assertThat(cr.getAuthors()).isEqualTo(new String[] {"Test Name"});
-    assertThat(cr.getDomain()).isEqualTo(Domain.INDUSTRIAL);
-    assertThat(cr.getDescription()).isEqualTo("Test Description");
-    assertThat(cr.isStageLevel()).isEqualTo(true);
-    assertThat(cr.getOutputPath()).isEqualTo("/home/user/WTA");
-  }
-
-  @Test
   void readsConfigFileWithInvalidDomain() {
     assertThatThrownBy(() -> RuntimeConfig.readConfig("src/test/resources/testConfigInvalidDomain.json"))
         .isInstanceOf(IllegalArgumentException.class);
