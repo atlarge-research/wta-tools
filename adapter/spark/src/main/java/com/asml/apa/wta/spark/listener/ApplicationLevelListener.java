@@ -327,7 +327,7 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
    * @param data              stream of data
    * @return                  double maximum value from data
    */
-  private double computeMax(Stream<Double> data) {
+  public double computeMax(Stream<Double> data) {
     return data.reduce(Double::max).orElse(-1.0);
   }
 

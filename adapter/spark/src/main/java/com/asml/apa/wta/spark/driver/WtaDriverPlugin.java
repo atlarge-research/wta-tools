@@ -31,6 +31,8 @@ public class WtaDriverPlugin implements DriverPlugin {
 
   private static final String TOOL_VERSION = "spark-wta-generator-1_0";
 
+  private static final String CURRENT_TIME = String.valueOf(System.currentTimeMillis());
+
   private MetricStreamingEngine metricStreamingEngine;
 
   private SparkDataSource sparkDataSource;
@@ -60,7 +62,7 @@ public class WtaDriverPlugin implements DriverPlugin {
       metricStreamingEngine = new MetricStreamingEngine();
       OutputFile outputFile = new DiskOutputFile(Path.of(runtimeConfig.getOutputPath()));
       WtaWriter wtaWriter =
-          new WtaWriter(outputFile, "schema-1.0", String.valueOf(System.currentTimeMillis()), TOOL_VERSION);
+          new WtaWriter(outputFile, "schema-1.0", CURRENT_TIME, TOOL_VERSION);
       sparkDataSource = new SparkDataSource(sparkCtx, runtimeConfig, metricStreamingEngine, wtaWriter);
       initListeners();
       executorVars.put("resourcePingInterval", String.valueOf(runtimeConfig.getResourcePingInterval()));

@@ -1,15 +1,18 @@
 package com.asml.apa.wta.core.model;
 
-import org.junit.jupiter.api.Test;
-
 import static org.assertj.core.api.Assertions.assertThat;
+
+import org.junit.jupiter.api.Test;
 
 class WorkloadTest {
 
   @Test
   void defaultBuilderValues() {
-    Workload workload = Workload.builder().authors(new String[]{"authors"}).domain(Domain.INDUSTRIAL).build();
-    assertThat(workload.getAuthors()).isEqualTo(new String[]{"authors"});
+    Workload workload = Workload.builder()
+        .authors(new String[] {"authors"})
+        .domain(Domain.INDUSTRIAL)
+        .build();
+    assertThat(workload.getAuthors()).isEqualTo(new String[] {"authors"});
     assertThat(workload.getDomain()).isEqualTo(Domain.INDUSTRIAL);
     assertThat(workload.getWorkloadDescription()).isEqualTo("");
     assertThat(workload.getTotalWorkflows()).isEqualTo(-1L);

@@ -1,8 +1,9 @@
 package com.asml.apa.wta.core.model;
 
-import org.junit.jupiter.api.Test;
-import java.util.HashMap;
 import static org.assertj.core.api.Assertions.assertThat;
+
+import java.util.HashMap;
+import org.junit.jupiter.api.Test;
 
 class ResourceTest {
 
