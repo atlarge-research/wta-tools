@@ -9,7 +9,8 @@ import java.util.concurrent.CompletableFuture;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-public class ProcSupplierTest {
+class ProcSupplierTest {
+
   @Test
   void getSnapshotReturnsProcDto() {
     ShellRunner shellRunner = Mockito.mock(ShellRunner.class);

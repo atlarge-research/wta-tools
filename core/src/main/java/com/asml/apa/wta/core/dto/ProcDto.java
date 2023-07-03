@@ -1,12 +1,13 @@
 package com.asml.apa.wta.core.dto;
 
+import com.asml.apa.wta.core.supplier.ProcSupplier;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * ProcDto class.
+ * Data transfer object for the {@link ProcSupplier}.
  *
  * @author Lohithsai Yadala Chanchu
  * @since 1.0.0
@@ -83,7 +84,6 @@ public class ProcDto implements SupplierDto {
   private long hugePagesSurp = -1;
 
   // Units for below metrics are all in kB
-
   @Builder.Default
   private long memTotal = -1;
 

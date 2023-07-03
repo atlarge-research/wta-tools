@@ -180,8 +180,6 @@ public class Workload implements BaseTraceObject {
    *
    * @param schema The parquet schema
    * @throws RuntimeException always
-   * @author Atour Mousavi Gourabi
-   * @since 1.0.0
    */
   @Override
   public final GenericRecord convertToRecord(ParquetSchema schema) {
@@ -194,8 +192,6 @@ public class Workload implements BaseTraceObject {
    * This method should never be called as we do not need to ever fetch its ID.
    *
    * @throws RuntimeException always
-   * @author Atour Mousavi Gourabi
-   * @since 1.0.0
    */
   @Override
   public final long getId() {

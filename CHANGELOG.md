@@ -88,6 +88,7 @@ For the most part, since we are pre-release this will serve no real purpose, oth
 - Refactored the Spark listeners to improve readability and maintainability [@pcho](https://gitlab.ewi.tudelft.nl/pcho)
 - AbstractListener made to be actually abstract. [@hpage](https://gitlab.ewi.tudelft.nl/hpage)
 - Updated the READMEs [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)
+- Changed aggregation metrics on application end to be configurable by user [@pcho](https://gitlab.ewi.tudelft.nl/pcho)
 
 ### Fixed
 - Fixed the slf4j logging module to allow use in testing and `adapter/spark` [@amousavigourab](https://gitlab.ewi.tudelft.nl/amousavigourab)

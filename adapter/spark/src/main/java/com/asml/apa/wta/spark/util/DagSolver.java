@@ -12,12 +12,11 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
 /**
- * This class will take in all stages within the job, generate the DAG
- * and find the critical path. It will add two additional nodes to the dependency graph
- * one as the source (node with id = 0) connecting all stages that do not have parents,
- * the other as the sink (node with id = -1) connecting all stages without children.
- * The critical path shall be the longest path from the source to the sink.
- * The ids of the additional node(source and sink) are chosen such that there will be no collisions with the stage ids.
+ * This class takes in all Spark Stages within a Spark Job, generate the DAG and find the critical path.
+ * It will add two additional nodes to the dependency graph: one as the source (node with id = 0) connecting
+ * all stages that do not have parents, the other as the sink (node with id = -1) connecting all stages
+ * without children. The critical path shall be the longest path from the source to the sink. The ids of
+ * additional node(source and sink) are chosen such that there will be no collisions with the stage ids.
  *
  * @author Tianchen Qu
  * @since 1.0.0
@@ -25,10 +24,7 @@ import java.util.stream.Collectors;
 public class DagSolver {
 
   /**
-   * This is a class representing node inside the DAG graph.
-   *
-   * @author Tianchen Qu
-   * @since 1.0.0
+   * Nested class representing a node inside the DAG graph.
    */
   private static class Node {
 
@@ -36,17 +32,22 @@ public class DagSolver {
 
     private long distance;
 
+    /**
+     * Constructor for node with stage id.
+     *
+     * @param stage          Spark Stage to extract the id from
+     * @since 1.0.0
+     */
     Node(Task stage) {
       id = stage.getId();
       distance = Integer.MIN_VALUE;
     }
 
     /**
-     * This is used for instantiating node 0,-1 as the extra source/sink node.
-     * The ids of the source and sink are chosen such that there will be no collisions with the stage ids.
+     * Constructor for node 0, -1 as the extra source/sink node. Ids of the source and sink are chosen to avoid
+     * collisions with the stage ids.
      *
-     * @param nodeId id(0/-1)
-     * @author Tianchen Qu
+     * @param nodeId        id 0 or -1
      * @since 1.0.0
      */
     Node(long nodeId) {
@@ -78,18 +79,18 @@ public class DagSolver {
   }
 
   /**
-   * This will add the node and the adjacent edges of the node.
-   * If there is no parents, it will be linked to the source node.
+   * This will add the node and the adjacent edges of the node. If there is no parents, it will be linked to the
+   * source node.
    *
-   * @param stage stage
-   * @author Tianchen Qu
+   * @param stage                 Spark Stage
+   * @param taskLevelListener     TaskLevelListener
    * @since 1.0.0
    */
-  private void addNode(Task stage, TaskLevelListener listener) {
+  private void addNode(Task stage, TaskLevelListener taskLevelListener) {
     Node node = new Node(stage);
     nodes.put(stage.getId(), node);
 
-    List<Task> tasks = listener.getStageToTasks().getOrDefault(stage.getId(), new ArrayList<>());
+    List<Task> tasks = taskLevelListener.getStageToTasks().getOrDefault(stage.getId(), new ArrayList<>());
     long runtime = tasks.stream().map(Task::getRuntime).reduce(Long::max).orElse(0L);
 
     if (stage.getParents().length > 0) {
@@ -105,8 +106,7 @@ public class DagSolver {
    * This method is used to create the additional source and sink node.
    * The ids of the source and sink are chosen such that there will be no collisions with the stage ids.
    *
-   * @param id id of the source (id = 0) and sink (id = -1) node
-   * @author Tianchen Qu
+   * @param id            id of the source (id = 0) and sink (id = -1) node
    * @since 1.0.0
    */
   private void addNode(Long id) {
@@ -125,10 +125,9 @@ public class DagSolver {
   /**
    * This method add a directed edge from vertex1 to vertex2 with the specified weight.
    *
-   * @param vertex1 vertex1
-   * @param vertex2 vertex2
-   * @param weight weight
-   * @author Tianchen Qu
+   * @param vertex1       vertex1
+   * @param vertex2       vertex2
+   * @param weight        weight of edge from vertex1 to vertex2
    * @since 1.0.0
    */
   private void addEdge(long vertex1, long vertex2, long weight) {
@@ -144,7 +143,7 @@ public class DagSolver {
 
   /**
    * This method links all nodes without a children to the sink node.
-   * @author Tianchen Qu
+   *
    * @since 1.0.0
    */
   private void setFinalEdges() {
@@ -158,7 +157,6 @@ public class DagSolver {
   /**
    * This method does topological sorting on the DAG using a {@link Deque}.
    *
-   * @author Tianchen Qu
    * @since 1.0.0
    */
   private Deque<Long> topologicalSort() {
@@ -171,10 +169,9 @@ public class DagSolver {
   /**
    * This is the recursive utility method for topological sorting.
    *
-   * @param visited a map of all visited nodes
-   * @param node the current node
-   * @param stack stack used for topological sorting
-   * @author Tianchen Qu
+   * @param visited       map of all visited nodes
+   * @param node          current node
+   * @param stack         stack used for topological sorting
    * @since 1.0.0
    */
   private void topoUtil(Map<Long, Boolean> visited, Long node, Deque<Long> stack) {
@@ -190,8 +187,7 @@ public class DagSolver {
   /**
    * Computes the longest path on the DAG.
    *
-   * @return longest path
-   * @author Tianchen Qu
+   * @return              longest path
    * @since 1.0.0
    */
   public List<Task> longestPath() {
@@ -209,10 +205,9 @@ public class DagSolver {
   }
 
   /**
-   * This method backtraces the longest path on the DAG based on each node's maximum value.
+   * Backtraces the longest path on the DAG based on each node's maximum value.
    *
-   * @return the longest path
-   * @author Tianchen Qu
+   * @return              longest path
    * @since 1.0.0
    */
   private List<Task> backTracing() {

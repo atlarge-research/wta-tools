@@ -4,7 +4,7 @@
   "description": "Test Description",
   "outputPath": "/home/user/WTA",
   "isStageLevel": true,
-  "resourcePingInterval": -1,
+  "resourcePingInterval": 0,
   "executorSynchronizationInterval": 4000,
   "aggregateMetrics": true
 }

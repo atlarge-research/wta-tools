@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Util class to find the kth smallest number in a {@link Stream} of {@code doubles}.
+ * Utility class to find the kth smallest number in a {@link Stream} of {@code doubles}.
  *
  * @author Atour Mousavi Gourabi
  * @since 1.0.0
@@ -15,9 +15,8 @@ public class KthSmallest {
   /**
    * Finds the median of a {@link List} of at most five {@link Double}s.
    *
-   * @param fiveDoubles the {@link List} of at most five doubles
-   * @return the median of the {@link List}
-   * @author Atour Mousavi Gourabi
+   * @param fiveDoubles     {@link List} of at most five doubles
+   * @return                median of the {@link List}
    * @since 1.0.0
    */
   private double findMedian(List<Double> fiveDoubles) {
@@ -36,27 +35,22 @@ public class KthSmallest {
    * Gets the median of medians, recursively.
    * Provides a good starting pivot.
    *
-   * @param data the {@link Stream} to compute the median of medians over
-   * @return the median of medians
-   * @author Atour Mousavi Gourabi
+   * @param data            {@link Stream} to compute the median of medians over
+   * @return                median of medians
    * @since 1.0.0
    */
   private double medianOfMedians(Stream<Double> data) {
     Stream<Double> stream = data;
     while (!stream.isEmpty()) {
       Stream<Double> recursive = new Stream<>();
-      long amount = 0;
       while (!stream.isEmpty()) {
         List<Double> listOfFive = new ArrayList<>();
-        for (int i = 0; i < 5; i++) {
-          if (!stream.isEmpty()) {
-            listOfFive.add(stream.head());
-          }
+        for (int i = 0; i < 5 && !stream.isEmpty(); i++) {
+          listOfFive.add(stream.head());
         }
-        amount++;
         recursive.addToStream(findMedian(listOfFive));
       }
-      if (amount == 1) {
+      if (recursive.copy().count() == 1) {
         return recursive.head();
       } else {
         stream = recursive;
@@ -68,10 +62,9 @@ public class KthSmallest {
   /**
    * Finds the kth smallest in the {@link Stream}.
    *
-   * @param data the {@link Stream} to query
-   * @param kthSmallest the amount of numbers smaller than the one we want to fetch
-   * @return the kth smallest number in the {@link Stream}
-   * @author Atour Mousavi Gourabi
+   * @param data          {@link Stream} to query
+   * @param kthSmallest   amount of numbers smaller than the one we want to fetch
+   * @return              kth smallest number in the {@link Stream}
    * @since 1.0.0
    */
   public double find(Stream<Double> data, long kthSmallest) {
@@ -81,8 +74,8 @@ public class KthSmallest {
       double medianOfMedians = medianOfMedians(stream.copy());
       Stream<Double> smaller = stream.copy().filter(x -> x < medianOfMedians);
       Stream<Double> larger = stream.copy().filter(x -> x > medianOfMedians);
-      long equalSize = stream.copy().filter(x -> x == medianOfMedians).count();
-      long smallerSize = smaller.copy().count();
+      long equalSize = stream.copy().countFilter(x -> x == medianOfMedians);
+      long smallerSize = stream.copy().countFilter(x -> x < medianOfMedians);
       if (kth < smallerSize) {
         stream = smaller;
       } else if (kth < equalSize + smallerSize) {

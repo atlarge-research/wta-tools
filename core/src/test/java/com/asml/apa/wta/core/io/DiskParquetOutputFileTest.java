@@ -10,7 +10,7 @@ import java.nio.file.Path;
 import org.apache.parquet.io.PositionOutputStream;
 import org.junit.jupiter.api.Test;
 
-public class DiskParquetOutputFileTest {
+class DiskParquetOutputFileTest {
 
   @Test
   void testGetPos() throws IOException {

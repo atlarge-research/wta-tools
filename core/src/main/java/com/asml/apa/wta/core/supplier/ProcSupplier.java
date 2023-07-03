@@ -21,23 +21,34 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * ProcSupplier class.
+ * ProcSupplier class for the pseudo-file system Proc.
  *
  * @author Lohithsai Yadala Chanchu
  * @since 1.0.0
  */
 @Slf4j
 public class ProcSupplier implements InformationSupplier<ProcDto> {
+
   private final ShellRunner shellRunner;
 
   @Setter
   private boolean isProcAvailable;
 
   private final boolean isDiskMetricsAvailable;
+
   private final boolean isMemMetricsAvailable;
+
   private final boolean isCpuMetricsAvailable;
+
   private final boolean isLoadAvgMetricsAvailable;
 
+  /**
+   * Constructor for the Proc supplier. It checks not only whether Proc is available but also each of
+   * its subdirectories.
+   *
+   * @param shellRunner   shell utils instance to use
+   * @since 1.0.0
+   */
   public ProcSupplier(ShellRunner shellRunner) {
     this.shellRunner = shellRunner;
     isProcAvailable = isAvailable();
@@ -58,8 +69,7 @@ public class ProcSupplier implements InformationSupplier<ProcDto> {
   /**
    * Checks if the system runs Linux.
    *
-   * @return a {@code boolean} that represents if the proc directory is available
-   * @author Lohithsai Yadala Chanchu
+   * @return      {@code boolean} that represents if the proc directory is available
    * @since 1.0.0
    */
   @Override
@@ -70,8 +80,8 @@ public class ProcSupplier implements InformationSupplier<ProcDto> {
   /**
    * Gets information from proc directory to get disk and memory metrics.
    *
-   * @return CompletableFuture&lt;ProcDto&gt; that will be sent to the driver
-   * @author Lohithsai Yadala Chanchu
+   * @return      if Proc is available, {@link Optional} {@link ProcDto} wrapped in a {@link CompletableFuture} that
+   *              will be sent to the driver. Otherwise {@link CompletableFuture} with an empty {@link Optional}
    * @since 1.0.0
    */
   public CompletableFuture<Optional<ProcDto>> getSnapshot() {
@@ -196,18 +206,41 @@ public class ProcSupplier implements InformationSupplier<ProcDto> {
   }
 
   /**
+   * Parse /proc/meminfo.
+   *
+   * @param input     input to be parsed.
+   * @return          list of parsed numbers from the /proc/meminfo file
+   * @since 1.0.0
+   */
+  private List<Long> parseMemMetrics(String input) {
+    String[] lines = input.split("\n");
+    Pattern pattern = Pattern.compile("\\b\\d+\\b");
+
+    List<Long> numbersList = Arrays.stream(lines)
+        .flatMap(line -> pattern.matcher(line).results())
+        .map(matchResult -> {
+          try {
+            return Long.parseLong(matchResult.group());
+          } catch (NumberFormatException e) {
+            log.error("There was an error parsing the contents of the /proc/meminfo file");
+            return null;
+          }
+        })
+        .collect(Collectors.toList());
+    return numbersList;
+  }
+
+  /**
    * Get contents of /proc/meminfo.
    *
-   * @return CompletableFuture&lt;Optional&lt;Long&gt;[]&gt; of the parsed numbers from the /proc/meminfo file
-   * @author Lohithsai Yadala Chanchu
+   * @return      if /proc/meminfo file is available, {@link Optional} of parsed numbers wrapped in a
+   *              {@link CompletableFuture}. Otherwise {@link CompletableFuture} with an empty {@link Optional}
    * @since 1.0.0
    */
   private CompletableFuture<Optional<Long>[]> getMemMetrics() {
     CompletableFuture<String> memMetrics = shellRunner.executeCommand("cat /proc/meminfo", false);
-
     return memMetrics.thenApply(result -> {
       Optional<Long>[] agg = Stream.generate(Optional::empty).limit(60).toArray(Optional[]::new);
-
       if (result != null && !result.isEmpty() && !fileNotFound(result)) {
         List<Long> parsedList = parseMemMetrics(result);
         IntStream.range(0, parsedList.size()).forEach(i -> agg[i] = Optional.of(parsedList.get(i)));
@@ -217,10 +250,36 @@ public class ProcSupplier implements InformationSupplier<ProcDto> {
   }
 
   /**
+   * Parse /proc/diskstats.
+   *
+   * @param input     input to be parsed.
+   * @return          list of parsed numbers from the /proc/diskstats file
+   * @since 1.0.0
+   */
+  private List<OutputLine> parseDiskMetrics(String input) {
+    List<OutputLine> result = new ArrayList<>();
+    try (BufferedReader reader = new BufferedReader(new StringReader(input))) {
+      String line;
+      while ((line = reader.readLine()) != null) {
+        String[] tokens = line.trim().split("\\s+");
+
+        OutputLine outputLine = new OutputLine();
+        for (String token : tokens) {
+          outputLine.addToLine(token);
+        }
+        result.add(outputLine);
+      }
+    } catch (IOException e) {
+      log.error("Something went wrong while parsing the contents of /proc/diskstats");
+    }
+    return result;
+  }
+
+  /**
    * Get contents /proc/diskstats.
    *
-   * @return CompletableFuture&lt;Optional&lt;Long&gt;[]&gt; of the parsed numbers from the /proc/diskstats file
-   * @author Lohithsai Yadala Chanchu
+   * @return      if /proc/diskstats file is available, {@link Optional} of parsed numbers wrapped in a
+   *              {@link CompletableFuture}. Otherwise {@link CompletableFuture} with an empty {@link Optional}
    * @since 1.0.0
    */
   private CompletableFuture<Optional<Long>[]> getDiskMetrics() {
@@ -249,8 +308,8 @@ public class ProcSupplier implements InformationSupplier<ProcDto> {
   /**
    * Get cpu model from /proc/cpuinfo.
    *
-   * @return CompletableFuture&lt;Optional&lt;Long&gt;&gt; of the parsed cpu model from the /proc/cpuinfo file
-   * @author Lohithsai Yadala Chanchu
+   * @return      if /proc/cpuinfo file is available, {@link Optional} of parsed numbers wrapped in a
+   *              {@link CompletableFuture}. Otherwise {@link CompletableFuture} with an empty {@link Optional}
    * @since 1.0.0
    */
   private CompletableFuture<Optional<String>> getCpuModel() {
@@ -267,8 +326,8 @@ public class ProcSupplier implements InformationSupplier<ProcDto> {
   /**
    * Get loadAvgStats from /proc/loadavg.
    *
-   * @return CompletableFuture of the parsed numbers from the /proc/loadavg file
-   * @author Lohithsai Yadala Chanchu
+   * @return      if /proc/loadavg file is available, {@link Optional} of parsed numbers wrapped in a
+   *              {@link CompletableFuture}. Otherwise {@link CompletableFuture} with an empty {@link Optional}
    * @since 1.0.0
    */
   private CompletableFuture<Optional<Double>[]> getLoadAvgMetrics() {
@@ -295,66 +354,10 @@ public class ProcSupplier implements InformationSupplier<ProcDto> {
   }
 
   /**
-   * Parse /proc/diskstats.
-   *
-   * @param input the input to be parsed
-   * @return List&lt;List&lt;String&gt;&gt; of the parsed numbers from the /proc/diskstats file
-   * @author Lohithsai Yadala Chanchu
-   * @since 1.0.0
-   */
-  private List<OutputLine> parseDiskMetrics(String input) {
-    List<OutputLine> result = new ArrayList<>();
-
-    try (BufferedReader reader = new BufferedReader(new StringReader(input))) {
-      String line;
-      while ((line = reader.readLine()) != null) {
-        String[] tokens = line.trim().split("\\s+");
-
-        OutputLine outputLine = new OutputLine();
-        for (String token : tokens) {
-          outputLine.addToLine(token);
-        }
-        result.add(outputLine);
-      }
-    } catch (IOException e) {
-      log.error("Something went wrong while parsing the contents of /proc/diskstats");
-    }
-
-    return result;
-  }
-
-  /**
-   * Parse /proc/diskstats.
-   *
-   * @param input the input to be parsed
-   * @return List&lt;Long&gt; of the parsed numbers from the /proc/meminfo file
-   * @author Lohithsai Yadala Chanchu
-   * @since 1.0.0
-   */
-  private List<Long> parseMemMetrics(String input) {
-    String[] lines = input.split("\n");
-    Pattern pattern = Pattern.compile("\\b\\d+\\b");
-
-    List<Long> numbersList = Arrays.stream(lines)
-        .flatMap(line -> pattern.matcher(line).results())
-        .map(matchResult -> {
-          try {
-            return Long.parseLong(matchResult.group());
-          } catch (NumberFormatException e) {
-            log.error("There was an error parsing the contents of the /proc/meminfo file");
-            return null;
-          }
-        })
-        .collect(Collectors.toList());
-    return numbersList;
-  }
-
-  /**
    * Checks the terminal output if the file that is going to be accessed exists.
    *
-   * @param output the output of the cat terminal command
-   * @return a boolean value that represents if the file was not found
-   * @author Lohithsai Yadala Chanchu
+   * @param output    output of the cat terminal command
+   * @return          boolean value that represents if the file was not found
    * @since 1.0.0
    */
   private boolean fileNotFound(String output) {
@@ -375,8 +378,7 @@ public class ProcSupplier implements InformationSupplier<ProcDto> {
     /**
      * Add an element to the outputLine.
      *
-     * @param element the string to be added to the outputLine
-     * @author Lohithsai Yadala Chanchu
+     * @param element     string to be added to the outputLine
      * @since 1.0.0
      */
     public void addToLine(String element) {
@@ -386,8 +388,7 @@ public class ProcSupplier implements InformationSupplier<ProcDto> {
     /**
      * Gets the length of the outputLine.
      *
-     * @return the length of the outputLine
-     * @author Lohithsai Yadala Chanchu
+     * @return      length of the outputLine
      * @since 1.0.0
      */
     public int getLineLength() {
@@ -397,9 +398,8 @@ public class ProcSupplier implements InformationSupplier<ProcDto> {
     /**
      * Gets the element at the specified index.
      *
-     * @param index the index of the element we want to receive
-     * @return the string that is at the specified index
-     * @author Lohithsai Yadala Chanchu
+     * @param index     index of the element we want to receive
+     * @return          string that is at the specified index
      * @since 1.0.0
      */
     public String getElementAt(int index) {

@@ -23,14 +23,15 @@ import org.apache.spark.scheduler.SparkListenerApplicationEnd;
 import org.apache.spark.scheduler.SparkListenerApplicationStart;
 
 /**
- * This class is an application-level listener for the Spark data source.
- * It's important that one does not override {@link org.apache.spark.scheduler.SparkListenerInterface#onApplicationStart(SparkListenerApplicationStart)}
+ * Application-level listener for the Spark data source. It's important that one does not override
+ * {@link org.apache.spark.scheduler.SparkListenerInterface#onApplicationStart(SparkListenerApplicationStart)}
  * here, as the event is already sent before the listener is registered unless the listener is explicitly registered in
  * the Spark configuration as per <a href="https://stackoverflow.com/questions/36401238/spark-onapplicationstart-is-never-gets-called">SO</a>
  *
  * @author Pil Kyu Cho
  * @author Henry Page
  * @author Tianchen Qu
+ * @author Atour Mousavi Gourabi
  * @since 1.0.0
  */
 @Slf4j
@@ -57,15 +58,14 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
   /**
    * Constructor for the application-level listener.
    *
-   * @param sparkContext The current spark context
-   * @param config Additional config specified by the user for the plugin
-   * @param wtaTaskLevelListener The task-level listener to be used by this listener
-   * @param wtaStageLevelListener The stage-level listener to be used by this listener
-   * @param wtaJobLevelListener The job-level listener to be used by this listener
-   * @param dataSource the {@link SparkDataSource} to inject
-   * @param streamingEngine the driver's {@link MetricStreamingEngine} to use
-   * @param traceWriter the {@link WtaWriter} to write the traces with
-   * @author Henry Page
+   * @param sparkContext                current spark context
+   * @param config                      additional config specified by the user for the plugin
+   * @param wtaTaskLevelListener        task-level listener to be used by this listener
+   * @param wtaStageLevelListener       stage-level listener to be used by this listener
+   * @param wtaJobLevelListener         job-level listener to be used by this listener
+   * @param dataSource                  {@link SparkDataSource} to inject
+   * @param streamingEngine             driver's {@link MetricStreamingEngine} to use
+   * @param traceWriter                 {@link WtaWriter} to write the traces with
    * @since 1.0.0
    */
   public ApplicationLevelListener(
@@ -89,14 +89,13 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
   /**
    * Constructor for the application-level listener at stage level.
    *
-   * @param sparkContext The current spark context
-   * @param config Additional config specified by the user for the plugin
-   * @param wtaStageLevelListener The stage-level listener to be used by this listener
-   * @param wtaJobLevelListener The job-level listener to be used by this listener
-   * @param dataSource the {@link SparkDataSource} to inject
-   * @param streamingEngine the driver's {@link MetricStreamingEngine} to use
-   * @param traceWriter the {@link WtaWriter} to write the traces with
-   * @author Tianchen Qu
+   * @param sparkContext                current spark context
+   * @param config                      additional config specified by the user for the plugin
+   * @param wtaStageLevelListener       stage-level listener to be used by this listener
+   * @param wtaJobLevelListener         job-level listener to be used by this listener
+   * @param dataSource                  {@link SparkDataSource} to inject
+   * @param streamingEngine             driver's {@link MetricStreamingEngine} to use
+   * @param traceWriter                 {@link WtaWriter} to write the traces with
    * @since 1.0.0
    */
   public ApplicationLevelListener(
@@ -119,7 +118,6 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
   /**
    * Writes the trace to file.
    *
-   * @author Atour Mousavi Gourabi
    * @since 1.0.0
    */
   public void writeTrace() {
@@ -148,9 +146,8 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
   /**
    * Setters for the general fields of the Workload.
    *
-   * @param dateEnd     End date of the application
-   * @param builder     WorkloadBuilder to be used to build the Workload
-   * @author Pil Kyu Cho
+   * @param dateEnd         end-date of the application
+   * @param builder         WorkloadBuilder to be used to build the Workload
    * @since 1.0.0
    */
   private void setGeneralFields(long dateEnd, WorkloadBuilder builder) {
@@ -168,9 +165,8 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
   /**
    * Setters for the count fields of the Workload.
    *
-   * @param tasks       List of WTA Task objects
-   * @param builder     WorkloadBuilder to be used to build the Workload
-   * @author Pil Kyu Cho
+   * @param tasks           list of WTA Task objects
+   * @param builder         WorkloadBuilder to be used to build the Workload
    * @since 1.0.0
    */
   private void setCountFields(Stream<Task> tasks, WorkloadBuilder builder) {
@@ -178,8 +174,7 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
     final long totalWorkflows = workflows.copy().count();
     final long totalTasks =
         workflows.map(Workflow::getTaskCount).reduce(Long::sum).orElse(0L);
-    long numSites =
-        tasks.copy().filter(task -> task.getSubmissionSite() >= 0).count();
+    long numSites = tasks.copy().countFilter(task -> task.getSubmissionSite() >= 0);
     numSites = numSites < 1 ? -1 : numSites;
     final long numResources = tasks.copy()
         .map(Task::getResourceAmountRequested)
@@ -187,9 +182,9 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
         .reduce(Double::sum)
         .orElse(-1.0)
         .longValue();
-    long numUsers = tasks.copy().filter(task -> task.getUserId() >= 0).count();
+    long numUsers = tasks.copy().countFilter(task -> task.getUserId() >= 0);
     numUsers = numUsers < 1 ? -1 : numUsers;
-    long numGroups = tasks.copy().filter(task -> task.getGroupId() >= 0).count();
+    long numGroups = tasks.copy().countFilter(task -> task.getGroupId() >= 0);
     numGroups = numGroups < 1 ? -1 : numGroups;
     final double totalResourceSeconds = tasks.copy()
         .filter(task -> task.getRuntime() >= 0 && task.getResourceAmountRequested() >= 0.0)
@@ -222,10 +217,9 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
   /**
    * Setters for the statistical resource fields of the Workload.
    *
-   * @param metrics         {@link List} of WTA Task objects
-   * @param resourceType    Type of resource to be set
-   * @param builder         WorkloadBuilder to be used to build the Workload
-   * @author Pil Kyu Cho
+   * @param metrics             {@link List} of WTA Task objects
+   * @param resourceType        type of resource to be set
+   * @param builder             WorkloadBuilder to be used to build the Workload
    * @since 1.0.0
    */
   @SuppressWarnings("CyclomaticComplexity")
@@ -300,10 +294,7 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
    * Callback function that is called right at the end of the application. Further experimentation
    * is needed to determine if applicationEnd is called first or shutdown.
    *
-   * @param applicationEnd    The event corresponding to the end of the application
-   * @author Henry Page
-   * @author Tianchen Qu
-   * @author Pil Kyu Cho
+   * @param applicationEnd        event corresponding to the end of the application
    * @since 1.0.0
    */
   public void onApplicationEnd(SparkListenerApplicationEnd applicationEnd) {
@@ -314,20 +305,26 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
 
     WorkloadBuilder workloadBuilder = Workload.builder();
     final Stream<Task> tasks = wtaTaskListener.getProcessedObjects();
-    Function<Task, Long> networkFunction = Task::getNetworkIoTime;
 
     setGeneralFields(applicationEnd.time(), workloadBuilder);
     setCountFields(tasks.copy(), workloadBuilder);
-    setResourceStatisticsFields(
-        tasks.copy().map(Task::getResourceAmountRequested), ResourceType.RESOURCE, workloadBuilder);
-    setResourceStatisticsFields(tasks.copy().map(Task::getMemoryRequested), ResourceType.MEMORY, workloadBuilder);
-    setResourceStatisticsFields(
-        tasks.copy().map(networkFunction.andThen(Long::doubleValue)), ResourceType.NETWORK, workloadBuilder);
-    setResourceStatisticsFields(tasks.copy().map(Task::getDiskSpaceRequested), ResourceType.DISK, workloadBuilder);
-    setResourceStatisticsFields(tasks.copy().map(Task::getEnergyConsumption), ResourceType.ENERGY, workloadBuilder);
+    if (getConfig().isAggregateMetrics()) {
+      Function<Task, Long> networkFunction = Task::getNetworkIoTime;
+      setResourceStatisticsFields(
+          tasks.copy().map(Task::getResourceAmountRequested), ResourceType.RESOURCE, workloadBuilder);
+      setResourceStatisticsFields(
+          tasks.copy().map(Task::getMemoryRequested), ResourceType.MEMORY, workloadBuilder);
+      setResourceStatisticsFields(
+          tasks.copy().map(networkFunction.andThen(Long::doubleValue)),
+          ResourceType.NETWORK,
+          workloadBuilder);
+      setResourceStatisticsFields(
+          tasks.copy().map(Task::getDiskSpaceRequested), ResourceType.DISK, workloadBuilder);
+      setResourceStatisticsFields(
+          tasks.copy().map(Task::getEnergyConsumption), ResourceType.ENERGY, workloadBuilder);
+    }
 
     sparkDataSource.removeListeners();
-
     workload = workloadBuilder.build();
     writeTrace();
   }
@@ -337,11 +334,9 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
    *
    * @param data              stream of data
    * @return                  double maximum value from data
-   * @author Tianchen Qu
-   * @author Pil Kyu Cho
    * @since 1.0.0
    */
-  private double computeMax(Stream<Double> data) {
+  public double computeMax(Stream<Double> data) {
     return data.reduce(Double::max).orElse(-1.0);
   }
 
@@ -350,8 +345,6 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
    *
    * @param data              stream of data
    * @return                  double minimum value from data
-   * @author Tianchen Qu
-   * @author Pil Kyu Cho
    * @since 1.0.0
    */
   public double computeMin(Stream<Double> data) {
@@ -364,8 +357,6 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
    * @param data              stream of data
    * @param size              size of the stream
    * @return                  mean value from data or -1.0
-   * @author Tianchen Qu
-   * @author Pil Kyu Cho
    * @since 1.0.0
    */
   public double computeMean(Stream<Double> data, long size) {
@@ -383,8 +374,6 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
    * @param mean              mean value from {@link #computeMean(Stream, long)}
    * @param size              size from data
    * @return                  standard deviation value from data or -1.0
-   * @author Tianchen Qu
-   * @author Pil Kyu Cho
    * @since 1.0.0
    */
   private double computeStd(Stream<Double> data, double mean, long size) {
@@ -404,8 +393,6 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
    * @param mean              mean value from {@link #computeMean(Stream, long)}
    * @param std               standard deviation from {@link #computeStd(Stream, double, long)}
    * @return                  normalized standard deviation value from data or -1.0
-   * @author Tianchen Qu
-   * @author Pil Kyu Cho
    * @since 1.0.0
    */
   private double computeCov(double mean, double std) {
@@ -418,9 +405,8 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
   /**
    * Median value for data stream. Assumes that data is not empty, sorted, and positive elements only.
    *
-   * @param data {@link Stream} of data
-   * @return the median value of the data
-   * @author Atour Mousavi Gourabi
+   * @param data              {@link Stream} of data
+   * @return                  median value of the data
    * @since 1.0.0
    */
   private double computeMedian(Stream<Double> data) {
@@ -430,9 +416,8 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
   /**
    * First quantile value for data stream. Assumes that data is not empty, sorted, and positive elements only.
    *
-   * @param data {@link Stream} of data
-   * @return the first quantile value of the data
-   * @author Atour Mousavi Gourabi
+   * @param data              {@link Stream} of data
+   * @return                  first quantile value of the data
    * @since 1.0.0
    */
   private double computeFirstQuantile(Stream<Double> data) {
@@ -442,10 +427,8 @@ public class ApplicationLevelListener extends AbstractListener<Workload> {
   /**
    * Third quantile value for data stream. Assumes that data is not empty, sorted, and positive elements only.
    *
-   * @param data {@link Stream} of data
-   * @return third quantile value of the data
-   * @author Tianchen Qu
-   * @author Pil Kyu Cho
+   * @param data              {@link Stream} of data
+   * @return                  third quantile value of the data
    * @since 1.0.0
    */
   private double computeThirdQuantile(Stream<Double> data) {

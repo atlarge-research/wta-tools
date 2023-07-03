@@ -11,7 +11,7 @@ import org.apache.avro.generic.GenericRecord;
 /**
  * Resource class corresponding to WTA format.
  *
- * @author  Lohithsai Yadala Chanchu
+ * @author Lohithsai Yadala Chanchu
  * @since 1.0.0
  */
 @Data

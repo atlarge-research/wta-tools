@@ -74,8 +74,6 @@ public class Workflow implements BaseTraceObject {
    *
    * @param schema The parquet schema
    * @return record The record representing a row in Parquet
-   * @author Tianchen Qu
-   * @since 1.0.0
    */
   @Override
   public GenericRecord convertToRecord(ParquetSchema schema) {

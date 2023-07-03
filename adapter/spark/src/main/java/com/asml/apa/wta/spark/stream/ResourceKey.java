@@ -14,5 +14,6 @@ import lombok.Getter;
 @EqualsAndHashCode
 @AllArgsConstructor
 public class ResourceKey {
+
   private final String executorId;
 }

@@ -2,7 +2,9 @@ package com.asml.apa.wta.spark.listener;
 
 import com.asml.apa.wta.core.config.RuntimeConfig;
 import com.asml.apa.wta.core.model.Task;
+import com.asml.apa.wta.core.model.Workflow;
 import com.asml.apa.wta.core.stream.KeyedStream;
+import com.asml.apa.wta.core.stream.Stream;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.Getter;
@@ -10,9 +12,11 @@ import org.apache.spark.SparkContext;
 import org.apache.spark.scheduler.SparkListenerJobStart;
 
 /**
- * This abstract class is a base class for the task and stage level listeners.
+ * This abstract class is a base class for the task-level and stage-level listeners.
  *
+ * @author Henry Page
  * @author Lohithsai Yadala Chanchu
+ * @author Atour Mousavi Gourabi
  * @since 1.0.0
  */
 public abstract class TaskStageBaseListener extends AbstractListener<Task> {
@@ -26,9 +30,8 @@ public abstract class TaskStageBaseListener extends AbstractListener<Task> {
   /**
    * Constructor for the stage-level listener.
    *
-   * @param sparkContext The current spark context
-   * @param config Additional config specified by the user for the plugin
-   * @author Lohithsai Yadala Chanchu
+   * @param sparkContext        current spark context
+   * @param config              additional config specified by the user for the plugin
    * @since 1.0.0
    */
   public TaskStageBaseListener(SparkContext sparkContext, RuntimeConfig config) {
@@ -38,8 +41,7 @@ public abstract class TaskStageBaseListener extends AbstractListener<Task> {
   /**
    * This method is called every time a job starts. In the context of the WTA, this is a workflow.
    *
-   * @param jobStart The object corresponding to information on job start.
-   * @author Henry Page
+   * @param jobStart            SparkListenerJobStart object corresponding to information on job start
    * @since 1.0.0
    */
   @Override
@@ -49,12 +51,11 @@ public abstract class TaskStageBaseListener extends AbstractListener<Task> {
   }
 
   /**
-   * Associates a {@link Task} with a {@link com.asml.apa.wta.core.model.Workflow}.
-   * Also adds the {@link Task} to the processed objects {@link com.asml.apa.wta.core.stream.Stream}.
+   * Associates a {@link Task} with a {@link Workflow}.
+   * Also adds the {@link Task} to the processed objects {@link Stream}.
    *
-   * @param workflowId the id of the {@link com.asml.apa.wta.core.model.Workflow} to add the {@link Task} to
-   * @param task the {@link Task} to add
-   * @author Atour Mousavi Gourabi
+   * @param workflowId          id of the {@link Workflow} to add the {@link Task} to
+   * @param task                {@link Task} to add
    * @since 1.0.0
    */
   public void addTaskToWorkflow(long workflowId, Task task) {

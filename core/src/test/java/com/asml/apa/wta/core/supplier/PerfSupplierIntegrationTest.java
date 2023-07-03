@@ -10,7 +10,7 @@ import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledOnOs;
 
-public class PerfSupplierIntegrationTest {
+class PerfSupplierIntegrationTest {
 
   private final ShellRunner shellRunner = new ShellRunner();
 

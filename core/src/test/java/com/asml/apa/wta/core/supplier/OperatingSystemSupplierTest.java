@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 
 class OperatingSystemSupplierTest {
 
-  OperatingSystemSupplier sut = spy(OperatingSystemSupplier.class);
+  private final OperatingSystemSupplier sut = spy(OperatingSystemSupplier.class);
 
   @Test
   void getCommittedVirtualMemorySize() {

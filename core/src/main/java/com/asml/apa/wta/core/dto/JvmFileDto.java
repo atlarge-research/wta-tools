@@ -1,12 +1,13 @@
 package com.asml.apa.wta.core.dto;
 
+import com.asml.apa.wta.core.supplier.JavaFileSupplier;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * DTO representing filesystem metrics accessible from the JVM.
+ * Data transfer object for the {@link JavaFileSupplier} accessible from the JVM.
  *
  * @author Henry Page
  * @since 1.0.0

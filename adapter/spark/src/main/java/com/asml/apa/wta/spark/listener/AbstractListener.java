@@ -15,6 +15,7 @@ import org.apache.spark.scheduler.SparkListener;
  *
  * @param <T> The domain object generic
  * @author Henry Page
+ * @author Atour Mousavi Gourabi
  * @since 1.0.0
  */
 @RequiredArgsConstructor
@@ -23,32 +24,51 @@ public abstract class AbstractListener<T extends BaseTraceObject> extends SparkL
 
   /**
    * The current spark context.
+   *
+   * @since 1.0.0
    */
   @Getter
   private final SparkContext sparkContext;
 
   /**
    * The current runtime config.
+   *
+   * @since 1.0.0
    */
   @Getter
   private final RuntimeConfig config;
 
   /**
    * A list of processed domain objects.
+   *
+   * @since 1.0.0
    */
   private final Stream<T> processedObjects = new Stream<>();
 
   /**
    * The thread pool.
+   *
+   * @since 1.0.0
    */
-  @Getter
-  private static final ExecutorService threadPool = Executors.newSingleThreadExecutor();
+  private static ExecutorService threadPool = Executors.newSingleThreadExecutor();
+
+  /**
+   * Getter for the thread pool.
+   *
+   * @return the {@link ExecutorService} to offload expensive computations to
+   * @since 1.0.0
+   */
+  public static ExecutorService getThreadPool() {
+    if (threadPool.isShutdown()) {
+      threadPool = Executors.newSingleThreadExecutor();
+    }
+    return threadPool;
+  }
 
   /**
    * Returns a clone of the processed objects {@link Stream}.
    *
-   * @return a clone of the processed objects
-   * @author Atour Mousavi Gourabi
+   * @return          clone of the processed objects
    * @since 1.0.0
    */
   public Stream<T> getProcessedObjects() {
@@ -58,8 +78,7 @@ public abstract class AbstractListener<T extends BaseTraceObject> extends SparkL
   /**
    * Adds a processed object to the {@link Stream} maintained by the listener.
    *
-   * @param object the processed object to add
-   * @author Atour Mousavi Gourabi
+   * @param object    processed object to add
    * @since 1.0.0
    */
   public void addProcessedObject(T object) {
@@ -69,7 +88,6 @@ public abstract class AbstractListener<T extends BaseTraceObject> extends SparkL
   /**
    * Registers the listener to the current spark context.
    *
-   * @author Henry Page
    * @since 1.0.0
    */
   public void register() {
@@ -79,7 +97,6 @@ public abstract class AbstractListener<T extends BaseTraceObject> extends SparkL
   /**
    * Removes the listener to the current spark context.
    *
-   * @author Henry Page
    * @since 1.0.0
    */
   public void remove() {

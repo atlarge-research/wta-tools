@@ -14,6 +14,7 @@ import org.apache.spark.api.plugin.PluginContext;
  * Executor component of the plugin.
  *
  * @author Henry Page
+ * @author Pil Kyu Cho
  * @author Lohithsai Yadala Chanchu
  * @since 1.0.0
  */
@@ -30,14 +31,11 @@ public class WtaExecutorPlugin implements ExecutorPlugin {
    * Developers are urged not to put inefficient code here as it blocks executor initialization until
    * it is completed.
    *
-   * @param pCtx The PluginContext object that represents the context of the plugin.
-   * @param extraConf A map object that contains any extra configuration information. This map
-   *                  is directly returned from {@link WtaDriverPlugin#init(SparkContext, PluginContext)}
-   * @see WtaPlugin#executorPlugin() where a new instance of the plugin is created. This gets called as soon
-   * as it is loaded on to the executor.
-   *
-   * @author Henry Page
-   * @author Pil Kyu Cho
+   * @param pCtx          PluginContext object that represents the context of the plugin
+   * @param extraConf     map object that contains any extra configuration information. This map is directly returned
+   *                      from {@link WtaDriverPlugin#init(SparkContext, PluginContext)}
+   * @see                 WtaPlugin#executorPlugin() where a new instance of the plugin is created. This gets
+   *                      called as soon as it is loaded on to the executor
    * @since 1.0.0
    */
   @Override
@@ -73,17 +71,14 @@ public class WtaExecutorPlugin implements ExecutorPlugin {
    * Exceptions thrown here are not propagated, meaning a task won't fail if this method throws an exception.
    * <a href="https://spark.apache.org/docs/3.2.1/api/java/org/apache/spark/api/plugin/ExecutorPlugin.html#init-org.apache.spark.api.plugin.PluginContext-java.util.Map-">Refer to the docs</a> for more information.
    *
-   * @author Henry Page
    * @since 1.0.0
    */
   @Override
   public void onTaskStart() {}
 
   /**
-   * Gets called when a task is successfully completed.
-   * Gets called even if {@link #onTaskStart()} threw an exception.
+   * Gets called when either a task is successfully completed or {@link #onTaskStart()} threw an exception.
    *
-   * @author Henry Page
    * @since 1.0.0
    */
   @Override
@@ -92,9 +87,7 @@ public class WtaExecutorPlugin implements ExecutorPlugin {
   /**
    * Gets called if a task fails.
    *
-   * @param failureReason The reason the task failed, accessible through a string.
-   *
-   * @author Henry Page
+   * @param failureReason       reason the task failed, accessible through a string
    * @since 1.0.0
    */
   @Override
@@ -105,8 +98,6 @@ public class WtaExecutorPlugin implements ExecutorPlugin {
   /**
    * Gets called just before shutdown. Blocks executor shutdown until it is completed.
    *
-   * @author Henry Page
-   * @author Pil Kyu Cho
    * @since 1.0.0
    */
   @Override

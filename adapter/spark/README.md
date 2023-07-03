@@ -80,7 +80,7 @@ There are two ways to make use of the plugin
 1. Integrate the plugin into the Spark application source code
 2. Create the plugin as a JAR and run alongside the main Spark application via **spark-submit**
 
-Note that for either approaches, `sparkContext.stop()` must be specified at the end of the main Java application to invoke the plugin's application finished callback. Otherwise, the plugin doesn't end properly.
+Note that for either approaches, `sparkSession.close()` must be specified at the end of each Spark session to invoke the plugin's application finished callback. Otherwise, the plugin doesn't end properly.
 
 ### Plugin Integration
 For the first approach, create a `SparkConf` object and set the following config:
@@ -102,7 +102,7 @@ For the second approach, create a JAR file of the plugin and run it alongside th
 ```shell
 spark-submit --class <main class path to spark application> --master local \
 --conf spark.plugins=com.asml.apa.wta.spark.WtaPlugin \
---conf spark.driver.extraJavaOptions=-DconfigFile=<config.json_location> \
+--conf "spark.driver.extraJavaOptions=-DconfigFile=<config.json_location>" \
 --jars <plugin_JAR_location> <Spark_JAR_location> \
 <optional arguments for spark application>
 ```
@@ -137,13 +137,9 @@ from pyspark import SparkConf, SparkContext
 
 conf = SparkConf().setAppName("MyApp").set("spark.plugins", "com.asml.apa.wta.spark.WtaPlugin").set("spark.driver.extraJavaOptions", "-DconfigFile=/home/user/sp_resources/config.json")
 sc = SparkContext(conf=conf)
-
-...
-
-sc.stop()
 ```
 
-Note that in the Python script, `sc.stop()` must also be specified at the end to invoke the plugin's application finished callback.
+Note that in the Python script, `sparkSession.close()` must also be specified at the end to invoke the plugin's application finished callback.
 
 Now execute the following command and submit the Python script along with the JAR file of the plugin to **spark-submit**.
 
@@ -237,14 +233,14 @@ Aggregation of all the resource utilisation metrics are done on the driver end.
 - Certain lifecycle callbacks in the SparkListenerInterface do **NOT** suppress exceptions, whilst the Spark Plugin API does.
 
 #### Memory
-- As we gather an enormous amount of data to create the traces, we write a lot of data to disk. This is done to avoid everything from piling up in memory and causing `OutOfMemoryExceptions`. This constant writing to and reading from disk causes some overhead.
+- As we gather an enormous amount of data to create the traces, we write a lot of data to disk. This is done to avoid everything from piling up in memory and causing `OutOfMemoryException`. This constant writing to and reading from disk causes some overhead.
   - As we perform these operations in the listeners, this could theoretically cause Spark's listener queue to fill up on very intensive jobs which produce a lot of small tasks. To avoid issues with this, it is recommended to increase the queue size for such very intensive workloads.
   - Decreasing the size of the queue is warned against as it can cause such issues to come up where they are not expected to.
   - All this serialisation also means that you will need a disk that is able to store sizeable amounts of data and handle a large number of reads and writes.
+- When the plugin is finished processing and writing traces to parquet, it could cause `OutOfMemoryException` if not enough memory is allocated to the driver-side. This is due to the aggregation metrics in the `Workload.json` file. Therefore, always allocate enough memory to the driver-side (at least 4GB is recommended). Moreover, Spark applications that run for more than 12 hours are recommended to disable the aggregation metrics. This can be done by setting the `aggregateMetrics` field is set to "false" in the `config.json` file.
 
 ## Metric Calculation Clarification
 For some metrics, it is not immediately clear how they are calculated. This section aims to clarify this.
-
 
 ### Resource
 
@@ -282,6 +278,7 @@ Just like Spark, this plugin uses the [SLF4J](http://www.slf4j.org/) logging API
 the desired logging frameworks (e.g. `java.util.logging`, logback, log4j). The plugin itself does not depend on any
 logging implementation. The plugin log level corresponds to the Spark log level. This means that the plugin log level
 can be configured using the Spark configuration through the following:
+
 ```java
 sc.setLogLevel("INFO");
 ```

@@ -51,10 +51,7 @@ public abstract class SupplierExtractionEngine<T extends BaseSupplierDto> {
    * Constructor for the resource extraction engine.
    * Suppliers should be injected here.
    *
-   * @param resourcePingInterval How often to ping the suppliers, in milliseconds
-   * @author Henry Page
-   * @author Lohithsai Yadala Chanchu
-   * @author Pil Kyu Cho
+   * @param resourcePingInterval    how often to ping the suppliers, in milliseconds
    * @since 1.0.0
    */
   public SupplierExtractionEngine(int resourcePingInterval) {
@@ -72,8 +69,7 @@ public abstract class SupplierExtractionEngine<T extends BaseSupplierDto> {
    * Ping the suppliers and add the results to the buffer.
    * Developers are encouraged to override this to add/remove additional information.
    *
-   * @return A {@link CompletableFuture} that completes when the result has been resolved
-   * @author Henry Page
+   * @return      {@link CompletableFuture} that completes when the result has been resolved
    * @since 1.0.0
    */
   protected CompletableFuture<T> ping() {
@@ -107,7 +103,8 @@ public abstract class SupplierExtractionEngine<T extends BaseSupplierDto> {
   /**
    * Ping the suppliers and add the results to the buffer. This is done asynchronously.
    *
-   * @return A {@link CompletableFuture} representing the result of the ping operation
+   * @return      {@link CompletableFuture} representing the result of the ping operation
+   * @since 1.0.0
    */
   public CompletableFuture<Void> pingAndBuffer() {
     log.trace("Pinging suppliers and buffering results.");
@@ -117,7 +114,6 @@ public abstract class SupplierExtractionEngine<T extends BaseSupplierDto> {
   /**
    * Starts pinging the suppliers at a fixed rate.
    *
-   * @author Henry Page
    * @since 1.0.0
    */
   public void startPinging() {
@@ -128,7 +124,6 @@ public abstract class SupplierExtractionEngine<T extends BaseSupplierDto> {
   /**
    * Stops pinging the suppliers.
    *
-   * @author Henry Page
    * @since 1.0.0
    */
   public void stopPinging() {
@@ -137,12 +132,11 @@ public abstract class SupplierExtractionEngine<T extends BaseSupplierDto> {
   }
 
   /**
-   * Transform the resource metrics record.
-   * This method can be overridden by extending classes to add additional information.
+   * Transform the resource metrics record. This method can be overridden by extending classes to add additional
+   * information.
    *
-   * @param record The 'bare-bones' information that needs to be augmented
-   * @return The transformed resource metrics record, with additional information
-   * @author Henry Page
+   * @param record      'bare-bones' information that needs to be augmented
+   * @return            transformed resource metrics record, with additional information
    * @since 1.0.0
    */
   public abstract T transform(BaseSupplierDto record);
@@ -150,8 +144,7 @@ public abstract class SupplierExtractionEngine<T extends BaseSupplierDto> {
   /**
    * Get and clear the buffer.
    *
-   * @return The buffer contents as a list
-   * @author Henry Page
+   * @return            buffer contents as a list
    * @since 1.0.0
    */
   public List<T> getAndClear() {

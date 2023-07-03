@@ -7,7 +7,7 @@ import java.util.concurrent.CompletableFuture;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * PerfDataSource class.
+ * PerfDataSource class for the performance analyzing tool in Linux.
  *
  * @author Atour Mousavi Gourabi
  * @author Pil Kyu Cho
@@ -23,8 +23,7 @@ public class PerfSupplier implements InformationSupplier<PerfDto> {
   /**
    * Constructs a {@code perf} data source.
    *
-   * @param shellRunner the {@link ShellRunner} to inject.
-   * @author Atour Mousavi Gourabi
+   * @param     shellRunner the {@link ShellRunner} to inject
    * @since 1.0.0
    */
   public PerfSupplier(ShellRunner shellRunner) {
@@ -35,9 +34,7 @@ public class PerfSupplier implements InformationSupplier<PerfDto> {
   /**
    * Verifies the availability of the perf energy data source.
    *
-   * @return a {@code boolean} indicating the availability of this data source
-   * @author Atour Mousavi Gourabi
-   * @author Pil Kyu Cho
+   * @return    {@code boolean} indicating the availability of this data source
    * @since 1.0.0
    */
   @Override
@@ -62,8 +59,8 @@ public class PerfSupplier implements InformationSupplier<PerfDto> {
   /**
    * Uses the Perf dependency to get energy metrics (computed asynchronously).
    *
-   * @return PerfDto object that will be sent to the driver (with the necessary information filled out)
-   * @author Pil Kyu Cho
+   * @return      if Perf is available, {@link Optional} {@link PerfDto} wrapped in a {@link CompletableFuture} that
+   *              will be sent to the driver. Otherwise {@link CompletableFuture} with an empty {@link Optional}
    * @since 1.0.0
    */
   @Override
@@ -90,9 +87,7 @@ public class PerfSupplier implements InformationSupplier<PerfDto> {
    * Gather the perf energy metrics. Returns a completable future string of total joules in a second,
    * which is equivalent to watt.
    *
-   * @return Completable future string of joules used by the CPU package over the past second
-   * @author Atour Mousavi Gourabi
-   * @author Pil Kyu Cho
+   * @return    Completable future string of joules used by the CPU package over the past second
    * @since 1.0.0
    */
   public CompletableFuture<String> gatherMetrics() {
