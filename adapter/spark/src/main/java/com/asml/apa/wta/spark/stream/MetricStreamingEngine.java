@@ -9,6 +9,7 @@ import com.asml.apa.wta.core.model.Resource;
 import com.asml.apa.wta.core.model.ResourceState;
 import com.asml.apa.wta.core.stream.KeyedStream;
 import com.asml.apa.wta.core.stream.Stream;
+import com.asml.apa.wta.spark.datasource.SparkDataSource;
 import com.asml.apa.wta.spark.dto.ResourceAndStateWrapper;
 import com.asml.apa.wta.spark.dto.SparkBaseSupplierWrapperDto;
 import java.io.Serializable;
@@ -37,7 +38,6 @@ public class MetricStreamingEngine {
   /**
    * Initializes the streams.
    *
-   * @author Atour Mousavi Gourabi
    * @since 1.0.0
    */
   public MetricStreamingEngine() {
@@ -47,9 +47,8 @@ public class MetricStreamingEngine {
   /**
    * Adds resource metrics to the resource stream.
    *
-   * @param resourceKey A {@link String} identifying the resource. This is usually the executorID.
-   * @param record the {@link com.asml.apa.wta.spark.datasource.SparkDataSource} containing metrics.
-   * @author Atour Mousavi Gourabi
+   * @param resourceKey       {@link String} identifying the resource. This is usually the executorID
+   * @param record            {@link SparkDataSource} containing metrics
    * @since 1.0.0
    */
   public void addToResourceStream(String resourceKey, SparkBaseSupplierWrapperDto record) {
@@ -59,8 +58,7 @@ public class MetricStreamingEngine {
   /**
    * Consumes all resource related streams and aggregates them into objects.
    *
-   * @return a list of {@link ResourceAndStateWrapper} objects containing the resource and its states
-   * @author Henry Page
+   * @return      list of {@link ResourceAndStateWrapper} objects containing the resource and its states
    * @since 1.0.0
    */
   public List<ResourceAndStateWrapper> collectResourceInformation() {
@@ -75,10 +73,9 @@ public class MetricStreamingEngine {
   /**
    * Constructs a resource from a stream of pings.
    *
-   * @param executorId The transformed id of the executor
-   * @param pings The stream of pings that correspond to this executor
-   * @return A Resource object that is constructed from the given information
-   * @author Henry Page
+   * @param executorId      transformed id of the executor
+   * @param pings           stream of pings that correspond to this executor
+   * @return                {@link Resource} object that is constructed from the given information
    * @since 1.0.0
    */
   private Resource produceResourceFromExecutorInfo(long executorId, Stream<SparkBaseSupplierWrapperDto> pings) {
@@ -126,10 +123,9 @@ public class MetricStreamingEngine {
   /**
    * Constructs a list of resource states from a stream of pings.
    *
-   * @param resourceId    associated resource id
-   * @param pings         stream of pings that are to be transformed to states
-   * @return              list of resource states that is constructed from the given information
-   * @author Henry Page
+   * @param resourceId      associated resource id
+   * @param pings           stream of pings that are to be transformed to states
+   * @return                list of resource states that is constructed from the given information
    * @since 1.0.0
    */
   private Stream<ResourceState> produceResourceStatesFromExecutorInfo(
@@ -197,10 +193,11 @@ public class MetricStreamingEngine {
   /**
    * Used for getting information across all pings that is constant.
    *
-   * @param pings A list of pings to analyse
-   * @param mapper The mapping function that should map the dto to an optional data supplier object
-   * @param <R> The type of the data supplier object
-   * @return The constant information that is requested
+   * @param pings       list of pings to analyse
+   * @param mapper      mapping function that should map the dto to an optional data supplier object
+   * @param <R>         type of the data supplier object
+   * @return            constant information that is requested
+   * @since 1.0.0
    */
   private <R extends Serializable> Optional<R> getFirstAvailable(
       Stream<SparkBaseSupplierWrapperDto> pings, Function<SparkBaseSupplierWrapperDto, R> mapper) {

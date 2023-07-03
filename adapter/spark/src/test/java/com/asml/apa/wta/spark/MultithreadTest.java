@@ -18,12 +18,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
 
-public class MultithreadTest {
+class MultithreadTest {
 
-  PluginContext mockPluginContext;
-  SparkSupplierExtractionEngine sutSupplierExtractionEngine;
+  private PluginContext mockPluginContext;
 
-  WtaExecutorPlugin sutExecutorPlugin;
+  private SparkSupplierExtractionEngine sutSupplierExtractionEngine;
+
+  private WtaExecutorPlugin sutExecutorPlugin;
 
   @BeforeEach
   void setup() {

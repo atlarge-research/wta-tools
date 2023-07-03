@@ -1,10 +1,13 @@
 package com.asml.apa.wta.spark.driver;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
+import com.asml.apa.wta.core.config.RuntimeConfig;
 import com.asml.apa.wta.spark.dto.ResourceCollectionDto;
 import com.asml.apa.wta.spark.dto.SparkBaseSupplierWrapperDto;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import org.apache.spark.SparkConf;
@@ -155,5 +158,16 @@ class WtaDriverPluginTest {
             .onKey("2")
             .isEmpty())
         .isFalse();
+  }
+
+  @Test
+  void wtaDriverPluginDoesNotInitializeWhenReadConfigThrowsIOException() {
+    given(RuntimeConfig.readConfig("src/test/resources/throwsIOException.json"))
+        .willAnswer(invocation -> {
+          throw new IOException();
+        });
+    Map<String, String> configMap = createSparkConfAndInitialize("src/test/resources/throwsIOException.json");
+    assertThat(configMap).containsKeys("errorStatus");
+    assertThat(configMap.get("errorStatus")).isEqualTo("true");
   }
 }

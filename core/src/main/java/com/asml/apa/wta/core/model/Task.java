@@ -9,7 +9,7 @@ import org.apache.avro.generic.GenericRecord;
 /**
  * Task class corresponding to WTA format.
  *
- * @author  Lohithsai Yadala Chanchu
+ * @author Lohithsai Yadala Chanchu
  * @since 1.0.0
  */
 @Data
@@ -87,8 +87,6 @@ public class Task implements BaseTraceObject {
    *
    * @param schema schema
    * @return record
-   * @since 1.0.0
-   * @author Atour Mousavi Gourabi
    */
   @Override
   public GenericRecord convertToRecord(ParquetSchema schema) {

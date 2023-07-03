@@ -6,6 +6,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Queue;
 import org.junit.jupiter.api.Test;
@@ -264,7 +265,7 @@ class StreamTest {
   void reduceStreamWithOneElement() {
     Stream<Integer> stream = new Stream<>(3);
     assertThat(stream.isEmpty()).isFalse();
-    assertThat(stream.reduce(Integer::sum).get()).isEqualTo(3);
+    assertThat(stream.reduce(Integer::sum).orElse(-1)).isEqualTo(3);
     assertThat(stream.isEmpty()).isTrue();
   }
 
@@ -272,7 +273,7 @@ class StreamTest {
   void reduceStreamWithMultipleElements() {
     Stream<Integer> stream = new Stream<>(List.of(1, 2, 3, 4, 5));
     assertThat(stream.isEmpty()).isFalse();
-    assertThat(stream.reduce(Integer::sum).get()).isEqualTo(15);
+    assertThat(stream.reduce(Integer::sum).orElse(-1)).isEqualTo(15);
     assertThat(stream.isEmpty()).isTrue();
   }
 
@@ -348,5 +349,88 @@ class StreamTest {
     assertThat(arr[0]).isEqualTo('a');
     assertThat(arr[1]).isEqualTo('b');
     assertThat(arr).hasSize(2);
+  }
+
+  @Test
+  void foldLeftAfterFilter() {
+    List<String> list = new ArrayList<>(4);
+    list.add(null);
+    list.add("Harry ");
+    list.add("Pott");
+    list.add("er");
+    Stream<String> stream = new Stream<>(list);
+    String name = stream.filter(Objects::nonNull).foldLeft("", (acc, cur) -> acc + cur);
+    assertThat(name).isEqualTo("Harry Potter");
+  }
+
+  @Test
+  void reduceAfterFilters() {
+    Stream<Long> stream = new Stream<>(List.of(-1L, 3L, 8291L, -3189L, 0L));
+    long sum = stream.filter(Objects::nonNull)
+        .filter(x -> x > 0)
+        .reduce(Long::sum)
+        .orElse(-1L);
+    assertThat(sum).isEqualTo(8294L);
+  }
+
+  @Test
+  void reduceNullAfterFilters() {
+    Stream<Long> stream = new Stream<>(List.of(-1L, 3L, 8291L, -3189L, 0L));
+    assertThatThrownBy(() -> stream.filter(Objects::nonNull)
+            .filter(x -> x > 0)
+            .reduce(null)
+            .orElse(-1L))
+        .isInstanceOf(NullPointerException.class);
+  }
+
+  @Test
+  void mapSandwichedByFilters() {
+    List<Long> list = new ArrayList<>(5);
+    list.add(null);
+    list.add(-13L);
+    list.add(4L);
+    list.add(81904L);
+    list.add(0L);
+    Stream<Long> stream = new Stream<>(list);
+    Stream<Long> processedStream =
+        stream.filter(Objects::nonNull).map(x -> x > 0 ? x : -x).filter(x -> x > 10);
+    assertThat(processedStream.count()).isEqualTo(2);
+  }
+
+  @Test
+  void toListAfterFilter() {
+    Stream<Long> stream = new Stream<>(List.of(-1L, 3L, 8291L, -3189L, 0L));
+    List<Long> sum = stream.filter(Objects::nonNull).filter(x -> x > 0).toList();
+    assertThat(sum).containsExactlyElementsOf(List.of(3L, 8291L));
+  }
+
+  @Test
+  void addToStreamAfterFilter() {
+    Stream<Long> stream = new Stream<>(List.of(-1L, 3L, 8291L, -3189L, 0L));
+    stream.addToStream(null);
+    stream.addToStream(39L);
+    Stream<Long> filteredStream = stream.filter(Objects::nonNull).filter(x -> x > 0);
+    filteredStream.addToStream(null);
+    long nulls = filteredStream.filter(Objects::isNull).count();
+    assertThat(nulls).isEqualTo(1L);
+  }
+
+  @Test
+  void forEachAfterFilter() {
+    Stream<Long> stream = new Stream<>(List.of(-1L, 3L, 8291L, -3189L, 0L));
+    stream.addToStream(null);
+    stream.addToStream(39L);
+    Stream<Long> secondaryStream = new Stream<>();
+    stream.filter(Objects::nonNull).filter(x -> x > 0).forEach(secondaryStream::addToStream);
+    long nulls = secondaryStream.filter(Objects::isNull).count();
+    assertThat(nulls).isEqualTo(0L);
+  }
+
+  @Test
+  void peekAfterFilter() {
+    Stream<Character> stream = new Stream<>(List.of('a', 'b', 'c', 'd', 'e', '.', '.', '.'));
+    Stream<Character> filteredStream = stream.filter(x -> x != '.');
+    assertThat(filteredStream.peek()).isEqualTo('a');
+    assertThat(filteredStream.countFilter(x -> x > 'a')).isEqualTo(4);
   }
 }

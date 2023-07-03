@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import com.asml.apa.wta.core.util.ShellRunner;
 import org.junit.jupiter.api.Test;
 
-public class IostatSupplierIntegrationTest {
+class IostatSupplierIntegrationTest {
 
   @Test
   public void IostatSupplierSuccessfullyReturnsADtoObject() {

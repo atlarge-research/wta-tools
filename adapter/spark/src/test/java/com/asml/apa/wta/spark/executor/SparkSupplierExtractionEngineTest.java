@@ -19,8 +19,9 @@ import org.junit.jupiter.api.Test;
 
 class SparkSupplierExtractionEngineTest {
 
-  PluginContext mockPluginContext;
-  SparkSupplierExtractionEngine sutSupplierExtractionEngine;
+  private PluginContext mockPluginContext;
+
+  private SparkSupplierExtractionEngine sutSupplierExtractionEngine;
 
   @BeforeEach
   void setup() {

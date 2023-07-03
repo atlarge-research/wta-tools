@@ -58,8 +58,6 @@ public class ResourceState implements BaseTraceObject {
    * This method should never be called as we do not need to ever fetch its ID.
    *
    * @throws RuntimeException always
-   * @author Atour Mousavi Gourabi
-   * @since 1.0.0
    */
   @Override
   public final long getId() {

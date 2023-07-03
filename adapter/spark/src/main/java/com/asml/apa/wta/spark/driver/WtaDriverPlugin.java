@@ -31,6 +31,8 @@ public class WtaDriverPlugin implements DriverPlugin {
 
   private static final String TOOL_VERSION = "spark-wta-generator-1_0";
 
+  private static final String CURRENT_TIME = String.valueOf(System.currentTimeMillis());
+
   private MetricStreamingEngine metricStreamingEngine;
 
   private SparkDataSource sparkDataSource;
@@ -41,13 +43,11 @@ public class WtaDriverPlugin implements DriverPlugin {
    * This method is called early in the initialization of the Spark driver.
    * Explicitly, it is called before the Spark driver's task scheduler is initialized. It is blocking.
    * Expensive calls should be postponed or delegated to another thread. If an error occurs while
-   * initializing the plugin, the plugin should call {@link #shutdown()} with {@link #error} set to false.
+   * initializing the plugin it will set {@link #error} to false.
    *
-   * @param sparkCtx The current SparkContext.
-   * @param pluginCtx Additional plugin-specific about the Spark application where the plugin is running.
-   * @return Extra information provided to the executor
-   * @author Pil Kyu Cho
-   * @author Henry Page
+   * @param sparkCtx        current SparkContext
+   * @param pluginCtx       additional plugin-specific about the Spark application where the plugin is running
+   * @return                extra information provided to the executor
    * @since 1.0.0
    */
   @Override
@@ -62,7 +62,7 @@ public class WtaDriverPlugin implements DriverPlugin {
       RuntimeConfig runtimeConfig = RuntimeConfig.readConfig(configFile);
       metricStreamingEngine = new MetricStreamingEngine();
       OutputFile outputFile = new DiskOutputFile(Path.of(runtimeConfig.getOutputPath()));
-      WtaWriter wtaWriter = new WtaWriter(outputFile, "schema-1.0", TOOL_VERSION);
+      WtaWriter wtaWriter = new WtaWriter(outputFile, "schema-1.0", CURRENT_TIME, TOOL_VERSION);
       sparkDataSource = new SparkDataSource(sparkCtx, runtimeConfig, metricStreamingEngine, wtaWriter);
       initListeners();
       executorVars.put("resourcePingInterval", String.valueOf(runtimeConfig.getResourcePingInterval()));
@@ -81,9 +81,9 @@ public class WtaDriverPlugin implements DriverPlugin {
   /**
    * Receives messages from the executors.
    *
-   * @param message the message that was sent by the executors, to be serializable
-   * @return a response to the executor, if no response is expected the result is ignored
-   * @author Atour Mousavi Gourabi
+   * @param message       message that was sent by the executors, to be serializable
+   * @return              response to the executor, if no response is expected the result is ignored
+   * @since 1.0.0
    */
   @Override
   public Object receive(Object message) {
@@ -97,12 +97,9 @@ public class WtaDriverPlugin implements DriverPlugin {
   }
 
   /**
-   * Gets called just before shutdown.
-   * If an error occurred, it is logged before shutdown.
-   * Recommended that no Spark functions are used here.
+   * Gets called just before shutdown. If an error occurred, it is logged before shutdown
+   * Recommended that no Spark functions are used here
    *
-   * @author Pil Kyu Cho
-   * @author Henry Page
    * @since 1.0.0
    */
   @Override
@@ -117,7 +114,6 @@ public class WtaDriverPlugin implements DriverPlugin {
   /**
    * Initializes the listeners to get Spark metrics.
    *
-   * @author Lohithsai Yadala Chanchu
    * @since 1.0.0
    */
   public void initListeners() {

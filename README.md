@@ -48,7 +48,8 @@ An example of a valid configuration can be seen here:
   "isStageLevel": false,
   "outputPath": "wta-output",
   "resourcePingInterval": 500,
-  "executorSynchronizationInterval": -1
+  "executorSynchronizationInterval": -1,
+  "aggregateMetrics": false
 }
 ```
 
@@ -64,6 +65,7 @@ Below is an explanation of each field and their expected types. The default valu
 | outputPath                      |                                                                                                                                                                                                                                                                                                                                                                                                                               The output path of the generated trace. |    `STRING`     | :heavy_check_mark: |
 | resourcePingInterval            |                                                       How often the resources are pinged for metrics in milliseconds. By default this is set to 500 and it is encouraged that the user does not modify this unless they know exactly what they are doing, as modifying this in a naive manner can introduce unforeseen effects. If this parameter is too large, metrics will not be captured for executors that have a lifespan shorter than the respective interval. |     `INT32`     |                    |
 | executorSynchronizationInterval | How often executors/slaves send their captured resource metrics to the driver/master in milliseconds. By default this is set to -1.  If the resources are pinged and the executor subsequently ends before a buffer synchronization tick, the respective resources will not be included in the aggregated metrics on the driver side. If this value is non-positive, resource information will be sent immediately after it is collected and it will not be buffered. |     `INT32`     |                    |
+| aggregateMetrics                |                                                                                                                                                                                                                                                                                                                                                                                       Whether to collect aggregation metrics on Workload object, defaults to `false`. |     `BOOL`      |                    |
 
 
 ### Configuration per Application

@@ -7,7 +7,8 @@ import com.asml.apa.wta.core.util.ShellRunner;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 
-public class DstatSupplierIntegrationTest {
+class DstatSupplierIntegrationTest {
+
   @Test
   public void DstatSupplierSuccessfullyReturnsADtoObject() {
     DstatSupplier a = new DstatSupplier(new ShellRunner());

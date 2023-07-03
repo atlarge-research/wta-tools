@@ -50,71 +50,67 @@ import scala.collection.mutable.ListBuffer;
 
 class ApplicationLevelListenerTest {
 
-  protected SparkContext mockedSparkContext;
+  private SparkContext mockedSparkContext;
 
-  protected ResourceProfileManager mockedResourceProfileManager;
+  private ResourceProfileManager mockedResourceProfileManager;
 
-  protected ResourceProfile mockedResource;
+  private ResourceProfile mockedResource;
 
-  protected Map<String, TaskResourceRequest> mapResource;
+  private Map<String, TaskResourceRequest> mapResource;
 
-  protected SparkContext mockedSparkContext2;
+  private SparkContext mockedSparkContext2;
 
-  protected ResourceProfileManager mockedResourceProfileManager2;
+  private ResourceProfileManager mockedResourceProfileManager2;
 
-  protected ResourceProfile mockedResource2;
+  private ResourceProfile mockedResource2;
 
-  protected Map<String, TaskResourceRequest> mapResource2;
+  private Map<String, TaskResourceRequest> mapResource2;
 
-  protected RuntimeConfig fakeConfig1;
+  private RuntimeConfig fakeConfig;
 
-  protected RuntimeConfig fakeConfig2;
+  private TaskLevelListener fakeTaskListener;
 
-  protected TaskLevelListener fakeTaskListener1;
-  protected StageLevelListener fakeStageListener1;
-  protected JobLevelListener fakeJobListener1;
-  protected ApplicationLevelListener fakeApplicationListener1;
+  private StageLevelListener fakeStageListener;
 
-  protected TaskLevelListener fakeTaskListener2;
-  protected StageLevelListener fakeStageListener2;
-  protected JobLevelListener fakeJobListener2;
-  protected ApplicationLevelListener fakeApplicationListener2;
+  private JobLevelListener fakeJobListener;
+
+  private ApplicationLevelListener fakeApplicationListener;
 
   private SparkDataSource sparkDataSource;
 
-  SparkListenerApplicationEnd applicationEndObj;
+  private SparkListenerApplicationEnd applicationEndObj;
 
-  TaskInfo testTaskInfo1;
+  private TaskInfo testTaskInfo1;
 
-  TaskInfo testTaskInfo2;
+  private TaskInfo testTaskInfo2;
 
-  TaskInfo testTaskInfo3;
+  private TaskInfo testTaskInfo3;
 
-  TaskInfo testTaskInfo4;
+  private TaskInfo testTaskInfo4;
 
-  StageInfo testStageInfo1;
+  private StageInfo testStageInfo1;
 
-  StageInfo testStageInfo2;
+  private StageInfo testStageInfo2;
 
-  SparkListenerTaskEnd taskEndEvent1;
+  private SparkListenerTaskEnd taskEndEvent1;
 
-  SparkListenerTaskEnd taskEndEvent2;
+  private SparkListenerTaskEnd taskEndEvent2;
 
-  SparkListenerTaskEnd taskEndEvent3;
+  private SparkListenerTaskEnd taskEndEvent3;
 
   SparkListenerTaskEnd taskEndEvent4;
 
-  SparkListenerStageCompleted stageCompleted1;
+  private SparkListenerStageCompleted stageCompleted1;
 
-  SparkListenerStageCompleted stageCompleted2;
+  private SparkListenerStageCompleted stageCompleted2;
 
-  int stageId1;
+  private int stageId1;
 
-  int stageId2;
+  private int stageId2;
 
-  long applicationDateEnd;
+  private long applicationDateEnd;
 
-  MetricStreamingEngine metricStreamingEngine;
+  private MetricStreamingEngine metricStreamingEngine;
 
   @BeforeEach
   void setup() {
@@ -144,19 +140,19 @@ class ApplicationLevelListenerTest {
     when(mockedResourceProfileManager2.resourceProfileFromId(100)).thenReturn(mockedResource2);
     when(mockedResource2.taskResources()).thenReturn(mapResource2);
 
-    fakeConfig1 = RuntimeConfig.builder()
+    fakeConfig = RuntimeConfig.builder()
         .authors(new String[] {"Harry Potter"})
         .domain(Domain.SCIENTIFIC)
         .isStageLevel(false)
         .description("Yer a wizard harry")
+        .aggregateMetrics(true)
         .build();
-    fakeStageListener1 = new StageLevelListener(mockedSparkContext, fakeConfig1);
 
-    fakeTaskListener1 = new TaskLevelListener(mockedSparkContext, fakeConfig1);
+    fakeTaskListener = new TaskLevelListener(mockedSparkContext, fakeConfig);
 
-    fakeStageListener1 = new StageLevelListener(mockedSparkContext, fakeConfig1);
+    fakeStageListener = new StageLevelListener(mockedSparkContext, fakeConfig);
 
-    fakeJobListener1 = new JobLevelListener(mockedSparkContext, fakeConfig1, fakeTaskListener1, fakeStageListener1);
+    fakeJobListener = new JobLevelListener(mockedSparkContext, fakeConfig, fakeTaskListener, fakeStageListener);
 
     sparkDataSource = mock(SparkDataSource.class);
     when(sparkDataSource.getRuntimeConfig()).thenReturn(mock(RuntimeConfig.class));
@@ -164,39 +160,16 @@ class ApplicationLevelListenerTest {
     when(sparkDataSource.getStageLevelListener()).thenReturn(mock(StageLevelListener.class));
     when(sparkDataSource.getJobLevelListener()).thenReturn(mock(JobLevelListener.class));
 
-    fakeApplicationListener1 = new ApplicationLevelListener(
+    fakeApplicationListener = new ApplicationLevelListener(
         mockedSparkContext,
-        fakeConfig1,
-        fakeTaskListener1,
-        fakeStageListener1,
-        fakeJobListener1,
+        fakeConfig,
+        fakeTaskListener,
+        fakeStageListener,
+        fakeJobListener,
         sparkDataSource,
         mock(MetricStreamingEngine.class),
         mock(WtaWriter.class));
 
-    fakeConfig2 = RuntimeConfig.builder()
-        .authors(new String[] {"Harry Potter"})
-        .domain(Domain.SCIENTIFIC)
-        .isStageLevel(true)
-        .description("Yer a wizard harry")
-        .build();
-
-    fakeTaskListener2 = new TaskLevelListener(mockedSparkContext2, fakeConfig2);
-
-    fakeStageListener2 = new StageLevelListener(mockedSparkContext2, fakeConfig2);
-
-    fakeJobListener2 =
-        new JobLevelListener(mockedSparkContext2, fakeConfig2, fakeTaskListener2, fakeStageListener2);
-
-    fakeApplicationListener2 = new ApplicationLevelListener(
-        mockedSparkContext2,
-        fakeConfig2,
-        fakeTaskListener2,
-        fakeStageListener2,
-        fakeJobListener2,
-        sparkDataSource,
-        mock(MetricStreamingEngine.class),
-        mock(WtaWriter.class));
     testTaskInfo1 = new TaskInfo(0, 0, 1, 50L, "testExecutor", "local", TaskLocality.NODE_LOCAL(), false);
     testTaskInfo2 = new TaskInfo(1, 0, 1, 50L, "testExecutor", "local", TaskLocality.NODE_LOCAL(), false);
     testTaskInfo3 = new TaskInfo(2, 0, 1, 50L, "testExecutor", "local", TaskLocality.NODE_LOCAL(), false);
@@ -264,13 +237,13 @@ class ApplicationLevelListenerTest {
 
   @Test
   void workloadBuiltWithDefaultMetricValues() {
-    assertThat(fakeApplicationListener1.getProcessedObjects().isEmpty()).isTrue();
-    fakeApplicationListener1.onApplicationEnd(applicationEndObj);
-    await().atMost(20, SECONDS).until(() -> fakeApplicationListener1.getWorkload() != null);
-    assertThat(fakeApplicationListener1.getProcessedObjects().count()).isEqualTo(0);
+    assertThat(fakeApplicationListener.getProcessedObjects().isEmpty()).isTrue();
+    fakeApplicationListener.onApplicationEnd(applicationEndObj);
+    await().atMost(20, SECONDS).until(() -> fakeApplicationListener.getWorkload() != null);
+    assertThat(fakeApplicationListener.getProcessedObjects().count()).isEqualTo(0);
 
-    Workload workload = fakeApplicationListener1.getWorkload();
-    assertThat(fakeApplicationListener1.getProcessedObjects().count()).isEqualTo(0);
+    Workload workload = fakeApplicationListener.getWorkload();
+    assertThat(fakeApplicationListener.getProcessedObjects().count()).isEqualTo(0);
     assertThat(workload.getFirstQuartileResourceTask()).isEqualTo(-1.0);
     assertThat(workload.getMaxResourceTask()).isEqualTo(-1.0);
     assertThat(workload.getCovResourceTask()).isEqualTo(-1.0);
@@ -291,15 +264,15 @@ class ApplicationLevelListenerTest {
 
   @Test
   void workloadGeneralMetricsCollected() {
-    assertThat(fakeApplicationListener1.getProcessedObjects().isEmpty()).isTrue();
-    fakeApplicationListener1.onApplicationEnd(applicationEndObj);
-    await().atMost(20, SECONDS).until(() -> fakeApplicationListener1.getWorkload() != null);
-    assertThat(fakeApplicationListener1.getProcessedObjects().count()).isEqualTo(0);
+    assertThat(fakeApplicationListener.getProcessedObjects().isEmpty()).isTrue();
+    fakeApplicationListener.onApplicationEnd(applicationEndObj);
+    await().atMost(20, SECONDS).until(() -> fakeApplicationListener.getWorkload() != null);
+    assertThat(fakeApplicationListener.getProcessedObjects().count()).isEqualTo(0);
 
-    Workload workload = fakeApplicationListener1.getWorkload();
-    assertThat(workload.getDomain()).isEqualTo(fakeConfig1.getDomain());
-    assertThat(workload.getAuthors()).isEqualTo(fakeConfig1.getAuthors());
-    assertThat(workload.getWorkloadDescription()).isEqualTo(fakeConfig1.getDescription());
+    Workload workload = fakeApplicationListener.getWorkload();
+    assertThat(workload.getDomain()).isEqualTo(fakeConfig.getDomain());
+    assertThat(workload.getAuthors()).isEqualTo(fakeConfig.getAuthors());
+    assertThat(workload.getWorkloadDescription()).isEqualTo(fakeConfig.getDescription());
     long sutStartTime = mockedSparkContext.startTime();
     assertThat(workload.getDateStart()).isEqualTo(sutStartTime);
     assertThat(workload.getDateEnd()).isEqualTo(applicationDateEnd);
@@ -307,12 +280,12 @@ class ApplicationLevelListenerTest {
 
   @Test
   void workloadCountMetricsCollected() {
-    assertThat(fakeApplicationListener1.getProcessedObjects().isEmpty()).isTrue();
-    fakeApplicationListener1.onApplicationEnd(applicationEndObj);
-    await().atMost(20, SECONDS).until(() -> fakeApplicationListener1.getWorkload() != null);
-    assertThat(fakeApplicationListener1.getProcessedObjects().count()).isEqualTo(0);
+    assertThat(fakeApplicationListener.getProcessedObjects().isEmpty()).isTrue();
+    fakeApplicationListener.onApplicationEnd(applicationEndObj);
+    await().atMost(20, SECONDS).until(() -> fakeApplicationListener.getWorkload() != null);
+    assertThat(fakeApplicationListener.getProcessedObjects().count()).isEqualTo(0);
 
-    Workload workload = fakeApplicationListener1.getWorkload();
+    Workload workload = fakeApplicationListener.getWorkload();
     assertThat(workload.getTotalWorkflows()).isEqualTo(0);
     assertThat(workload.getTotalTasks()).isEqualTo(0);
     assertThat(workload.getNumUsers()).isEqualTo(-1L);
@@ -328,22 +301,22 @@ class ApplicationLevelListenerTest {
     stageBuffer.$plus$eq(testStageInfo1);
     stageBuffer.$plus$eq(testStageInfo2);
     SparkListenerJobStart jobStart = new SparkListenerJobStart(0, 2L, stageBuffer.toList(), new Properties());
-    fakeTaskListener1.onJobStart(jobStart);
-    fakeStageListener1.onJobStart(jobStart);
-    fakeTaskListener1.onTaskEnd(taskEndEvent1);
-    fakeTaskListener1.onTaskEnd(taskEndEvent2);
-    fakeStageListener1.onStageCompleted(stageCompleted1);
-    fakeTaskListener1.onTaskEnd(taskEndEvent3);
-    fakeTaskListener1.onTaskEnd(taskEndEvent4);
-    fakeStageListener1.onStageCompleted(stageCompleted2);
+    fakeTaskListener.onJobStart(jobStart);
+    fakeStageListener.onJobStart(jobStart);
+    fakeTaskListener.onTaskEnd(taskEndEvent1);
+    fakeTaskListener.onTaskEnd(taskEndEvent2);
+    fakeStageListener.onStageCompleted(stageCompleted1);
+    fakeTaskListener.onTaskEnd(taskEndEvent3);
+    fakeTaskListener.onTaskEnd(taskEndEvent4);
+    fakeStageListener.onStageCompleted(stageCompleted2);
 
-    assertThat(fakeApplicationListener1.getProcessedObjects().isEmpty()).isTrue();
-    fakeApplicationListener1.onApplicationEnd(applicationEndObj);
-    await().atMost(20, SECONDS).until(() -> fakeApplicationListener1.getWorkload() != null);
+    assertThat(fakeApplicationListener.getProcessedObjects().isEmpty()).isTrue();
+    fakeApplicationListener.onApplicationEnd(applicationEndObj);
+    await().atMost(20, SECONDS).until(() -> fakeApplicationListener.getWorkload() != null);
 
-    assertThat(fakeApplicationListener1.getProcessedObjects().count()).isEqualTo(0);
+    assertThat(fakeApplicationListener.getProcessedObjects().count()).isEqualTo(0);
 
-    Workload workload = fakeApplicationListener1.getWorkload();
+    Workload workload = fakeApplicationListener.getWorkload();
     assertThat(workload.getMeanEnergy()).isEqualTo(-1.0);
     assertThat(workload.getMeanMemory()).isEqualTo(-1.0);
     assertThat(workload.getMeanResourceTask()).isEqualTo(-1.0);
@@ -357,16 +330,16 @@ class ApplicationLevelListenerTest {
     ListBuffer<StageInfo> stageBuffer = new ListBuffer<>();
     stageBuffer.$plus$eq(testStageInfo2);
     SparkListenerJobStart jobStart = new SparkListenerJobStart(0, 2L, stageBuffer.toList(), new Properties());
-    fakeTaskListener1.onJobStart(jobStart);
-    fakeStageListener1.onJobStart(jobStart);
-    fakeStageListener1.onStageCompleted(stageCompleted2);
+    fakeTaskListener.onJobStart(jobStart);
+    fakeStageListener.onJobStart(jobStart);
+    fakeStageListener.onStageCompleted(stageCompleted2);
 
-    assertThat(fakeApplicationListener1.getProcessedObjects().isEmpty()).isTrue();
-    fakeApplicationListener1.onApplicationEnd(applicationEndObj);
-    await().atMost(20, SECONDS).until(() -> fakeApplicationListener1.getWorkload() != null);
-    assertThat(fakeApplicationListener1.getProcessedObjects().count()).isEqualTo(0);
+    assertThat(fakeApplicationListener.getProcessedObjects().isEmpty()).isTrue();
+    fakeApplicationListener.onApplicationEnd(applicationEndObj);
+    await().atMost(20, SECONDS).until(() -> fakeApplicationListener.getWorkload() != null);
+    assertThat(fakeApplicationListener.getProcessedObjects().count()).isEqualTo(0);
 
-    Workload workload = fakeApplicationListener1.getWorkload();
+    Workload workload = fakeApplicationListener.getWorkload();
     assertThat(workload.getFirstQuartileResourceTask()).isEqualTo(-1);
     assertThat(workload.getMaxResourceTask()).isEqualTo(-1);
     assertThat(workload.getCovResourceTask()).isEqualTo(-1);
@@ -393,24 +366,24 @@ class ApplicationLevelListenerTest {
     SparkListenerJobStart jobStart1 = new SparkListenerJobStart(0, 2L, stageBuffer.toList(), new Properties());
     SparkListenerJobStart jobStart2 = new SparkListenerJobStart(1, 2L, stageBuffer.toList(), new Properties());
 
-    fakeTaskListener1.onJobStart(jobStart1);
-    fakeStageListener1.onJobStart(jobStart1);
-    fakeTaskListener1.onTaskEnd(taskEndEvent1);
-    fakeTaskListener1.onTaskEnd(taskEndEvent2);
-    fakeStageListener1.onStageCompleted(stageCompleted1);
-    assertThat(fakeApplicationListener1.getProcessedObjects().isEmpty()).isTrue();
-    fakeApplicationListener1.onApplicationEnd(applicationEndObj);
+    fakeTaskListener.onJobStart(jobStart1);
+    fakeStageListener.onJobStart(jobStart1);
+    fakeTaskListener.onTaskEnd(taskEndEvent1);
+    fakeTaskListener.onTaskEnd(taskEndEvent2);
+    fakeStageListener.onStageCompleted(stageCompleted1);
+    assertThat(fakeApplicationListener.getProcessedObjects().isEmpty()).isTrue();
+    fakeApplicationListener.onApplicationEnd(applicationEndObj);
     await().atMost(20, SECONDS)
-        .until(() -> fakeApplicationListener1.getProcessedObjects().count() == 0);
+        .until(() -> fakeApplicationListener.getProcessedObjects().count() == 0);
 
-    fakeTaskListener1.onJobStart(jobStart2);
-    fakeStageListener1.onJobStart(jobStart2);
-    fakeTaskListener1.onTaskEnd(taskEndEvent3);
-    fakeTaskListener1.onTaskEnd(taskEndEvent4);
-    fakeStageListener1.onStageCompleted(stageCompleted2);
-    assertThat(fakeApplicationListener1.getProcessedObjects().count()).isEqualTo(0);
-    fakeApplicationListener1.onApplicationEnd(applicationEndObj);
-    assertThat(fakeApplicationListener1.getProcessedObjects().count()).isEqualTo(0);
+    fakeTaskListener.onJobStart(jobStart2);
+    fakeStageListener.onJobStart(jobStart2);
+    fakeTaskListener.onTaskEnd(taskEndEvent3);
+    fakeTaskListener.onTaskEnd(taskEndEvent4);
+    fakeStageListener.onStageCompleted(stageCompleted2);
+    assertThat(fakeApplicationListener.getProcessedObjects().count()).isEqualTo(0);
+    fakeApplicationListener.onApplicationEnd(applicationEndObj);
+    assertThat(fakeApplicationListener.getProcessedObjects().count()).isEqualTo(0);
   }
 
   @Test
@@ -423,10 +396,10 @@ class ApplicationLevelListenerTest {
         .thenReturn(List.of(new ResourceAndStateWrapper(resource, new Stream<>(resourceState))));
     ApplicationLevelListener listener = new ApplicationLevelListener(
         mockedSparkContext2,
-        fakeConfig1,
-        fakeTaskListener1,
-        fakeStageListener1,
-        fakeJobListener1,
+        fakeConfig,
+        fakeTaskListener,
+        fakeStageListener,
+        fakeJobListener,
         sparkDataSource,
         streamingEngine,
         writer);
@@ -459,6 +432,33 @@ class ApplicationLevelListenerTest {
   }
 
   @Test
+  void computeMax() {
+    ApplicationLevelListener listener = mock(ApplicationLevelListener.class);
+    when(listener.computeMax(any(Stream.class))).thenCallRealMethod();
+    List<Double> maxList = List.of(-1.0, 0.0, 0.1, -0.03, 24.5, 891.0);
+    Stream<Double> maxStream = new Stream<>(maxList);
+    assertThat(listener.computeMax(maxStream)).isEqualTo(891.0);
+  }
+
+  @Test
+  void computeMaxWithZero() {
+    ApplicationLevelListener listener = mock(ApplicationLevelListener.class);
+    when(listener.computeMax(any(Stream.class))).thenCallRealMethod();
+    List<Double> maxList = List.of(-1.0, 0.0, -0.1, -0.03, -1.0, -891.0);
+    Stream<Double> maxStream = new Stream<>(maxList);
+    assertThat(listener.computeMax(maxStream)).isEqualTo(0.0);
+  }
+
+  @Test
+  void computeMaxWithOnlyNegative() {
+    ApplicationLevelListener listener = mock(ApplicationLevelListener.class);
+    when(listener.computeMax(any(Stream.class))).thenCallRealMethod();
+    List<Double> maxList = List.of(-2.0, -19.2, -0.1, -0.03, -1.0, -891.0);
+    Stream<Double> maxStream = new Stream<>(maxList);
+    assertThat(listener.computeMax(maxStream)).isEqualTo(-0.03);
+  }
+
+  @Test
   void computeMeanWithZero() {
     ApplicationLevelListener listener = mock(ApplicationLevelListener.class);
     when(listener.computeMean(any(Stream.class), anyLong())).thenCallRealMethod();
@@ -483,5 +483,56 @@ class ApplicationLevelListenerTest {
     List<Double> meanList = List.of(1.0, 2.0, 3.0);
     Stream<Double> meanStream = new Stream<>(meanList);
     assertThat(listener.computeMean(meanStream, 3)).isEqualTo(2.0);
+  }
+
+  @Test
+  void aggregateMetricsFalseSetsDefaultAggregationValues() {
+    fakeConfig = RuntimeConfig.builder()
+        .authors(new String[] {"Harry Potter"})
+        .domain(Domain.SCIENTIFIC)
+        .isStageLevel(false)
+        .description("Yer a wizard harry")
+        .aggregateMetrics(false)
+        .build();
+    fakeTaskListener = new TaskLevelListener(mockedSparkContext, fakeConfig);
+    fakeStageListener = new StageLevelListener(mockedSparkContext, fakeConfig);
+    fakeJobListener = new JobLevelListener(mockedSparkContext, fakeConfig, fakeTaskListener, fakeStageListener);
+
+    fakeApplicationListener = new ApplicationLevelListener(
+        mockedSparkContext,
+        fakeConfig,
+        fakeTaskListener,
+        fakeStageListener,
+        fakeJobListener,
+        sparkDataSource,
+        mock(MetricStreamingEngine.class),
+        mock(WtaWriter.class));
+
+    ListBuffer<StageInfo> stageBuffer = new ListBuffer<>();
+    stageBuffer.$plus$eq(testStageInfo1);
+    stageBuffer.$plus$eq(testStageInfo2);
+    SparkListenerJobStart jobStart = new SparkListenerJobStart(0, 2L, stageBuffer.toList(), new Properties());
+    fakeTaskListener.onJobStart(jobStart);
+    fakeStageListener.onJobStart(jobStart);
+    fakeTaskListener.onTaskEnd(taskEndEvent1);
+    fakeTaskListener.onTaskEnd(taskEndEvent2);
+    fakeStageListener.onStageCompleted(stageCompleted1);
+    fakeTaskListener.onTaskEnd(taskEndEvent3);
+    fakeTaskListener.onTaskEnd(taskEndEvent4);
+    fakeStageListener.onStageCompleted(stageCompleted2);
+
+    assertThat(fakeApplicationListener.getProcessedObjects().isEmpty()).isTrue();
+    fakeApplicationListener.onApplicationEnd(applicationEndObj);
+    await().atMost(20, SECONDS).until(() -> fakeApplicationListener.getWorkload() != null);
+
+    assertThat(fakeApplicationListener.getProcessedObjects().count()).isEqualTo(0);
+
+    Workload workload = fakeApplicationListener.getWorkload();
+    assertThat(workload.getMeanEnergy()).isEqualTo(-1.0);
+    assertThat(workload.getMeanMemory()).isEqualTo(-1.0);
+    assertThat(workload.getMeanResourceTask()).isEqualTo(-1.0);
+    assertThat(workload.getMeanNetworkUsage()).isEqualTo(-1.0);
+    assertThat(workload.getMeanDiskSpaceUsage()).isEqualTo(-1.0);
+    assertThat(workload.getTotalResourceSeconds()).isEqualTo(-1.0);
   }
 }

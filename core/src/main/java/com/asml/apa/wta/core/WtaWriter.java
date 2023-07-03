@@ -26,7 +26,9 @@ import lombok.extern.slf4j.Slf4j;
 public class WtaWriter {
 
   private final OutputFile file;
+
   private final String schemaVersion;
+
   private final Map<Class<? extends BaseTraceObject>, String> parquetLabels = Map.of(
       Resource.class, "resources",
       ResourceState.class, "resource_states",
@@ -36,22 +38,21 @@ public class WtaWriter {
   /**
    * Sets up a WTA writer for the specified output path and version.
    *
-   * @param path the output path to write to
-   * @param version the version of files to write
-   * @param toolVersion the version of the tool that writes to file
-   * @author Atour Mousavi Gourabi
+   * @param path          output path to write to
+   * @param version       version of files to write
+   * @param currentTime   current time in milliseconds
+   * @param toolVersion   version of the tool that writes to file
    * @since 1.0.0
    */
-  public WtaWriter(@NonNull OutputFile path, String version, String toolVersion) {
-    file = path.resolve(toolVersion);
+  public WtaWriter(@NonNull OutputFile path, String version, String currentTime, String toolVersion) {
+    file = path.resolve(currentTime).resolve(toolVersion);
     schemaVersion = version;
   }
 
   /**
    * Writes a {@link Workload} to the corresponding JSON file.
    *
-   * @param workload the workload to write
-   * @author Atour Mousavi Gourabi
+   * @param workload      {@link Workload} to write
    * @since 1.0.0
    */
   public void write(Workload workload) {
@@ -66,10 +67,9 @@ public class WtaWriter {
   /**
    * Writes a {@link Stream} of WTA objects to their corresponding Parquet file.
    *
-   * @param clazz the class of WTA objects to write
-   * @param wtaObjects the WTA objects to write
-   * @param <T> type parameter for the type of WTA object to write, should extend {@link BaseTraceObject}
-   * @author Atour Mousavi Gourabi
+   * @param clazz         class of WTA objects to write
+   * @param wtaObjects    WTA objects to write
+   * @param <T>           type parameter for the type of WTA object to write, should extend {@link BaseTraceObject}
    * @since 1.0.0
    */
   public <T extends BaseTraceObject> void write(Class<T> clazz, Stream<T> wtaObjects) {
@@ -94,8 +94,7 @@ public class WtaWriter {
   /**
    * Creates a Workload json writer.
    *
-   * @return JsonWriter a json writer that writes the workload json file
-   * @author Lohithsai Yadala Chanchu
+   * @return            {@link JsonWriter} that writes the workload json file
    * @since 1.0.0
    */
   protected JsonWriter<Workload> createWorkloadWriter() throws IOException {

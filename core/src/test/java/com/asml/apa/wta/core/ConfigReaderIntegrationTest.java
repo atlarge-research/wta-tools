@@ -30,6 +30,7 @@ class ConfigReaderIntegrationTest {
     assertThat(cr.getExecutorSynchronizationInterval()).isEqualTo(4000);
     assertThat(cr.isStageLevel()).isEqualTo(true);
     assertThat(cr.getOutputPath()).isEqualTo("/home/user/WTA");
+    assertThat(cr.isAggregateMetrics()).isTrue();
   }
 
   @Test
@@ -67,16 +68,6 @@ class ConfigReaderIntegrationTest {
   }
 
   @Test
-  void readsConfigFileWhereLogSettingIsNotThere() {
-    RuntimeConfig cr = RuntimeConfig.readConfig("src/test/resources/testConfigNoLogSettings.json");
-    assertThat(cr.getAuthors()).isEqualTo(new String[] {"Test Name"});
-    assertThat(cr.getDomain()).isEqualTo(Domain.INDUSTRIAL);
-    assertThat(cr.getDescription()).isEqualTo("Test Description");
-    assertThat(cr.isStageLevel()).isEqualTo(true);
-    assertThat(cr.getOutputPath()).isEqualTo("/home/user/WTA");
-  }
-
-  @Test
   void readsConfigFileWithInvalidDomain() {
     assertThatThrownBy(() -> RuntimeConfig.readConfig("src/test/resources/testConfigInvalidDomain.json"))
         .isInstanceOf(IllegalArgumentException.class);
@@ -95,5 +86,26 @@ class ConfigReaderIntegrationTest {
     assertThat(cr.getDomain()).isEqualTo(Domain.SCIENTIFIC);
     assertThat(cr.getDescription()).isEqualTo("Test Description");
     assertThat(cr.isStageLevel()).isEqualTo(false);
+  }
+
+  @Test
+  void readsConfigFileWhereAggregateMetricsIsNotThereDefaultsToFalse() {
+    RuntimeConfig cr = RuntimeConfig.readConfig("src/test/resources/testConfigNoIsStageLevel.json");
+    assertThat(cr.isAggregateMetrics()).isFalse();
+  }
+
+  @Test
+  void stringNumbersAutoParsedToIntAndViceVersa() {
+    RuntimeConfig cr = RuntimeConfig.readConfig("src/test/resources/testConfigInvalidValues.json");
+    assertThat(cr.getResourcePingInterval()).isEqualTo(2000);
+    assertThat(cr.getExecutorSynchronizationInterval()).isEqualTo(2000);
+    assertThat(cr.getDescription()).isEqualTo("13");
+  }
+
+  @Test
+  void unparseableStringBooleansSetsToDefaultValues() {
+    RuntimeConfig cr = RuntimeConfig.readConfig("src/test/resources/testConfigInvalidValues.json");
+    assertThat(cr.isStageLevel()).isFalse();
+    assertThat(cr.isAggregateMetrics()).isFalse();
   }
 }

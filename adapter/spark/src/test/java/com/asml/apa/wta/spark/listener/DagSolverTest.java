@@ -4,12 +4,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.asml.apa.wta.core.WtaWriter;
 import com.asml.apa.wta.core.config.RuntimeConfig;
 import com.asml.apa.wta.core.model.Domain;
 import com.asml.apa.wta.core.model.Task;
 import com.asml.apa.wta.spark.datasource.SparkDataSource;
-import com.asml.apa.wta.spark.stream.MetricStreamingEngine;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -26,43 +24,37 @@ import scala.Tuple2;
 
 class DagSolverTest {
 
-  protected SparkContext mockedSparkContext;
+  private SparkContext mockedSparkContext;
 
-  protected ResourceProfileManager mockedResourceProfileManager;
+  private ResourceProfileManager mockedResourceProfileManager;
 
-  protected ResourceProfile mockedResource;
+  private ResourceProfile mockedResource;
 
-  protected scala.collection.immutable.Map<String, TaskResourceRequest> mapResource;
+  private scala.collection.immutable.Map<String, TaskResourceRequest> mapResource;
 
-  protected SparkContext mockedSparkContext2;
+  private SparkContext mockedSparkContext2;
 
-  protected ResourceProfileManager mockedResourceProfileManager2;
+  private ResourceProfileManager mockedResourceProfileManager2;
 
-  protected ResourceProfile mockedResource2;
+  private ResourceProfile mockedResource2;
 
-  protected scala.collection.immutable.Map<String, TaskResourceRequest> mapResource2;
+  private scala.collection.immutable.Map<String, TaskResourceRequest> mapResource2;
 
-  protected RuntimeConfig fakeConfig1;
+  private RuntimeConfig fakeConfig1;
 
-  protected RuntimeConfig fakeConfig2;
+  private TaskLevelListener fakeTaskListener1;
 
-  protected TaskLevelListener fakeTaskListener1;
-  protected StageLevelListener fakeStageListener1;
-  protected JobLevelListener fakeJobListener1;
-  protected ApplicationLevelListener fakeApplicationListener1;
+  private StageLevelListener fakeStageListener1;
 
-  protected TaskLevelListener fakeTaskListener2;
-  protected StageLevelListener fakeStageListener2;
-  protected JobLevelListener fakeJobListener2;
-  protected ApplicationLevelListener fakeApplicationListener2;
+  private JobLevelListener fakeJobListener1;
 
-  TaskLevelListener mockedListener1;
+  private TaskLevelListener mockedListener1;
 
-  TaskLevelListener mockedListener2;
+  private TaskLevelListener mockedListener2;
 
-  List<Task> stages1;
+  private List<Task> stages1;
 
-  List<Task> stages2;
+  private List<Task> stages2;
 
   @BeforeEach
   void init() {
@@ -98,7 +90,6 @@ class DagSolverTest {
         .isStageLevel(false)
         .description("Yer a wizard harry")
         .build();
-    fakeStageListener1 = new StageLevelListener(mockedSparkContext, fakeConfig1);
 
     fakeTaskListener1 = new TaskLevelListener(mockedSparkContext, fakeConfig1);
 
@@ -112,39 +103,6 @@ class DagSolverTest {
     when(sparkDataSource.getStageLevelListener()).thenReturn(mock(StageLevelListener.class));
     when(sparkDataSource.getJobLevelListener()).thenReturn(mock(JobLevelListener.class));
 
-    fakeApplicationListener1 = new ApplicationLevelListener(
-        mockedSparkContext,
-        fakeConfig1,
-        fakeTaskListener1,
-        fakeStageListener1,
-        fakeJobListener1,
-        sparkDataSource,
-        mock(MetricStreamingEngine.class),
-        mock(WtaWriter.class));
-
-    fakeConfig2 = RuntimeConfig.builder()
-        .authors(new String[] {"Harry Potter"})
-        .domain(Domain.SCIENTIFIC)
-        .isStageLevel(true)
-        .description("Yer a wizard harry")
-        .build();
-
-    fakeTaskListener2 = new TaskLevelListener(mockedSparkContext2, fakeConfig2);
-
-    fakeStageListener2 = new StageLevelListener(mockedSparkContext2, fakeConfig2);
-
-    fakeJobListener2 =
-        new JobLevelListener(mockedSparkContext2, fakeConfig2, fakeTaskListener2, fakeStageListener2);
-
-    fakeApplicationListener2 = new ApplicationLevelListener(
-        mockedSparkContext2,
-        fakeConfig2,
-        fakeTaskListener2,
-        fakeStageListener2,
-        fakeJobListener2,
-        sparkDataSource,
-        mock(MetricStreamingEngine.class),
-        mock(WtaWriter.class));
     Task mockedTask1 = mock(Task.class);
     when(mockedTask1.getRuntime()).thenReturn(1L);
     Task mockedTask2 = mock(Task.class);

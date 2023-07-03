@@ -14,7 +14,6 @@ import java.io.Serializable;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Instant;
-import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -44,8 +43,133 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class Stream<V extends Serializable> implements Cloneable {
 
+  private class FilteredStream extends Stream<V> {
+
+    private final Predicate<V> predicate;
+    private boolean applied;
+
+    private FilteredStream(Predicate<V> filter) {
+      super(
+          diskLocations,
+          additionsSinceLastWriteToDisk,
+          serializationTrigger,
+          deserializationStart,
+          deserializationEnd,
+          head,
+          tail);
+      applied = false;
+      predicate = filter;
+    }
+
+    @Override
+    public synchronized Stream<V> filter(@NonNull Predicate<V> filter) {
+      if (applied) {
+        return new FilteredStream(filter);
+      }
+      return new FilteredStream(predicate.and(filter));
+    }
+
+    @Override
+    public synchronized V head() {
+      V elem = super.head();
+      while (!predicate.test(elem)) {
+        elem = super.head();
+      }
+      return elem;
+    }
+
+    @Override
+    public synchronized Optional<V> findFirst() {
+      super.forceFilter(predicate);
+      return super.findFirst();
+    }
+
+    @Override
+    public synchronized V peek() {
+      V elem = super.peek();
+      while (!predicate.test(elem)) {
+        super.head();
+        elem = super.peek();
+      }
+      return elem;
+    }
+
+    @Override
+    public synchronized long count() {
+      return super.countFilter(predicate);
+    }
+
+    @Override
+    public synchronized long countFilter(@NonNull Predicate<V> filter) {
+      return super.countFilter(predicate.and(filter));
+    }
+
+    @Override
+    public synchronized <R extends Serializable> Stream<R> map(@NonNull Function<V, R> mapper) {
+      if (!applied) {
+        super.forceFilter(predicate);
+        applied = true;
+      }
+      return super.map(mapper);
+    }
+
+    @Override
+    public synchronized void forEach(Consumer<? super V> consumer) {
+      if (!applied) {
+        super.forceFilter(predicate);
+        applied = true;
+      }
+      super.forEach(consumer);
+    }
+
+    @Override
+    public synchronized boolean isEmpty() {
+      if (!applied) {
+        super.forceFilter(predicate);
+        applied = true;
+      }
+      return super.isEmpty();
+    }
+
+    @Override
+    public synchronized void addToStream(V elem) {
+      if (!applied) {
+        super.forceFilter(predicate);
+        applied = true;
+      }
+      super.addToStream(elem);
+    }
+
+    @Override
+    public synchronized Optional<V> reduce(@NonNull BinaryOperator<V> accumulator) {
+      if (!applied) {
+        super.forceFilter(predicate);
+        applied = true;
+      }
+      return super.reduce(accumulator);
+    }
+
+    @Override
+    public synchronized List<V> toList() {
+      if (!applied) {
+        super.forceFilter(predicate);
+        applied = true;
+      }
+      return super.toList();
+    }
+
+    @Override
+    public synchronized <R> R foldLeft(R init, @NonNull BiFunction<R, V, R> op) {
+      if (!applied) {
+        super.forceFilter(predicate);
+        applied = true;
+      }
+      return super.foldLeft(init, op);
+    }
+  }
+
   /**
-   * Internal node of the {@link com.asml.apa.wta.core.stream.Stream}.
+   * Internal node of the {@link Stream}.
    *
    * @author Atour Mousavi Gourabi
    * @since 1.0.0
@@ -63,8 +187,7 @@ public class Stream<V extends Serializable> implements Cloneable {
     /**
      * Constructs a node.
      *
-     * @param content the content of this {@link com.asml.apa.wta.core.stream.Stream.StreamNode}
-     * @author Atour Mousavi Gourabi
+     * @param content     content of this {@link StreamNode}
      * @since 1.0.0
      */
     StreamNode(V content) {
@@ -77,22 +200,42 @@ public class Stream<V extends Serializable> implements Cloneable {
   private UUID id;
 
   private Queue<String> diskLocations;
+
   private int additionsSinceLastWriteToDisk;
-  private final int serializationTrigger;
+
+  private int serializationTrigger;
 
   private StreamNode<V> deserializationStart;
+
   private StreamNode<V> deserializationEnd;
 
   private StreamNode<V> head;
+
   private StreamNode<V> tail;
+
+  private Stream(
+      Queue<String> diskQueue,
+      int additionsSinceLastWrite,
+      int trigger,
+      StreamNode<V> start,
+      StreamNode<V> end,
+      StreamNode<V> headNode,
+      StreamNode<V> tailNode) {
+    id = UUID.randomUUID();
+    diskLocations = diskQueue;
+    additionsSinceLastWriteToDisk = additionsSinceLastWrite;
+    serializationTrigger = trigger;
+    deserializationStart = start;
+    deserializationEnd = end;
+    head = headNode;
+    tail = tailNode;
+  }
 
   /**
    * Constructs a stream with one element.
    *
-   * @param content the element to hold in the {@link com.asml.apa.wta.core.stream.Stream}
-   * @param serializationTrigger the amount of additions to the {@link com.asml.apa.wta.core.stream.Stream} after
-   *                             which serialization is triggered.
-   * @author Atour Mousavi Gourabi
+   * @param content               element to hold in the {@link Stream}
+   * @param serializationTrigger  amount of additions to the {@link Stream} after which serialization is triggered
    * @since 1.0.0
    */
   public Stream(V content, int serializationTrigger) {
@@ -110,8 +253,7 @@ public class Stream<V extends Serializable> implements Cloneable {
   /**
    * Constructs a stream with one element.
    *
-   * @param content the element to hold in the {@link com.asml.apa.wta.core.stream.Stream}
-   * @author Atour Mousavi Gourabi
+   * @param content       element to hold in the {@link Stream}
    * @since 1.0.0
    */
   public Stream(V content) {
@@ -121,7 +263,6 @@ public class Stream<V extends Serializable> implements Cloneable {
   /**
    * Constructs an empty stream.
    *
-   * @author Atour Mousavi Gourabi
    * @since 1.0.0
    */
   public Stream() {
@@ -139,8 +280,7 @@ public class Stream<V extends Serializable> implements Cloneable {
   /**
    * Constructs a {@link Stream} out of a {@link Collection}.
    *
-   * @param content the {@link Collection} to construct the {@link Stream} from
-   * @author Atour Mousavi Gourabi
+   * @param content     {@link Collection} to construct the {@link Stream} from
    * @since 1.0.0
    */
   public Stream(@NonNull Collection<V> content) {
@@ -150,10 +290,36 @@ public class Stream<V extends Serializable> implements Cloneable {
     }
   }
 
+  private void forceFilter(Predicate<V> predicate) {
+    log.trace("Consuming and applying filter on Stream {}.", id);
+    StreamNode<V> next = head;
+    Stream<V> ret = new Stream<>();
+    while (next != null) {
+      if (next.getNext() == null) {
+        deserializationStart = next;
+        deserializationEnd = null;
+      }
+      if (next == deserializationStart && !diskLocations.isEmpty()) {
+        head = next;
+        deserializeInternals(diskLocations.poll());
+      }
+      if (predicate.test(next.getContent())) {
+        ret.addToStream(next.getContent());
+      }
+      next = next.getNext();
+    }
+    head = ret.head;
+    tail = ret.tail;
+    deserializationStart = ret.deserializationStart;
+    deserializationEnd = ret.deserializationEnd;
+    diskLocations = ret.diskLocations;
+    additionsSinceLastWriteToDisk = ret.additionsSinceLastWriteToDisk;
+    serializationTrigger = ret.serializationTrigger;
+  }
+
   /**
    * Serializes the internals of the stream.
    *
-   * @author Atour Mousavi Gourabi
    * @since 1.0.0
    */
   private synchronized void serializeInternals() {
@@ -183,9 +349,9 @@ public class Stream<V extends Serializable> implements Cloneable {
   /**
    * Deserializes the internals of the stream on demand.
    *
-   * @param filePath the chunk of internals to deserialize, to not be {@code null}
-   * @throws FailedToDeserializeStreamException if an exception occurred when deserializing this batch of the stream
-   * @author Atour Mousavi Gourabi
+   * @param filePath        chunk of internals to deserialize, to not be {@code null}
+   * @throws FailedToDeserializeStreamException
+   *                        if an exception occurred when deserializing this batch of the stream
    * @since 1.0.0
    */
   private synchronized void deserializeInternals(String filePath) {
@@ -216,16 +382,16 @@ public class Stream<V extends Serializable> implements Cloneable {
   /**
    * Clones the {@link Stream}. Creates a shallow copy, so it points to the same elements.
    *
-   * @return a shallow copy of the current {@link Stream}
-   * @author Atour Mousavi Gourabi
+   * @return      shallow copy of the current {@link Stream}
+   * @throws FailedToSerializeStreamException
+   *              if an exception occurred when serializing the stream
    * @since 1.0.0
    */
   public synchronized Stream<V> copy() {
     try {
       Stream<V> clone = (Stream<V>) super.clone();
       clone.id = UUID.randomUUID();
-      clone.diskLocations = new ArrayDeque<>();
-      clone.diskLocations.addAll(diskLocations);
+      clone.diskLocations = new ConcurrentLinkedDeque<>(diskLocations);
       return clone;
     } catch (CloneNotSupportedException e) {
       log.error("Could not clone Stream because {}.", e.getMessage());
@@ -237,11 +403,10 @@ public class Stream<V extends Serializable> implements Cloneable {
    * Checks whether the stream is empty.
    *
    * @return {@code true} when this {@link com.asml.apa.wta.core.stream.Stream} is empty, {@code false} when it is not
-   * @author Atour Mousavi Gourabi
    * @since 1.0.0
    */
   public boolean isEmpty() {
-    log.trace("Checking whether stream {} is empty.", id);
+    log.trace("Checking whether Stream {} is empty.", id);
     return head == null;
   }
 
@@ -249,8 +414,7 @@ public class Stream<V extends Serializable> implements Cloneable {
    * Gets an {@link Optional} containing the head of the {@link Stream} if present.
    * If not, it returns an empty {@link Optional}. Consumes the element it returns.
    *
-   * @return the head of the {@link Stream} wrapped in an {@link Optional} if present
-   * @author Atour Mousavi Gourabi
+   * @return        head of the {@link Stream} wrapped in an {@link Optional} if present
    * @since 1.0.0
    */
   public synchronized Optional<V> findFirst() {
@@ -263,11 +427,11 @@ public class Stream<V extends Serializable> implements Cloneable {
   /**
    * Retrieves the head of the stream, which is then removed.
    *
-   * @return the head of the {@link com.asml.apa.wta.core.stream.Stream}
-   * @throws FailedToDeserializeStreamException when some error occurred during routine deserialization of parts of
-   *                                            the {@link com.asml.apa.wta.core.stream.Stream}
-   * @throws NoSuchElementException when head is called on an empty {@link com.asml.apa.wta.core.stream.Stream}
-   * @author Atour Mousavi Gourabi
+   * @return        head of the {@link Stream}
+   * @throws FailedToDeserializeStreamException
+   *                when some error occurred during routine deserialization of parts of the {@link Stream}
+   * @throws NoSuchElementException
+   *                when head is called on an empty {@link Stream}
    * @since 1.0.0
    */
   public synchronized V head() {
@@ -302,9 +466,8 @@ public class Stream<V extends Serializable> implements Cloneable {
    * If the specified amount of elements is larger than the size of the {@link Stream},
    * the {@link Stream} will be fully emptied. Consumes the {@link Stream}.
    *
-   * @param amount the amount of elements to drop from the {@link Stream}
-   * @return the {@link Stream} after the elements were dropped
-   * @author Atour Mousavi Gourabi
+   * @param amount    amount of elements to drop from the {@link Stream}
+   * @return          {@link Stream} after the elements were dropped
    * @since 1.0.0
    */
   public synchronized Stream<V> drop(long amount) {
@@ -332,9 +495,9 @@ public class Stream<V extends Serializable> implements Cloneable {
   /**
    * Peeks at the head of the stream.
    *
-   * @return the head of the {@link com.asml.apa.wta.core.stream.Stream}
-   * @throws NoSuchElementException when peek is called on an empty {@link com.asml.apa.wta.core.stream.Stream}
-   * @author Atour Mousavi Gourabi
+   * @return        head of the {@link Stream}
+   * @throws NoSuchElementException
+   *                when peek is called on an empty {@link Stream}
    * @since 1.0.0
    */
   public synchronized V peek() {
@@ -352,12 +515,10 @@ public class Stream<V extends Serializable> implements Cloneable {
   /**
    * Adds content to the stream.
    *
-   * @param content the content to add to this {@link com.asml.apa.wta.core.stream.Stream}
-   * @author Atour Mousavi Gourabi
+   * @param content       content to add to this {@link Stream}
    * @since 1.0.0
    */
   public synchronized void addToStream(V content) {
-    log.trace("Added content to stream {}", this.id);
     if (head == null) {
       head = new StreamNode<>(content);
       tail = head;
@@ -378,18 +539,18 @@ public class Stream<V extends Serializable> implements Cloneable {
           additionsSinceLastWriteToDisk);
       serializeInternals();
     }
+    log.trace("Added content to stream {}", id);
   }
 
   /**
    * Returns a stream that maps all elements in this stream using the given function. Consumes the
    * stream.
    *
-   * @param op the operation to perform over the {@link com.asml.apa.wta.core.stream.Stream}
-   * @param <R> generic return type of the mapping operation
-   * @return the mapped stream
-   * @throws FailedToDeserializeStreamException when some error occurred during routine deserialization of parts
-   *                                            of the {@link com.asml.apa.wta.core.stream.Stream}
-   * @author Atour Mousavi Gourabi
+   * @param op      operation to perform over the {@link Stream}
+   * @param <R>     generic return type of the mapping operation
+   * @return        mapped stream
+   * @throws FailedToDeserializeStreamException
+   *                when some error occurred during routine deserialization of parts
    * @since 1.0.0
    */
   public synchronized <R extends Serializable> Stream<R> map(@NonNull Function<V, R> op) {
@@ -419,17 +580,32 @@ public class Stream<V extends Serializable> implements Cloneable {
    * Returns a stream that filters all elements in this stream using the given predicate. Consumes
    * the stream.
    *
-   * @param predicate the predicate used for filtering, elements that return false get filtered out
-   * @return the filtered {@link com.asml.apa.wta.core.stream.Stream}
-   * @throws FailedToDeserializeStreamException when some error occurred during routine deserialization of parts
-   *                                            of the {@link com.asml.apa.wta.core.stream.Stream}
-   * @author Atour Mousavi Gourabi
+   * @param predicate       predicate used for filtering, elements that return false get filtered out
+   * @return                filtered {@link Stream}
+   * @throws FailedToDeserializeStreamException
+   *                        when some error occurred during routine deserialization of parts
    * @since 1.0.0
    */
   public synchronized Stream<V> filter(@NonNull Predicate<V> predicate) {
-    log.trace("Consuming and applying filter on stream {}", this.id);
+    Stream<V> ret = new FilteredStream(predicate);
+    head = null;
+    tail = null;
+    deserializationStart = null;
+    deserializationEnd = null;
+    return ret;
+  }
+
+  /**
+   * Counts the elements that satisfy the given {@link Predicate}.
+   *
+   * @param predicate       {@link Predicate} for which to run the count
+   * @return                amount of elements that satisfy the {@link Predicate}
+   * @since 1.0.0
+   */
+  public synchronized long countFilter(@NonNull Predicate<V> predicate) {
+    log.trace("Consuming and applying filtered count on Stream {}.", id);
     StreamNode<V> next = head;
-    Stream<V> ret = new Stream<>();
+    long ret = 0;
     while (next != null) {
       if (next.getNext() == null) {
         deserializationStart = next;
@@ -440,7 +616,7 @@ public class Stream<V extends Serializable> implements Cloneable {
         deserializeInternals(diskLocations.poll());
       }
       if (predicate.test(next.getContent())) {
-        ret.addToStream(next.getContent());
+        ret++;
       }
       next = next.getNext();
     }
@@ -455,13 +631,12 @@ public class Stream<V extends Serializable> implements Cloneable {
    * Returns a stream that aggregates all elements in this stream using the given function and initial value
    * using a left fold. Consumes the stream.
    *
-   * @param init the initial value
-   * @param op the fold operation to perform over the {@link com.asml.apa.wta.core.stream.Stream}
-   * @param <R> generic return type of the fold operation
-   * @return the resulting accumulator
-   * @throws FailedToDeserializeStreamException when some error occurred during routine deserialization of parts of
-   *                                            the {@link com.asml.apa.wta.core.stream.Stream}
-   * @author Atour Mousavi Gourabi
+   * @param init      initial value
+   * @param op        fold operation to perform over the {@link Stream}
+   * @param <R>       generic return type of the fold operation
+   * @return          resulting accumulator
+   * @throws FailedToDeserializeStreamException
+   *                  when some error occurred during routine deserialization of parts of the {@link Stream}
    * @since 1.0.0
    */
   public synchronized <R> R foldLeft(R init, @NonNull BiFunction<R, V, R> op) {
@@ -490,9 +665,9 @@ public class Stream<V extends Serializable> implements Cloneable {
   /**
    * Reduces the {@link Stream} with the given accumulator. Consumes the stream.
    *
-   * @param accumulator the {@link BinaryOperator} to reduce the stream over
-   * @return the result of the reduction, an empty {@link Optional} if the {@link Stream} was empty
-   * @author Atour Mousavi Gourabi
+   * @param accumulator     {@link BinaryOperator} to reduce the stream over
+   * @return                result of the reduction, an empty {@link Optional} if the {@link Stream} was empty
+   * @since 1.0.0
    */
   public synchronized Optional<V> reduce(@NonNull BinaryOperator<V> accumulator) {
     if (head == null) {
@@ -519,9 +694,7 @@ public class Stream<V extends Serializable> implements Cloneable {
   /**
    * Converts the {@link Stream} to a {@link List}, and consumes the {@link Stream}.
    *
-   * @return a {@link List} with the {@link Stream}s elements
-   * @author Atour Mousavi Gourabi
-   * @author Henry Page
+   * @return          {@link List} with the {@link Stream}s elements
    * @since 1.0.0
    */
   public synchronized List<V> toList() {
@@ -550,8 +723,7 @@ public class Stream<V extends Serializable> implements Cloneable {
   /**
    * Performs the action for each element in the {@link Stream}. Consumes the {@link Stream}.
    *
-   * @param action the action to perform for all elements of the {@link Stream}
-   * @author Atour Mousavi Gourabi
+   * @param action      action to perform for all elements of the {@link Stream}
    * @since 1.0.0
    */
   public synchronized void forEach(Consumer<? super V> action) {
@@ -577,8 +749,7 @@ public class Stream<V extends Serializable> implements Cloneable {
   /**
    * Counts the number of elements in the {@link Stream}. Consumes the {@link Stream}.
    *
-   * @return the size of the {@link Stream}
-   * @author Atour Mousavi Gourabi
+   * @return      size of the {@link Stream}
    * @since 1.0.0
    */
   public synchronized long count() {
@@ -606,9 +777,8 @@ public class Stream<V extends Serializable> implements Cloneable {
   /**
    * Converts the {@link Stream} to an array, and consumes the {@link Stream}.
    *
-   * @param generator the generator of the array
-   * @return an array with the {@link Stream}s elements
-   * @author Atour Mousavi Gourabi
+   * @param generator   generator of the array
+   * @return            array with the {@link Stream}s elements
    * @since 1.0.0
    */
   public synchronized V[] toArray(IntFunction<V[]> generator) {
@@ -618,7 +788,6 @@ public class Stream<V extends Serializable> implements Cloneable {
   /**
    * Deletes all the generated stream files.
    *
-   * @author Lohithsai Yadala Chanchu
    * @since 1.0.0
    */
   public static synchronized void deleteAllSerializedFiles() {

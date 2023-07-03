@@ -7,7 +7,7 @@ import org.apache.avro.generic.GenericRecord;
 /**
  * BaseSchema interface that all schema objects implement.
  *
- * @author  Lohithsai Yadala Chanchu
+ * @author Lohithsai Yadala Chanchu
  * @since 1.0.0
  */
 public interface BaseTraceObject extends Serializable {
@@ -17,8 +17,7 @@ public interface BaseTraceObject extends Serializable {
   /**
    * Returns a hardcoded schema version.
    *
-   * @return The associated config object
-   * @author Lohithsai Yadala Chanchu
+   * @return        associated config object
    * @since 1.0.0
    */
   default String getSchemaVersion() {
@@ -29,16 +28,16 @@ public interface BaseTraceObject extends Serializable {
    * All WTA objects that are stored as Parquet files rely on this method to convert the object to a record.
    * It should build the record object based on the checker and the schema provided.
    *
-   * @param schema schema for the output object
-   * @return record of the object
+   * @param schema  schema for the output object
+   * @return        record of the object
+   * @since 1.0.0
    */
   GenericRecord convertToRecord(ParquetSchema schema);
 
   /**
    * Creates a simple {@link RuntimeException}.
    *
-   * @return a {@link RuntimeException} with a simple error message
-   * @author Atour Mousavi Gourabi
+   * @return        {@link RuntimeException} with a simple error message
    * @since 1.0.0
    */
   default RuntimeException accessError() {

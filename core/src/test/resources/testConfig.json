@@ -3,7 +3,8 @@
   "domain": "Scientific",
   "description": "Test Description",
   "outputPath": "/home/user/WTA",
-  "isStageLevel": "true",
+  "isStageLevel": true,
   "resourcePingInterval": 2000,
-  "executorSynchronizationInterval": 4000
+  "executorSynchronizationInterval": 4000,
+  "aggregateMetrics": true
 }

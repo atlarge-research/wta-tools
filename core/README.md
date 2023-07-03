@@ -63,3 +63,29 @@ HADOOP_HOME=path_to_Hadoop_bin/hadoop
 ```
 
 If you want to use a different executable, replace the Winutils.exe at `<project_directory>/core/resources/hadoop`
+
+### Trace Structure
+The generated traces will have the following directory structure:
+
+```
+<output_dir>
+    <timestamp>
+        <plugin_version>
+            workload
+                schema-1.0
+                    generic_information.json
+            workflows
+                schema-1.0
+                    workflows.parquet
+            tasks
+                schema-1.0
+                    tasks.parquet
+            resources
+                schema-1.0
+                    resources.parquet
+            resource_states
+                schema-1.0
+                    resource_states.parquet
+```
+
+<output_dir> is the output path specified in the *config.json* file, <timestamp> is the timestamp of the traces starting to generate, and <plugin_version> is the application version.

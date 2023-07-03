@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 
 class KthSmallestTest {
 
-  static KthSmallest kthSmallest;
+  private static KthSmallest kthSmallest;
 
   @BeforeAll
   static void setUp() {

@@ -26,9 +26,8 @@ public class KeyedStream<K, V extends Serializable> {
   /**
    * Add to the keyed stream.
    *
-   * @param key the record key
-   * @param record the record
-   * @author Atour Mousavi Gourabi
+   * @param key       record key
+   * @param record    record
    * @since 1.0.0
    */
   public void addToStream(K key, @NonNull V record) {
@@ -43,8 +42,7 @@ public class KeyedStream<K, V extends Serializable> {
   /**
    * Drops the elements associated to the given key from the {@link KeyedStream}.
    *
-   * @param key the key to remove the elements from
-   * @author Atour Mousavi Gourabi
+   * @param key       key to remove the elements from
    * @since 1.0.0
    */
   public void dropKey(K key) {
@@ -55,10 +53,9 @@ public class KeyedStream<K, V extends Serializable> {
    * Performs the mapping operation over the {@link KeyedStream} per key.
    * Consumes the {@link KeyedStream}.
    *
-   * @param mapper the mapping function, takes in the key and value of the element to map
-   * @param <R> the type parameter for the mapper's return type
-   * @return the result of the mapping operation
-   * @author Atour Mousavi Gourabi
+   * @param mapper    mapping function, takes in the key and value of the element to map
+   * @param <R>       type parameter for the mapper's return type
+   * @return          result of the mapping operation
    * @since 1.0.0
    */
   public <R> List<R> mapKeyList(@NonNull BiFunction<K, Stream<V>, R> mapper) {
@@ -72,9 +69,8 @@ public class KeyedStream<K, V extends Serializable> {
   /**
    * Get the message stream at a given key.
    *
-   * @param key the key
-   * @return the stream of objects with the provided key
-   * @author Atour Mousavi Gourabi
+   * @param key       key
+   * @return          stream of objects with the provided key
    * @since 1.0.0
    */
   public Stream<V> onKey(K key) {
