@@ -1,0 +1,108 @@
+unit-tests-core:
+  stage: test-core
+  needs: [build-core]
+  dependencies:
+    - build-core
+  script:
+    - echo "Core unit tests started"
+    - "mvn -pl core jacoco:prepare-agent surefire:test"
+    - "[ -f core/target/jacoco.exec ] && mv -f core/target/jacoco.exec core/target/jacoco-unit-tests.exec || echo '0' >/dev/null"
+  artifacts:
+    name: unit-tests-core
+    expire_in: 20 minutes
+    when: always
+    paths:
+      - core/target/jacoco-unit-tests.exec
+  cache:
+    - key:
+        prefix: test
+        files:
+          - pom.xml
+          - core/pom.xml
+      paths:
+        - .m2/repository
+
+integration-tests-core:
+  stage: test-core
+  image: $LINUX_TOOLING_IMAGE
+  needs: [build-linux-tooling-image, build-core]
+  dependencies:
+    - build-core
+  script:
+    - echo "Core integration tests started"
+    - apt-get install -y linux-tools-`uname -r`
+    - sysctl -w kernel.perf_event_paranoid=0
+    - "mvn -pl core jacoco:prepare-agent-integration failsafe:integration-test failsafe:verify"
+    - "[ -f core/target/jacoco-it.exec ] && mv -f core/target/jacoco-it.exec core/target/jacoco-integration-tests.exec || echo '0' >/dev/null"
+  artifacts:
+    name: integration-tests-core
+    expire_in: 20 minutes
+    when: always
+    paths:
+      - core/target/jacoco-integration-tests.exec
+  cache:
+    - key:
+        prefix: test
+        files:
+          - pom.xml
+          - core/pom.xml
+      paths:
+        - .m2/repository
+
+
+line-coverage-core:
+  stage: test-core
+  needs: [integration-tests-core, unit-tests-core, build-core]
+  dependencies:
+    - integration-tests-core
+    - unit-tests-core
+    - build-core
+  script:
+    - echo "Started creating core line coverage"
+    - "mvn -pl core jacoco:merge jacoco:report"
+    - "cat core/reports/jacoco/index.html | grep -Po 'Total.*?([0-9]{1,3})%' || echo '0%'"
+  coverage: /([0-9]{1,3})%/
+  artifacts:
+    name: line-coverage-core
+    expire_in: 3 hours
+    when: always
+    paths:
+      - core/reports/jacoco/
+      - core/target/jacoco.exec
+  cache:
+    - key:
+        prefix: maven
+        files:
+          - pom.xml
+          - core/pom.xml
+      paths:
+        - .m2/repository
+
+branch-coverage-core:
+  stage: test-core
+  needs: [line-coverage-core]
+  dependencies:
+    - line-coverage-core
+  script:
+    - echo "Started generating core branch coverage"
+    - "cat core/reports/jacoco/index.html | grep -Po '%.*?of.*?([0-9]{1,3})%' || echo '0%'"
+  coverage: /([0-9]{1,3})%/
+
+
+enforce-coverage-core:
+  stage: test-core
+  needs: [line-coverage-core, build-core]
+  dependencies:
+    - line-coverage-core
+    - build-core
+  script:
+    - echo "Started enforcing core test coverage"
+    - "mvn -pl core jacoco:check"
+  cache:
+    - key:
+        prefix: maven
+        files:
+          - pom.xml
+          - core/pom.xml
+      paths:
+        - .m2/repository

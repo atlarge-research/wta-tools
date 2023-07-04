@@ -1,0 +1,10 @@
+{
+  "authors": ["Test Name"],
+  "domain": "Scientific",
+  "description": "Test Description",
+  "outputPath": "/home/user/WTA",
+  "isStageLevel": true,
+  "resourcePingInterval": -1,
+  "executorSynchronizationInterval": 4000,
+  "aggregateMetrics": true
+}
