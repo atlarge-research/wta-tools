@@ -1,0 +1,91 @@
+### Intellij ###
+.idea/
+*.iml
+*.iws
+
+# Java
+# Compiled class file
+*.class
+
+# Log file
+logging
+logs
+*.log
+
+# BlueJ files
+*.ctxt
+
+# Package Files
+*.jar
+*.war
+*.nar
+*.ear
+*.zip
+*.tar.gz
+*.rar
+
+# Databases
+*.db
+
+# Gradle
+.gradle
+build/
+gradle-app.setting
+!gradle/wrapper/gradle-wrapper.jar
+**/build/
+.gradletasknamecache
+.gitattributes
+
+# Maven
+target/
+log/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
+# https://github.com/takari/maven-wrapper#usage-without-binary-jar
+.mvn/wrapper/maven-wrapper.jar
+
+# Eclipse m2e generated files
+# Eclipse Core
+.project
+# JDT-specific (Eclipse Java Development Tools)
+.classpath
+
+# Gemnasium
+gemnasium-maven-plugin.json
+
+# pipeline reports (JaCoCo, pit)
+reports
+
+# application configuration
+config.json
+
+# serialization files
+*.ser
+tmp
+
+# jqwik
+.jqwik-database
+
+# test output
+core/src/test/resources/WTA
+core/src/test/resources/AvroOutput
+adapter/spark/src/test/resources/WTA
+wta-output
+
+# DAS config files
+*.pyc
+submodules/benchmarking/das-bigdata-deployment/frameworks
+
+# wta-tools
+venv
+__pycache__
+*.cfg
+include
+lib
+bin

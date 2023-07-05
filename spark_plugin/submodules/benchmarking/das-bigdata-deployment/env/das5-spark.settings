@@ -1,0 +1,3 @@
+worker_instances=4
+worker_cores=1
+worker_memory=32g
