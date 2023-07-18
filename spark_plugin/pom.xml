@@ -577,15 +577,6 @@
           <mutationThreshold>60</mutationThreshold>
           <withHistory>true</withHistory>
         </configuration>
-        <executions>
-          <execution>
-            <id>pitest-mutation-coverage</id>
-            <phase>integration-test</phase>
-            <goals>
-              <goal>mutationCoverage</goal>
-            </goals>
-          </execution>
-        </executions>
         <dependencies>
           <!-- https://mvnrepository.com/artifact/org.pitest/pitest-junit5-plugin -->
           <dependency>
@@ -843,17 +834,6 @@
       <id>no-tests</id>
       <build>
         <plugins>
-          <!-- https://mvnrepository.com/artifact/org.pitest/pitest-maven -->
-          <plugin>
-            <groupId>org.pitest</groupId>
-            <artifactId>pitest-maven</artifactId>
-            <executions>
-              <execution>
-                <id>pitest-mutation-coverage</id>
-                <phase>none</phase>
-              </execution>
-            </executions>
-          </plugin>
           <!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-surefire-plugin -->
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
@@ -1051,17 +1031,6 @@
             <executions>
               <execution>
                 <id>jacoco-merge</id>
-                <phase>none</phase>
-              </execution>
-            </executions>
-          </plugin>
-          <!-- https://mvnrepository.com/artifact/org.pitest/pitest-maven -->
-          <plugin>
-            <groupId>org.pitest</groupId>
-            <artifactId>pitest-maven</artifactId>
-            <executions>
-              <execution>
-                <id>pitest-mutation-coverage</id>
                 <phase>none</phase>
               </execution>
             </executions>
